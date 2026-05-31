@@ -5,6 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Mobs now have an innate `armour` value (symmetric with players) that reduces
+  incoming physical damage: lightbug 0, gloom-crawler 1, deep-dweller 2.
+- Leather jerkin armour lowered from 2 to 1.
+
 ### Added
 - **Equipment management**: `equip`/`wield`/`wear <item>` equips from inventory and
   stows whatever was in that slot; `unequip`/`remove <item|slot>` returns gear to

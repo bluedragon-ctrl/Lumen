@@ -131,7 +131,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
     "id": "leather-jerkin", "name": "a leather jerkin",
     "description": "Stiff, abyss-cured hide.",
     "type": "armour", "slot": "body", "weight": 3,
-    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0 }
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
   "flint": {
     "id": "flint", "name": "a flint shard",
@@ -194,6 +194,7 @@ A map of `mobId → template`.
 | `id`,`name`,`description` | string | |
 | `maxHp`      | integer | Starting/full HP. |
 | `speed`      | integer | Action-point gain per tick (normal ≈ 12). |
+| `armour`     | integer?| Innate physical damage reduction (default 0), like a player's Armour. |
 | `attributes` | block   | `{ might, vitality, intellect, wits, perception }`. |
 | `perception` | block   | `{ blindBelow, harmedAbove }`. |
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
