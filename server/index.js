@@ -9,6 +9,7 @@ const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView } = require("./render");
 const { execute } = require("./commands");
+const accounts = require("./accounts");
 
 // ---------------------------------------------------------------------------
 // World + state
@@ -20,6 +21,12 @@ console.log(
   `[lumen] world loaded: ${Object.keys(world.rooms).length} rooms, ` +
     `${Object.keys(world.mobs).length} mob templates, ${Object.keys(world.items).length} items.`
 );
+
+// The default admin account is always present (auto-created if missing).
+if (!accounts.exists("admin")) {
+  accounts.save(state.createCharacter("admin", { isAdmin: true }));
+  console.log('[lumen] created default admin account ("admin").');
+}
 
 function send(ws, msg) {
   if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
@@ -58,15 +65,37 @@ const httpServer = http.createServer(serveClient);
 // ---------------------------------------------------------------------------
 const wss = new WebSocketServer({ server: httpServer });
 
-wss.on("connection", (ws) => {
-  const player = state.createPlayer(`Delver-${state.players.size + 1}`);
+function login(ws, rawName) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  for (const p of state.players.values()) {
+    if (p.name.toLowerCase() === v.name.toLowerCase())
+      return void send(ws, { type: "error", text: `"${p.name}" is already logged in.` });
+  }
+  if (!accounts.exists(v.name)) {
+    return void send(ws, {
+      type: "error",
+      text: `No delver named "${v.name}". Ask an admin to create your account.`,
+    });
+  }
+  const player = state.admit(accounts.load(v.name));
   ws.playerId = player.id;
   connections.set(player.id, ws);
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
 
-  send(ws, { type: "system", text: `Welcome to Lumen v${VERSION}, ${player.name}. Type "help".` });
+  send(ws, { type: "authenticated", name: player.name, admin: !!player.isAdmin });
+  send(ws, {
+    type: "system",
+    text: `Welcome to Lumen v${VERSION}, ${player.name}.${player.isAdmin ? " [admin]" : ""} Type "help".`,
+  });
   send(ws, buildPlayerView(state, player));
   send(ws, buildRoomView(state, player));
-  console.log(`[lumen] ${player.name} connected (${state.players.size} online).`);
+  console.log(`[lumen] ${player.name} logged in (${state.players.size} online).`);
+}
+
+wss.on("connection", (ws) => {
+  ws.playerId = null; // null until authenticated
+  send(ws, { type: "login-required", text: 'Enter your delver name (or "admin"):' });
 
   ws.on("message", (raw) => {
     let msg;
@@ -75,6 +104,13 @@ wss.on("connection", (ws) => {
     } catch {
       return void send(ws, { type: "error", text: "malformed message (expected JSON)" });
     }
+    // Login phase: the first input is the player's name.
+    if (!ws.playerId) {
+      const name = msg.type === "login" ? msg.name : msg.type === "command" ? msg.text : null;
+      if (name == null) return void send(ws, { type: "error", text: "Please enter your name." });
+      return void login(ws, name);
+    }
+    const player = state.players.get(ws.playerId);
     if (msg.type === "command" && typeof msg.text === "string") {
       sendAll(ws, execute(state, player, msg.text));
     } else {
@@ -83,9 +119,19 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    state.removePlayer(ws.playerId);
-    connections.delete(ws.playerId);
-    console.log(`[lumen] ${player.name} disconnected (${state.players.size} online).`);
+    if (ws.playerId) {
+      const player = state.players.get(ws.playerId);
+      if (player) {
+        try {
+          accounts.save(player);
+        } catch (e) {
+          console.error("[lumen] account save failed:", e.message);
+        }
+        console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
+      }
+      state.removePlayer(ws.playerId);
+      connections.delete(ws.playerId);
+    }
   });
 });
 
@@ -105,10 +151,12 @@ const tickTimer = setInterval(() => {
     }
   }
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
-    try {
-      state.snapshot();
-    } catch (e) {
-      console.error("[lumen] snapshot failed:", e.message);
+    for (const player of state.players.values()) {
+      try {
+        accounts.save(player);
+      } catch (e) {
+        console.error("[lumen] account save failed:", e.message);
+      }
     }
   }
 }, TICK_MS);
@@ -120,6 +168,13 @@ httpServer.listen(PORT, () => {
 function shutdown() {
   console.log("\n[lumen] shutting down…");
   clearInterval(tickTimer);
+  for (const player of state.players.values()) {
+    try {
+      accounts.save(player);
+    } catch (e) {
+      console.error("[lumen] account save failed:", e.message);
+    }
+  }
   wss.close();
   httpServer.close(() => process.exit(0));
 }

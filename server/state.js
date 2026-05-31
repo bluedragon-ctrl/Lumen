@@ -1,7 +1,4 @@
 "use strict";
-const fs = require("fs");
-const path = require("path");
-const { RUNTIME_DIR } = require("./config");
 const { effectiveLight } = require("./light");
 
 // Monotonic source of unique runtime ids. Every addressable runtime entity —
@@ -12,6 +9,11 @@ const { effectiveLight } = require("./light");
 // the highest id seen in the snapshot to avoid collisions.
 let nextEntityId = 1;
 const entityId = (prefix) => `${prefix}.${nextEntityId++}`;
+/** Raise the counter past an existing id (e.g. when loading a saved account). */
+function ensureIdAbove(id) {
+  const n = typeof id === "string" ? parseInt(id.split(".")[1], 10) : NaN;
+  if (!isNaN(n) && n >= nextEntityId) nextEntityId = n + 1;
+}
 
 /**
  * Create a runtime item instance from an authoring ItemRef (`{template, qty?, fuel?}`).
@@ -97,12 +99,17 @@ class GameState {
     return effectiveLight(room.ambientLight, outputs);
   }
 
-  /** Instantiate a fresh player from the static template. */
-  createPlayer(name) {
+  /**
+   * Build a fresh character from the static template. Returns plain player data;
+   * it is NOT added to the live world (that's `admit`). Used both for new
+   * accounts and the auto-created admin.
+   */
+  createCharacter(name, opts = {}) {
     const t = this.world.playerTemplate;
     const player = {
       id: entityId("player"),
       name,
+      isAdmin: !!opts.isAdmin,
       level: t.level,
       xp: t.xp,
       attributes: { ...t.attributes },
@@ -122,6 +129,18 @@ class GameState {
       player.equipment[slot] =
         tmplId == null ? null : makeItemInstance({ template: tmplId }, this.world);
     }
+    return player;
+  }
+
+  /**
+   * Admit a character (freshly created or loaded from an account) into the live
+   * world. Seeds the id counter past any ids it carries so a post-restart load
+   * can't collide with freshly minted ids.
+   */
+  admit(player) {
+    ensureIdAbove(player.id);
+    for (const inst of player.inventory || []) if (inst) ensureIdAbove(inst.id);
+    for (const inst of Object.values(player.equipment || {})) if (inst) ensureIdAbove(inst.id);
     this.players.set(player.id, player);
     return player;
   }
@@ -154,16 +173,6 @@ class GameState {
       this.rooms[id].light = this.computeRoomLight(id);
     }
     return events;
-  }
-
-  /** Persist a snapshot of dynamic state to disk (runtime dir, gitignored). */
-  snapshot() {
-    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
-    const data = {
-      tick: this.tick,
-      players: [...this.players.values()],
-    };
-    fs.writeFileSync(path.join(RUNTIME_DIR, "snapshot.json"), JSON.stringify(data, null, 2));
   }
 }
 
