@@ -41,11 +41,22 @@ function isHarmedByLight(perception, light) {
 
 /**
  * Can the actor see *clearly* — i.e. light is within its comfortable band
- * (bright enough to see, not so bright it's blinded by glare)? Used for combat
- * accuracy: clear sight → full hit chance, otherwise the actor is flailing.
+ * (bright enough to see, not so bright it's blinded by glare)?
  */
 function perceivesClearly(perception, light) {
   return canSee(perception, light) && !isHarmedByLight(perception, light);
+}
+
+/**
+ * Combat hit chance by visibility tier:
+ *   clear sight (within comfortable band) → 1.0
+ *   impaired (visible, but glare above harmedAbove) → 0.5
+ *   can't see the target at all (below blindBelow) → 0.05 (flailing)
+ */
+function hitChance(perception, light) {
+  if (!canSee(perception, light)) return 0.05;
+  if (isHarmedByLight(perception, light)) return 0.5;
+  return 1.0;
 }
 
 module.exports = {
@@ -57,4 +68,5 @@ module.exports = {
   canSee,
   isHarmedByLight,
   perceivesClearly,
+  hitChance,
 };

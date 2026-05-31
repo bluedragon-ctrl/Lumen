@@ -1,9 +1,6 @@
 "use strict";
-const { effectiveLight, perceivesClearly } = require("./light");
+const { effectiveLight, canSee, hitChance } = require("./light");
 const { rollDice } = require("./dice");
-
-// Swinging blind (target outside your comfortable light band) almost always whiffs.
-const BLIND_HIT_CHANCE = 0.05;
 
 /** The attacker's effective weapon: equipped hand weapon, or unarmed. */
 function weaponOf(world, player) {
@@ -28,10 +25,11 @@ function playerArmour(world, player) {
 
 const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
 
-/** Resolve one swing. Light gates accuracy; sighted → always hits. */
+/** Resolve one swing. Accuracy is gated by how well the attacker sees the target
+ *  (clear 100% / glare 50% / can't-see 5%). `sighted` drives miss-message wording. */
 function strike(attackerPerception, light, dice, attackerMightMod, targetArmour) {
-  const sighted = perceivesClearly(attackerPerception, light);
-  const hit = sighted || Math.random() < BLIND_HIT_CHANCE;
+  const hit = Math.random() < hitChance(attackerPerception, light);
+  const sighted = canSee(attackerPerception, light);
   if (!hit) return { hit: false, sighted, damage: 0 };
   const damage = Math.max(1, rollDice(dice) + attackerMightMod - targetArmour);
   return { hit: true, sighted, damage };
