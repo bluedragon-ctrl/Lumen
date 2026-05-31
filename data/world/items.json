@@ -17,6 +17,15 @@
     "weight": 2,
     "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1 }
   },
+  "short-sword": {
+    "id": "short-sword",
+    "name": "a short sword",
+    "description": "A plain, well-balanced short sword. Reliable steel.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
+  },
   "rusted-blade": {
     "id": "rusted-blade",
     "name": "a rusted blade",
@@ -24,7 +33,7 @@
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
-    "weapon": { "damage": { "physical": 4 }, "actionCost": 12 }
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
   },
   "leather-jerkin": {
     "id": "leather-jerkin",

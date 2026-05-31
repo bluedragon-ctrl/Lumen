@@ -13,6 +13,8 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+// Dice notation: "<count>d<sides>" with optional "+/-<flat>", or a plain integer.
+const DICE_RE = /^\d+d\d+([+-]\d+)?$|^\d+$/;
 
 function main() {
   const rooms = read("data/world/rooms.json");
@@ -34,6 +36,14 @@ function main() {
       if (!has(mobs, s.mob)) errs.push(`room ${id}: spawn references missing mob ${s.mob}`);
     for (const g of r.groundItems || [])
       if (!has(items, g.template)) errs.push(`room ${id}: groundItem missing template ${g.template}`);
+  }
+
+  for (const [id, it] of Object.entries(items)) {
+    if (it.type === "weapon" && it.weapon) {
+      for (const [kind, val] of Object.entries(it.weapon.damage || {}))
+        if (typeof val !== "string" || !DICE_RE.test(val))
+          errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
+    }
   }
 
   for (const [id, m] of Object.entries(mobs))

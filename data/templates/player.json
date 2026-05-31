@@ -11,5 +11,5 @@
     { "template": "torch", "fuel": 200 },
     { "template": "flint", "qty": 3 }
   ],
-  "startEquipment": { "hand": null, "body": "leather-jerkin", "light": null }
+  "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null }
 }

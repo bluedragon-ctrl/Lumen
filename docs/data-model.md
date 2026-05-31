@@ -114,11 +114,11 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
     "type": "light", "slot": "hand", "weight": 1,
     "light": { "output": 3, "fuelMax": 200, "burnPerTick": 1 }
   },
-  "rusted-blade": {
-    "id": "rusted-blade", "name": "a rusted blade",
-    "description": "Pitted iron, but it holds an edge.",
+  "short-sword": {
+    "id": "short-sword", "name": "a short sword",
+    "description": "A plain, well-balanced short sword.",
     "type": "weapon", "slot": "hand", "weight": 2,
-    "weapon": { "damage": { "physical": 4 }, "actionCost": 12 }
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
   },
   "leather-jerkin": {
     "id": "leather-jerkin", "name": "a leather jerkin",
@@ -142,9 +142,23 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `weight`     | number  | For future carry-capacity. |
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
 | `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. |
-| `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. |
+| `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
 | `armour`     | block?  | `{ armour, ward, speedPenalty }`. |
 | `consumable` | block?  | `{ effect, … }` (TBD with effects system). |
+
+### Dice notation
+
+Damage (and other rolled values) use standard dice notation as a **string**:
+
+```
+"<count>d<sides>"            e.g. "1d6"  →  roll one 6-sided die
+"<count>d<sides>+<flat>"     e.g. "2d4+1"
+"<count>d<sides>-<flat>"     e.g. "1d8-1"
+```
+
+A plain integer string (e.g. `"3"`) is also accepted as a constant. Attribute
+bonuses (e.g. Might added to physical damage) are applied by the combat system
+at resolution time — they are **not** baked into the weapon's dice string.
 
 ---
 
