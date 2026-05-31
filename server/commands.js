@@ -18,7 +18,7 @@ const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
 
 const HELP = [
   "Commands:",
-  "  look | l [target]     — view the room, or examine something",
+  "  look | examine | x [target] — view the room, or examine something",
   "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
   "  go <dir> | move <dir> — move",
   "  get | take <target>   — pick up an item",
@@ -257,6 +257,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return [];
     case "look":
     case "l":
+    case "examine":
+    case "exam":
+    case "x":
       return arg ? lookAt(state, player, arg) : [buildRoomView(state, player)];
     case "go":
     case "move": {

@@ -9,7 +9,7 @@ const { bandOf, canSee, isHarmedByLight } = require("./light");
 function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
-  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type };
+  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null };
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
     v.lit = !!inst.lit;

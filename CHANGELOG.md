@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Context-aware TAB completion**: the first word completes commands; the
+  argument completes from what that command can act on — `remove`→equipped gear,
+  `get`→ground items, `drop`/`equip`→inventory (equip only equippable),
+  `attack`→mobs here, `look`→everything examinable, `go`→exits, `light`→light
+  sources. `examine`/`x` added as aliases for `look`.
 - **Weighted mob AI**: each mob has an `actions` table and takes one weighted
   action per tick from those available — `attack`, `emote` (flavour lines),
   `move` (wander/flee to an adjacent room, carrying its light), or `idle`. Gives
