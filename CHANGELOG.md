@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- World-interaction commands: `get`/`take`, `drop`, `inventory` (stackables merge;
+  picking up requires light). Social: `say`, `emote`.
+- **Room-presence broadcasts**: other players in the room see speech, emotes,
+  arrivals/departures, and pick-ups/drops, and their room view refreshes when
+  contents change — the shared world now feels live with multiple delvers.
+
 ### Changed
 - Raised the **searing** threshold to `10+` (bright now spans `3–9`) and the light
   clamp ceiling to `20`, so searing is exceptional — a torch plus a few lightbugs

@@ -100,5 +100,7 @@ live room.
 The `room` view is filtered by what the viewer can perceive: in darkness the
 description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement
-(`n/s/e/w/u/d`, `go <dir>`), `light`/`douse`, `help`. The rest of the loop
-(get/drop/say/inventory, combat) lands in PR #4.
+(`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
+`light`/`douse`, `help`, and admin `@`-commands. Effects visible to other
+players in the room (speech, arrivals/departures, picking things up) are
+broadcast to them. Combat + the Energy/action-point economy + mob AI land next.

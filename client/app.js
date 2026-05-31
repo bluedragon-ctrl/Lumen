@@ -238,7 +238,8 @@ function label(text) {
 const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
-const VERBS = ["look", "go", "move", "light", "douse", "extinguish", "ignite", "help",
+const VERBS = ["look", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
+  "light", "douse", "extinguish", "ignite", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
