@@ -1,0 +1,15 @@
+{
+  "level": 1,
+  "xp": 0,
+  "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
+  "maxHp": 18,
+  "maxMana": 10,
+  "speed": 12,
+  "perception": { "blindBelow": 1, "harmedAbove": 5 },
+  "startLocation": "settlement.plaza",
+  "startInventory": [
+    { "template": "torch", "fuel": 200 },
+    { "template": "flint", "qty": 3 }
+  ],
+  "startEquipment": { "hand": null, "body": "leather-jerkin", "light": null }
+}

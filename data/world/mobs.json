@@ -1,0 +1,42 @@
+{
+  "lightbug": {
+    "id": "lightbug",
+    "name": "a lightbug",
+    "description": "A drifting mote of soft luminescence, trailing pale sparks.",
+    "maxHp": 6,
+    "speed": 10,
+    "attributes": { "might": 1, "vitality": 3, "intellect": 0, "wits": 6, "perception": 4 },
+    "perception": { "blindBelow": 0, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "wander",
+    "hostile": false,
+    "loot": [{ "template": "luminescent-gland", "chance": 0.5 }]
+  },
+  "gloom-crawler": {
+    "id": "gloom-crawler",
+    "name": "a gloom-crawler",
+    "description": "A pallid, eyeless thing that flows over the stone, hunting by tremor and scent.",
+    "maxHp": 14,
+    "speed": 11,
+    "attributes": { "might": 6, "vitality": 6, "intellect": 0, "wits": 4, "perception": 7 },
+    "perception": { "blindBelow": 0, "harmedAbove": 2 },
+    "behavior": "hunt",
+    "hostile": true,
+    "loot": [{ "template": "flint", "chance": 0.3 }]
+  },
+  "deep-dweller": {
+    "id": "deep-dweller",
+    "name": "a deep-dweller",
+    "description": "Tall, gaunt, and grey, it guards the dark with patient malice. Bright light pains it.",
+    "maxHp": 22,
+    "speed": 12,
+    "attributes": { "might": 8, "vitality": 7, "intellect": 3, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "harmedAbove": 2 },
+    "behavior": "guard",
+    "hostile": true,
+    "loot": [
+      { "template": "vial", "chance": 0.6 },
+      { "template": "rusted-blade", "chance": 0.2 }
+    ]
+  }
+}
