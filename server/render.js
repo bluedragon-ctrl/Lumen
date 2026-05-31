@@ -34,6 +34,7 @@ function buildPlayerView(state, p) {
       mana: p.mana,
       maxMana: p.maxMana,
       energy: p.energy,
+      energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
       speed: p.speed,
       attributes: p.attributes,
       perception: p.perception,

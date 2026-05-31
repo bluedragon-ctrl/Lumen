@@ -41,9 +41,10 @@
 
     <!-- Status strip: always-visible vitals -->
     <section id="status" class="status" aria-label="Status">
-      <span class="stat"><label>HP</label><span class="bar"><i id="hp-fill"></i></span><b id="hp-val">—</b></span>
-      <span class="stat"><label>Energy</label><span class="bar energy"><i id="en-fill"></i></span><b id="en-val">—</b></span>
-      <span class="stat"><label>Mana</label><span class="bar mana"><i id="mp-fill"></i></span><b id="mp-val">—</b></span>
+      <span class="stat" title="Health. You die at 0 and awaken at the rim."><label>HP</label><span class="bar"><i id="hp-fill"></i></span><b id="hp-val">—</b></span>
+      <span class="stat" id="en-stat"><label>Energy</label><span class="bar energy"><i id="en-fill"></i></span><b id="en-val">—</b></span>
+      <span class="stat" title="Magic fuel for spells."><label>Mana</label><span class="bar mana"><i id="mp-fill"></i></span><b id="mp-val">—</b></span>
+      <span class="stat" id="sp-stat" title="Speed: action points regained per second. Higher = act more often."><label>Speed</label><b id="sp-val">—</b></span>
     </section>
 
     <!-- Command line -->

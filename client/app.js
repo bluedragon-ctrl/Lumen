@@ -218,10 +218,13 @@ function renderPlayer(p) {
     inv.appendChild(li);
   }
 
-  // Status strip
+  // Status strip. Energy is the action-point bank: full = ready to act, drains
+  // as you take actions (e.g. attacking), refills by Speed each second.
   setBar("hp", p.hp, p.maxHp);
-  setBar("en", p.energy, p.speed * 8); // rough scale for a tempo read until combat lands
+  setBar("en", p.energy, p.energyMax != null ? p.energyMax : p.speed * 3);
   setBar("mp", p.mana, p.maxMana);
+  $("en-stat").title = `Action points: ready to act when full. Regains +${p.speed}/s (your Speed); attacking and other actions spend it.`;
+  $("sp-val").textContent = p.speed;
 }
 
 function setBar(prefix, val, max) {
