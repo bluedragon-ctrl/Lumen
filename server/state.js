@@ -25,6 +25,18 @@ function playerArmour(world, player) {
 
 const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
 
+/** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
+function pickWeighted(options) {
+  const total = options.reduce((s, o) => s + (o.weight || 1), 0);
+  if (total <= 0) return null;
+  let r = Math.random() * total;
+  for (const o of options) {
+    r -= o.weight || 1;
+    if (r < 0) return o;
+  }
+  return options[options.length - 1];
+}
+
 /** Resolve one swing. Accuracy is gated by how well the attacker sees the target
  *  (clear 100% / glare 50% / can't-see 5%). `sighted` drives miss-message wording. */
 function strike(attackerPerception, light, dice, attackerMightMod, targetArmour) {
@@ -218,14 +230,14 @@ class GameState {
 
     for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
 
-    this.resolveCombat(events);
+    this.resolvePlayerAttacks(events);
+    this.resolveMobAI(events);
     return events;
   }
 
-  /** Player pending-attacks, then hostile mob attacks. Accuracy gated by light. */
-  resolveCombat(events) {
+  /** Player pending-attacks. Accuracy gated by light; multiple swings if energy allows. */
+  resolvePlayerAttacks(events) {
     const w = this.world;
-
     for (const p of this.players.values()) {
       if (p.hp <= 0 || !p.pending || p.pending.type !== "attack") continue;
       const rt = this.rooms[p.location];
@@ -254,31 +266,77 @@ class GameState {
         }
       }
     }
+  }
 
+  /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */
+  resolveMobAI(events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
-      for (const m of rt.mobs) {
-        const t = w.mobs[m.template];
-        if (!t.hostile || !t.attack) continue;
-        const victims = this.playersIn(roomId).filter((p) => p.hp > 0);
-        if (!victims.length) continue;
-        const target = victims[Math.floor(Math.random() * victims.length)];
-        while (m.energy >= t.attack.actionCost && target.hp > 0) {
-          m.energy -= t.attack.actionCost;
-          const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerArmour(w, target));
-          events.push({
-            type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
-            targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
-            damage: r.damage, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
-            light: rt.light, attackerEmitsLight: !!t.emitsLight,
-          });
-          target.hp -= r.damage;
-          if (target.hp <= 0) {
-            events.push(this._respawn(target, roomId));
-            break;
-          }
-        }
+      for (const m of [...rt.mobs]) {
+        const t = this.world.mobs[m.template];
+        const cost = (t.attack && t.attack.actionCost) || 12;
+        if (m.energy < cost) continue;
+        m.energy -= cost;
+        this._mobAct(m, t, roomId, events);
       }
     }
+  }
+
+  _mobAct(m, t, roomId, events) {
+    const rt = this.rooms[roomId];
+    const playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
+    const exits = Object.keys(this.world.rooms[roomId].exits || {});
+
+    let options;
+    if (Array.isArray(t.actions) && t.actions.length) {
+      options = t.actions.filter((a) => {
+        if (a.type === "attack") return t.hostile && t.attack && playersHere.length > 0;
+        if (a.type === "move") return exits.length > 0;
+        if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
+        return a.type === "idle";
+      });
+    } else {
+      // Default behaviour for mobs without an actions table: attack if able.
+      options = t.hostile && t.attack && playersHere.length ? [{ type: "attack" }] : [];
+    }
+
+    const choice = pickWeighted(options);
+    if (!choice || choice.type === "idle") return;
+    if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, playersHere);
+    if (choice.type === "emote") {
+      const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
+      events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
+      return;
+    }
+    if (choice.type === "move") return this._mobMove(m, t, roomId, events, choice.verb || "moves off", exits);
+  }
+
+  _mobAttack(m, t, roomId, events, playersHere) {
+    const rt = this.rooms[roomId];
+    const target = playersHere[Math.floor(Math.random() * playersHere.length)];
+    const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerArmour(this.world, target));
+    events.push({
+      type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
+      targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
+      damage: r.damage, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
+      light: rt.light, attackerEmitsLight: !!t.emitsLight,
+    });
+    target.hp -= r.damage;
+    if (target.hp <= 0) events.push(this._respawn(target, roomId));
+  }
+
+  _mobMove(m, t, roomId, events, verb, exits) {
+    const dir = exits[Math.floor(Math.random() * exits.length)];
+    const dest = this.world.rooms[roomId].exits[dir];
+    const rt = this.rooms[roomId];
+    const idx = rt.mobs.indexOf(m);
+    if (idx >= 0) rt.mobs.splice(idx, 1);
+    this.rooms[dest].mobs.push(m);
+    rt.light = this.computeRoomLight(roomId);
+    this.rooms[dest].light = this.computeRoomLight(dest);
+    events.push({
+      type: "mob-move", mobId: m.id, mobName: t.name, from: roomId, to: dest, dir, verb,
+      emitsLight: !!t.emitsLight, lightFrom: rt.light, lightTo: this.rooms[dest].light,
+    });
   }
 
   _killMob(mob, killer) {

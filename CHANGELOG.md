@@ -5,6 +5,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Weighted mob AI**: each mob has an `actions` table and takes one weighted
+  action per tick from those available — `attack`, `emote` (flavour lines),
+  `move` (wander/flee to an adjacent room, carrying its light), or `idle`. Gives
+  mobs fight/emote/flee personalities; unseen mob actions read as "Something …".
+
 ### Changed
 - Mobs now have an innate `armour` value (symmetric with players) that reduces
   incoming physical damage: lightbug 0, gloom-crawler 1, deep-dweller 2.
