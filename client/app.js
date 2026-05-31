@@ -1,0 +1,243 @@
+"use strict";
+// Lumen browser client. Renders server messages into the four panes and turns
+// typed (and clicked) input into commands. The command system is the single
+// source of truth — clicks just inject the equivalent text command.
+
+const $ = (id) => document.getElementById(id);
+const logEl = $("log");
+const cmdEl = $("cmd");
+
+// Cached state for TAB completion / rendering.
+let lastRoom = null;
+let lastPlayer = null;
+
+// --- WebSocket -------------------------------------------------------------
+let ws;
+function connect() {
+  ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host);
+  ws.onopen = () => addLine("[connected]", "system");
+  ws.onclose = () => {
+    addLine("[disconnected — retrying in 2s]", "error");
+    setTimeout(connect, 2000);
+  };
+  ws.onmessage = (e) => handle(JSON.parse(e.data));
+}
+function sendCommand(text) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "command", text }));
+}
+
+// --- Message handling ------------------------------------------------------
+function handle(msg) {
+  switch (msg.type) {
+    case "system": addLine(msg.text, "system"); break;
+    case "error": addLine(msg.text, "error"); break;
+    case "log": addLine(msg.text, "log"); break;
+    case "room": lastRoom = msg.room; renderRoom(msg.room); break;
+    case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
+    default: addLine(JSON.stringify(msg), "log");
+  }
+}
+
+// --- Console ---------------------------------------------------------------
+function addLine(text, kind) {
+  const div = document.createElement("div");
+  div.className = "line-" + (kind || "log");
+  div.textContent = text;
+  logEl.appendChild(div);
+  logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+}
+
+// --- Inspect (room) --------------------------------------------------------
+function renderRoom(room) {
+  const inspect = $("inspect");
+  inspect.className = "pane light-" + room.light.band;
+  $("room-name").textContent = room.name;
+  $("light-meter").textContent = `light: ${room.light.band} (${room.light.value})` + (room.harmed ? " ⚠ harsh" : "");
+
+  const desc = $("room-desc");
+  if (room.canSee) {
+    desc.className = "room-desc";
+    desc.textContent = room.description || "";
+  } else {
+    desc.className = "room-desc placeholder";
+    desc.textContent = "It is too dark to see. You can make out nothing here — a light source would help.";
+  }
+
+  // Exits
+  const exits = $("room-exits");
+  exits.innerHTML = "";
+  if (room.exits.length) {
+    exits.appendChild(label("exits:"));
+    for (const dir of room.exits) exits.appendChild(chip(dir, "exit", () => sendCommand(dir)));
+  }
+
+  // Contents
+  const c = $("room-contents");
+  c.innerHTML = "";
+  const { players, mobs, items, fixtures } = room.contents;
+  // Clicks address entities by their unique id (unambiguous), not by name.
+  for (const p of players) c.appendChild(chip(p.name, "player", () => sendCommand("look " + p.id)));
+  for (const m of mobs) {
+    const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
+    c.appendChild(chip(m.name, cls, () => sendCommand("look " + m.id)));
+  }
+  for (const it of items) c.appendChild(chip(it.name, "item", () => sendCommand("look " + it.id)));
+  for (const f of fixtures) c.appendChild(chip(f.name, "fixture", () => sendCommand("look " + f.id)));
+  if (!players.length && !mobs.length && !items.length && !fixtures.length && room.canSee) {
+    c.appendChild(label("nothing of note here."));
+  }
+}
+
+// --- Player panel ----------------------------------------------------------
+function renderPlayer(p) {
+  $("p-name").textContent = p.name;
+  $("p-level").textContent = `Lv ${p.level} · ${p.xp} xp`;
+
+  // States
+  const states = $("p-states");
+  states.innerHTML = "";
+  for (const s of p.states || []) {
+    const el = document.createElement("span");
+    el.className = "state-chip" + (s.good ? " good" : "");
+    el.textContent = s.name || s;
+    states.appendChild(el);
+  }
+
+  // Attributes
+  const attrs = $("p-attrs");
+  attrs.innerHTML = "";
+  for (const [k, v] of Object.entries(p.attributes)) {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
+    attrs.appendChild(wrap);
+  }
+
+  // Equipment
+  const equip = $("p-equip");
+  equip.innerHTML = "";
+  for (const [slot, item] of Object.entries(p.equipment)) {
+    const li = document.createElement("li");
+    if (item) {
+      let sub = slot;
+      if (item.type === "light") sub += item.lit ? ` · lit · fuel ${item.fuel}/${item.fuelMax}` : ` · unlit · fuel ${item.fuel}/${item.fuelMax}`;
+      li.innerHTML = `<span>${item.name}</span><span class="sub">${sub}</span>`;
+    } else {
+      li.className = "empty";
+      li.innerHTML = `<span>— ${slot} —</span>`;
+    }
+    equip.appendChild(li);
+  }
+
+  // Inventory
+  const inv = $("p-inv");
+  inv.innerHTML = "";
+  if (!p.inventory.length) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "(empty)";
+    inv.appendChild(li);
+  }
+  for (const item of p.inventory) {
+    const li = document.createElement("li");
+    const qty = item.qty != null ? ` ×${item.qty}` : "";
+    const fuel = item.type === "light" ? ` <span class="sub">fuel ${item.fuel}/${item.fuelMax}</span>` : "";
+    li.innerHTML = `<span>${item.name}${qty}</span>${fuel}`;
+    inv.appendChild(li);
+  }
+
+  // Status strip
+  setBar("hp", p.hp, p.maxHp);
+  setBar("en", p.energy, p.speed * 8); // rough scale for a tempo read until combat lands
+  setBar("mp", p.mana, p.maxMana);
+}
+
+function setBar(prefix, val, max) {
+  const pct = max > 0 ? Math.max(0, Math.min(100, (val / max) * 100)) : 0;
+  $(prefix + "-fill").style.width = pct + "%";
+  $(prefix + "-val").textContent = `${Math.round(val)}/${max}`;
+}
+
+// --- Helpers ---------------------------------------------------------------
+function chip(text, cls, onClick) {
+  const el = document.createElement("span");
+  el.className = "chip " + cls;
+  el.textContent = text;
+  if (onClick) el.addEventListener("click", onClick);
+  return el;
+}
+function label(text) {
+  const el = document.createElement("span");
+  el.className = "label";
+  el.textContent = text;
+  return el;
+}
+// Strip a leading article and take the last word — used for TAB-completion
+// candidates so players can type "lightbug" / "sword" instead of an id.
+const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
+
+// --- Command input: history + TAB completion -------------------------------
+const VERBS = ["look", "go", "move", "light", "douse", "extinguish", "ignite", "help",
+  "north", "south", "east", "west", "up", "down"];
+const history = [];
+let histIdx = -1;
+let tabState = null; // { base, matches, idx }
+
+function completionCandidates() {
+  const set = new Set(VERBS);
+  if (lastRoom) {
+    for (const d of lastRoom.exits) set.add(d);
+    for (const m of lastRoom.contents.mobs) set.add(lastWord(m.name));
+    for (const it of lastRoom.contents.items) set.add(lastWord(it.name));
+    for (const f of lastRoom.contents.fixtures) set.add(lastWord(f.name));
+  }
+  if (lastPlayer) for (const it of lastPlayer.inventory) set.add(lastWord(it.name));
+  return [...set];
+}
+
+cmdEl.addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") {
+    const text = cmdEl.value.trim();
+    if (!text) return;
+    addLine("> " + text, "echo");
+    sendCommand(text);
+    history.push(text);
+    histIdx = history.length;
+    cmdEl.value = "";
+    tabState = null;
+  } else if (ev.key === "ArrowUp") {
+    ev.preventDefault();
+    if (histIdx > 0) cmdEl.value = history[--histIdx];
+  } else if (ev.key === "ArrowDown") {
+    ev.preventDefault();
+    if (histIdx < history.length - 1) cmdEl.value = history[++histIdx];
+    else { histIdx = history.length; cmdEl.value = ""; }
+  } else if (ev.key === "Tab") {
+    ev.preventDefault();
+    handleTab();
+  } else {
+    tabState = null;
+  }
+});
+
+function handleTab() {
+  const value = cmdEl.value;
+  const head = value.slice(0, value.lastIndexOf(" ") + 1);
+  const token = value.slice(head.length).toLowerCase();
+  if (tabState && tabState.base === value) {
+    // cycle
+    tabState.idx = (tabState.idx + 1) % tabState.matches.length;
+    cmdEl.value = head + tabState.matches[tabState.idx];
+    return;
+  }
+  const matches = completionCandidates().filter((c) => c.startsWith(token));
+  if (!matches.length) return;
+  if (matches.length === 1) {
+    cmdEl.value = head + matches[0];
+    tabState = null;
+  } else {
+    cmdEl.value = head + matches[0];
+    tabState = { base: cmdEl.value, matches, idx: 0 };
+  }
+}
+
+connect();

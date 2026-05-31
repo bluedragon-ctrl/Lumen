@@ -266,9 +266,18 @@ Two shapes are used wherever items appear in data:
 - **ItemRef** (authoring shorthand, in templates/world data):
   `{ "template": "<id>", "qty": <n> }` for stackables, or
   `{ "template": "<id>", "fuel": <n> }` for fuelled items.
-- **ItemInstance** (runtime, dynamic state): a concrete thing carrying its own
-  mutable state, e.g. `{ "template": "torch", "fuel": 150, "lit": true }`.
-  Stackable materials collapse to `{ "template": "flint", "qty": 3 }`.
+- **ItemInstance** (runtime, dynamic state): a concrete thing carrying a unique
+  runtime `id` plus its own mutable state, e.g.
+  `{ "id": "item.42", "template": "torch", "fuel": 150, "lit": true }`.
+  Stackable materials collapse to `{ "id": "item.7", "template": "flint", "qty": 3 }`.
+
+### Runtime entity ids
+
+Every **addressable runtime entity** carries a unique, type-prefixed id so it can
+be targeted unambiguously by commands and clicks (even when names collide, e.g.
+two lightbugs): `player.N`, `mob.N`, `item.N`, `fixture.N`. Authored static
+definitions (rooms, item/mob/fixture templates) already have their own unique
+string ids. Targeted commands resolve **by id first, then by name substring**.
 
 ---
 

@@ -4,6 +4,12 @@ const path = require("path");
 const { RUNTIME_DIR } = require("./config");
 const { effectiveLight } = require("./light");
 
+// Monotonic source of unique runtime ids. Every addressable runtime entity —
+// players, mob instances, item instances, placed fixtures — gets one
+// (`player.N`, `mob.N`, `item.N`, `fixture.N`). Authored static defs (rooms,
+// templates) keep their own unique string ids.
+// NOTE: resets on restart; when snapshot-resume lands we must seed this above
+// the highest id seen in the snapshot to avoid collisions.
 let nextEntityId = 1;
 const entityId = (prefix) => `${prefix}.${nextEntityId++}`;
 
@@ -14,7 +20,7 @@ const entityId = (prefix) => `${prefix}.${nextEntityId++}`;
 function makeItemInstance(ref, world) {
   const tmpl = world.items[ref.template];
   if (!tmpl) throw new Error(`unknown item template: ${ref.template}`);
-  const inst = { template: ref.template };
+  const inst = { id: entityId("item"), template: ref.template };
   if (tmpl.stackable) inst.qty = ref.qty != null ? ref.qty : 1;
   if (tmpl.light) {
     inst.fuel = ref.fuel != null ? ref.fuel : tmpl.light.fuelMax;
@@ -51,8 +57,9 @@ class GameState {
 
   _initRooms() {
     for (const [id, room] of Object.entries(this.world.rooms)) {
-      const rt = { mobs: [], items: [], light: room.ambientLight || 0 };
+      const rt = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
       for (const g of room.groundItems || []) rt.items.push(makeItemInstance(g, this.world));
+      for (const f of room.fixtures || []) rt.fixtures.push({ id: entityId("fixture"), template: f });
       for (const s of room.spawns || []) {
         const max = s.max != null ? s.max : 1;
         for (let i = 0; i < max; i++) rt.mobs.push(makeMobInstance(s.mob, this.world));
@@ -123,12 +130,30 @@ class GameState {
     this.players.delete(playerId);
   }
 
-  /** Advance the world one tick. Recomputes room light; combat/AI arrive later. */
+  /**
+   * Advance the world one tick: burn fuel on lit light sources, then recompute
+   * room light. Returns an event list (e.g. lights guttering out) so the server
+   * can push updates to affected players. Combat/AI arrive later.
+   */
   advance() {
     this.tick++;
+    const events = [];
+    for (const p of this.players.values()) {
+      const li = p.equipment && p.equipment.light;
+      if (li && li.lit && li.fuel > 0) {
+        const tmpl = this.world.items[li.template];
+        li.fuel -= (tmpl.light && tmpl.light.burnPerTick) || 1;
+        if (li.fuel <= 0) {
+          li.fuel = 0;
+          li.lit = false;
+          events.push({ type: "light-out", playerId: p.id, item: li.template });
+        }
+      }
+    }
     for (const id of Object.keys(this.rooms)) {
       this.rooms[id].light = this.computeRoomLight(id);
     }
+    return events;
   }
 
   /** Persist a snapshot of dynamic state to disk (runtime dir, gitignored). */

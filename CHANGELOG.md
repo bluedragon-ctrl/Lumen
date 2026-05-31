@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Single shared HTTP + WebSocket server on **port 3737** (test on **3738**),
   with a temporary dev console served at root until the real client lands.
 - `package.json` (`npm start`, `npm run validate`) with `ws` dependency.
+- **Browser client** (`client/`): four-pane UI (console / inspect / player panel /
+  status strip / command line), WebSocket wiring, command history (↑/↓), TAB
+  completion, and click-as-command on room entities/exits.
+- **Light-reactive inspect window**: live atmospheric tint per band
+  (darkness → near-black placeholder, dim → desaturated, bright → normal,
+  searing → dark panel with shimmering blown-out white text/glow + harm warning).
+- Structured `room`/`player` view protocol; server commands `look`, movement,
+  `light`/`douse`, `help`; per-tick fuel burn that guts lit lights when spent.
+- `.claude/launch.json` preview config.
+- **Unique runtime ids** on every addressable entity (`player.N`/`mob.N`/`item.N`/
+  `fixture.N`); targeted commands resolve by id first then name, and client
+  clicks address entities by id (unambiguous even with duplicate names).
 - `docs/data-model.md` — full JSON data-model spec (static vs. dynamic split,
   light scale, per-actor perception bands, room/item/mob/fixture/recipe/player schemas).
 - `data/world/` — sample authored world: 6-room vertical slice (rim settlement →
