@@ -75,13 +75,14 @@ function renderRoom(room) {
   const c = $("room-contents");
   c.innerHTML = "";
   const { players, mobs, items, fixtures } = room.contents;
-  for (const p of players) c.appendChild(chip(p.name, "player", () => sendCommand("look " + firstWord(p.name))));
+  // Clicks address entities by their unique id (unambiguous), not by name.
+  for (const p of players) c.appendChild(chip(p.name, "player", () => sendCommand("look " + p.id)));
   for (const m of mobs) {
     const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
-    c.appendChild(chip(m.name, cls, () => sendCommand("look " + lastWord(m.name))));
+    c.appendChild(chip(m.name, cls, () => sendCommand("look " + m.id)));
   }
-  for (const it of items) c.appendChild(chip(it.name, "item", () => sendCommand("look " + lastWord(it.name))));
-  for (const f of fixtures) c.appendChild(chip(f.name, "fixture", () => sendCommand("look " + lastWord(f.name))));
+  for (const it of items) c.appendChild(chip(it.name, "item", () => sendCommand("look " + it.id)));
+  for (const f of fixtures) c.appendChild(chip(f.name, "fixture", () => sendCommand("look " + f.id)));
   if (!players.length && !mobs.length && !items.length && !fixtures.length && room.canSee) {
     c.appendChild(label("nothing of note here."));
   }
@@ -170,7 +171,8 @@ function label(text) {
   el.textContent = text;
   return el;
 }
-const firstWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/)[0];
+// Strip a leading article and take the last word — used for TAB-completion
+// candidates so players can type "lightbug" / "sword" instead of an id.
 const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------

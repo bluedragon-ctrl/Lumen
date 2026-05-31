@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Structured `room`/`player` view protocol; server commands `look`, movement,
   `light`/`douse`, `help`; per-tick fuel burn that guts lit lights when spent.
 - `.claude/launch.json` preview config.
+- **Unique runtime ids** on every addressable entity (`player.N`/`mob.N`/`item.N`/
+  `fixture.N`); targeted commands resolve by id first then name, and client
+  clicks address entities by id (unambiguous even with duplicate names).
 - `docs/data-model.md` — full JSON data-model spec (static vs. dynamic split,
   light scale, per-actor perception bands, room/item/mob/fixture/recipe/player schemas).
 - `data/world/` — sample authored world: 6-room vertical slice (rim settlement →

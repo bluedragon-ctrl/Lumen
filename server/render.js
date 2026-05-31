@@ -9,7 +9,7 @@ const { bandOf, canSee, isHarmedByLight } = require("./light");
 function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
-  const v = { template: inst.template, name: t.name, type: t.type };
+  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type };
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
     v.lit = !!inst.lit;
@@ -63,12 +63,14 @@ function buildRoomView(state, p) {
     const luminous = !!t.emitsLight;
     if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous });
   }
-  const items = see ? rt.items.map((i) => ({ name: w.items[i.template].name, template: i.template })) : [];
+  const items = see
+    ? rt.items.map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template }))
+    : [];
   const fixtures = see
-    ? (room.fixtures || []).map((f) => ({ name: w.fixtures[f].name, id: f }))
+    ? rt.fixtures.map((f) => ({ id: f.id, name: w.fixtures[f.template].name, template: f.template }))
     : [];
   const players = see
-    ? state.playersIn(p.location).filter((o) => o.id !== p.id).map((o) => ({ name: o.name }))
+    ? state.playersIn(p.location).filter((o) => o.id !== p.id).map((o) => ({ id: o.id, name: o.name }))
     : [];
 
   return {

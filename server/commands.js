@@ -59,28 +59,29 @@ function lookAt(state, player, arg) {
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const q = arg.toLowerCase();
-  const match = (name) => name.toLowerCase().includes(q);
+  // Resolve by unique id first (unambiguous — used by clicks), then by name.
+  const hit = (inst, name) => inst.id.toLowerCase() === q || name.toLowerCase().includes(q);
 
   for (const m of rt.mobs) {
     const t = w.mobs[m.template];
-    if ((see || t.emitsLight) && match(t.name)) return { type: "log", text: t.description };
+    if ((see || t.emitsLight) && hit(m, t.name)) return { type: "log", text: t.description };
   }
   if (see) {
     for (const i of rt.items) {
       const t = w.items[i.template];
-      if (match(t.name)) return { type: "log", text: t.description };
+      if (hit(i, t.name)) return { type: "log", text: t.description };
     }
-    for (const f of w.rooms[player.location].fixtures || []) {
-      const t = w.fixtures[f];
-      if (match(t.name)) return { type: "log", text: t.description };
+    for (const f of rt.fixtures) {
+      const t = w.fixtures[f.template];
+      if (hit(f, t.name)) return { type: "log", text: t.description };
     }
   }
   for (const i of player.inventory) {
-    const t = w.items[i.template];
-    if (match(t.name)) return { type: "log", text: t.description };
+    if (hit(i, w.items[i.template].name)) return { type: "log", text: w.items[i.template].description };
   }
   for (const slot of Object.values(player.equipment)) {
-    if (slot && match(w.items[slot.template].name)) return { type: "log", text: w.items[slot.template].description };
+    if (slot && hit(slot, w.items[slot.template].name))
+      return { type: "log", text: w.items[slot.template].description };
   }
   return { type: "error", text: `You see no "${arg}" here.` };
 }
