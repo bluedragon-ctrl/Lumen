@@ -251,7 +251,7 @@ function label(text) {
 const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
-const VERBS = ["look", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
+const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "help",
   "north", "south", "east", "west", "up", "down"];
@@ -259,16 +259,42 @@ const history = [];
 let histIdx = -1;
 let tabState = null; // { base, matches, idx }
 
-function completionCandidates() {
-  const set = new Set(VERBS);
-  if (lastRoom) {
-    for (const d of lastRoom.exits) set.add(d);
-    for (const m of lastRoom.contents.mobs) set.add(lastWord(m.name));
-    for (const it of lastRoom.contents.items) set.add(lastWord(it.name));
-    for (const f of lastRoom.contents.fixtures) set.add(lastWord(f.name));
+// Context-aware completion: the first token completes commands; the argument
+// completes from what THAT command can act on (equipped gear for remove, mobs
+// for attack, ground items for get, etc.).
+function completionCandidates(value) {
+  const parts = value.split(/\s+/);
+  if (parts.length <= 1) return VERBS;
+  return [...new Set(argCandidates(parts[0].toLowerCase()))];
+}
+
+function argCandidates(cmd) {
+  const room = lastRoom;
+  const p = lastPlayer;
+  const names = (arr) => (arr || []).map((x) => lastWord(x.name));
+  const equipped = () => (p ? Object.values(p.equipment).filter(Boolean) : []);
+  switch (cmd) {
+    case "look": case "l": case "examine": case "exam": case "x": {
+      const out = [];
+      if (room) out.push(...names(room.contents.mobs), ...names(room.contents.items), ...names(room.contents.fixtures), ...names(room.contents.players));
+      if (p) out.push(...names(p.inventory), ...names(equipped()));
+      return out;
+    }
+    case "get": case "take": return room ? names(room.contents.items) : [];
+    case "drop": return p ? names(p.inventory) : [];
+    case "equip": case "wield": case "wear": case "hold":
+      return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];
+    case "unequip": case "remove":
+      return p ? [...names(equipped()), ...Object.keys(p.equipment)] : [];
+    case "attack": case "kill": case "k": return room ? names(room.contents.mobs) : [];
+    case "light": case "ignite": {
+      const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
+      if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
+      return out;
+    }
+    case "go": case "move": return room ? room.exits.slice() : [];
+    default: return []; // say / emote / douse / stop / help — free text or no arg
   }
-  if (lastPlayer) for (const it of lastPlayer.inventory) set.add(lastWord(it.name));
-  return [...set];
 }
 
 cmdEl.addEventListener("keydown", (ev) => {
@@ -312,7 +338,7 @@ function handleTab() {
     cmdEl.value = head + tabState.matches[tabState.idx];
     return;
   }
-  const matches = completionCandidates().filter((c) => c.startsWith(token));
+  const matches = completionCandidates(value).filter((c) => c.startsWith(token));
   if (!matches.length) return;
   if (matches.length === 1) {
     cmdEl.value = head + matches[0];
