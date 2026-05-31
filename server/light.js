@@ -5,14 +5,14 @@
  */
 
 const LIGHT_MIN = 0;
-const LIGHT_MAX = 9;
+const LIGHT_MAX = 20;
 
 /** Map an integer light value to its band name. */
 function bandOf(value) {
   if (value <= 0) return "darkness";
   if (value <= 2) return "dim";
-  if (value <= 5) return "bright";
-  return "searing";
+  if (value <= 9) return "bright";
+  return "searing"; // exceptional — a torch + a few lightbugs stays "bright"
 }
 
 function clampLight(value) {

@@ -28,13 +28,16 @@ the integer:
 |------------:|------------|
 | `0`         | darkness   |
 | `1`–`2`     | dim        |
-| `3`–`5`     | bright     |
-| `6`+        | searing    |
+| `3`–`9`     | bright     |
+| `10`+       | searing    |
+
+Searing is deliberately hard to reach — a torch plus a few lightbugs stays
+*bright*. Effective light is clamped to `0..20`.
 
 **Effective light** of a room each tick:
 
 ```
-effective = clamp( room.ambientLight + Σ(active light-source output in room), 0, 9 )
+effective = clamp( room.ambientLight + Σ(active light-source output in room), 0, 20 )
 ```
 
 - `ambientLight` is the room's authored base (usually falls toward 0 with depth).
@@ -60,7 +63,7 @@ Example actors:
 
 | Actor        | blindBelow | harmedAbove | Reads as                                  |
 |--------------|-----------:|------------:|-------------------------------------------|
-| Human        | 1          | 5           | needs dim+, harmed only by searing        |
+| Human        | 1          | 9           | needs dim+, harmed only by searing (10+)  |
 | Deep-dweller | 0          | 2           | sees in dark, harmed by bright            |
 | Lightbug     | 0          | 6           | sees in dark, very light-tolerant         |
 
