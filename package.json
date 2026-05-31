@@ -1,0 +1,17 @@
+{
+  "name": "lumen",
+  "version": "0.1.0",
+  "description": "A browser-based MUD of descent, light, and survival.",
+  "type": "commonjs",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "validate": "node tools/validate-data.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

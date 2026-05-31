@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Node + `ws` **server skeleton** (`server/`): loads static world into a frozen
+  in-memory object, authoritative `GameState` (per-room mob/item instances,
+  players), the light model (`bandOf`/`effectiveLight`/`canSee`/`isHarmedByLight`),
+  a 1s living-world tick loop, and periodic JSON snapshots to `data/runtime/`.
+- Single shared HTTP + WebSocket server on **port 3737** (test on **3738**),
+  with a temporary dev console served at root until the real client lands.
+- `package.json` (`npm start`, `npm run validate`) with `ws` dependency.
 - `docs/data-model.md` — full JSON data-model spec (static vs. dynamic split,
   light scale, per-actor perception bands, room/item/mob/fixture/recipe/player schemas).
 - `data/world/` — sample authored world: 6-room vertical slice (rim settlement →
