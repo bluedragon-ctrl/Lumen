@@ -85,6 +85,18 @@ Admin commands are prefixed with `@` (`@create-player`, `@list-players`, `@help`
   "contents": { "players", "mobs", "items", "fixtures" } } }  // filtered by light
 ```
 
+```json
+{ "type": "examine", "entity": { "kind": "mob|item|fixture|player", "id", "name",
+  "description", "bars": [{ "label", "value", "max", "kind" }],
+  "lines": ["type: weapon", "damage: 1d6 physical"], "hints": ["…"] } }
+```
+
+`look <target>` (and clicking an entity) returns an `examine` view rendered in
+the Inspect window. The payload is generic — `bars` (e.g. HP), `lines` (specs),
+`hints` (interactions) — so it extends without protocol churn. A subsequent
+`room` message (move / `look` with no arg) returns the Inspect window to the
+live room.
+
 The `room` view is filtered by what the viewer can perceive: in darkness the
 description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement

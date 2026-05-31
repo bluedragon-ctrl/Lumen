@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Examine view**: `look <target>` and clicking an entity now render its detail
+  in the Inspect window (name, kind, description) with an extensible payload —
+  HP bars for mobs/players, item spec lines (damage/armour/light), and
+  interaction hints (e.g. crafting). A "↩ back to room" control and any room
+  update return the window to the live room view.
 - **Player accounts & persistence** (`server/accounts.js`): one JSON file per
   character under `data/runtime/players/` (gitignored), saved on disconnect and
   periodically; characters resume their saved state (location, hp, inventory…).

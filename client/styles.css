@@ -99,6 +99,17 @@ body {
 
 .placeholder { color: var(--muted); font-style: italic; }
 
+/* Examine view (a single entity shown in the Inspect window) */
+#ex-kind { text-transform: uppercase; letter-spacing: .06em; }
+.ex-bars { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.ex-bars .stat { gap: 8px; }
+.ex-lines { list-style: none; margin: 8px 0; padding: 0; }
+.ex-lines li { color: var(--muted); padding: 1px 0; }
+.ex-hints { margin: 8px 0; }
+.ex-hints .hint { display: block; color: var(--accent); font-size: 13px; padding: 1px 0; }
+.ex-back { margin-top: 10px; background: var(--panel-2); color: var(--accent); border: 1px solid var(--edge); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
+.ex-back:hover { border-color: var(--accent); }
+
 /* Status strip --------------------------------------------------------- */
 .status {
   grid-area: status; display: flex; gap: 18px; align-items: center;

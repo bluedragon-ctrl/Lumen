@@ -4,8 +4,7 @@
  * Each handler returns an array of messages to send back to the actor.
  * The full gameplay loop (get/drop/say/inventory, combat) arrives in PR #4.
  */
-const { buildRoomView, buildPlayerView } = require("./render");
-const { canSee } = require("./light");
+const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const accounts = require("./accounts");
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
@@ -55,36 +54,12 @@ function toggleLight(state, player, on) {
   ];
 }
 
+// Examine a target: render its detail in the Inspect window (+ a brief console
+// echo). Resolution (by id first, then name) and perception live in render.js.
 function lookAt(state, player, arg) {
-  const w = state.world;
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const q = arg.toLowerCase();
-  // Resolve by unique id first (unambiguous — used by clicks), then by name.
-  const hit = (inst, name) => inst.id.toLowerCase() === q || name.toLowerCase().includes(q);
-
-  for (const m of rt.mobs) {
-    const t = w.mobs[m.template];
-    if ((see || t.emitsLight) && hit(m, t.name)) return { type: "log", text: t.description };
-  }
-  if (see) {
-    for (const i of rt.items) {
-      const t = w.items[i.template];
-      if (hit(i, t.name)) return { type: "log", text: t.description };
-    }
-    for (const f of rt.fixtures) {
-      const t = w.fixtures[f.template];
-      if (hit(f, t.name)) return { type: "log", text: t.description };
-    }
-  }
-  for (const i of player.inventory) {
-    if (hit(i, w.items[i.template].name)) return { type: "log", text: w.items[i.template].description };
-  }
-  for (const slot of Object.values(player.equipment)) {
-    if (slot && hit(slot, w.items[slot.template].name))
-      return { type: "log", text: w.items[slot.template].description };
-  }
-  return { type: "error", text: `You see no "${arg}" here.` };
+  const view = buildExamineView(state, player, arg);
+  if (!view) return [{ type: "error", text: `You see no "${arg}" here.` }];
+  return [{ type: "log", text: `You examine ${view.entity.name}.` }, view];
 }
 
 /** Admin-only commands, prefixed with '@'. */
@@ -121,7 +96,7 @@ function execute(state, player, input) {
       return [];
     case "look":
     case "l":
-      return arg ? [lookAt(state, player, arg)] : [buildRoomView(state, player)];
+      return arg ? lookAt(state, player, arg) : [buildRoomView(state, player)];
     case "go":
     case "move": {
       let d = arg.toLowerCase();
