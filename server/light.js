@@ -40,22 +40,19 @@ function isHarmedByLight(perception, light) {
 }
 
 /**
- * Can the actor see *clearly* — i.e. light is within its comfortable band
- * (bright enough to see, not so bright it's blinded by glare)?
- */
-function perceivesClearly(perception, light) {
-  return canSee(perception, light) && !isHarmedByLight(perception, light);
-}
-
-/**
- * Combat hit chance by visibility tier:
- *   clear sight (within comfortable band) → 1.0
- *   impaired (visible, but glare above harmedAbove) → 0.5
- *   can't see the target at all (below blindBelow) → 0.05 (flailing)
+ * Combat hit chance by visibility tier (low → high light):
+ *   can't see (below blindBelow)                → 0.05 (flailing)
+ *   partial / dim (blindBelow .. below dimBelow) → 0.5
+ *   clear (dimBelow .. harmedAbove)              → 1.0
+ *   glare (above harmedAbove)                    → 0.5
+ * `dimBelow` defaults to `blindBelow` (no partial tier) when an actor omits it.
  */
 function hitChance(perception, light) {
-  if (!canSee(perception, light)) return 0.05;
+  const blindBelow = perception ? perception.blindBelow : 1;
+  const dimBelow = perception && perception.dimBelow != null ? perception.dimBelow : blindBelow;
+  if (light < blindBelow) return 0.05;
   if (isHarmedByLight(perception, light)) return 0.5;
+  if (light < dimBelow) return 0.5;
   return 1.0;
 }
 
@@ -67,6 +64,5 @@ module.exports = {
   effectiveLight,
   canSee,
   isHarmedByLight,
-  perceivesClearly,
   hitChance,
 };

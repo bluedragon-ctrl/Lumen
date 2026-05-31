@@ -113,12 +113,13 @@ it — faster actors/weapons act more often. `attack <target>` sets a pending
 attack that resolves on subsequent ticks until the target dies, you `stop`, or
 you move.
 
-Accuracy is **light-gated**, in three tiers by how well the attacker sees the
-target: **clear** sight (light within its `blindBelow..harmedAbove` band) → 100%;
-**impaired** by glare (visible, but above `harmedAbove`) → 50%; **can't see it**
-(below `blindBelow`) → 5% flailing. So lighting a torch lets you see clearly
-*and* drops a light-sensitive deep-dweller to its glare-impaired 50% — a mutual,
-exploitable condition.
+Accuracy is **light-gated**, in four tiers by how well the attacker sees the
+target (per-actor thresholds `blindBelow`/`dimBelow`/`harmedAbove`):
+**can't see** (below `blindBelow`) → 5% flailing; **partial/dim**
+(`blindBelow`…below `dimBelow`) → 50%; **clear** (`dimBelow`…`harmedAbove`) →
+100%; **glare** (above `harmedAbove`) → 50%. So lighting a torch lifts you from
+dim/partial to clear *and* drops a light-sensitive deep-dweller into glare — a
+mutual, exploitable condition.
 
 Damage = `roll(weapon dice) + (Might − 5) − target Armour` (min 1). Mob HP≤0 →
 death, loot dropped to the room, XP to the killer. Player HP≤0 → respawn at the

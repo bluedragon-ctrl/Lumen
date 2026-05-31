@@ -48,24 +48,28 @@ effective = clamp( room.ambientLight + Σ(active light-source output in room), 0
 Every actor (player + mob) carries:
 
 ```json
-"perception": { "blindBelow": 1, "harmedAbove": 5 }
+"perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 }
 ```
 
-- **`blindBelow`** — minimum effective light required to *see*. If the room's
-  effective light `< blindBelow`, the actor is effectively blind (sees only
-  self-illuminating things). `0` means the actor sees even in total darkness
-  (darkvision).
-- **`harmedAbove`** — maximum comfortable light. If effective light `> harmedAbove`,
-  the actor is harmed/blinded by excess light. Deep-dwellers have low values
-  (bright light hurts them); humans tolerate up to searing.
+- **`blindBelow`** — minimum effective light required to *see* at all. Below it
+  the actor is effectively blind (sees only self-illuminating things). `0` means
+  the actor sees even in total darkness (darkvision).
+- **`dimBelow`** — light at/above which the actor sees *clearly*; between
+  `blindBelow` and `dimBelow` sight is **partial** (a combat accuracy penalty,
+  but not harmful). Defaults to `blindBelow` (no partial tier) if omitted.
+- **`harmedAbove`** — maximum comfortable light. Above it the actor is harmed and
+  dazzled by glare. Deep-dwellers have low values (bright light hurts them).
+
+These define four visibility tiers used for **combat accuracy** (see the server
+README): can't-see (5%) · partial/dim (50%) · clear (100%) · glare (50%).
 
 Example actors:
 
-| Actor        | blindBelow | harmedAbove | Reads as                                  |
-|--------------|-----------:|------------:|-------------------------------------------|
-| Human        | 1          | 9           | needs dim+, harmed only by searing (10+)  |
-| Deep-dweller | 0          | 2           | sees in dark, harmed by bright            |
-| Lightbug     | 0          | 6           | sees in dark, very light-tolerant         |
+| Actor        | blindBelow | dimBelow | harmedAbove | Reads as                                            |
+|--------------|-----------:|---------:|------------:|-----------------------------------------------------|
+| Human        | 1          | 3        | 9           | blind in dark, partial in dim, clear in bright, glare in searing |
+| Deep-dweller | 0          | 0        | 2           | sees clearly in the dark; bright light dazzles it   |
+| Lightbug     | 0          | 0        | 6           | sees clearly in the dark, very light-tolerant       |
 
 ---
 
