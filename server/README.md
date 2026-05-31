@@ -101,6 +101,27 @@ The `room` view is filtered by what the viewer can perceive: in darkness the
 description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement
 (`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
-`light`/`douse`, `help`, and admin `@`-commands. Effects visible to other
-players in the room (speech, arrivals/departures, picking things up) are
-broadcast to them. Combat + the Energy/action-point economy + mob AI land next.
+`attack`/`kill`/`stop`, `light`/`douse`, `help`, and admin `@`-commands. Effects
+visible to other players in the room (speech, arrivals/departures, picking
+things up, combat) are broadcast to them.
+
+### Combat
+
+Tick-driven, Energy-gated. Each tick every actor banks `speed` action points
+(capped); an attack fires when banked ≥ the weapon's `actionCost`, then deducts
+it — faster actors/weapons act more often. `attack <target>` sets a pending
+attack that resolves on subsequent ticks until the target dies, you `stop`, or
+you move.
+
+Accuracy is **light-gated**, in four tiers by how well the attacker sees the
+target (per-actor thresholds `blindBelow`/`dimBelow`/`harmedAbove`):
+**can't see** (below `blindBelow`) → 5% flailing; **partial/dim**
+(`blindBelow`…below `dimBelow`) → 50%; **clear** (`dimBelow`…`harmedAbove`) →
+100%; **glare** (above `harmedAbove`) → 50%. So lighting a torch lifts you from
+dim/partial to clear *and* drops a light-sensitive deep-dweller into glare — a
+mutual, exploitable condition.
+
+Damage = `roll(weapon dice) + (Might − 5) − target Armour` (min 1). Mob HP≤0 →
+death, loot dropped to the room, XP to the killer. Player HP≤0 → respawn at the
+rim, full HP, no penalty beyond lost progress (DESIGN v1). Hostile mobs attack
+players in their room only (no cross-room pursuit yet).

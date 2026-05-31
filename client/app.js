@@ -110,8 +110,9 @@ function renderRoom(room) {
 
 // --- Examine (single entity in the Inspect window) -------------------------
 function renderExamine(e) {
-  // Neutral panel for readability (no room light tint while examining).
-  $("inspect").className = "pane light-unknown";
+  // Tint the examine view by the current room's light band, so detail text reads
+  // gray in dim → washed/shimmering in searing, aligned with the room view.
+  $("inspect").className = "pane light-" + (lastRoom ? lastRoom.light.band : "unknown");
   $("room-view").hidden = true;
   $("examine-view").hidden = false;
 
@@ -144,6 +145,16 @@ function renderExamine(e) {
     span.className = "hint";
     span.textContent = h;
     hints.appendChild(span);
+  }
+
+  const actions = $("ex-actions");
+  actions.innerHTML = "";
+  for (const a of e.actions || []) {
+    const btn = document.createElement("button");
+    btn.className = "ex-action";
+    btn.textContent = a.label;
+    btn.addEventListener("click", () => sendCommand(a.command));
+    actions.appendChild(btn);
   }
 }
 
@@ -207,10 +218,12 @@ function renderPlayer(p) {
     inv.appendChild(li);
   }
 
-  // Status strip
+  // Status strip. (Energy/action-points are tracked server-side and drive combat
+  // tempo, but the bar is hidden until actions have player-chosen costs that make
+  // it actionable; Speed conveys tempo for now.)
   setBar("hp", p.hp, p.maxHp);
-  setBar("en", p.energy, p.speed * 8); // rough scale for a tempo read until combat lands
   setBar("mp", p.mana, p.maxMana);
+  $("sp-val").textContent = p.speed;
 }
 
 function setBar(prefix, val, max) {
@@ -239,7 +252,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
-  "light", "douse", "extinguish", "ignite", "help",
+  "attack", "kill", "stop", "light", "douse", "extinguish", "ignite", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;

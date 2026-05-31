@@ -1,5 +1,39 @@
 "use strict";
-const { effectiveLight } = require("./light");
+const { effectiveLight, canSee, hitChance } = require("./light");
+const { rollDice } = require("./dice");
+
+/** The attacker's effective weapon: equipped hand weapon, or unarmed. */
+function weaponOf(world, player) {
+  const hand = player.equipment && player.equipment.hand;
+  if (hand) {
+    const t = world.items[hand.template];
+    if (t.weapon) return { dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2", actionCost: t.weapon.actionCost || 12 };
+  }
+  return { dice: "1d2", actionCost: 10 }; // unarmed
+}
+
+/** Total physical Armour from a player's equipped gear. */
+function playerArmour(world, player) {
+  let a = 0;
+  for (const inst of Object.values(player.equipment || {})) {
+    if (!inst) continue;
+    const t = world.items[inst.template];
+    if (t.armour) a += t.armour.armour || 0;
+  }
+  return a;
+}
+
+const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
+
+/** Resolve one swing. Accuracy is gated by how well the attacker sees the target
+ *  (clear 100% / glare 50% / can't-see 5%). `sighted` drives miss-message wording. */
+function strike(attackerPerception, light, dice, attackerMightMod, targetArmour) {
+  const hit = Math.random() < hitChance(attackerPerception, light);
+  const sighted = canSee(attackerPerception, light);
+  if (!hit) return { hit: false, sighted, damage: 0 };
+  const damage = Math.max(1, rollDice(dice) + attackerMightMod - targetArmour);
+  return { hit: true, sighted, damage };
+}
 
 // Monotonic source of unique runtime ids. Every addressable runtime entity —
 // players, mob instances, item instances, placed fixtures — gets one
@@ -150,13 +184,25 @@ class GameState {
   }
 
   /**
-   * Advance the world one tick: burn fuel on lit light sources, then recompute
-   * room light. Returns an event list (e.g. lights guttering out) so the server
-   * can push updates to affected players. Combat/AI arrive later.
+   * Advance the world one tick:
+   *   1. accrue action-point energy (capped) for all actors
+   *   2. burn fuel on lit lights (→ light-out events)
+   *   3. recompute room light
+   *   4. resolve combat (player attacks + hostile mob attacks), light-gated
+   * Returns an event list the server turns into messages/view refreshes.
    */
   advance() {
     this.tick++;
     const events = [];
+
+    for (const p of this.players.values()) p.energy = Math.min(p.energy + p.speed, p.speed * 3);
+    for (const rt of Object.values(this.rooms)) {
+      for (const m of rt.mobs) {
+        const speed = this.world.mobs[m.template].speed || 10;
+        m.energy = Math.min((m.energy || 0) + speed, speed * 3);
+      }
+    }
+
     for (const p of this.players.values()) {
       const li = p.equipment && p.equipment.light;
       if (li && li.lit && li.fuel > 0) {
@@ -169,10 +215,98 @@ class GameState {
         }
       }
     }
-    for (const id of Object.keys(this.rooms)) {
-      this.rooms[id].light = this.computeRoomLight(id);
-    }
+
+    for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
+
+    this.resolveCombat(events);
     return events;
+  }
+
+  /** Player pending-attacks, then hostile mob attacks. Accuracy gated by light. */
+  resolveCombat(events) {
+    const w = this.world;
+
+    for (const p of this.players.values()) {
+      if (p.hp <= 0 || !p.pending || p.pending.type !== "attack") continue;
+      const rt = this.rooms[p.location];
+      const mob = rt.mobs.find((m) => m.id === p.pending.targetId);
+      if (!mob) {
+        p.pending = null;
+        events.push({ type: "combat-stop", playerId: p.id, reason: "Your quarry is gone." });
+        continue;
+      }
+      const weapon = weaponOf(w, p);
+      while (p.energy >= weapon.actionCost && mob.hp > 0) {
+        p.energy -= weapon.actionCost;
+        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), 0);
+        events.push({
+          type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
+          targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,
+          damage: r.damage, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
+          light: rt.light, targetEmitsLight: !!w.mobs[mob.template].emitsLight,
+        });
+        mob.hp -= r.damage;
+        if (mob.hp <= 0) {
+          events.push(this._killMob(mob, p));
+          p.pending = null;
+          break;
+        }
+      }
+    }
+
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      for (const m of rt.mobs) {
+        const t = w.mobs[m.template];
+        if (!t.hostile || !t.attack) continue;
+        const victims = this.playersIn(roomId).filter((p) => p.hp > 0);
+        if (!victims.length) continue;
+        const target = victims[Math.floor(Math.random() * victims.length)];
+        while (m.energy >= t.attack.actionCost && target.hp > 0) {
+          m.energy -= t.attack.actionCost;
+          const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerArmour(w, target));
+          events.push({
+            type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
+            targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
+            damage: r.damage, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
+            light: rt.light, attackerEmitsLight: !!t.emitsLight,
+          });
+          target.hp -= r.damage;
+          if (target.hp <= 0) {
+            events.push(this._respawn(target, roomId));
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  _killMob(mob, killer) {
+    const t = this.world.mobs[mob.template];
+    const rt = this.rooms[killer.location];
+    const idx = rt.mobs.indexOf(mob);
+    if (idx >= 0) rt.mobs.splice(idx, 1);
+    const loot = [];
+    for (const l of t.loot || []) {
+      if (Math.random() < l.chance) {
+        rt.items.push(makeItemInstance({ template: l.template }, this.world));
+        loot.push(this.world.items[l.template].name);
+      }
+    }
+    const xp = t.xp || 0;
+    killer.xp = (killer.xp || 0) + xp;
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId: killer.location, killerId: killer.id, loot, xp };
+  }
+
+  /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */
+  _respawn(player, deathRoom) {
+    const start = this.world.playerTemplate.startLocation;
+    player.hp = player.maxHp;
+    player.location = start;
+    player.pending = null;
+    player.energy = 0;
+    this.rooms[start].light = this.computeRoomLight(start);
+    this.rooms[deathRoom].light = this.computeRoomLight(deathRoom);
+    return { type: "death", victimKind: "player", victimId: player.id, victimName: player.name, roomId: deathRoom, respawnRoom: start };
   }
 }
 

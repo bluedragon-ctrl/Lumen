@@ -39,6 +39,23 @@ function isHarmedByLight(perception, light) {
   return perception ? light > perception.harmedAbove : false;
 }
 
+/**
+ * Combat hit chance by visibility tier (low → high light):
+ *   can't see (below blindBelow)                → 0.05 (flailing)
+ *   partial / dim (blindBelow .. below dimBelow) → 0.5
+ *   clear (dimBelow .. harmedAbove)              → 1.0
+ *   glare (above harmedAbove)                    → 0.5
+ * `dimBelow` defaults to `blindBelow` (no partial tier) when an actor omits it.
+ */
+function hitChance(perception, light) {
+  const blindBelow = perception ? perception.blindBelow : 1;
+  const dimBelow = perception && perception.dimBelow != null ? perception.dimBelow : blindBelow;
+  if (light < blindBelow) return 0.05;
+  if (isHarmedByLight(perception, light)) return 0.5;
+  if (light < dimBelow) return 0.5;
+  return 1.0;
+}
+
 module.exports = {
   LIGHT_MIN,
   LIGHT_MAX,
@@ -47,4 +64,5 @@ module.exports = {
   effectiveLight,
   canSee,
   isHarmedByLight,
+  hitChance,
 };

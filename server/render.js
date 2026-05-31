@@ -34,6 +34,7 @@ function buildPlayerView(state, p) {
       mana: p.mana,
       maxMana: p.maxMana,
       energy: p.energy,
+      energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
       speed: p.speed,
       attributes: p.attributes,
       perception: p.perception,
@@ -119,39 +120,54 @@ function entity(kind, id, name, description, extra) {
 function buildExamineView(state, p, q) {
   const w = state.world;
   const rt = state.rooms[p.location];
-  const see = canSee(p.perception, rt.light);
+  const light = rt.light;
+  const see = canSee(p.perception, light);
+  // Detail (HP, description, specs) only at *clear* sight; in the partial/dim
+  // tier you make out what a thing is, but not its particulars.
+  const dimBelow = p.perception && p.perception.dimBelow != null ? p.perception.dimBelow : p.perception.blindBelow;
+  const detailed = light >= dimBelow;
   const ql = (q || "").toLowerCase();
   const hit = (id, name) => id.toLowerCase() === ql || name.toLowerCase().includes(ql);
+  const tooDim = { hints: ["Too dim to make out details."] };
 
   for (const m of rt.mobs) {
     const t = w.mobs[m.template];
     if ((see || t.emitsLight) && hit(m.id, t.name)) {
+      const attack = { actions: [{ label: "Attack", command: `attack ${m.id}` }] };
+      if (!detailed) return entity("mob", m.id, t.name, null, { dim: true, ...tooDim, ...attack });
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
         hints: [t.hostile ? "Hostile — it may attack if it senses you." : "It seems harmless."],
+        ...attack,
       });
     }
   }
   if (see) {
     for (const i of rt.items) {
       const t = w.items[i.template];
-      if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) });
+      if (hit(i.id, t.name))
+        return detailed
+          ? entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) })
+          : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const f of rt.fixtures) {
       const t = w.fixtures[f.template];
       if (hit(f.id, t.name))
-        return entity("fixture", f.id, t.name, t.description, {
-          lines: t.station ? [`station: ${t.station}`] : [],
-          hints: t.type === "crafting" ? [`Craft here: use <components> on ${f.id}`] : [],
-        });
+        return detailed
+          ? entity("fixture", f.id, t.name, t.description, {
+              lines: t.station ? [`station: ${t.station}`] : [],
+              hints: t.type === "crafting" ? [`Craft here: use <components> on ${f.id}`] : [],
+            })
+          : entity("fixture", f.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const o of state.playersIn(p.location)) {
       if (o.id !== p.id && hit(o.id, o.name))
-        return entity("player", o.id, o.name, "A fellow delver.", {
-          bars: [{ label: "HP", value: o.hp, max: o.maxHp, kind: "hp" }],
-        });
+        return detailed
+          ? entity("player", o.id, o.name, "A fellow delver.", { bars: [{ label: "HP", value: o.hp, max: o.maxHp, kind: "hp" }] })
+          : entity("player", o.id, o.name, null, { dim: true, ...tooDim });
     }
   }
+  // Carried items are always examined clearly (in hand).
   for (const i of p.inventory) {
     const t = w.items[i.template];
     if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) });

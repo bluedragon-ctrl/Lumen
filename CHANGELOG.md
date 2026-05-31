@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Combat + Energy/action-point economy + mob AI**: tick-driven attacks gated by
+  banked `speed` energy (`attack`/`kill`/`stop`); damage = weapon dice + (Might−5)
+  − Armour. **Light-gated accuracy (four tiers)** via per-actor `blindBelow`/
+  `dimBelow`/`harmedAbove`: can't-see 5% · partial/dim 50% · clear 100% · glare
+  50% — so a torch lifts you from dim to clear *and* drops light-sensitive foes
+  into glare.
+  Hostile mobs attack players in their room. Death: mobs drop loot + grant XP;
+  players respawn at the rim (no penalty, v1). Mobs gained attack stats + XP.
+- Examine view shows an **Attack** action button for creatures (clicking it issues
+  `attack <id>`); the target's HP bar updates live as you fight.
+- Combat log hides the name of a creature you can't see: an unseen attacker reads
+  as "**Something** hits you", not its name (computed per recipient; self-lit mobs
+  are still named). Bystander lines hide unseen names too.
+- `server/dice.js` dice roller; validator now checks mob attack dice notation.
 - World-interaction commands: `get`/`take`, `drop`, `inventory` (stackables merge;
   picking up requires light). Social: `say`, `emote`.
 - **Room-presence broadcasts**: other players in the room see speech, emotes,

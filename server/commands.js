@@ -24,6 +24,7 @@ const HELP = [
   "  get | take <target>   — pick up an item",
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
+  "  attack | kill <target> — attack a creature (stop to break off)",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  light | douse         — light or douse your carried light source",
@@ -58,6 +59,7 @@ function move(state, player, dir, ctx) {
   const room = state.world.rooms[player.location];
   const dest = room.exits && room.exits[dir];
   if (!dest) return [{ type: "error", text: `You can't go ${dir} from here.` }];
+  player.pending = null; // moving breaks off any attack
   const from = player.location;
   ctx.toRoom(from, { type: "log", text: `${player.name} leaves ${dir}.` }, player.id);
   player.location = dest;
@@ -143,6 +145,22 @@ function lookAt(state, player, arg) {
   return [{ type: "log", text: `You examine ${view.entity.name}.` }, view];
 }
 
+// Set a pending attack on a mob in the room; swings resolve on ticks as energy
+// allows (see state.resolveCombat). You can only target what you can perceive.
+function attack(state, player, arg) {
+  if (!arg) return [{ type: "error", text: "Attack what?" }];
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const ql = arg.toLowerCase();
+  const mob = rt.mobs.find((m) => {
+    const t = state.world.mobs[m.template];
+    return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+  });
+  if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
+  player.pending = { type: "attack", targetId: mob.id };
+  return [{ type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` }];
+}
+
 /** Admin-only commands, prefixed with '@'. */
 function handleAdmin(state, player, verb, arg) {
   if (!player.isAdmin) return [{ type: "error", text: "You lack the authority for that." }];
@@ -193,6 +211,13 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "inv":
     case "i":
       return inventory(state, player);
+    case "attack":
+    case "kill":
+    case "k":
+      return attack(state, player, arg);
+    case "stop":
+      player.pending = null;
+      return [{ type: "log", text: "You break off your attack." }];
     case "say":
       return say(state, player, arg, ctx);
     case "emote":

@@ -79,8 +79,8 @@ body {
 /* searing: light is painful. Keep the panel dark, but blast the text with a
    shimmering white bloom (overexposed feel) plus a pulsing glare overlay. */
 .light-searing { background: #0a0c0f; color: #eef3f9; }
-.light-searing #room-name, .light-searing .room-desc, .light-searing .light-meter { color: #fff; font-weight: 700; }
-.light-searing #room-name, .light-searing .room-desc { animation: searing-shimmer 1.7s ease-in-out infinite; }
+.light-searing #room-name, .light-searing #ex-name, .light-searing .room-desc, .light-searing .light-meter { color: #fff; font-weight: 700; }
+.light-searing #room-name, .light-searing #ex-name, .light-searing .room-desc { animation: searing-shimmer 1.7s ease-in-out infinite; }
 .light-searing .chip { color: #fff; border-color: rgba(255, 255, 255, .55); box-shadow: 0 0 7px rgba(255, 255, 255, .22); }
 .light-searing::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -107,7 +107,10 @@ body {
 .ex-lines li { color: var(--muted); padding: 1px 0; }
 .ex-hints { margin: 8px 0; }
 .ex-hints .hint { display: block; color: var(--accent); font-size: 13px; padding: 1px 0; }
-.ex-back { margin-top: 10px; background: var(--panel-2); color: var(--accent); border: 1px solid var(--edge); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
+.ex-actions { display: flex; gap: 6px; margin: 10px 0 4px; }
+.ex-action { background: var(--panel-2); color: var(--hostile); border: 1px solid var(--hostile); border-radius: 6px; padding: 4px 12px; font: inherit; cursor: pointer; }
+.ex-action:hover { background: var(--hostile); color: #0b0d10; }
+.ex-back { margin-top: 6px; background: var(--panel-2); color: var(--accent); border: 1px solid var(--edge); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
 .ex-back:hover { border-color: var(--accent); }
 
 /* Status strip --------------------------------------------------------- */
