@@ -9,7 +9,12 @@ const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { execute } = require("./commands");
+const { canSee } = require("./light");
 const accounts = require("./accounts");
+
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+// Can this player make out the mob — room bright enough for them, or it's self-lit?
+const canSeeMob = (player, light, emitsLight) => !!emitsLight || canSee(player.perception, light);
 
 // ---------------------------------------------------------------------------
 // World + state
@@ -160,27 +165,40 @@ function dispatchEvent(ev) {
 
   if (ev.type === "attack") {
     if (ev.by === "player") {
+      // The attacker targeted it, so they always know what it is.
       const verb = ev.hit
         ? `hit ${ev.targetName} for ${ev.damage}`
         : ev.sighted
           ? `swing at ${ev.targetName} and miss`
           : `flail at ${ev.targetName} in the dark and miss`;
       sendToPlayer(ev.attackerId, { type: "log", text: `You ${verb}.` });
-      roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.attackerName} ${ev.hit ? "strikes" : "lunges at"} ${ev.targetName}.` }, ev.attackerId);
-      // Push the target's examine view so the attacker watches its HP bar drop.
+      // Bystanders only learn the mob's name if they can see it.
+      for (const o of state.playersIn(ev.roomId)) {
+        if (o.id === ev.attackerId) continue;
+        const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
+        sendToPlayer(o.id, { type: "log", text: `${ev.attackerName} ${ev.hit ? "strikes" : "lunges at"} ${tn}.` });
+      }
       const attacker = state.players.get(ev.attackerId);
       if (attacker && ev.targetHp > 0) {
         const view = buildExamineView(state, attacker, ev.targetId);
         if (view) sendToPlayer(ev.attackerId, view);
       }
     } else {
-      const youLine = ev.hit
-        ? `${ev.attackerName} hits you for ${ev.damage}!`
-        : `${ev.attackerName} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`;
-      sendToPlayer(ev.targetId, { type: "log", text: youLine });
       const target = state.players.get(ev.targetId);
+      const seen = target && canSeeMob(target, ev.light, ev.attackerEmitsLight);
+      const who = seen ? ev.attackerName : "something";
+      const youLine = ev.hit
+        ? `${cap(who)} hits you for ${ev.damage}!`
+        : seen
+          ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
+          : "Something lunges out of the dark and misses.";
+      sendToPlayer(ev.targetId, { type: "log", text: youLine });
       if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
-      roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.attackerName} attacks ${ev.targetName}.` }, ev.targetId);
+      for (const o of state.playersIn(ev.roomId)) {
+        if (o.id === ev.targetId) continue;
+        const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
+        sendToPlayer(o.id, { type: "log", text: `${cap(an)} attacks ${ev.targetName}.` });
+      }
     }
     return;
   }

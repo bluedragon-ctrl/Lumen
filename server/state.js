@@ -243,6 +243,7 @@ class GameState {
           type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
           targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,
           damage: r.damage, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
+          light: rt.light, targetEmitsLight: !!w.mobs[mob.template].emitsLight,
         });
         mob.hp -= r.damage;
         if (mob.hp <= 0) {
@@ -267,6 +268,7 @@ class GameState {
             type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
             targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
             damage: r.damage, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
+            light: rt.light, attackerEmitsLight: !!t.emitsLight,
           });
           target.hp -= r.damage;
           if (target.hp <= 0) {
