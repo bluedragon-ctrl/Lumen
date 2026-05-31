@@ -5,7 +5,7 @@
   "maxHp": 18,
   "maxMana": 10,
   "speed": 12,
-  "perception": { "blindBelow": 1, "harmedAbove": 5 },
+  "perception": { "blindBelow": 1, "harmedAbove": 9 },
   "startLocation": "settlement.plaza",
   "startInventory": [
     { "template": "torch", "fuel": 200 },
