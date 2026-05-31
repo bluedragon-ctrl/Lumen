@@ -42,7 +42,7 @@
     "type": "armour",
     "slot": "body",
     "weight": 3,
-    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0 }
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
   "flint": {
     "id": "flint",

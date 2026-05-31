@@ -236,9 +236,10 @@ class GameState {
         continue;
       }
       const weapon = weaponOf(w, p);
+      const mobArmour = w.mobs[mob.template].armour || 0;
       while (p.energy >= weapon.actionCost && mob.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), 0);
+        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), mobArmour);
         events.push({
           type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
           targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,

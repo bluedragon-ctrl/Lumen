@@ -51,6 +51,8 @@ function main() {
       if (!has(items, l.template)) errs.push(`mob ${id}: loot references missing template ${l.template}`);
     if (m.attack && (typeof m.attack.damage !== "string" || !DICE_RE.test(m.attack.damage)))
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
+    if (m.armour != null && typeof m.armour !== "number")
+      errs.push(`mob ${id}: armour must be a number`);
   }
 
   for (const [id, rc] of Object.entries(recipes)) {
