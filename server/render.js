@@ -129,6 +129,7 @@ function buildExamineView(state, p, q) {
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
         hints: [t.hostile ? "Hostile — it may attack if it senses you." : "It seems harmless."],
+        actions: [{ label: "Attack", command: `attack ${m.id}` }],
       });
     }
   }

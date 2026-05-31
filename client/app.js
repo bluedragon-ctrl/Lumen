@@ -145,6 +145,16 @@ function renderExamine(e) {
     span.textContent = h;
     hints.appendChild(span);
   }
+
+  const actions = $("ex-actions");
+  actions.innerHTML = "";
+  for (const a of e.actions || []) {
+    const btn = document.createElement("button");
+    btn.className = "ex-action";
+    btn.textContent = a.label;
+    btn.addEventListener("click", () => sendCommand(a.command));
+    actions.appendChild(btn);
+  }
 }
 
 // Back to the live room view.
@@ -239,7 +249,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
-  "light", "douse", "extinguish", "ignite", "help",
+  "attack", "kill", "stop", "light", "douse", "extinguish", "ignite", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;

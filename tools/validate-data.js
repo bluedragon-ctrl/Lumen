@@ -46,9 +46,12 @@ function main() {
     }
   }
 
-  for (const [id, m] of Object.entries(mobs))
+  for (const [id, m] of Object.entries(mobs)) {
     for (const l of m.loot || [])
       if (!has(items, l.template)) errs.push(`mob ${id}: loot references missing template ${l.template}`);
+    if (m.attack && (typeof m.attack.damage !== "string" || !DICE_RE.test(m.attack.damage)))
+      errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
+  }
 
   for (const [id, rc] of Object.entries(recipes)) {
     for (const i of rc.inputs || [])

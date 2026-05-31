@@ -10,6 +10,7 @@
     "emitsLight": 1,
     "behavior": "wander",
     "hostile": false,
+    "xp": 2,
     "loot": [{ "template": "luminescent-gland", "chance": 0.5 }]
   },
   "gloom-crawler": {
@@ -22,6 +23,8 @@
     "perception": { "blindBelow": 0, "harmedAbove": 2 },
     "behavior": "hunt",
     "hostile": true,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 8,
     "loot": [{ "template": "flint", "chance": 0.3 }]
   },
   "deep-dweller": {
@@ -34,6 +37,8 @@
     "perception": { "blindBelow": 0, "harmedAbove": 2 },
     "behavior": "guard",
     "hostile": true,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "xp": 20,
     "loot": [
       { "template": "vial", "chance": 0.6 },
       { "template": "rusted-blade", "chance": 0.2 }

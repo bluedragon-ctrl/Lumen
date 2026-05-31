@@ -7,7 +7,7 @@ const { WebSocketServer } = require("ws");
 const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION } = require("./config");
 const { loadWorld } = require("./world");
 const { GameState } = require("./state");
-const { buildRoomView, buildPlayerView } = require("./render");
+const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { execute } = require("./commands");
 const accounts = require("./accounts");
 
@@ -148,18 +148,76 @@ wss.on("connection", (ws) => {
 // ---------------------------------------------------------------------------
 // Tick loop — the heartbeat of the living world (DESIGN.md §3.4, §4).
 // ---------------------------------------------------------------------------
-const tickTimer = setInterval(() => {
-  const events = state.advance();
-  for (const ev of events) {
-    if (ev.type === "light-out") {
-      const player = state.players.get(ev.playerId);
-      if (!player) continue;
-      const name = world.items[ev.item].name;
-      sendToPlayer(ev.playerId, { type: "log", text: `${name} gutters out. Darkness closes in.` });
-      sendToPlayer(ev.playerId, buildRoomView(state, player));
-      sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    }
+function dispatchEvent(ev) {
+  if (ev.type === "light-out") {
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    sendToPlayer(ev.playerId, { type: "log", text: `${world.items[ev.item].name} gutters out. Darkness closes in.` });
+    sendToPlayer(ev.playerId, buildRoomView(state, player));
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
   }
+
+  if (ev.type === "attack") {
+    if (ev.by === "player") {
+      const verb = ev.hit
+        ? `hit ${ev.targetName} for ${ev.damage}`
+        : ev.sighted
+          ? `swing at ${ev.targetName} and miss`
+          : `flail at ${ev.targetName} in the dark and miss`;
+      sendToPlayer(ev.attackerId, { type: "log", text: `You ${verb}.` });
+      roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.attackerName} ${ev.hit ? "strikes" : "lunges at"} ${ev.targetName}.` }, ev.attackerId);
+      // Push the target's examine view so the attacker watches its HP bar drop.
+      const attacker = state.players.get(ev.attackerId);
+      if (attacker && ev.targetHp > 0) {
+        const view = buildExamineView(state, attacker, ev.targetId);
+        if (view) sendToPlayer(ev.attackerId, view);
+      }
+    } else {
+      const youLine = ev.hit
+        ? `${ev.attackerName} hits you for ${ev.damage}!`
+        : `${ev.attackerName} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`;
+      sendToPlayer(ev.targetId, { type: "log", text: youLine });
+      const target = state.players.get(ev.targetId);
+      if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
+      roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.attackerName} attacks ${ev.targetName}.` }, ev.targetId);
+    }
+    return;
+  }
+
+  if (ev.type === "combat-stop") {
+    sendToPlayer(ev.playerId, { type: "log", text: ev.reason });
+    return;
+  }
+
+  if (ev.type === "death" && ev.victimKind === "mob") {
+    const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
+    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} dies.${lootTxt}` }, ev.killerId);
+    const killer = state.players.get(ev.killerId);
+    if (killer) {
+      sendToPlayer(ev.killerId, { type: "log", text: `You slay ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
+      sendToPlayer(ev.killerId, buildRoomView(state, killer));
+      sendToPlayer(ev.killerId, buildPlayerView(state, killer));
+    }
+    roomCtx.refreshRoom(ev.roomId, ev.killerId);
+    return;
+  }
+
+  if (ev.type === "death" && ev.victimKind === "player") {
+    const victim = state.players.get(ev.victimId);
+    sendToPlayer(ev.victimId, { type: "system", text: "You have fallen in the dark. You awaken at the rim." });
+    if (victim) {
+      sendToPlayer(ev.victimId, buildRoomView(state, victim));
+      sendToPlayer(ev.victimId, buildPlayerView(state, victim));
+    }
+    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} falls.` }, ev.victimId);
+    roomCtx.refreshRoom(ev.roomId, ev.victimId);
+    roomCtx.refreshRoom(ev.respawnRoom, ev.victimId);
+  }
+}
+
+const tickTimer = setInterval(() => {
+  for (const ev of state.advance()) dispatchEvent(ev);
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
     for (const player of state.players.values()) {
       try {

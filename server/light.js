@@ -39,6 +39,15 @@ function isHarmedByLight(perception, light) {
   return perception ? light > perception.harmedAbove : false;
 }
 
+/**
+ * Can the actor see *clearly* — i.e. light is within its comfortable band
+ * (bright enough to see, not so bright it's blinded by glare)? Used for combat
+ * accuracy: clear sight → full hit chance, otherwise the actor is flailing.
+ */
+function perceivesClearly(perception, light) {
+  return canSee(perception, light) && !isHarmedByLight(perception, light);
+}
+
 module.exports = {
   LIGHT_MIN,
   LIGHT_MAX,
@@ -47,4 +56,5 @@ module.exports = {
   effectiveLight,
   canSee,
   isHarmedByLight,
+  perceivesClearly,
 };
