@@ -101,7 +101,9 @@ The `room` view is filtered by what the viewer can perceive: in darkness the
 description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement
 (`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
-`attack`/`kill`/`stop`, `light`/`douse`, `help`, and admin `@`-commands. Effects
+`attack`/`kill`/`stop`, `equip`/`wield`/`wear`, `unequip`/`remove`,
+`light [item]`/`douse`, `help`, and admin `@`-commands. (`light` auto-swaps a
+spent source for a fuelled one.) Effects
 visible to other players in the room (speech, arrivals/departures, picking
 things up, combat) are broadcast to them.
 

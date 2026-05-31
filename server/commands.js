@@ -25,9 +25,11 @@ const HELP = [
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
   "  attack | kill <target> — attack a creature (stop to break off)",
+  "  equip | wield | wear <item> — equip from inventory (swaps current)",
+  "  unequip | remove <item|slot> — return equipped gear to inventory",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
-  "  light | douse         — light or douse your carried light source",
+  "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
   "  help | ?              — this list",
 ].join("\n");
 
@@ -55,6 +57,17 @@ function addToInventory(player, inst, world) {
   player.inventory.push(inst);
 }
 
+// Equip an instance into its template's slot, stowing whatever was there back to
+// inventory (and dousing it if it was a lit light). Returns the displaced item.
+function equipItem(player, inst, world) {
+  const slot = world.items[inst.template].slot;
+  const prev = player.equipment[slot] || null;
+  if (prev && prev.lit) prev.lit = false;
+  player.equipment[slot] = inst;
+  if (prev) player.inventory.push(prev);
+  return prev;
+}
+
 function move(state, player, dir, ctx) {
   const room = state.world.rooms[player.location];
   const dest = room.exits && room.exits[dir];
@@ -71,23 +84,73 @@ function move(state, player, dir, ctx) {
   return selfAndViews(state, player, `You go ${dir}.`);
 }
 
-function toggleLight(state, player, on, ctx) {
+const fueledLightIdx = (player, w) =>
+  player.inventory.findIndex((i) => w.items[i.template].light && i.fuel > 0);
+
+function toggleLight(state, player, on, ctx, arg) {
   const w = state.world;
-  let inst = player.equipment.light;
-  if (!inst && on) {
-    const idx = player.inventory.findIndex((i) => w.items[i.template].light);
-    if (idx < 0) return [{ type: "error", text: "You have no light source." }];
-    inst = player.inventory.splice(idx, 1)[0];
-    player.equipment.light = inst;
+  // `light <item>`: equip that specific source first (swapping the current one).
+  if (on && arg) {
+    const idx = findItem(player.inventory, w, arg);
+    if (idx >= 0 && w.items[player.inventory[idx].template].light) {
+      equipItem(player, player.inventory.splice(idx, 1)[0], w);
+    }
   }
-  if (!inst) return [{ type: "error", text: "You have no light source ready." }];
+  let inst = player.equipment.light;
+  // Auto-equip a light if none held, or swap out a spent one for a fuelled one.
+  if (on && (!inst || inst.fuel <= 0)) {
+    let idx = fueledLightIdx(player, w);
+    if (idx < 0 && !inst) idx = player.inventory.findIndex((i) => w.items[i.template].light);
+    if (idx >= 0) {
+      equipItem(player, player.inventory.splice(idx, 1)[0], w);
+      inst = player.equipment.light;
+    }
+  }
+  if (!inst) return [{ type: "error", text: "You have no light source." }];
   const name = w.items[inst.template].name;
-  if (on && inst.fuel <= 0) return [{ type: "error", text: `${name} is spent.` }];
+  if (on && inst.fuel <= 0) return [{ type: "error", text: `${name} is spent and you have no fresh light.` }];
   inst.lit = on;
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.toRoom(player.location, { type: "log", text: `${player.name} ${on ? "lights" : "douses"} ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, on ? `You light ${name}. The dark recedes.` : `You douse ${name}.`);
+}
+
+function equip(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Equip what?" }];
+  const idx = findItem(player.inventory, w, arg);
+  if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
+  const t = w.items[player.inventory[idx].template];
+  if (!t.slot) return [{ type: "error", text: `You can't equip ${t.name}.` }];
+  const prev = equipItem(player, player.inventory.splice(idx, 1)[0], w);
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.refreshRoom(player.location, player.id);
+  const extra = prev ? `, stowing ${w.items[prev.template].name}` : "";
+  return selfAndViews(state, player, `You equip ${t.name}${extra}.`);
+}
+
+function unequip(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Remove what?" }];
+  const ql = arg.toLowerCase();
+  let slot = null;
+  if (player.equipment[ql] !== undefined) slot = ql; // a slot name (hand/body/light)
+  else
+    for (const [s, inst] of Object.entries(player.equipment)) {
+      if (inst && (inst.id.toLowerCase() === ql || w.items[inst.template].name.toLowerCase().includes(ql))) {
+        slot = s;
+        break;
+      }
+    }
+  const inst = slot ? player.equipment[slot] : null;
+  if (!inst) return [{ type: "error", text: `You don't have "${arg}" equipped.` }];
+  if (inst.lit) inst.lit = false;
+  player.equipment[slot] = null;
+  player.inventory.push(inst);
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(state, player, `You remove ${w.items[inst.template].name}.`);
 }
 
 function get(state, player, arg, ctx) {
@@ -223,9 +286,17 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "emote":
     case "me":
       return emote(state, player, arg, ctx);
+    case "equip":
+    case "wield":
+    case "wear":
+    case "hold":
+      return equip(state, player, arg, ctx);
+    case "unequip":
+    case "remove":
+      return unequip(state, player, arg, ctx);
     case "light":
     case "ignite":
-      return toggleLight(state, player, true, ctx);
+      return toggleLight(state, player, true, ctx, arg);
     case "douse":
     case "extinguish":
       return toggleLight(state, player, false, ctx);
