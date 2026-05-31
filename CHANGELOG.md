@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Player accounts & persistence** (`server/accounts.js`): one JSON file per
+  character under `data/runtime/players/` (gitignored), saved on disconnect and
+  periodically; characters resume their saved state (location, hp, inventory…).
+- **Name-only login flow**: on connect the client's first input is the delver
+  name; the server loads that account or rejects unknown names.
+- **Admin account**, auto-created on first boot, with `@`-prefixed admin commands
+  (`@create-player <name>`, `@list-players`, `@help`). Account creation is
+  admin-only for now (self-registration with rules comes later).
+- Runtime id counter is seeded past loaded account ids to avoid collisions.
 - Node + `ws` **server skeleton** (`server/`): loads static world into a frozen
   in-memory object, authoritative `GameState` (per-room mob/item instances,
   players), the light model (`bandOf`/`effectiveLight`/`canSee`/`isHarmedByLight`),

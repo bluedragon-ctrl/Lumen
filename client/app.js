@@ -11,12 +11,17 @@ const cmdEl = $("cmd");
 let lastRoom = null;
 let lastPlayer = null;
 
+// Until authenticated, the command line captures the player's NAME, not commands.
+let authed = false;
+
 // --- WebSocket -------------------------------------------------------------
 let ws;
 function connect() {
   ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host);
   ws.onopen = () => addLine("[connected]", "system");
   ws.onclose = () => {
+    authed = false;
+    setPrompt();
     addLine("[disconnected — retrying in 2s]", "error");
     setTimeout(connect, 2000);
   };
@@ -25,10 +30,20 @@ function connect() {
 function sendCommand(text) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "command", text }));
 }
+function sendLogin(name) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name }));
+}
+function setPrompt() {
+  cmdEl.placeholder = authed
+    ? 'type a command — try "look", "down", "light", "help"'
+    : 'enter your delver name (or "admin") and press Enter';
+}
 
 // --- Message handling ------------------------------------------------------
 function handle(msg) {
   switch (msg.type) {
+    case "login-required": authed = false; setPrompt(); addLine(msg.text, "system"); break;
+    case "authenticated": authed = true; setPrompt(); break;
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
@@ -198,6 +213,12 @@ cmdEl.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") {
     const text = cmdEl.value.trim();
     if (!text) return;
+    if (!authed) {
+      addLine("> " + text, "echo");
+      sendLogin(text);
+      cmdEl.value = "";
+      return;
+    }
     addLine("> " + text, "echo");
     sendCommand(text);
     history.push(text);
@@ -240,4 +261,5 @@ function handleTab() {
   }
 }
 
+setPrompt();
 connect();

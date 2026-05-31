@@ -42,11 +42,30 @@ Dynamic state is snapshotted to `data/runtime/` (gitignored) every
 
 JSON messages over a single socket per player.
 
+### Login
+
+On connect the server sends `{ "type": "login-required", "text": "…" }`. The
+client's first input is the player **name** (name-only identity for now):
+
+```json
+{ "type": "login", "name": "admin" }      // client → server
+{ "type": "authenticated", "name": "admin", "admin": true }  // server → client (on success)
+```
+
+Unknown names are rejected (admin-only account creation; admins use
+`@create-player <name>`). The `admin` account is auto-created on first boot.
+Accounts persist as one JSON file per character under `data/runtime/players/`
+(gitignored), saved on disconnect and periodically.
+
+### Commands
+
 **Client → Server**
 
 ```json
 { "type": "command", "text": "look" }
 ```
+
+Admin commands are prefixed with `@` (`@create-player`, `@list-players`, `@help`).
 
 **Server → Client**
 
