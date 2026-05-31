@@ -13,15 +13,29 @@
       <div id="log"></div>
     </section>
 
-    <!-- Inspect: live view of the current room, tinted by light level -->
+    <!-- Inspect: live view of the current room (tinted by light), or the
+         examine view of a single entity when you look at / click something. -->
     <section id="inspect" class="pane light-unknown" aria-label="Room view">
-      <header class="inspect-head">
-        <span id="room-name">—</span>
-        <span id="light-meter" class="light-meter">light: —</span>
-      </header>
-      <p id="room-desc" class="room-desc"></p>
-      <div id="room-exits" class="row"></div>
-      <div id="room-contents" class="contents"></div>
+      <div id="room-view">
+        <header class="inspect-head">
+          <span id="room-name">—</span>
+          <span id="light-meter" class="light-meter">light: —</span>
+        </header>
+        <p id="room-desc" class="room-desc"></p>
+        <div id="room-exits" class="row"></div>
+        <div id="room-contents" class="contents"></div>
+      </div>
+      <div id="examine-view" hidden>
+        <header class="inspect-head">
+          <span id="ex-name">—</span>
+          <span id="ex-kind" class="light-meter"></span>
+        </header>
+        <p id="ex-desc" class="room-desc"></p>
+        <div id="ex-bars"></div>
+        <ul id="ex-lines" class="ex-lines"></ul>
+        <div id="ex-hints" class="ex-hints"></div>
+        <button id="ex-back" class="ex-back">↩ back to room</button>
+      </div>
     </section>
 
     <!-- Status strip: always-visible vitals -->

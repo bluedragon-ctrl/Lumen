@@ -48,6 +48,7 @@ function handle(msg) {
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
     case "room": lastRoom = msg.room; renderRoom(msg.room); break;
+    case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
     default: addLine(JSON.stringify(msg), "log");
   }
@@ -64,6 +65,10 @@ function addLine(text, kind) {
 
 // --- Inspect (room) --------------------------------------------------------
 function renderRoom(room) {
+  // Receiving a room view (on move / look / light change) returns the Inspect
+  // window from any examine view back to the live room.
+  $("examine-view").hidden = true;
+  $("room-view").hidden = false;
   const inspect = $("inspect");
   inspect.className = "pane light-" + room.light.band;
   $("room-name").textContent = room.name;
@@ -102,6 +107,48 @@ function renderRoom(room) {
     c.appendChild(label("nothing of note here."));
   }
 }
+
+// --- Examine (single entity in the Inspect window) -------------------------
+function renderExamine(e) {
+  // Neutral panel for readability (no room light tint while examining).
+  $("inspect").className = "pane light-unknown";
+  $("room-view").hidden = true;
+  $("examine-view").hidden = false;
+
+  $("ex-name").textContent = e.name;
+  $("ex-kind").textContent = e.kind;
+  $("ex-desc").textContent = e.description || "";
+
+  const bars = $("ex-bars");
+  bars.innerHTML = "";
+  for (const b of e.bars || []) {
+    const pct = b.max > 0 ? Math.max(0, Math.min(100, (b.value / b.max) * 100)) : 0;
+    const span = document.createElement("span");
+    span.className = "stat";
+    span.innerHTML = `<label>${b.label}</label><span class="bar"><i style="width:${pct}%"></i></span><b>${b.value}/${b.max}</b>`;
+    bars.appendChild(span);
+  }
+
+  const lines = $("ex-lines");
+  lines.innerHTML = "";
+  for (const l of e.lines || []) {
+    const li = document.createElement("li");
+    li.textContent = l;
+    lines.appendChild(li);
+  }
+
+  const hints = $("ex-hints");
+  hints.innerHTML = "";
+  for (const h of e.hints || []) {
+    const span = document.createElement("span");
+    span.className = "hint";
+    span.textContent = h;
+    hints.appendChild(span);
+  }
+}
+
+// Back to the live room view.
+document.getElementById("ex-back").addEventListener("click", () => sendCommand("look"));
 
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {

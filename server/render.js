@@ -89,4 +89,80 @@ function buildRoomView(state, p) {
   };
 }
 
-module.exports = { buildPlayerView, buildRoomView, itemView };
+// --- Examine -----------------------------------------------------------------
+// A single examined entity, rendered in the Inspect window. The payload is
+// intentionally generic — `bars`/`lines`/`hints` — so HP bars, stats, and
+// interaction hints can grow without protocol churn.
+
+function itemSpecLines(tmpl) {
+  const lines = [`type: ${tmpl.type}`];
+  if (tmpl.weapon) {
+    const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
+    lines.push(`damage: ${dmg}`, `action cost: ${tmpl.weapon.actionCost}`);
+  }
+  if (tmpl.armour) {
+    lines.push(`armour ${tmpl.armour.armour}, ward ${tmpl.armour.ward}`);
+    if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
+  }
+  if (tmpl.light) lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);
+  return lines;
+}
+
+function entity(kind, id, name, description, extra) {
+  return { type: "examine", entity: Object.assign({ kind, id, name, description }, extra) };
+}
+
+/**
+ * Resolve a target (by id first, then name) within what the player can perceive,
+ * and build its examine payload. Returns null if nothing matches.
+ */
+function buildExamineView(state, p, q) {
+  const w = state.world;
+  const rt = state.rooms[p.location];
+  const see = canSee(p.perception, rt.light);
+  const ql = (q || "").toLowerCase();
+  const hit = (id, name) => id.toLowerCase() === ql || name.toLowerCase().includes(ql);
+
+  for (const m of rt.mobs) {
+    const t = w.mobs[m.template];
+    if ((see || t.emitsLight) && hit(m.id, t.name)) {
+      return entity("mob", m.id, t.name, t.description, {
+        bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
+        hints: [t.hostile ? "Hostile — it may attack if it senses you." : "It seems harmless."],
+      });
+    }
+  }
+  if (see) {
+    for (const i of rt.items) {
+      const t = w.items[i.template];
+      if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) });
+    }
+    for (const f of rt.fixtures) {
+      const t = w.fixtures[f.template];
+      if (hit(f.id, t.name))
+        return entity("fixture", f.id, t.name, t.description, {
+          lines: t.station ? [`station: ${t.station}`] : [],
+          hints: t.type === "crafting" ? [`Craft here: use <components> on ${f.id}`] : [],
+        });
+    }
+    for (const o of state.playersIn(p.location)) {
+      if (o.id !== p.id && hit(o.id, o.name))
+        return entity("player", o.id, o.name, "A fellow delver.", {
+          bars: [{ label: "HP", value: o.hp, max: o.maxHp, kind: "hp" }],
+        });
+    }
+  }
+  for (const i of p.inventory) {
+    const t = w.items[i.template];
+    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) });
+  }
+  for (const slot of Object.values(p.equipment)) {
+    if (slot && hit(slot.id, w.items[slot.template].name)) {
+      const t = w.items[slot.template];
+      return entity("item", slot.id, t.name, t.description, { lines: itemSpecLines(t) });
+    }
+  }
+  return null;
+}
+
+module.exports = { buildPlayerView, buildRoomView, buildExamineView, itemView };
