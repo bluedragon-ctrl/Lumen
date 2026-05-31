@@ -28,6 +28,7 @@ function main() {
 
   for (const [id, r] of Object.entries(rooms)) {
     if (r.id !== id) errs.push(`room ${id}: id field mismatch (${r.id})`);
+    if (r.zone != null && typeof r.zone !== "string") errs.push(`room ${id}: zone must be a string`);
     for (const [dir, dest] of Object.entries(r.exits || {}))
       if (!has(rooms, dest)) errs.push(`room ${id}: exit ${dir} -> missing room ${dest}`);
     for (const f of r.fixtures || [])

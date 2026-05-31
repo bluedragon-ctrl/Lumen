@@ -81,6 +81,7 @@ A map of `roomId → room`.
 {
   "settlement.plaza": {
     "id": "settlement.plaza",
+    "zone": "settlement",
     "name": "The Rim Plaza",
     "description": "Lantern-light pools across worn flagstones at the abyss's lip...",
     "depth": 0,
@@ -96,6 +97,7 @@ A map of `roomId → room`.
 | Field          | Type              | Notes |
 |----------------|-------------------|-------|
 | `id`           | string            | Unique, matches the map key. Convention: `area.name`. |
+| `zone`         | string?           | Area tag (e.g. `settlement`/`shaft`/`depths`). Reserved for future zone-scoped behaviour (mob wandering/pursuit limits). |
 | `name`         | string            | Short room title. |
 | `description`  | string            | Shown in the Inspect window when visible. |
 | `depth`        | integer           | 0 at the rim; increases downward. Flavour + future scaling. |
