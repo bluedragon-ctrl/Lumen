@@ -110,8 +110,9 @@ function renderRoom(room) {
 
 // --- Examine (single entity in the Inspect window) -------------------------
 function renderExamine(e) {
-  // Neutral panel for readability (no room light tint while examining).
-  $("inspect").className = "pane light-unknown";
+  // Tint the examine view by the current room's light band, so detail text reads
+  // gray in dim → washed/shimmering in searing, aligned with the room view.
+  $("inspect").className = "pane light-" + (lastRoom ? lastRoom.light.band : "unknown");
   $("room-view").hidden = true;
   $("examine-view").hidden = false;
 

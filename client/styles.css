@@ -79,8 +79,8 @@ body {
 /* searing: light is painful. Keep the panel dark, but blast the text with a
    shimmering white bloom (overexposed feel) plus a pulsing glare overlay. */
 .light-searing { background: #0a0c0f; color: #eef3f9; }
-.light-searing #room-name, .light-searing .room-desc, .light-searing .light-meter { color: #fff; font-weight: 700; }
-.light-searing #room-name, .light-searing .room-desc { animation: searing-shimmer 1.7s ease-in-out infinite; }
+.light-searing #room-name, .light-searing #ex-name, .light-searing .room-desc, .light-searing .light-meter { color: #fff; font-weight: 700; }
+.light-searing #room-name, .light-searing #ex-name, .light-searing .room-desc { animation: searing-shimmer 1.7s ease-in-out infinite; }
 .light-searing .chip { color: #fff; border-color: rgba(255, 255, 255, .55); box-shadow: 0 0 7px rgba(255, 255, 255, .22); }
 .light-searing::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
