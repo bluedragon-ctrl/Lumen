@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Equipment management**: `equip`/`wield`/`wear <item>` equips from inventory and
+  stows whatever was in that slot; `unequip`/`remove <item|slot>` returns gear to
+  inventory. Fills the gap where a held item (e.g. a torch) couldn't be replaced.
+- `light` now takes an optional `<item>` and **auto-swaps a spent light** for a
+  fuelled one from inventory — so a dead torch is replaced and lit in one command.
+### Added
 - **Combat + Energy/action-point economy + mob AI**: tick-driven attacks gated by
   banked `speed` energy (`attack`/`kill`/`stop`); damage = weapon dice + (Might−5)
   − Armour. **Light-gated accuracy (four tiers)** via per-actor `blindBelow`/
