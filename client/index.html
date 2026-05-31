@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lumen</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main id="app">
+    <!-- Console: append-only event/history log -->
+    <section id="console" class="pane" aria-label="Console">
+      <div id="log"></div>
+    </section>
+
+    <!-- Inspect: live view of the current room, tinted by light level -->
+    <section id="inspect" class="pane light-unknown" aria-label="Room view">
+      <header class="inspect-head">
+        <span id="room-name">—</span>
+        <span id="light-meter" class="light-meter">light: —</span>
+      </header>
+      <p id="room-desc" class="room-desc"></p>
+      <div id="room-exits" class="row"></div>
+      <div id="room-contents" class="contents"></div>
+    </section>
+
+    <!-- Status strip: always-visible vitals -->
+    <section id="status" class="status" aria-label="Status">
+      <span class="stat"><label>HP</label><span class="bar"><i id="hp-fill"></i></span><b id="hp-val">—</b></span>
+      <span class="stat"><label>Energy</label><span class="bar energy"><i id="en-fill"></i></span><b id="en-val">—</b></span>
+      <span class="stat"><label>Mana</label><span class="bar mana"><i id="mp-fill"></i></span><b id="mp-val">—</b></span>
+    </section>
+
+    <!-- Command line -->
+    <section id="commandbar" aria-label="Command input">
+      <span class="prompt">&gt;</span>
+      <input id="cmd" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder='type a command — try "look", "down", "light", "help"' autofocus />
+    </section>
+
+    <!-- Player panel: stats, attributes, states, equipment, inventory -->
+    <aside id="player" class="pane" aria-label="Player">
+      <header class="player-head">
+        <span id="p-name">—</span>
+        <span id="p-level" class="muted">Lv —</span>
+      </header>
+      <div id="p-states" class="chips"></div>
+      <dl id="p-attrs" class="attrs"></dl>
+      <h3>Equipment</h3>
+      <ul id="p-equip" class="list"></ul>
+      <h3>Inventory</h3>
+      <ul id="p-inv" class="list"></ul>
+    </aside>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

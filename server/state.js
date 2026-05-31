@@ -123,12 +123,30 @@ class GameState {
     this.players.delete(playerId);
   }
 
-  /** Advance the world one tick. Recomputes room light; combat/AI arrive later. */
+  /**
+   * Advance the world one tick: burn fuel on lit light sources, then recompute
+   * room light. Returns an event list (e.g. lights guttering out) so the server
+   * can push updates to affected players. Combat/AI arrive later.
+   */
   advance() {
     this.tick++;
+    const events = [];
+    for (const p of this.players.values()) {
+      const li = p.equipment && p.equipment.light;
+      if (li && li.lit && li.fuel > 0) {
+        const tmpl = this.world.items[li.template];
+        li.fuel -= (tmpl.light && tmpl.light.burnPerTick) || 1;
+        if (li.fuel <= 0) {
+          li.fuel = 0;
+          li.lit = false;
+          events.push({ type: "light-out", playerId: p.id, item: li.template });
+        }
+      }
+    }
     for (const id of Object.keys(this.rooms)) {
       this.rooms[id].light = this.computeRoomLight(id);
     }
+    return events;
   }
 
   /** Persist a snapshot of dynamic state to disk (runtime dir, gitignored). */
