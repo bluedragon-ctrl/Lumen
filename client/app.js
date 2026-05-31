@@ -218,12 +218,11 @@ function renderPlayer(p) {
     inv.appendChild(li);
   }
 
-  // Status strip. Energy is the action-point bank: full = ready to act, drains
-  // as you take actions (e.g. attacking), refills by Speed each second.
+  // Status strip. (Energy/action-points are tracked server-side and drive combat
+  // tempo, but the bar is hidden until actions have player-chosen costs that make
+  // it actionable; Speed conveys tempo for now.)
   setBar("hp", p.hp, p.maxHp);
-  setBar("en", p.energy, p.energyMax != null ? p.energyMax : p.speed * 3);
   setBar("mp", p.mana, p.maxMana);
-  $("en-stat").title = `Action points: ready to act when full. Regains +${p.speed}/s (your Speed); attacking and other actions spend it.`;
   $("sp-val").textContent = p.speed;
 }
 
