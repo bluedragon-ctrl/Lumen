@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   completion, and click-as-command on room entities/exits.
 - **Light-reactive inspect window**: live atmospheric tint per band
   (darkness → near-black placeholder, dim → desaturated, bright → normal,
-  searing → washed-out + harm warning).
+  searing → dark panel with shimmering blown-out white text/glow + harm warning).
 - Structured `room`/`player` view protocol; server commands `look`, movement,
   `light`/`douse`, `help`; per-tick fuel burn that guts lit lights when spent.
 - `.claude/launch.json` preview config.

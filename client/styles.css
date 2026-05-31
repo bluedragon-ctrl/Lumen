@@ -76,9 +76,25 @@ body {
 .light-darkness #room-name { color: #5a6770; }
 .light-dim { background: #0d1014; color: #9aa3ad; filter: saturate(.55) brightness(.92); }
 .light-bright { background: #141a20; color: var(--text); }
-.light-searing { background: #e9eef2; color: #2a2f34; filter: brightness(1.12); }
-.light-searing #room-name, .light-searing .light-meter { color: #44505a; }
-.light-searing .chip { background: #f4f7fa; border-color: #c9d2da; }
+/* searing: light is painful. Keep the panel dark, but blast the text with a
+   shimmering white bloom (overexposed feel) plus a pulsing glare overlay. */
+.light-searing { background: #0a0c0f; color: #eef3f9; }
+.light-searing #room-name, .light-searing .room-desc, .light-searing .light-meter { color: #fff; font-weight: 700; }
+.light-searing #room-name, .light-searing .room-desc { animation: searing-shimmer 1.7s ease-in-out infinite; }
+.light-searing .chip { color: #fff; border-color: rgba(255, 255, 255, .55); box-shadow: 0 0 7px rgba(255, 255, 255, .22); }
+.light-searing::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 30%, rgba(255, 255, 255, .10), transparent 60%);
+  animation: searing-pulse 1.7s ease-in-out infinite;
+}
+@keyframes searing-shimmer {
+  0%, 100% { text-shadow: 0 0 3px rgba(255, 255, 255, .55), 0 0 9px rgba(190, 216, 255, .35); }
+  50%      { text-shadow: 0 0 7px rgba(255, 255, 255, 1),   0 0 18px rgba(205, 228, 255, .75); }
+}
+@keyframes searing-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .light-searing #room-name, .light-searing .room-desc, .light-searing::after { animation: none; }
+}
 .light-unknown { background: var(--panel); }
 
 .placeholder { color: var(--muted); font-style: italic; }
