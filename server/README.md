@@ -125,5 +125,10 @@ mutual, exploitable condition.
 
 Damage = `roll(weapon dice) + (Might − 5) − target Armour` (min 1). Mob HP≤0 →
 death, loot dropped to the room, XP to the killer. Player HP≤0 → respawn at the
-rim, full HP, no penalty beyond lost progress (DESIGN v1). Hostile mobs attack
-players in their room only (no cross-room pursuit yet).
+rim, full HP, no penalty beyond lost progress (DESIGN v1).
+
+Each tick a mob takes **one weighted action** from its `actions` table
+(`attack` / `emote` / `move` / `idle`) among those currently available — so mobs
+fight, mutter flavour lines, wander, or lurk with distinct personalities. Mob
+actions you can't see read as "Something …". Mobs act in their own room only (no
+cross-room pursuit yet); `move` lets them wander between rooms.

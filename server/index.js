@@ -208,6 +208,28 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-emote") {
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.text}.` });
+    }
+    return;
+  }
+
+  if (ev.type === "mob-move") {
+    for (const o of state.playersIn(ev.from)) {
+      const n = canSeeMob(o, ev.lightFrom, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.verb}.` });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    for (const o of state.playersIn(ev.to)) {
+      const n = canSeeMob(o, ev.lightTo, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} slinks in.` });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
   if (ev.type === "death" && ev.victimKind === "mob") {
     const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
     roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} dies.${lootTxt}` }, ev.killerId);

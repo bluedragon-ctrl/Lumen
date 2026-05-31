@@ -12,6 +12,11 @@
     "behavior": "wander",
     "hostile": false,
     "xp": 2,
+    "actions": [
+      { "type": "idle", "weight": 10 },
+      { "type": "emote", "weight": 3, "messages": ["pulses with soft light", "drifts in a lazy arc", "flickers"] },
+      { "type": "move", "weight": 2, "verb": "drifts off" }
+    ],
     "loot": [{ "template": "luminescent-gland", "chance": 0.5 }]
   },
   "gloom-crawler": {
@@ -27,6 +32,12 @@
     "hostile": true,
     "attack": { "damage": "1d4", "actionCost": 12 },
     "xp": 8,
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air"] },
+      { "type": "move", "weight": 1, "verb": "skitters into the dark" }
+    ],
     "loot": [{ "template": "flint", "chance": 0.3 }]
   },
   "deep-dweller": {
@@ -42,6 +53,11 @@
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 14 },
     "xp": 20,
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["hisses, shielding its eyes", "utters something in a dead tongue", "bares jagged teeth"] }
+    ],
     "loot": [
       { "template": "vial", "chance": 0.6 },
       { "template": "rusted-blade", "chance": 0.2 }

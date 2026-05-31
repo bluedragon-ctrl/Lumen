@@ -198,8 +198,31 @@ A map of `mobId → template`.
 | `attributes` | block   | `{ might, vitality, intellect, wits, perception }`. |
 | `perception` | block   | `{ blindBelow, harmedAbove }`. |
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
-| `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (extensible). |
-| `hostile`    | bool    | Attacks players on sight when able. |
+| `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
+| `hostile`    | bool    | May attack players when able. |
+| `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
+
+### Mob actions (weighted)
+
+Each tick a mob may take **one** action, chosen by weight from the options
+currently available (e.g. `attack` only when a player is present, `move` only
+when there's an exit). This gives mobs fight/emote/flee/idle personalities.
+
+```json
+"actions": [
+  { "type": "attack", "weight": 7 },
+  { "type": "emote",  "weight": 2, "messages": ["lets out a wet rattle", "tastes the air"] },
+  { "type": "move",   "weight": 1, "verb": "skitters into the dark" },
+  { "type": "idle",   "weight": 4 }
+]
+```
+
+| Action  | Effect | Fields |
+|---------|--------|--------|
+| `attack`| Strike a player in the room (light-gated like player attacks). | — |
+| `emote` | Broadcast a flavour line to the room (a name you can't see reads as "Something …"). | `messages: string[]` |
+| `move`  | Walk to a random adjacent room (carrying its light if it glows). | `verb` (display, e.g. "flees") |
+| `idle`  | Do nothing this turn — raise its weight to keep a mob calm/quiet. | — |
 | `loot`       | LootRule[] | `{ template, chance }`, chance 0..1. |
 
 ---

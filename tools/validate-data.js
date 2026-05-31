@@ -53,6 +53,14 @@ function main() {
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
+    for (const a of m.actions || []) {
+      if (!["attack", "emote", "move", "idle"].includes(a.type))
+        errs.push(`mob ${id}: invalid action type "${a.type}"`);
+      if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
+        errs.push(`mob ${id}: emote action needs a non-empty messages array`);
+      if (a.weight != null && typeof a.weight !== "number")
+        errs.push(`mob ${id}: action weight must be a number`);
+    }
   }
 
   for (const [id, rc] of Object.entries(recipes)) {
