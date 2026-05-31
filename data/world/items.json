@@ -1,0 +1,80 @@
+{
+  "torch": {
+    "id": "torch",
+    "name": "a torch",
+    "description": "A pitch-soaked length of wood. It burns bright but not forever.",
+    "type": "light",
+    "slot": "light",
+    "weight": 1,
+    "light": { "output": 3, "fuelMax": 200, "burnPerTick": 1 }
+  },
+  "lantern": {
+    "id": "lantern",
+    "name": "a brass lantern",
+    "description": "A shuttered brass lantern; steadier and longer-lived than a torch.",
+    "type": "light",
+    "slot": "light",
+    "weight": 2,
+    "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1 }
+  },
+  "short-sword": {
+    "id": "short-sword",
+    "name": "a short sword",
+    "description": "A plain, well-balanced short sword. Reliable steel.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
+  },
+  "rusted-blade": {
+    "id": "rusted-blade",
+    "name": "a rusted blade",
+    "description": "Pitted iron, but it still holds an edge.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
+  },
+  "leather-jerkin": {
+    "id": "leather-jerkin",
+    "name": "a leather jerkin",
+    "description": "Stiff, abyss-cured hide. Modest protection against tooth and claw.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 3,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0 }
+  },
+  "flint": {
+    "id": "flint",
+    "name": "a flint shard",
+    "description": "Strikes a spark against steel.",
+    "type": "material",
+    "weight": 0,
+    "stackable": true
+  },
+  "luminescent-gland": {
+    "id": "luminescent-gland",
+    "name": "a luminescent gland",
+    "description": "Harvested from a lightbug; it glows faintly and cold in the palm.",
+    "type": "material",
+    "weight": 0,
+    "stackable": true
+  },
+  "vial": {
+    "id": "vial",
+    "name": "an empty vial",
+    "description": "A small glass vial, stoppered with wax.",
+    "type": "material",
+    "weight": 0,
+    "stackable": true
+  },
+  "light-potion": {
+    "id": "light-potion",
+    "name": "a light potion",
+    "description": "A vial of suspended luminescence. Shattering it floods a room with light.",
+    "type": "consumable",
+    "weight": 0,
+    "stackable": true,
+    "consumable": { "effect": "flood-light", "magnitude": 4, "duration": 20 }
+  }
+}

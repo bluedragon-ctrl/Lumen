@@ -1,0 +1,68 @@
+{
+  "settlement.plaza": {
+    "id": "settlement.plaza",
+    "name": "The Rim Plaza",
+    "description": "Lantern-light pools across worn flagstones at the very lip of the abyss. A cold updraft breathes from the great dark shaft to the west of the well, and the murmur of the last human outpost surrounds you. Stairs spiral down into shadow.",
+    "depth": 0,
+    "ambientLight": 4,
+    "exits": { "east": "settlement.market", "down": "shaft.landing-1" },
+    "fixtures": ["alchemist-bench"],
+    "groundItems": [{ "template": "flint", "qty": 2 }],
+    "spawns": []
+  },
+  "settlement.market": {
+    "id": "settlement.market",
+    "name": "The Rim Market",
+    "description": "A huddle of stalls and a smith's forge glowing warm against the chill. Traders eye the shaft and speak in low voices of what comes up from below — and what does not come back.",
+    "depth": 0,
+    "ambientLight": 4,
+    "exits": { "west": "settlement.plaza" },
+    "fixtures": ["forge"],
+    "groundItems": [{ "template": "torch", "fuel": 200 }],
+    "spawns": []
+  },
+  "shaft.landing-1": {
+    "id": "shaft.landing-1",
+    "name": "First Landing",
+    "description": "The spiral stair widens onto a narrow landing. Daylight from the rim still reaches here, grey and thin. The steps continue down into deeper gloom.",
+    "depth": 1,
+    "ambientLight": 2,
+    "exits": { "up": "settlement.plaza", "down": "shaft.landing-2" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "lightbug", "max": 1 }]
+  },
+  "shaft.landing-2": {
+    "id": "shaft.landing-2",
+    "name": "Second Landing",
+    "description": "Here the last of the rim-light dies. The air is wet and still. Your own breath sounds loud. A passage opens north into a black gallery.",
+    "depth": 2,
+    "ambientLight": 1,
+    "exits": { "up": "shaft.landing-1", "down": "dark.gallery", "north": "dark.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "lightbug", "max": 2 }]
+  },
+  "dark.gallery": {
+    "id": "dark.gallery",
+    "name": "The Black Gallery",
+    "description": "A vast dark space; sound returns from far walls you cannot see. Something skitters at the edge of hearing. Without light, the dark is absolute.",
+    "depth": 3,
+    "ambientLight": 0,
+    "exits": { "up": "shaft.landing-2" },
+    "fixtures": [],
+    "groundItems": [{ "template": "vial", "qty": 1 }],
+    "spawns": [{ "mob": "gloom-crawler", "max": 1 }]
+  },
+  "dark.warren": {
+    "id": "dark.warren",
+    "name": "The Dweller's Warren",
+    "description": "A low, fetid chamber of piled stone and bone. This is a lair, and it is not empty. The darkness here feels watchful.",
+    "depth": 3,
+    "ambientLight": 0,
+    "exits": { "south": "shaft.landing-2" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "deep-dweller", "max": 1 }]
+  }
+}

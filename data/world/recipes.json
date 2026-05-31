@@ -1,0 +1,12 @@
+{
+  "minor-light-potion": {
+    "id": "minor-light-potion",
+    "name": "Minor Light Potion",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "luminescent-gland", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "output": { "template": "light-potion", "qty": 1 }
+  }
+}

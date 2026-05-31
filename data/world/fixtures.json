@@ -1,0 +1,16 @@
+{
+  "alchemist-bench": {
+    "id": "alchemist-bench",
+    "name": "an alchemist's bench",
+    "description": "Glass coils and a cold burner await reagents.",
+    "type": "crafting",
+    "station": "alchemy"
+  },
+  "forge": {
+    "id": "forge",
+    "name": "a smith's forge",
+    "description": "A banked coal forge with anvil and tongs, warm against the abyssal chill.",
+    "type": "crafting",
+    "station": "smithing"
+  }
+}
