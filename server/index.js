@@ -38,6 +38,16 @@ function sendToPlayer(playerId, msg) {
   send(connections.get(playerId), msg);
 }
 
+// Broadcast context handed to commands so effects reach OTHER players in a room.
+const roomCtx = {
+  toRoom(roomId, msg, exceptId) {
+    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, msg);
+  },
+  refreshRoom(roomId, exceptId) {
+    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, buildRoomView(state, p));
+  },
+};
+
 // ---------------------------------------------------------------------------
 // HTTP: serve the client, falling back to a dev page if it's missing.
 // ---------------------------------------------------------------------------
@@ -112,7 +122,7 @@ wss.on("connection", (ws) => {
     }
     const player = state.players.get(ws.playerId);
     if (msg.type === "command" && typeof msg.text === "string") {
-      sendAll(ws, execute(state, player, msg.text));
+      sendAll(ws, execute(state, player, msg.text, roomCtx));
     } else {
       send(ws, { type: "error", text: `unhandled message type: ${msg.type}` });
     }
