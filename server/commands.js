@@ -10,7 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance } = require("./state");
+const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE } = require("./state");
 const accounts = require("./accounts");
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
@@ -38,6 +38,7 @@ const HELP = [
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
+  "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
   "  help | ?              — this list",
 ].join("\n");
 
@@ -241,14 +242,22 @@ function shopHere(state, player) {
   return null;
 }
 
+// Price a trader sells an item for: its intrinsic value, or a per-shop override.
+function buyPrice(offer, t) {
+  return offer && offer.price != null ? offer.price : buyValueOf(t);
+}
+
 function shopList(state, player) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
-  const fmt = (o) => `  ${w.items[o.template].name} — ${o.price} shards`;
   const lines = [`${sh.t.name} trades:`];
-  if ((sh.t.shop.sells || []).length) lines.push("Sells (you buy):", ...sh.t.shop.sells.map(fmt));
-  if ((sh.t.shop.buys || []).length) lines.push("Buys (you sell):", ...sh.t.shop.buys.map(fmt));
+  const sells = sh.t.shop.sells || [];
+  if (sells.length) {
+    lines.push("Sells (you buy):");
+    for (const o of sells) lines.push(`  ${w.items[o.template].name} — ${buyPrice(o, w.items[o.template])} shards`);
+  }
+  lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
   lines.push(`You have ${player.shards || 0} shards.`);
   return [{ type: "log", text: lines.join("\n") }];
 }
@@ -264,12 +273,13 @@ function buy(state, player, arg, ctx) {
   );
   if (!offer) return [{ type: "error", text: `${sh.t.name} doesn't sell "${arg}".` }];
   const name = w.items[offer.template].name;
-  if ((player.shards || 0) < offer.price)
-    return [{ type: "error", text: `You can't afford ${name} — ${offer.price} shards, you have ${player.shards || 0}.` }];
-  player.shards -= offer.price;
+  const price = buyPrice(offer, w.items[offer.template]);
+  if ((player.shards || 0) < price)
+    return [{ type: "error", text: `You can't afford ${name} — ${price} shards, you have ${player.shards || 0}.` }];
+  player.shards -= price;
   addToInventory(player, makeItemInstance({ template: offer.template }, w), w);
   ctx.toRoom(player.location, { type: "log", text: `${player.name} buys ${name} from ${sh.t.name}.` }, player.id);
-  return selfAndViews(state, player, `You buy ${name} for ${offer.price} shards. (${player.shards} left)`);
+  return selfAndViews(state, player, `You buy ${name} for ${price} shards. (${player.shards} left)`);
 }
 
 function sell(state, player, arg, ctx) {
@@ -280,14 +290,15 @@ function sell(state, player, arg, ctx) {
   const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory[idx];
-  const offer = (sh.t.shop.buys || []).find((b) => b.template === inst.template);
-  if (!offer) return [{ type: "error", text: `${sh.t.name} won't buy ${w.items[inst.template].name}.` }];
+  const t = w.items[inst.template];
+  // The trader buys any valued item at its sell value — no per-trader buy list.
+  const price = sellValueOf(t);
+  if (!t.value || price <= 0) return [{ type: "error", text: `${sh.t.name} won't give you anything for ${t.name}.` }];
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
   else player.inventory.splice(idx, 1);
-  player.shards = (player.shards || 0) + offer.price;
-  const name = w.items[offer.template].name;
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} sells ${name} to ${sh.t.name}.` }, player.id);
-  return selfAndViews(state, player, `You sell ${name} for ${offer.price} shards. (${player.shards} total)`);
+  player.shards = (player.shards || 0) + price;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} sells ${t.name} to ${sh.t.name}.` }, player.id);
+  return selfAndViews(state, player, `You sell ${t.name} for ${price} shards. (${player.shards} total)`);
 }
 
 // Effect primitives this client knows how to flavour. The engine (state.js)
@@ -320,6 +331,33 @@ function use(state, player, arg, ctx) {
     if (f) return toggleFixture(state, player, f, ctx);
   }
   return drink(state, player, arg, ctx);
+}
+
+// `refuel <item>`: top up a carried/equipped fuelled light from its fuel item
+// (e.g. a lantern with a flask of oil). Torches aren't refuellable — replace them.
+function refuel(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Refuel what?" }];
+  const ql = arg.toLowerCase();
+  // A light source matching arg, equipped or in the pack.
+  const candidates = [player.equipment && player.equipment.light, ...player.inventory].filter(Boolean);
+  const inst = candidates.find(
+    (i) => w.items[i.template].light && (i.id.toLowerCase() === ql || w.items[i.template].name.toLowerCase().includes(ql))
+  );
+  if (!inst) return [{ type: "error", text: `You have no light source "${arg}" to refuel.` }];
+  const t = w.items[inst.template];
+  const lt = t.light;
+  if (!lt.fuelItem) return [{ type: "error", text: `${t.name} can't be refuelled — you'd just replace it.` }];
+  if (inst.fuel >= lt.fuelMax) return [{ type: "error", text: `${t.name} is already full.` }];
+  const fidx = player.inventory.findIndex((i) => i.template === lt.fuelItem);
+  if (fidx < 0) return [{ type: "error", text: `You need ${w.items[lt.fuelItem].name} to refuel ${t.name}.` }];
+  const fuelItem = player.inventory[fidx];
+  if (fuelItem.qty != null && fuelItem.qty > 1) fuelItem.qty -= 1;
+  else player.inventory.splice(fidx, 1);
+  inst.fuel = Math.min(lt.fuelMax, (inst.fuel || 0) + (lt.refuelPerUnit || lt.fuelMax));
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(state, player, `You refuel ${t.name} with ${w.items[lt.fuelItem].name}. (fuel ${inst.fuel}/${lt.fuelMax})`);
 }
 
 function drink(state, player, arg, ctx) {
@@ -503,6 +541,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "drink":
     case "quaff":
       return drink(state, player, arg, ctx);
+    case "refuel":
+    case "fill":
+      return refuel(state, player, arg, ctx);
     case "use":
     case "switch":
     case "toggle":

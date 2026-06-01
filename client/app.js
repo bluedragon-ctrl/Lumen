@@ -260,7 +260,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
-  "drink", "quaff", "use", "switch", "toggle", "flip", "craft", "make", "recipes", "help",
+  "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
@@ -303,6 +303,11 @@ function argCandidates(cmd) {
       return p ? [...names(equipped()), ...Object.keys(p.equipment)] : [];
     case "attack": case "kill": case "k": return room ? names(room.contents.mobs) : [];
     case "light": case "ignite": {
+      const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
+      if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
+      return out;
+    }
+    case "refuel": case "fill": {
       const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
       if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
       return out;

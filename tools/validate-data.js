@@ -46,10 +46,22 @@ function main() {
 
   const EFFECT_TYPES = ["emit-light"];
   for (const [id, it] of Object.entries(items)) {
+    // Every tradeable item needs a buy `value`; currency (shards) is exempt.
+    if (it.type !== "currency") {
+      if (typeof it.value !== "number" || it.value < 0)
+        errs.push(`item ${id}: value must be a non-negative number (buy price)`);
+      if (it.sellValue != null && (typeof it.sellValue !== "number" || it.sellValue < 0))
+        errs.push(`item ${id}: sellValue must be a non-negative number`);
+    }
     if (it.type === "weapon" && it.weapon) {
       for (const [kind, val] of Object.entries(it.weapon.damage || {}))
         if (typeof val !== "string" || !DICE_RE.test(val))
           errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
+    }
+    if (it.light && it.light.fuelItem) {
+      if (!has(items, it.light.fuelItem)) errs.push(`item ${id}: light.fuelItem references missing template ${it.light.fuelItem}`);
+      if (it.light.refuelPerUnit != null && (typeof it.light.refuelPerUnit !== "number" || it.light.refuelPerUnit <= 0))
+        errs.push(`item ${id}: light.refuelPerUnit must be a positive number`);
     }
     const eff = it.consumable && it.consumable.effect;
     if (eff != null) {
@@ -75,11 +87,12 @@ function main() {
     if (m.ward != null && typeof m.ward !== "number")
       errs.push(`mob ${id}: ward must be a number`);
     if (m.shop) {
-      for (const kind of ["sells", "buys"])
-        for (const o of m.shop[kind] || []) {
-          if (!has(items, o.template)) errs.push(`mob ${id}: shop.${kind} missing template ${o.template}`);
-          if (typeof o.price !== "number" || o.price < 0) errs.push(`mob ${id}: shop.${kind} price for ${o.template} must be a non-negative number`);
-        }
+      // A trader's stock; prices default to each item's `value` (override optional).
+      // Buying from a player is data-driven (any valued item), so no `buys` list.
+      for (const o of m.shop.sells || []) {
+        if (!has(items, o.template)) errs.push(`mob ${id}: shop.sells missing template ${o.template}`);
+        if (o.price != null && (typeof o.price !== "number" || o.price < 0)) errs.push(`mob ${id}: shop.sells price for ${o.template} must be a non-negative number`);
+      }
     }
     for (const a of m.actions || []) {
       if (!["attack", "emote", "wander", "idle"].includes(a.type))

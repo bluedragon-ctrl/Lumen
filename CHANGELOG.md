@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Item values & data-driven trade**: every item carries a buy `value` (sell price
+  defaults to 20%, overridable via `sellValue`). A trader sells its stock at value
+  and **buys any valued item** at its sell value — pricing comes from item data, not
+  a per-trader buy script (the `shop.buys` list is gone). Examine shows an item's
+  value and sell price. Garrick now stocks torch, lantern, oil, and vials.
+- **Refuellable lights**: a fuelled light may declare a `fuelItem` + `refuelPerUnit`;
+  `refuel`/`fill <item>` tops it up from that item. The brass lantern burns
+  **a flask of oil** (sold by Garrick) — so a lantern is a reusable investment, while
+  the torch stays a disposable replace-it light. (Refuelling the fixed shaft *lamp*
+  is deferred — it stays lit for now.)
 - **Crafting loop**: `craft <recipe>` at a matching station fixture consumes the
   recipe's inputs (and an optional **shard cost**) and yields the output. Recipes
   are **learned** (`knownRecipes` on the character; `recipes` lists them). First
