@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "if": "Bash(git commit*)",
+            "command": "b=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); [ \"$b\" = \"main\" ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Lumen workflow: no direct commits to main. Create a feat/ or fix/ branch and open a PR (see CONTRIBUTING.md).\"}}' || true"
+          }
+        ]
+      }
+    ]
+  }
+}
