@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence } = require("./state");
+const { actorEmitLight, playerDefence, sellValueOf } = require("./state");
 
 function itemView(inst, world) {
   if (!inst) return null;
@@ -112,7 +112,7 @@ function buildRoomView(state, p) {
 // intentionally generic — `bars`/`lines`/`hints` — so HP bars, stats, and
 // interaction hints can grow without protocol churn.
 
-function itemSpecLines(tmpl) {
+function itemSpecLines(tmpl, w) {
   const lines = [`type: ${tmpl.type}`];
   if (tmpl.weapon) {
     const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
@@ -122,12 +122,16 @@ function itemSpecLines(tmpl) {
     lines.push(`armour ${tmpl.armour.armour}, ward ${tmpl.armour.ward}`);
     if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
   }
-  if (tmpl.light) lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);
+  if (tmpl.light) {
+    lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);
+    if (tmpl.light.fuelItem) lines.push(`refuel with: ${w.items[tmpl.light.fuelItem] ? w.items[tmpl.light.fuelItem].name : tmpl.light.fuelItem}`);
+  }
   const eff = tmpl.consumable && tmpl.consumable.effect;
   if (eff && typeof eff === "object") {
     if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
     else lines.push(`drink: ${eff.type}`);
   }
+  if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}`);
   return lines;
 }
 
@@ -177,7 +181,7 @@ function buildExamineView(state, p, q) {
       const t = w.items[i.template];
       if (hit(i.id, t.name))
         return detailed
-          ? entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) })
+          ? entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) })
           : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const f of rt.fixtures) {
@@ -208,12 +212,12 @@ function buildExamineView(state, p, q) {
   // Carried items are always examined clearly (in hand).
   for (const i of p.inventory) {
     const t = w.items[i.template];
-    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t) });
+    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) });
   }
   for (const slot of Object.values(p.equipment)) {
     if (slot && hit(slot.id, w.items[slot.template].name)) {
       const t = w.items[slot.template];
-      return entity("item", slot.id, t.name, t.description, { lines: itemSpecLines(t) });
+      return entity("item", slot.id, t.name, t.description, { lines: itemSpecLines(t, w) });
     }
   }
   return null;

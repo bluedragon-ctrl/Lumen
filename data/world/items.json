@@ -6,6 +6,7 @@
     "type": "light",
     "slot": "light",
     "weight": 1,
+    "value": 6,
     "light": { "output": 3, "fuelMax": 200, "burnPerTick": 1 }
   },
   "lantern": {
@@ -15,7 +16,8 @@
     "type": "light",
     "slot": "light",
     "weight": 2,
-    "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1 }
+    "value": 30,
+    "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
   },
   "short-sword": {
     "id": "short-sword",
@@ -24,6 +26,7 @@
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
+    "value": 20,
     "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
   },
   "rusted-blade": {
@@ -33,6 +36,7 @@
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
+    "value": 8,
     "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
   },
   "leather-jerkin": {
@@ -42,6 +46,7 @@
     "type": "armour",
     "slot": "body",
     "weight": 3,
+    "value": 16,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
   "shards": {
@@ -58,6 +63,7 @@
     "description": "Harvested from a lightbug; it glows faintly and cold in the palm.",
     "type": "material",
     "weight": 0,
+    "value": 10,
     "stackable": true
   },
   "vial": {
@@ -66,6 +72,16 @@
     "description": "A small glass vial, stoppered with wax.",
     "type": "material",
     "weight": 0,
+    "value": 5,
+    "stackable": true
+  },
+  "lamp-oil": {
+    "id": "lamp-oil",
+    "name": "a flask of oil",
+    "description": "A stoppered clay flask of thick, slow-burning oil — fuel to refill a lantern.",
+    "type": "material",
+    "weight": 1,
+    "value": 6,
     "stackable": true
   },
   "minor-light-potion": {
@@ -74,6 +90,7 @@
     "description": "A small vial of cold, captured luminescence, thumbed from a lightbug's gland. Drink it and your own skin glows softly for a time.",
     "type": "consumable",
     "weight": 0,
+    "value": 18,
     "stackable": true,
     "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 1, "duration": 180 } }
   },
@@ -83,6 +100,7 @@
     "description": "A vial of suspended luminescence, brighter and longer-lived than the minor draught. Drink it and you blaze like a held torch.",
     "type": "consumable",
     "weight": 0,
+    "value": 45,
     "stackable": true,
     "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 3, "duration": 360 } }
   }

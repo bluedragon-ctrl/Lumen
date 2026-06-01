@@ -103,7 +103,7 @@ lightbug) still appear. Commands handled today: `look [target]`, movement
 (`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
 `attack`/`kill`/`stop`, `equip`/`wield`/`wear`, `unequip`/`remove`,
 `light [item]`/`douse`, `list`/`buy`/`sell`, `recipes`/`craft`, `drink`/`quaff`,
-`use`/`switch` (operate a fixture here, else drink), `help`, and admin
+`use`/`switch` (operate a fixture here, else drink), `refuel`/`fill`, `help`, and admin
 `@`-commands. (`light` auto-swaps a spent source for a fuelled one.) Effects
 visible to other players in the room (speech, arrivals/departures, picking
 things up, combat) are broadcast to them.
@@ -146,10 +146,13 @@ actions you can't see read as "Something …". Mobs act in their own room only (
 cross-room pursuit yet); `wander` lets them roam between rooms, bounded by its
 `scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones).
 
-**Trading.** A mob with a `shop` block is a trader. In its room a player can `list`
-the wares, `buy <item>` (deducts **shards**, the player's currency, and hands over a
-fresh instance) and `sell <item>` (the trader's `buys` list pays shards for it).
-Shards are an abstract integer balance on the character, shown in the player panel.
+**Trading.** A mob with a `shop` block is a trader. Pricing is **data-driven from
+item `value`**, not a per-trader script. In its room a player can `list` the wares,
+`buy <item>` (deducts the item's `value`, or a per-shop `price` override, and hands
+over a fresh instance) and `sell <item>` — the trader buys *any* valued item at its
+`sellValue` (default 20% of `value`); there is no per-trader buy list. Currency
+(`shards`) has no value and can't be sold. Shards are an abstract integer balance on
+the character, shown in the player panel.
 
 Mobs keep a minimal **aggro table** (`{ playerId: threat }`): attacking a mob earns
 threat and hostile mobs engage any delver present. A mob with live threat is *in

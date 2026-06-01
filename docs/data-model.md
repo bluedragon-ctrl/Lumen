@@ -149,8 +149,10 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `type`       | enum    | `light` \| `weapon` \| `armour` \| `consumable` \| `material` \| `currency` \| `misc`. `currency` (e.g. `shards`) is gathered into the player's balance by `get`, not stowed in inventory. |
 | `slot`       | enum?   | Equip slot: `hand` \| `body` \| `head` \| `light` … (omit if not equippable). |
 | `weight`     | number  | For future carry-capacity. |
+| `value`      | integer | Buy price in shards (what a trader charges). **Required** for every item except `currency`. |
+| `sellValue`  | integer?| What a trader pays to buy it from a player. Defaults to `round(value × 0.2)` (20%); set it to override. |
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
-| `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. |
+| `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. Add `fuelItem` + `refuelPerUnit` to make it **refuellable** (`refuel <item>` consumes one `fuelItem` and adds `refuelPerUnit` fuel); omit them for a disposable light (e.g. a torch). |
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
 | `armour`     | block?  | `{ armour, ward, speedPenalty }`. |
 | `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
@@ -203,7 +205,7 @@ A map of `mobId → template`.
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able. |
-| `shop`       | block?  | Makes the mob a trader: `{ "sells": [{template, price}], "buys": [{template, price}] }`. `price` is in **shards**. Players use `list`/`buy`/`sell` in the room. |
+| `shop`       | block?  | Makes the mob a trader: `{ "sells": [{ template, price? }] }` — its stock, each sold at the item's `value` (or an optional `price` override). There is **no buy list**: the trader buys *any* valued item from a player at its `sellValue`. Players use `list`/`buy`/`sell` in the room. |
 | `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
 
