@@ -49,12 +49,32 @@
     "value": 16,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
+  "leather-helm": {
+    "id": "leather-helm",
+    "name": "a leather helm",
+    "description": "A boiled-leather cap reinforced with iron studs. Won't stop a true blow, but it has turned many a glancing one.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 1,
+    "value": 12,
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
+  },
   "shards": {
     "id": "shards",
     "name": "shards",
     "description": "Motes of crystallised light scattered on the stone — the Rim's coin. Gather them and they tally to your purse.",
     "type": "currency",
     "weight": 0,
+    "stackable": true
+  },
+  "crystal": {
+    "id": "crystal",
+    "name": "a crystal",
+    "description": "A fist-sized shard of the deep's crystal, its facets holding a slow, captive glow. Shattered, it would yield a fortune in shards — but whole, a trader will pay well for it.",
+    "type": "treasure",
+    "weight": 1,
+    "value": 45,
+    "sellValue": 45,
     "stackable": true
   },
   "luminescent-gland": {

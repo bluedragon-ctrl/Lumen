@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Crystal** (placeholder name) — a sellable `treasure` item worth 45 shards.
+  **Gnaw, the Brood-Mother** now drops one on death, giving her kill a payoff.
+- **Leather helm** (+1 armour, new `head` slot), sold by Garrick alongside the
+  **leather jerkin** (now also on his shelf). New characters start **without** the
+  jerkin, and the `body`/`head` slots seed empty so `unequip` works from the start.
+
 ### Fixed
 - Mob wandering no longer causes difficulty spikes: only **lightbugs** wander now.
   Gloom-crawlers, giant rats, and cave bats stay in their authored rooms (the
