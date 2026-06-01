@@ -2,18 +2,41 @@
 const { effectiveLight, canSee, hitChance } = require("./light");
 const { rollDice } = require("./dice");
 
-/** The attacker's effective weapon: equipped hand weapon, or unarmed. */
+// Default melee scaling when a weapon omits its own `scale`: floor(Might / 4)
+// added to physical damage. Mirrors a spell's `effect.scale`.
+const MELEE_SCALE = { attr: "might", per: 4 };
+
+/** The attacker's effective weapon: equipped hand weapon, or unarmed. `scale`
+ *  is the attribute the weapon's damage grows with (default Might/4). */
 function weaponOf(world, player) {
   const hand = player.equipment && player.equipment.hand;
   if (hand) {
     const t = world.items[hand.template];
-    if (t.weapon) return { dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2", actionCost: t.weapon.actionCost || 12 };
+    if (t.weapon) return {
+      dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2",
+      actionCost: t.weapon.actionCost || 12,
+      scale: t.weapon.scale || MELEE_SCALE,
+    };
   }
-  return { dice: "1d2", actionCost: 10 }; // unarmed
+  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE }; // unarmed
 }
 
-/** Defensive mitigation from a player's equipped gear: Armour (vs physical)
- *  and Ward (vs magical). Mirrors the {armour, ward} block on armour items. */
+// Each point of Wits grants this much innate Ward (magic resist) and this much
+// evasion (a flat reduction to an attacker's hit chance). Pure defensive stat.
+const WARD_PER_WITS = 2;
+const EVASION_PER_WITS = 0.02;
+// Each point of Perception grants this much to-hit and this much crit chance.
+const HIT_PER_PERCEPTION = 0.02;
+const CRIT_PER_PERCEPTION = 0.01;
+// Attribute-derived pools and the sight curve (see GameState.deriveStats).
+const HP_PER_VITALITY = 5;
+const MANA_PER_INTELLECT = 4;
+const ATTR_BASELINE = 3; // starting value of every attribute
+const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimBelow by 1
+
+/** Defensive profile of a player: Armour (vs physical) and Ward (vs magical)
+ *  from equipped gear plus innate Ward from Wits, and Wits-derived evasion.
+ *  Mirrors the {armour, ward} block on armour items. */
 function playerDefence(world, player) {
   let armour = 0;
   let ward = 0;
@@ -25,13 +48,14 @@ function playerDefence(world, player) {
       ward += t.armour.ward || 0;
     }
   }
-  return { armour, ward };
+  const wits = (player.attributes && player.attributes.wits) || 0;
+  ward += wits * WARD_PER_WITS;
+  return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
 
-const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
-
-// A spell's flat damage bonus from a scaling attribute, e.g. {attr:"intellect", per:4}
-// adds floor(intellect / 4). No `scale` block → no attribute bonus.
+// A flat damage bonus from a scaling attribute, e.g. {attr:"intellect", per:4}
+// adds floor(intellect / 4). Used by both spells (effect.scale) and melee
+// weapons (weapon.scale). No `scale` block → no attribute bonus.
 function spellScaleBonus(attrs, scale) {
   if (!scale || !scale.attr) return 0;
   const v = (attrs && attrs[scale.attr] != null) ? attrs[scale.attr] : 0;
@@ -55,16 +79,28 @@ function pickWeighted(options) {
   return options[options.length - 1];
 }
 
-/** Resolve one swing. Accuracy is gated by how well the attacker sees the target
- *  (clear 100% / glare 50% / can't-see 5%). `sighted` drives miss-message wording. */
-function strike(attackerPerception, light, dice, attackerMightMod, defence, damageType = "physical") {
-  const hit = Math.random() < hitChance(attackerPerception, light);
-  const sighted = canSee(attackerPerception, light);
-  if (!hit) return { hit: false, sighted, damage: 0 };
+// A hit can never be rarer than this, even against heavy evasion — there is
+// always a sliver of a chance to land a blow (matches the can't-see floor).
+const MIN_HIT = 0.05;
+
+/** Resolve one swing.
+ *  @param attacker { band, hitBonus, dmgBonus, crit } — light-perception band,
+ *         flat to-hit bonus (Perception), flat damage bonus (weapon scale), crit chance.
+ *  @param defender { armour, ward, evasion } — mitigation + dodge.
+ *  Accuracy is the light tier (clear 100% / glare 50% / can't-see 5%) plus the
+ *  attacker's hit bonus minus the defender's evasion, clamped to [MIN_HIT, 1].
+ *  `sighted` drives miss-message wording; a crit doubles the damage roll. */
+function strike(attacker, defender, light, dice, damageType = "physical") {
+  const chance = Math.max(MIN_HIT, Math.min(1, hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0)));
+  const sighted = canSee(attacker.band, light);
+  if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
   // Physical damage is soaked by Armour; everything else (magical) by Ward.
-  const mitigation = damageType === "physical" ? defence.armour || 0 : defence.ward || 0;
-  const damage = Math.max(1, rollDice(dice) + attackerMightMod - mitigation);
-  return { hit: true, sighted, damage };
+  const mitigation = damageType === "physical" ? defender.armour || 0 : defender.ward || 0;
+  let base = rollDice(dice) + (attacker.dmgBonus || 0);
+  const crit = Math.random() < (attacker.crit || 0);
+  if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
+  const damage = Math.max(1, base - mitigation);
+  return { hit: true, sighted, damage, crit };
 }
 
 // Monotonic source of unique runtime ids. Every addressable runtime entity —
@@ -368,6 +404,25 @@ class GameState {
   }
 
   /**
+   * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
+   * max HP (Vitality), max Mana (Intellect), and the low-light sight band
+   * (Perception). Idempotent — always derived from `attributes` plus the
+   * template's perception band as the baseline-at-3 anchor, so it is safe to
+   * re-run on every admit (like the manaRegen re-sync). Innate Ward/evasion
+   * (Wits), to-hit/crit (Perception), and melee damage (Might) are applied live
+   * at combat time, not stored here. Does NOT touch current hp/mana — callers clamp.
+   */
+  deriveStats(player) {
+    const a = player.attributes || {};
+    player.maxHp = (a.vitality || 0) * HP_PER_VITALITY;
+    player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT;
+    const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
+    const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);
+    const dimBelow = Math.max(band.blindBelow, band.dimBelow - sight);
+    player.perception = { blindBelow: band.blindBelow, dimBelow, harmedAbove: band.harmedAbove };
+  }
+
+  /**
    * Build a fresh character from the static template. Returns plain player data;
    * it is NOT added to the live world (that's `admit`). Used both for new
    * accounts and the auto-created admin.
@@ -382,14 +437,9 @@ class GameState {
       xp: t.xp,
       shards: t.shards || 0,
       attributes: { ...t.attributes },
-      hp: t.maxHp,
-      maxHp: t.maxHp,
-      mana: t.maxMana,
-      maxMana: t.maxMana,
       manaRegen: t.manaRegen || 0,
       speed: t.speed,
       energy: 0,
-      perception: { ...t.perception },
       location: t.startLocation,
       equipment: {},
       inventory: (t.startInventory || []).map((ref) => makeItemInstance(ref, this.world)),
@@ -401,6 +451,9 @@ class GameState {
       player.equipment[slot] =
         tmplId == null ? null : makeItemInstance({ template: tmplId }, this.world);
     }
+    this.deriveStats(player); // maxHp/maxMana/sight band from attributes
+    player.hp = player.maxHp;
+    player.mana = player.maxMana;
     return player;
   }
 
@@ -425,8 +478,15 @@ class GameState {
     if (!Array.isArray(player.states)) player.states = [];
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
-    if (player.maxMana == null) player.maxMana = this.world.playerTemplate.maxMana;
+    // Attributes drive maxHp/maxMana/sight (added after early saves) — backfill from
+    // the template, then re-derive so formula/tuning changes apply to existing saves
+    // too (like manaRegen). Clamp current hp/mana to the (possibly new) maxima.
+    if (!player.attributes) player.attributes = { ...this.world.playerTemplate.attributes };
+    this.deriveStats(player);
+    if (player.hp == null) player.hp = player.maxHp;
     if (player.mana == null) player.mana = player.maxMana;
+    player.hp = Math.min(player.hp, player.maxHp);
+    player.mana = Math.min(player.mana, player.maxMana);
     // manaRegen is a global tuning constant (not per-character progress), so always
     // re-sync it from the template — tuning changes then apply to existing saves too.
     player.manaRegen = this.world.playerTemplate.manaRegen || 0;
@@ -508,14 +568,21 @@ class GameState {
       }
       const weapon = weaponOf(w, p);
       const mt = w.mobs[mob.template];
-      const mobDef = { armour: mt.armour || 0, ward: mt.ward || 0 };
+      const mobDef = { armour: mt.armour || 0, ward: mt.ward || 0, evasion: mt.evasion || 0 };
+      const per = (p.attributes && p.attributes.perception) || 0;
+      const attacker = {
+        band: p.perception,
+        hitBonus: per * HIT_PER_PERCEPTION,
+        dmgBonus: spellScaleBonus(p.attributes, weapon.scale),
+        crit: per * CRIT_PER_PERCEPTION,
+      };
       while (p.energy >= weapon.actionCost && mob.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), mobDef, weapon.damageType || "physical");
+        const r = strike(attacker, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
         events.push({
           type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
           targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,
-          damage: r.damage, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
+          damage: r.damage, crit: r.crit, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
           light: rt.light, targetEmitsLight: !!w.mobs[mob.template].emitsLight,
         });
         this._addThreat(mob, p.id, Math.max(1, r.damage)); // attacking it earns its ire
@@ -672,11 +739,17 @@ class GameState {
     const rt = this.rooms[roomId];
     const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
     this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
-    const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerDefence(this.world, target), t.attack.type || "physical");
+    const attacker = {
+      band: t.perception,
+      hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
+      dmgBonus: (t.attack.bonus) || 0,
+      crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
+    };
+    const r = strike(attacker, playerDefence(this.world, target), rt.light, t.attack.damage, t.attack.type || "physical");
     events.push({
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
       targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
-      damage: r.damage, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
+      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
       light: rt.light, attackerEmitsLight: !!t.emitsLight,
     });
     target.hp -= r.damage;

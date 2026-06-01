@@ -189,7 +189,7 @@ function dispatchEvent(ev) {
         : ev.sighted
           ? `swing at ${ev.targetName} and miss`
           : `flail at ${ev.targetName} in the dark and miss`;
-      sendToPlayer(ev.attackerId, { type: "log", text: `You ${verb}.` });
+      sendToPlayer(ev.attackerId, { type: "log", text: `You ${verb}.${ev.crit ? " A critical hit!" : ""}` });
       // Bystanders only learn the mob's name if they can see it.
       for (const o of state.playersIn(ev.roomId)) {
         if (o.id === ev.attackerId) continue;
@@ -206,7 +206,7 @@ function dispatchEvent(ev) {
       const seen = target && canSeeMob(target, ev.light, ev.attackerEmitsLight);
       const who = seen ? ev.attackerName : "something";
       const youLine = ev.hit
-        ? `${cap(who)} hits you for ${ev.damage}!`
+        ? `${cap(who)} hits you for ${ev.damage}!${ev.crit ? " A critical hit!" : ""}`
         : seen
           ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
           : "Something lunges out of the dark and misses.";

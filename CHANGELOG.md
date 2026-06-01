@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Attributes now drive derived stats** (DESIGN.md §3.2). The five attributes
+  start at **3** and each feeds a live effect: **Might** adds `floor(Might/4)` to
+  melee damage (data-driven via a weapon's `scale`, default `{might,4}`);
+  **Intellect** sets `maxMana` (`Int×4`) on top of the existing spell scaling;
+  **Vitality** sets `maxHp` (`Vit×5`); **Wits** is a pure defence stat — innate
+  Ward (`Wits×2`, magic resist) plus **evasion** (`−Wits×2%` to an attacker's hit
+  chance); **Perception** adds `+2%`/pt to hit (compensating darkness), a
+  `Perception×1%` **critical-hit** chance (doubles damage), and deeper low-light
+  sight (every +5 over baseline lowers the dim-sight threshold). Derived stats are
+  recomputed from attributes on character creation and on every login (so tuning
+  applies to existing saves), with current HP/Mana clamped to the new maxima.
+- **Critical hits** are bidirectional and narrated ("A critical hit!"). Mobs gained
+  optional `attack.crit`, `attack.hitBonus`, and `evasion` fields (all default 0, so
+  no existing mob changes), mirroring the player Perception/Wits effects.
+- **Admin** — `@attr <attribute> <value>` sets one of the caller's attributes and
+  re-derives their stats live, for testing and tuning.
 - **Mining** — a new `mine` (alias `dig`) command works ore loose from a resource
   vein in the room. Veins are data-driven fixtures (`type: "resource"` + a `mine`
   block: ore template, yield, charges, respawn, energy) that deplete as they're
