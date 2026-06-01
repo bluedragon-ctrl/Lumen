@@ -87,6 +87,7 @@ function makeMobInstance(mobId, world) {
     hp: tmpl.maxHp,
     maxHp: tmpl.maxHp,
     energy: 0, // accumulated action points
+    aggro: {}, // playerId -> threat; minimal threat table, see _addThreat()
   };
 }
 
@@ -104,16 +105,53 @@ class GameState {
   }
 
   _initRooms() {
+    // Spawners drive repop: each remembers its room, mob, population cap, and a
+    // countdown. A rule without `respawn` is static (spawned once, never refills).
+    this.spawners = [];
     for (const [id, room] of Object.entries(this.world.rooms)) {
-      const rt = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
-      for (const g of room.groundItems || []) rt.items.push(makeItemInstance(g, this.world));
-      for (const f of room.fixtures || []) rt.fixtures.push({ id: entityId("fixture"), template: f });
+      this.rooms[id] = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
+      for (const g of room.groundItems || []) this.rooms[id].items.push(makeItemInstance(g, this.world));
+      for (const f of room.fixtures || []) this.rooms[id].fixtures.push({ id: entityId("fixture"), template: f });
       for (const s of room.spawns || []) {
         const max = s.max != null ? s.max : 1;
-        for (let i = 0; i < max; i++) rt.mobs.push(makeMobInstance(s.mob, this.world));
+        for (let i = 0; i < max; i++) this._spawnMob(id, s.mob);
+        if (s.respawn != null) this.spawners.push({ roomId: id, mob: s.mob, max, respawn: s.respawn, timer: s.respawn });
       }
-      this.rooms[id] = rt;
-      rt.light = this.computeRoomLight(id);
+      this.rooms[id].light = this.computeRoomLight(id);
+    }
+  }
+
+  /** Create a mob instance, tag it with the spawner that owns it, and place it. */
+  _spawnMob(roomId, mobId) {
+    const m = makeMobInstance(mobId, this.world);
+    m.origin = { roomId, mob: mobId }; // which spawner this counts against (survives wandering)
+    this.rooms[roomId].mobs.push(m);
+    return m;
+  }
+
+  /** Living mobs that belong to a spawner, wherever they have since wandered. */
+  _countOwned(roomId, mobId) {
+    let n = 0;
+    for (const rt of Object.values(this.rooms))
+      for (const m of rt.mobs)
+        if (m.origin && m.origin.roomId === roomId && m.origin.mob === mobId) n++;
+    return n;
+  }
+
+  /**
+   * Repop: each tick, any spawner below its cap counts down; at zero it spawns one
+   * mob back in its home room and rearms. At/above cap the timer stays primed, so
+   * the full delay only begins once a kill (or a wandered-off mob) drops the count.
+   */
+  _respawnTick(events) {
+    for (const sp of this.spawners) {
+      if (this._countOwned(sp.roomId, sp.mob) >= sp.max) { sp.timer = sp.respawn; continue; }
+      if (--sp.timer > 0) continue;
+      sp.timer = sp.respawn;
+      const m = this._spawnMob(sp.roomId, sp.mob);
+      const t = this.world.mobs[sp.mob];
+      const light = this.rooms[sp.roomId].light = this.computeRoomLight(sp.roomId);
+      events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light });
     }
   }
 
@@ -158,6 +196,7 @@ class GameState {
       isAdmin: !!opts.isAdmin,
       level: t.level,
       xp: t.xp,
+      shards: t.shards || 0,
       attributes: { ...t.attributes },
       hp: t.maxHp,
       maxHp: t.maxHp,
@@ -187,6 +226,9 @@ class GameState {
     ensureIdAbove(player.id);
     for (const inst of player.inventory || []) if (inst) ensureIdAbove(inst.id);
     for (const inst of Object.values(player.equipment || {})) if (inst) ensureIdAbove(inst.id);
+    // A persisted location can name a room that no longer exists (e.g. content was
+    // reworked since the save). Strand-proof it: fall back to the start room.
+    if (!this.rooms[player.location]) player.location = this.world.playerTemplate.startLocation;
     this.players.set(player.id, player);
     return player;
   }
@@ -232,6 +274,7 @@ class GameState {
 
     this.resolvePlayerAttacks(events);
     this.resolveMobAI(events);
+    this._respawnTick(events);
     return events;
   }
 
@@ -258,6 +301,7 @@ class GameState {
           damage: r.damage, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
           light: rt.light, targetEmitsLight: !!w.mobs[mob.template].emitsLight,
         });
+        this._addThreat(mob, p.id, Math.max(1, r.damage)); // attacking it earns its ire
         mob.hp -= r.damage;
         if (mob.hp <= 0) {
           events.push(this._killMob(mob, p));
@@ -284,13 +328,24 @@ class GameState {
   _mobAct(m, t, roomId, events) {
     const rt = this.rooms[roomId];
     const playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
-    const exits = Object.keys(this.world.rooms[roomId].exits || {});
+
+    // Threat: hostile mobs engage any delver present; drop threat toward those
+    // who have left/died. A mob with live threat is "in combat" and won't wander.
+    if (t.hostile) for (const p of playersHere) this._addThreat(m, p.id, 0);
+    this._pruneAggro(m, playersHere);
+    const inCombat = Object.keys(m.aggro || {}).length > 0;
+
+    // Wander destinations: "zone" scope confines a mob to its current zone (the
+    // village stays in the village, the abyss below); "any" lets it cross zones.
+    const allDirs = Object.keys(this.world.rooms[roomId].exits || {});
+    const roamDirs = this._zoneExits(roomId);
+    const wanderDirs = (a) => (a.scope === "any" ? allDirs : roamDirs);
 
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return t.hostile && t.attack && playersHere.length > 0;
-        if (a.type === "move") return exits.length > 0;
+        if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
@@ -307,12 +362,51 @@ class GameState {
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
       return;
     }
-    if (choice.type === "move") return this._mobMove(m, t, roomId, events, choice.verb || "moves off", exits);
+    if (choice.type === "wander") return this._mobMove(m, t, roomId, events, choice.verb || "wanders off", wanderDirs(choice));
+  }
+
+  /** Exit directions whose destination room shares this room's zone (roamable). */
+  _zoneExits(roomId) {
+    const room = this.world.rooms[roomId];
+    const zone = room.zone;
+    return Object.entries(room.exits || {})
+      .filter(([, dest]) => this.world.rooms[dest] && this.world.rooms[dest].zone === zone)
+      .map(([dir]) => dir);
+  }
+
+  // --- Aggro / threat table (minimal; placeholder for a fuller threat system) ---
+  // Today: tracks which players a mob is engaged with so it stays to fight rather
+  // than wandering off, and picks its target by highest threat. Later: threat
+  // weighting per action, decay over time, and cross-room pursuit hook here.
+
+  /** Add `amount` threat toward a player (0 just ensures an entry exists). */
+  _addThreat(mob, playerId, amount) {
+    if (!mob.aggro) mob.aggro = {};
+    mob.aggro[playerId] = (mob.aggro[playerId] || 0) + amount;
+  }
+
+  /** Forget players no longer present/alive. (Later: decay instead of hard drop.) */
+  _pruneAggro(mob, playersHere) {
+    if (!mob.aggro) { mob.aggro = {}; return; }
+    const present = new Set(playersHere.map((p) => p.id));
+    for (const pid of Object.keys(mob.aggro)) if (!present.has(pid)) delete mob.aggro[pid];
+  }
+
+  /** The present player a mob is most angry at, or null. */
+  _topThreat(mob, playersHere) {
+    if (!mob.aggro) return null;
+    let best = null, bestT = -Infinity;
+    for (const p of playersHere) {
+      const th = mob.aggro[p.id];
+      if (th != null && th > bestT) { bestT = th; best = p; }
+    }
+    return best;
   }
 
   _mobAttack(m, t, roomId, events, playersHere) {
     const rt = this.rooms[roomId];
-    const target = playersHere[Math.floor(Math.random() * playersHere.length)];
+    const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
+    this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
     const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerArmour(this.world, target));
     events.push({
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,

@@ -1,74 +1,88 @@
 {
-  "settlement.plaza": {
-    "id": "settlement.plaza",
-    "zone": "settlement",
+  "rim.plaza": {
+    "id": "rim.plaza",
+    "zone": "rim",
     "name": "The Rim Plaza",
-    "description": "Lantern-light pools across worn flagstones at the very lip of the abyss. A cold updraft breathes from the great dark shaft to the west of the well, and the murmur of the last human outpost surrounds you. Stairs spiral down into shadow.",
+    "description": "The heart of the Rim — a ring of worn flagstones around a covered well, lit by iron lanterns swaying on their chains. This is the last human settlement at the lip of the abyss; a cold updraft breathes up from the dark and sets the lantern-light shivering. Lanes lead off to the inn in the north, the market east, and the craftsmen's row to the west. Southward the cobbles give way to the descent.",
     "depth": 0,
-    "ambientLight": 4,
-    "exits": { "east": "settlement.market", "down": "shaft.landing-1" },
-    "fixtures": ["alchemist-bench"],
-    "groundItems": [{ "template": "flint", "qty": 2 }],
-    "spawns": []
-  },
-  "settlement.market": {
-    "id": "settlement.market",
-    "zone": "settlement",
-    "name": "The Rim Market",
-    "description": "A huddle of stalls and a smith's forge glowing warm against the chill. Traders eye the shaft and speak in low voices of what comes up from below — and what does not come back.",
-    "depth": 0,
-    "ambientLight": 4,
-    "exits": { "west": "settlement.plaza" },
-    "fixtures": ["forge"],
-    "groundItems": [{ "template": "torch", "fuel": 200 }],
-    "spawns": []
-  },
-  "shaft.landing-1": {
-    "id": "shaft.landing-1",
-    "zone": "shaft",
-    "name": "First Landing",
-    "description": "The spiral stair widens onto a narrow landing. Daylight from the rim still reaches here, grey and thin. The steps continue down into deeper gloom.",
-    "depth": 1,
     "ambientLight": 2,
-    "exits": { "up": "settlement.plaza", "down": "shaft.landing-2" },
+    "exits": { "north": "rim.inn", "east": "rim.market", "west": "rim.workshop", "south": "rim.gate" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "lightbug", "max": 1 }]
+    "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 20 }]
   },
-  "shaft.landing-2": {
-    "id": "shaft.landing-2",
-    "zone": "shaft",
-    "name": "Second Landing",
-    "description": "Here the last of the rim-light dies. The air is wet and still. Your own breath sounds loud. A passage opens north into a black gallery.",
-    "depth": 2,
-    "ambientLight": 1,
-    "exits": { "up": "shaft.landing-1", "down": "dark.gallery", "north": "dark.warren" },
+  "rim.inn": {
+    "id": "rim.inn",
+    "zone": "rim",
+    "name": "The Lantern's Rest",
+    "description": "Warmth and low talk spill from a long common room. A great hearth throws orange light across crowded benches, and the smell of broth and tallow hangs thick. Delvers nurse their drinks here between descents, trading rumours of what waits below. The plaza lies back through the door to the south.",
+    "depth": 0,
+    "ambientLight": 5,
+    "exits": { "south": "rim.plaza" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "lightbug", "max": 2 }]
+    "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 60 }]
   },
-  "dark.gallery": {
-    "id": "dark.gallery",
-    "zone": "depths",
-    "name": "The Black Gallery",
-    "description": "A vast dark space; sound returns from far walls you cannot see. Something skitters at the edge of hearing. Without light, the dark is absolute.",
-    "depth": 3,
+  "rim.market": {
+    "id": "rim.market",
+    "zone": "rim",
+    "name": "The Rim Market",
+    "description": "A huddle of stalls under oiled canvas, hung with torches, coils of rope, and racks of plain steel. The quartermaster trades in what a delver needs and buys back what they haul up — those who come up at all. The plaza is west.",
+    "depth": 0,
+    "ambientLight": 4,
+    "exits": { "west": "rim.plaza" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 60 }]
+  },
+  "rim.workshop": {
+    "id": "rim.workshop",
+    "zone": "rim",
+    "name": "The Craftsmen's Row",
+    "description": "A narrow lane of workshops, ringing with the smith's hammer and sharp with the alchemist's fumes. A coal forge glows beside a bench of glass coils and burners; this is where the Rim turns raw spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
+    "depth": 0,
+    "ambientLight": 4,
+    "exits": { "east": "rim.plaza" },
+    "fixtures": ["forge", "alchemist-bench"],
+    "groundItems": [],
+    "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 60 }]
+  },
+  "rim.gate": {
+    "id": "rim.gate",
+    "zone": "rim",
+    "name": "The Descent Gate",
+    "description": "The lanterns thin out here, at the edge of the settlement. A low stone arch frames the path south, and beyond it the ground falls away into shadow. A weathered sign warns delvers to count their light before they go down. The plaza is north.",
+    "depth": 0,
+    "ambientLight": 2,
+    "exits": { "north": "rim.plaza", "south": "rim.descent" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "rim.descent": {
+    "id": "rim.descent",
+    "zone": "rim",
+    "name": "The Mouth of the Shaft",
+    "description": "The path ends at a great black throat in the rock — the way down. A timber winch and a frayed rope lean over the drop, and the last of the rim-light dies a few feet past the edge. The cold from below is constant now. The gate lies north; the abyss waits down.",
+    "depth": 0,
+    "ambientLight": 2,
+    "exits": { "north": "rim.gate", "down": "abyss.first" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "abyss.first": {
+    "id": "abyss.first",
+    "zone": "abyss",
+    "name": "The First Dark",
+    "description": "A rough chamber hewn or worn into the rock just below the rim. The shaft's faint light does not reach here; without a light of your own the dark is total. Something shifts against the far wall, just out of hearing. The way up is back the way you came.",
+    "depth": 1,
     "ambientLight": 0,
-    "exits": { "up": "shaft.landing-2" },
+    "exits": { "up": "rim.descent" },
     "fixtures": [],
     "groundItems": [{ "template": "vial", "qty": 1 }],
-    "spawns": [{ "mob": "gloom-crawler", "max": 1 }]
-  },
-  "dark.warren": {
-    "id": "dark.warren",
-    "zone": "depths",
-    "name": "The Dweller's Warren",
-    "description": "A low, fetid chamber of piled stone and bone. This is a lair, and it is not empty. The darkness here feels watchful.",
-    "depth": 3,
-    "ambientLight": 0,
-    "exits": { "south": "shaft.landing-2" },
-    "fixtures": [],
-    "groundItems": [],
-    "spawns": [{ "mob": "deep-dweller", "max": 1 }]
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
+    ]
   }
 }

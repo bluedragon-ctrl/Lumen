@@ -89,7 +89,7 @@ A map of `roomId → room`.
     "exits": { "east": "settlement.market", "down": "shaft.landing-1" },
     "fixtures": ["alchemist-bench"],
     "groundItems": [{ "template": "flint", "qty": 2 }],
-    "spawns": [{ "mob": "lightbug", "max": 1 }]
+    "spawns": [{ "mob": "lightbug", "max": 1, "respawn": 20 }]
   }
 }
 ```
@@ -97,7 +97,7 @@ A map of `roomId → room`.
 | Field          | Type              | Notes |
 |----------------|-------------------|-------|
 | `id`           | string            | Unique, matches the map key. Convention: `area.name`. |
-| `zone`         | string?           | Area tag (e.g. `settlement`/`shaft`/`depths`). Reserved for future zone-scoped behaviour (mob wandering/pursuit limits). |
+| `zone`         | string?           | Area tag (e.g. `rim`/`abyss`). Bounds `wander` with `scope: "zone"` — a mob only roams between rooms sharing its current zone. (Future: pursuit limits.) |
 | `name`         | string            | Short room title. |
 | `description`  | string            | Shown in the Inspect window when visible. |
 | `depth`        | integer           | 0 at the rim; increases downward. Flavour + future scaling. |
@@ -105,7 +105,7 @@ A map of `roomId → room`.
 | `exits`        | map dir→roomId    | Directions: `north`,`south`,`east`,`west`,`up`,`down` (extensible). |
 | `fixtures`     | string[]          | Fixture ids present in the room (crafting stations, etc.). |
 | `groundItems`  | ItemRef[]         | Initial items on the floor (instantiated at world load). |
-| `spawns`       | SpawnRule[]       | Mob spawn rules. `{ "mob": id, "max": n }`. |
+| `spawns`       | SpawnRule[]       | Mob spawn rules. `{ "mob": id, "max": n, "respawn": ticks? }`. `respawn` (ticks) refills the population back to `max`, one mob per interval, once a kill or a wandered-off mob drops the count; omit it for a static one-time spawn. The cap counts a spawner's mobs **wherever they have wandered**, so wandering doesn't multiply them. |
 
 `groundItems`/`fixtures`/`spawns` are optional (default empty).
 
@@ -202,6 +202,7 @@ A map of `mobId → template`.
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able. |
+| `shop`       | block?  | Makes the mob a trader: `{ "sells": [{template, price}], "buys": [{template, price}] }`. `price` is in **shards**. Players use `list`/`buy`/`sell` in the room. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
 
 ### Mob actions (weighted)
@@ -214,7 +215,7 @@ when there's an exit). This gives mobs fight/emote/flee/idle personalities.
 "actions": [
   { "type": "attack", "weight": 7 },
   { "type": "emote",  "weight": 2, "messages": ["lets out a wet rattle", "tastes the air"] },
-  { "type": "move",   "weight": 1, "verb": "skitters into the dark" },
+  { "type": "wander", "weight": 1, "verb": "skitters into the dark", "scope": "zone" },
   { "type": "idle",   "weight": 4 }
 ]
 ```
@@ -223,9 +224,18 @@ when there's an exit). This gives mobs fight/emote/flee/idle personalities.
 |---------|--------|--------|
 | `attack`| Strike a player in the room (light-gated like player attacks). | — |
 | `emote` | Broadcast a flavour line to the room (a name you can't see reads as "Something …"). | `messages: string[]` |
-| `move`  | Walk to a random adjacent room (carrying its light if it glows). | `verb` (display, e.g. "flees") |
+| `wander`| Walk to a random adjacent room (carrying its light if it glows). **Suppressed while the mob is in combat** (has live threat). | `verb` (display, e.g. "flees"); `scope`: `"zone"` (default — only rooms sharing the mob's current `zone`) or `"any"` (cross-zone). |
 | `idle`  | Do nothing this turn — raise its weight to keep a mob calm/quiet. | — |
 | `loot`       | LootRule[] | `{ template, chance }`, chance 0..1. |
+
+### Aggro / threat (runtime)
+
+Each mob instance carries an `aggro` table (`{ playerId: threat }`) — minimal today,
+the foundation for a fuller threat system. A player swinging at a mob earns threat;
+hostile mobs auto-engage any delver in their room. A mob with any live threat entry
+is **in combat**: it won't `wander` off, and it attacks its **highest-threat** target.
+Threat toward a player is dropped when they leave the room or die (later: gradual
+decay, per-action threat weighting, cross-room pursuit).
 
 ---
 
@@ -278,9 +288,12 @@ A map of `recipeId → recipe`. Crafting happens via `use <components> on <fixtu
 
 The blueprint a new player is instantiated from.
 
+`shards` is the player's money (a special light-crystal currency; abstract integer
+balance, shown in the player panel). New characters start with the template's value.
+
 ```json
 {
-  "level": 1, "xp": 0,
+  "level": 1, "xp": 0, "shards": 10,
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "maxHp": 18, "maxMana": 10, "speed": 12,
   "perception": { "blindBelow": 1, "harmedAbove": 5 },
@@ -321,7 +334,7 @@ Not committed; shown here so the shape is documented:
 ```json
 {
   "id": "player.varan", "name": "Varan",
-  "level": 1, "xp": 0,
+  "level": 1, "xp": 0, "shards": 10,
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "hp": 18, "maxHp": 18,
   "mana": 10, "maxMana": 10,
