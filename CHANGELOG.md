@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Mob wandering no longer causes difficulty spikes: only **lightbugs** wander now.
+  Gloom-crawlers, giant rats, and cave bats stay in their authored rooms (the
+  crawler still *flees* a bright light), so hostiles no longer drift together into
+  unexpected pile-ups.
 - Command line keeps focus: clicking a chip/exit/action returns focus to the input,
   and typing a printable key anywhere snaps focus back to it (Ctrl/Cmd combos left
   alone so copying log text still works).
