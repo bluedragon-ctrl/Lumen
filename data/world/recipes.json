@@ -7,6 +7,7 @@
       { "template": "luminescent-gland", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
-    "output": { "template": "light-potion", "qty": 1 }
+    "shards": 5,
+    "output": { "template": "minor-light-potion", "qty": 1 }
   }
 }

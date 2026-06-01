@@ -12,15 +12,20 @@ function weaponOf(world, player) {
   return { dice: "1d2", actionCost: 10 }; // unarmed
 }
 
-/** Total physical Armour from a player's equipped gear. */
-function playerArmour(world, player) {
-  let a = 0;
+/** Defensive mitigation from a player's equipped gear: Armour (vs physical)
+ *  and Ward (vs magical). Mirrors the {armour, ward} block on armour items. */
+function playerDefence(world, player) {
+  let armour = 0;
+  let ward = 0;
   for (const inst of Object.values(player.equipment || {})) {
     if (!inst) continue;
     const t = world.items[inst.template];
-    if (t.armour) a += t.armour.armour || 0;
+    if (t.armour) {
+      armour += t.armour.armour || 0;
+      ward += t.armour.ward || 0;
+    }
   }
-  return a;
+  return { armour, ward };
 }
 
 const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
@@ -39,11 +44,13 @@ function pickWeighted(options) {
 
 /** Resolve one swing. Accuracy is gated by how well the attacker sees the target
  *  (clear 100% / glare 50% / can't-see 5%). `sighted` drives miss-message wording. */
-function strike(attackerPerception, light, dice, attackerMightMod, targetArmour) {
+function strike(attackerPerception, light, dice, attackerMightMod, defence, damageType = "physical") {
   const hit = Math.random() < hitChance(attackerPerception, light);
   const sighted = canSee(attackerPerception, light);
   if (!hit) return { hit: false, sighted, damage: 0 };
-  const damage = Math.max(1, rollDice(dice) + attackerMightMod - targetArmour);
+  // Physical damage is soaked by Armour; everything else (magical) by Ward.
+  const mitigation = damageType === "physical" ? defence.armour || 0 : defence.ward || 0;
+  const damage = Math.max(1, rollDice(dice) + attackerMightMod - mitigation);
   return { hit: true, sighted, damage };
 }
 
@@ -91,6 +98,13 @@ function makeMobInstance(mobId, world) {
   };
 }
 
+/** Total light an actor radiates from active `emit-light` status effects. */
+function actorEmitLight(actor) {
+  let sum = 0;
+  for (const s of actor.states || []) if (s.type === "emit-light") sum += s.magnitude || 0;
+  return sum;
+}
+
 /**
  * Authoritative in-memory world state (DESIGN.md §6.1). Owns all dynamic state:
  * per-room mob/item instances and connected players. Static content lives in `world`.
@@ -111,7 +125,12 @@ class GameState {
     for (const [id, room] of Object.entries(this.world.rooms)) {
       this.rooms[id] = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
       for (const g of room.groundItems || []) this.rooms[id].items.push(makeItemInstance(g, this.world));
-      for (const f of room.fixtures || []) this.rooms[id].fixtures.push({ id: entityId("fixture"), template: f });
+      for (const f of room.fixtures || []) {
+        const inst = { id: entityId("fixture"), template: f };
+        const ft = this.world.fixtures[f];
+        if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
+        this.rooms[id].fixtures.push(inst);
+      }
       for (const s of room.spawns || []) {
         const max = s.max != null ? s.max : 1;
         for (let i = 0; i < max; i++) this._spawnMob(id, s.mob);
@@ -172,6 +191,12 @@ class GameState {
     for (const m of rt.mobs) {
       const tmpl = this.world.mobs[m.template];
       if (tmpl && tmpl.emitsLight) outputs.push(tmpl.emitsLight);
+      const e = actorEmitLight(m); // a mob could carry a light effect (e.g. a spell)
+      if (e) outputs.push(e);
+    }
+    for (const f of rt.fixtures) {
+      const ft = this.world.fixtures[f.template];
+      if (ft && ft.switch && f.on) outputs.push(ft.switch.emitsLight || 0); // a lit lamp, etc.
     }
     for (const p of this.playersIn(roomId)) {
       const lightItem = p.equipment && p.equipment.light;
@@ -179,8 +204,46 @@ class GameState {
         const tmpl = this.world.items[lightItem.template];
         if (tmpl && tmpl.light) outputs.push(tmpl.light.output);
       }
+      const e = actorEmitLight(p); // a held Light effect (potion/spell) glows too
+      if (e) outputs.push(e);
     }
     return effectiveLight(room.ambientLight, outputs);
+  }
+
+  /**
+   * Apply a status-effect primitive to an actor. `spec` is the data-driven
+   * descriptor authored on a potion/spell, e.g.
+   *   { type: "emit-light", name: "Light", magnitude: 1, duration: 180 }
+   * Effects stack as independent instances, each with its own countdown; the
+   * engine reads them where relevant (emit-light is summed into room light).
+   */
+  applyEffect(actor, spec) {
+    if (!actor.states) actor.states = [];
+    actor.states.push({
+      type: spec.type,
+      name: spec.name || spec.type,
+      magnitude: spec.magnitude || 0,
+      remaining: spec.duration != null ? spec.duration : null, // null = permanent
+      good: spec.good !== false,
+    });
+  }
+
+  /** Tick down active effects on all players; emit an event as each expires. */
+  _tickEffects(events) {
+    for (const p of this.players.values()) {
+      if (!p.states || !p.states.length) continue;
+      const expired = [];
+      p.states = p.states.filter((s) => {
+        if (s.remaining == null) return true; // permanent
+        s.remaining -= 1;
+        if (s.remaining <= 0) {
+          expired.push(s);
+          return false;
+        }
+        return true;
+      });
+      for (const s of expired) events.push({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name });
+    }
   }
 
   /**
@@ -208,7 +271,8 @@ class GameState {
       location: t.startLocation,
       equipment: {},
       inventory: (t.startInventory || []).map((ref) => makeItemInstance(ref, this.world)),
-      states: [],
+      states: [], // active status effects (see applyEffect / _tickEffects)
+      knownRecipes: [...(t.knownRecipes || [])],
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
       player.equipment[slot] =
@@ -234,6 +298,9 @@ class GameState {
     player.inventory = (player.inventory || []).filter((i) => i && this.world.items[i.template]);
     for (const slot of Object.keys(player.equipment || {}))
       if (player.equipment[slot] && !this.world.items[player.equipment[slot].template]) player.equipment[slot] = null;
+    // Backfill fields added after this save was written (e.g. effects, recipes).
+    if (!Array.isArray(player.states)) player.states = [];
+    if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     this.players.set(player.id, player);
     return player;
   }
@@ -275,6 +342,8 @@ class GameState {
       }
     }
 
+    this._tickEffects(events);
+
     for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
 
     this.resolvePlayerAttacks(events);
@@ -296,10 +365,11 @@ class GameState {
         continue;
       }
       const weapon = weaponOf(w, p);
-      const mobArmour = w.mobs[mob.template].armour || 0;
+      const mt = w.mobs[mob.template];
+      const mobDef = { armour: mt.armour || 0, ward: mt.ward || 0 };
       while (p.energy >= weapon.actionCost && mob.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), mobArmour);
+        const r = strike(p.perception, rt.light, weapon.dice, mightMod(p.attributes), mobDef, weapon.damageType || "physical");
         events.push({
           type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
           targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,
@@ -412,7 +482,7 @@ class GameState {
     const rt = this.rooms[roomId];
     const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
     this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
-    const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerArmour(this.world, target));
+    const r = strike(t.perception, rt.light, t.attack.damage, mightMod(t.attributes), playerDefence(this.world, target), t.attack.type || "physical");
     events.push({
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
       targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
@@ -478,4 +548,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance };
+module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence };

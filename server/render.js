@@ -5,6 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
+const { actorEmitLight, playerDefence } = require("./state");
 
 function itemView(inst, world) {
   if (!inst) return null;
@@ -23,6 +24,7 @@ function buildPlayerView(state, p) {
   const w = state.world;
   const equipment = {};
   for (const [slot, inst] of Object.entries(p.equipment)) equipment[slot] = itemView(inst, w);
+  const defence = playerDefence(w, p); // Armour (vs physical) + Ward (vs magical) from gear
   return {
     type: "player",
     player: {
@@ -37,11 +39,17 @@ function buildPlayerView(state, p) {
       energy: p.energy,
       energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
       speed: p.speed,
+      armour: defence.armour,
+      ward: defence.ward,
       attributes: p.attributes,
       perception: p.perception,
       equipment,
       inventory: p.inventory.map((i) => itemView(i, w)),
-      states: p.states,
+      states: (p.states || []).map((s) => ({
+        name: s.remaining != null ? `${s.name} ${fmtDuration(s.remaining)}` : s.name,
+        good: s.good !== false,
+      })),
+      recipes: (p.knownRecipes || []).map((id) => (w.recipes[id] ? w.recipes[id].name : id)),
     },
   };
 }
@@ -69,11 +77,19 @@ function buildRoomView(state, p) {
     ? rt.items.map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
     : [];
   const fixtures = see
-    ? rt.fixtures.map((f) => ({ id: f.id, name: w.fixtures[f.template].name, template: f.template }))
+    ? rt.fixtures.map((f) => {
+        const ft = w.fixtures[f.template];
+        return { id: f.id, name: ft.name, template: f.template, lit: ft.switch ? !!f.on : undefined };
+      })
     : [];
-  const players = see
-    ? state.playersIn(p.location).filter((o) => o.id !== p.id).map((o) => ({ id: o.id, name: o.name }))
-    : [];
+  // A delver glowing with a Light effect stays visible even in the dark, and
+  // gets the same luminous treatment as a lightbug.
+  const players = [];
+  for (const o of state.playersIn(p.location)) {
+    if (o.id === p.id) continue;
+    const luminous = actorEmitLight(o) > 0;
+    if (see || luminous) players.push({ id: o.id, name: o.name, luminous });
+  }
 
   return {
     type: "room",
@@ -107,7 +123,18 @@ function itemSpecLines(tmpl) {
     if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
   }
   if (tmpl.light) lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);
+  const eff = tmpl.consumable && tmpl.consumable.effect;
+  if (eff && typeof eff === "object") {
+    if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
+    else lines.push(`drink: ${eff.type}`);
+  }
   return lines;
+}
+
+/** Tick count → m:ss (the world ticks once per second). */
+function fmtDuration(ticks) {
+  const s = Math.max(0, ticks | 0);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
 function entity(kind, id, name, description, extra) {
@@ -155,13 +182,21 @@ function buildExamineView(state, p, q) {
     }
     for (const f of rt.fixtures) {
       const t = w.fixtures[f.template];
-      if (hit(f.id, t.name))
-        return detailed
-          ? entity("fixture", f.id, t.name, t.description, {
-              lines: t.station ? [`station: ${t.station}`] : [],
-              hints: t.type === "crafting" ? [`Craft here: use <components> on ${f.id}`] : [],
-            })
-          : entity("fixture", f.id, t.name, null, { dim: true, ...tooDim });
+      if (hit(f.id, t.name)) {
+        if (!detailed) return entity("fixture", f.id, t.name, null, { dim: true, ...tooDim });
+        const lines = [];
+        const hints = [];
+        if (t.station) {
+          lines.push(`station: ${t.station}`);
+          hints.push("Craft here — see `recipes`, then `craft <recipe>`.");
+        }
+        if (t.switch) {
+          lines.push(`power: ${f.on ? "on" : "off"}`);
+          if (t.switch.emitsLight) lines.push(`light when on: ${t.switch.emitsLight}`);
+          hints.push(`Switch it with \`use ${f.id}\`.`);
+        }
+        return entity("fixture", f.id, t.name, t.description, { lines, hints });
+      }
     }
     for (const o of state.playersIn(p.location)) {
       if (o.id !== p.id && hit(o.id, o.name))

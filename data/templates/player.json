@@ -11,5 +11,6 @@
   "startInventory": [
     { "template": "torch", "fuel": 200 }
   ],
-  "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null }
+  "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null },
+  "knownRecipes": ["minor-light-potion"]
 }

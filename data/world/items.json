@@ -68,13 +68,22 @@
     "weight": 0,
     "stackable": true
   },
-  "light-potion": {
-    "id": "light-potion",
-    "name": "a light potion",
-    "description": "A vial of suspended luminescence. Shattering it floods a room with light.",
+  "minor-light-potion": {
+    "id": "minor-light-potion",
+    "name": "a minor light potion",
+    "description": "A small vial of cold, captured luminescence, thumbed from a lightbug's gland. Drink it and your own skin glows softly for a time.",
     "type": "consumable",
     "weight": 0,
     "stackable": true,
-    "consumable": { "effect": "flood-light", "magnitude": 4, "duration": 20 }
+    "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 1, "duration": 180 } }
+  },
+  "light-potion": {
+    "id": "light-potion",
+    "name": "a light potion",
+    "description": "A vial of suspended luminescence, brighter and longer-lived than the minor draught. Drink it and you blaze like a held torch.",
+    "type": "consumable",
+    "weight": 0,
+    "stackable": true,
+    "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 3, "duration": 360 } }
   }
 }

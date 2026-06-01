@@ -96,13 +96,13 @@ function renderRoom(room) {
   c.innerHTML = "";
   const { players, mobs, items, fixtures } = room.contents;
   // Clicks address entities by their unique id (unambiguous), not by name.
-  for (const p of players) c.appendChild(chip(p.name, "player", () => sendCommand("look " + p.id)));
+  for (const p of players) c.appendChild(chip(p.name, "player" + (p.luminous ? " luminous" : ""), () => sendCommand("look " + p.id)));
   for (const m of mobs) {
     const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
     c.appendChild(chip(m.name, cls, () => sendCommand("look " + m.id)));
   }
   for (const it of items) c.appendChild(chip(it.qty != null ? `${it.name} ×${it.qty}` : it.name, "item", () => sendCommand("look " + it.id)));
-  for (const f of fixtures) c.appendChild(chip(f.name, "fixture", () => sendCommand("look " + f.id)));
+  for (const f of fixtures) c.appendChild(chip(f.name, "fixture" + (f.lit ? " luminous" : ""), () => sendCommand("look " + f.id)));
   if (!players.length && !mobs.length && !items.length && !fixtures.length && room.canSee) {
     c.appendChild(label("nothing of note here."));
   }
@@ -176,7 +176,7 @@ function renderPlayer(p) {
     states.appendChild(el);
   }
 
-  // Attributes
+  // Attributes, then derived defences (Armour vs physical, Ward vs magical).
   const attrs = $("p-attrs");
   attrs.innerHTML = "";
   for (const [k, v] of Object.entries(p.attributes)) {
@@ -184,6 +184,12 @@ function renderPlayer(p) {
     wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
     attrs.appendChild(wrap);
   }
+  [["armour", p.armour], ["ward", p.ward]].forEach(([k, v], i) => {
+    const wrap = document.createElement("div");
+    wrap.className = "defence" + (i === 0 ? " first" : "");
+    wrap.innerHTML = `<dt>${k}</dt><dd>${v || 0}</dd>`;
+    attrs.appendChild(wrap);
+  });
 
   // Equipment
   const equip = $("p-equip");
@@ -253,7 +259,8 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "equip", "wield", "wear", "unequip", "remove",
-  "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell", "help",
+  "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
+  "drink", "quaff", "use", "switch", "toggle", "flip", "craft", "make", "recipes", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
@@ -282,6 +289,14 @@ function argCandidates(cmd) {
     }
     case "get": case "take": return room ? names(room.contents.items) : [];
     case "drop": case "sell": return p ? names(p.inventory) : [];
+    case "drink": case "quaff":
+      return p ? p.inventory.filter((i) => i.type === "consumable").map((i) => lastWord(i.name)) : [];
+    case "use": case "switch": case "toggle": case "flip": {
+      const out = room ? names(room.contents.fixtures) : [];
+      if (p) out.push(...p.inventory.filter((i) => i.type === "consumable").map((i) => lastWord(i.name)));
+      return out;
+    }
+    case "craft": case "make": return p ? (p.recipes || []).map((r) => lastWord(r)) : [];
     case "equip": case "wield": case "wear": case "hold":
       return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];
     case "unequip": case "remove":

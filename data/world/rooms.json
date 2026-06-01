@@ -67,7 +67,7 @@
     "depth": 0,
     "ambientLight": 2,
     "exits": { "north": "rim.gate", "down": "abyss.first" },
-    "fixtures": [],
+    "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": []
   },

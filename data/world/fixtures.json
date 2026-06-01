@@ -12,5 +12,12 @@
     "description": "A banked coal forge with anvil and tongs, warm against the abyssal chill.",
     "type": "crafting",
     "station": "smithing"
+  },
+  "lamp": {
+    "id": "lamp",
+    "name": "an iron lamp",
+    "description": "A heavy iron lamp bolted to the rock above the shaft, fed by a slow reservoir of oil. A lever on its side turns the flame up or down — a last light before the descent.",
+    "type": "switch",
+    "switch": { "emitsLight": 3, "on": false }
   }
 }
