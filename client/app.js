@@ -29,6 +29,9 @@ function connect() {
 }
 function sendCommand(text) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "command", text }));
+  // Clicking a chip/exit/action moves focus to that element; return it to the
+  // command line so the player can keep typing without clicking back in.
+  cmdEl.focus();
 }
 function sendLogin(name) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name }));
@@ -316,6 +319,16 @@ function argCandidates(cmd) {
     default: return []; // say / emote / douse / stop / help — free text or no arg
   }
 }
+
+// Safety net: if focus has drifted off the command line (a click elsewhere, a
+// blur), pull it back the instant the player types a printable character — so the
+// keystroke lands in the input rather than being lost. Modifier combos
+// (Ctrl/Cmd+C to copy log text, etc.) are left alone.
+document.addEventListener("keydown", (ev) => {
+  if (document.activeElement === cmdEl) return;
+  if (ev.ctrlKey || ev.metaKey || ev.altKey || ev.key.length !== 1) return;
+  cmdEl.focus();
+});
 
 cmdEl.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") {

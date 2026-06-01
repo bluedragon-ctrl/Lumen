@@ -197,7 +197,8 @@ function buildExamineView(state, p, q) {
         if (t.switch) {
           lines.push(`power: ${f.on ? "on" : "off"}`);
           if (t.switch.emitsLight) lines.push(`light when on: ${t.switch.emitsLight}`);
-          hints.push(`Switch it with \`use ${f.id}\`.`);
+          const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "an iron lamp" → "iron lamp"
+          hints.push(`Switch it with \`use ${callName}\`.`);
         }
         return entity("fixture", f.id, t.name, t.description, { lines, hints });
       }

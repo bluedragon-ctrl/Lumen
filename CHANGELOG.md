@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Command line keeps focus: clicking a chip/exit/action returns focus to the input,
+  and typing a printable key anywhere snaps focus back to it (Ctrl/Cmd combos left
+  alone so copying log text still works).
+- Fixture examine hints use the readable name (`use iron lamp`) instead of the
+  internal instance id (`use fixture.10`).
+
 ### Added
 - **Item values & data-driven trade**: every item carries a buy `value` (sell price
   defaults to 20%, overridable via `sellValue`). A trader sells its stock at value
