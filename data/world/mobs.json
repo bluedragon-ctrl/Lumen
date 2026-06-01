@@ -39,8 +39,7 @@
       { "type": "flee", "lightAbove": 3, "verb": "recoils from the light and flees into the dark", "scope": "zone" },
       { "type": "attack", "weight": 7 },
       { "type": "idle", "weight": 4 },
-      { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air"] },
-      { "type": "wander", "weight": 1, "verb": "skitters into the dark", "scope": "zone" }
+      { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air"] }
     ],
     "loot": []
   },
@@ -62,8 +61,7 @@
     "actions": [
       { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 4 },
-      { "type": "emote", "weight": 2, "messages": ["lets out a shrill squeak", "gnaws at the stone", "twitches its whiskers", "sniffs the air"] },
-      { "type": "wander", "weight": 2, "verb": "scurries away into the dark", "scope": "zone" }
+      { "type": "emote", "weight": 2, "messages": ["lets out a shrill squeak", "gnaws at the stone", "twitches its whiskers", "sniffs the air"] }
     ],
     "loot": []
   },
@@ -83,8 +81,7 @@
     "xp": 3,
     "shards": "1d2",
     "actions": [
-      { "type": "wander", "weight": 5, "verb": "flits away through a crack", "scope": "zone" },
-      { "type": "idle", "weight": 4 },
+      { "type": "idle", "weight": 6 },
       { "type": "attack", "weight": 3 },
       { "type": "emote", "weight": 2, "messages": ["wheels in a tight, erratic loop", "lets out a thin, piercing squeak", "swoops low, then veers off"] }
     ],
