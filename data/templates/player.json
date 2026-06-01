@@ -13,7 +13,7 @@
     { "template": "torch", "fuel": 200 },
     { "template": "scroll-spark" }
   ],
-  "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null },
+  "startEquipment": { "hand": "short-sword", "body": null, "head": null, "light": null },
   "knownRecipes": ["minor-light-potion"],
   "knownSpells": []
 }
