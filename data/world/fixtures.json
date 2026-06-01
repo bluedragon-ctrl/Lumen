@@ -45,5 +45,19 @@
     "name": "a bone pile",
     "description": "A reeking midden of gnawed bones heaped against the wall — rat, and not only rat. A cracked helm and a delver's splintered femur lie among them.",
     "type": "scenery"
+  },
+  "iron-vein": {
+    "id": "iron-vein",
+    "name": "an iron vein",
+    "description": "A seam of rust-red ore threads the broken rock, dense enough to work loose with a steady arm and time. The seam gives up only so much before it runs thin, and needs a long while to be worth the swing again.",
+    "type": "resource",
+    "mine": { "template": "iron-ore", "yield": 1, "charges": 5, "respawn": 90, "energy": 30 }
+  },
+  "smelter": {
+    "id": "smelter",
+    "name": "a smelting furnace",
+    "description": "A squat stone furnace with a clay crucible, kept hot by the row's shared bellows. Ore goes in raw and runs out in bars — the first step from rock to blade.",
+    "type": "crafting",
+    "station": "smelting"
   }
 }

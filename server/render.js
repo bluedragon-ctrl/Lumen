@@ -205,6 +205,12 @@ function buildExamineView(state, p, q) {
           const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "an iron lamp" → "iron lamp"
           hints.push(`Switch it with \`use ${callName}\`.`);
         }
+        if (t.mine) {
+          const left = f.charges != null ? f.charges : t.mine.charges;
+          lines.push(`ore: ${w.items[t.mine.template].name}`);
+          lines.push(`yield left: ${left}/${t.mine.charges}`);
+          hints.push(left > 0 ? "Work it with `mine`." : "Worked out — leave it time to recover.");
+        }
         return entity("fixture", f.id, t.name, t.description, { lines, hints });
       }
     }

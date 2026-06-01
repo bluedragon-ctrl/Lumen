@@ -267,6 +267,15 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "vein-recover") {
+    for (const o of state.playersIn(ev.roomId)) {
+      if (canSee(o.perception, state.rooms[ev.roomId].light)) {
+        sendToPlayer(o.id, { type: "log", text: `${cap(ev.fixtureName)} has fresh ore to work again.` });
+      }
+    }
+    return;
+  }
+
   if (ev.type === "mob-hurt") {
     const flavour = {
       light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,
