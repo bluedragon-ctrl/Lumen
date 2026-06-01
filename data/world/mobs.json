@@ -36,10 +36,80 @@
     "xp": 8,
     "shards": "1d4",
     "actions": [
+      { "type": "flee", "lightAbove": 3, "verb": "recoils from the light and flees into the dark", "scope": "zone" },
       { "type": "attack", "weight": 7 },
       { "type": "idle", "weight": 4 },
       { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air"] },
       { "type": "wander", "weight": 1, "verb": "skitters into the dark", "scope": "zone" }
+    ],
+    "loot": []
+  },
+  "giant-rat": {
+    "id": "giant-rat",
+    "name": "a giant rat",
+    "description": "A mangy, dog-sized rat with yellowed incisors and a hairless, ringed tail. Surface vermin, grown bold and bloated this near the dark.",
+    "maxHp": 9,
+    "speed": 11,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 4, "intellect": 0, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d3", "actionCost": 12 },
+    "xp": 5,
+    "shards": "1d2",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["lets out a shrill squeak", "gnaws at the stone", "twitches its whiskers", "sniffs the air"] },
+      { "type": "wander", "weight": 2, "verb": "scurries away into the dark", "scope": "zone" }
+    ],
+    "loot": []
+  },
+  "cave-bat": {
+    "id": "cave-bat",
+    "name": "a cave bat",
+    "description": "A leathery flutter of wings and needle teeth, wheeling in erratic loops through the dark. More nuisance than threat, until a swarm finds you.",
+    "maxHp": 5,
+    "speed": 9,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 2, "vitality": 2, "intellect": 0, "wits": 7, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d2", "actionCost": 14 },
+    "xp": 3,
+    "shards": "1d2",
+    "actions": [
+      { "type": "wander", "weight": 5, "verb": "flits away through a crack", "scope": "zone" },
+      { "type": "idle", "weight": 4 },
+      { "type": "attack", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["wheels in a tight, erratic loop", "lets out a thin, piercing squeak", "swoops low, then veers off"] }
+    ],
+    "loot": []
+  },
+  "gnaw": {
+    "id": "gnaw",
+    "name": "Gnaw, the Brood-Mother",
+    "description": "A monstrous, scarred dire-rat, swollen and grey, her hide a map of old wounds. She squats amid the gnawed bones of delvers — the reason the vermin spill up toward the rim.",
+    "maxHp": 40,
+    "speed": 12,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 9, "intellect": 1, "wits": 5, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": { "damage": "1d6", "actionCost": 13 },
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "xp": 30,
+    "shards": "2d6",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["lets out a shrill, rattling screech", "bares a mouthful of yellowed incisors", "lashes her scaled tail across the bones", "drags a delver's femur closer with one clawed foot"] }
     ],
     "loot": []
   },
@@ -56,6 +126,7 @@
     "behavior": "guard",
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 14 },
+    "lightBane": { "above": 2, "damage": "1d3" },
     "xp": 20,
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -82,7 +153,10 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
-    ]
+    ],
+    "shop": {
+      "sells": [{ "template": "mushroom-soup" }]
+    }
   },
   "rim-shopkeeper": {
     "id": "rim-shopkeeper",

@@ -41,11 +41,14 @@ function main() {
       if (s.respawn != null && (typeof s.respawn !== "number" || s.respawn <= 0))
         errs.push(`room ${id}: spawn respawn must be a positive number (ticks)`);
     }
-    for (const g of r.groundItems || [])
+    for (const g of r.groundItems || []) {
       if (!has(items, g.template)) errs.push(`room ${id}: groundItem missing template ${g.template}`);
+      if (g.respawn != null && (typeof g.respawn !== "number" || g.respawn <= 0))
+        errs.push(`room ${id}: groundItem respawn must be a positive number (ticks)`);
+    }
   }
 
-  const EFFECT_TYPES = ["emit-light"];
+  const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
   for (const [id, it] of Object.entries(items)) {
     // Every tradeable item needs a buy `value`; currency (shards) is exempt.
     if (it.type !== "currency") {
@@ -76,6 +79,10 @@ function main() {
         if (!EFFECT_TYPES.includes(eff.type)) errs.push(`item ${id}: unknown effect type "${eff.type}" (known: ${EFFECT_TYPES.join(", ")})`);
         if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`item ${id}: effect.magnitude must be a number`);
         if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`item ${id}: effect.duration must be a positive number (ticks)`);
+        if (eff.hp != null && typeof eff.hp !== "number") errs.push(`item ${id}: effect.hp must be a number`);
+        if (eff.mana != null && typeof eff.mana !== "number") errs.push(`item ${id}: effect.mana must be a number`);
+        if (eff.damage != null && (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage)))
+          errs.push(`item ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
       }
     }
   }
@@ -87,6 +94,11 @@ function main() {
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
     if (m.shards != null && (typeof m.shards !== "string" || !DICE_RE.test(m.shards)))
       errs.push(`mob ${id}: shards "${m.shards}" is not valid dice notation`);
+    if (m.lightBane) {
+      if (typeof m.lightBane.above !== "number") errs.push(`mob ${id}: lightBane.above must be a number`);
+      if (typeof m.lightBane.damage !== "string" || !DICE_RE.test(m.lightBane.damage))
+        errs.push(`mob ${id}: lightBane.damage "${m.lightBane.damage}" is not valid dice notation`);
+    }
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")
@@ -100,18 +112,22 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "emote", "wander", "idle"].includes(a.type))
+      if (!["attack", "emote", "wander", "idle", "flee"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
-      if (a.type === "wander" && a.scope != null && !["zone", "any"].includes(a.scope))
-        errs.push(`mob ${id}: wander scope must be "zone" or "any"`);
+      if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
+        errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
+      if (a.type === "flee" && a.lightAbove != null && typeof a.lightAbove !== "number")
+        errs.push(`mob ${id}: flee lightAbove must be a number`);
       if (a.weight != null && typeof a.weight !== "number")
         errs.push(`mob ${id}: action weight must be a number`);
     }
   }
 
   for (const [id, f] of Object.entries(fixtures)) {
+    if (f.emitsLight != null && (typeof f.emitsLight !== "number" || f.emitsLight < 0))
+      errs.push(`fixture ${id}: emitsLight must be a non-negative number`);
     if (f.switch) {
       if (f.switch.emitsLight != null && (typeof f.switch.emitsLight !== "number" || f.switch.emitsLight < 0))
         errs.push(`fixture ${id}: switch.emitsLight must be a non-negative number`);

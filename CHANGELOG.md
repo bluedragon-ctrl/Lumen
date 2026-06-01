@@ -13,6 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   internal instance id (`use fixture.10`).
 
 ### Added
+- **The Shallows** — a 10-room beginner area branching off the First Dark (same
+  level, no new up/down). A fungal line (Dripping Tunnel → Fungal Grotto → Spore
+  Vault) gated by gloom-crawlers, a vermin loop (Bat Roost ↔ Echoing Fissure ↔
+  Collapsed Gallery → Rat Warren), and a southern descent (Glimmer Hollow →
+  Sunken Cut → the Brood-Mother's Den). New mobs: **giant rat**, **cave bat**, and
+  mini-boss **Gnaw, the Brood-Mother**. New scenery fixtures, two of which glow
+  (witchglow cluster, narrow fissure) via a fixture-level `emitsLight`.
+- **Renewable harvest nodes**: a `groundItem` may carry a `respawn` (ticks); a
+  picked-up item regrows on a timer (tagged so dropping a like item won't block
+  it). First nodes: **palecap mushrooms** (edible) and **witchglow caps** (glowing,
+  poison) in the Shallows.
+- **Pale mushroom soup**: a consumable that restores **+5 HP / +5 MP** (clamped),
+  sold by Maeve at the inn for 5 shards. Introduces an instantaneous **`restore`**
+  effect type (heal hp/mana) alongside the timed status effects.
+- **`flee` behaviour**: a light-triggered mob action — when room light rises above
+  its `lightAbove`, the mob bolts for a random exit, overriding all else (even
+  combat). Gloom-crawlers flee light above 3.
+- **Light as a weapon + general damage scaffolding**: all HP loss now flows through
+  shared sinks (`_hurtMob`/`_hurtPlayer`), so deaths can come from the room or an
+  effect, not just a blow — spoils drop where the victim falls; XP is credited only
+  when a player is responsible. **Light-bane** (`lightBane: { above, damage }`) sears
+  any mob standing in light above its threshold (deep-dweller, and the boss Gnaw),
+  and a **`damage-over-time`** status primitive (bleed/poison) is ticked on both
+  players and mobs (scaffolding; no bleed content authored yet).
+- **`start-server.bat`**: double-click launcher at the repo root — checks for Node,
+  installs deps on first run, and starts the server at http://localhost:3737.
 - **Item values & data-driven trade**: every item carries a buy `value` (sell price
   defaults to 20%, overridable via `sellValue`). A trader sells its stock at value
   and **buys any valued item** at its sell value — pricing comes from item data, not

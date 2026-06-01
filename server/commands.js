@@ -377,6 +377,17 @@ function drink(state, player, arg, ctx) {
   // Consume one, then apply the effect primitive.
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
   else player.inventory.splice(idx, 1);
+  // `restore` is instantaneous (heal hp/mana); everything else is a status effect.
+  if (spec.type === "restore") {
+    const r = state.applyRestore(player, spec);
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks ${t.name}.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    const parts = [];
+    if (r.hp) parts.push(`+${r.hp} HP`);
+    if (r.mana) parts.push(`+${r.mana} MP`);
+    const gain = parts.length ? ` (${parts.join(", ")})` : " It does nothing for you.";
+    return selfAndViews(state, player, `You drink ${t.name}.${gain}`);
+  }
   state.applyEffect(player, spec);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks ${t.name}.` }, player.id);

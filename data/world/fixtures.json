@@ -19,5 +19,31 @@
     "description": "A heavy iron lamp bolted to the rock above the shaft, fed by a slow reservoir of oil. A lever on its side turns the flame up or down — a last light before the descent.",
     "type": "switch",
     "switch": { "emitsLight": 3, "on": false }
+  },
+  "witchglow-cluster": {
+    "id": "witchglow-cluster",
+    "name": "a witchglow cluster",
+    "description": "A great fan of luminous fungus spreads across the wet rock, breathing a steady, cold green light into the vault. Its glow is faint but constant — enough to keep the dark-dwellers at bay.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
+  "narrow-fissure": {
+    "id": "narrow-fissure",
+    "name": "a narrow fissure",
+    "description": "A jagged crack splits the rock overhead, narrow as a blade. A thin grey thread of daylight falls through it, and the wind in the gap carries the echo of distant bat-cries.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
+  "dripping-pool": {
+    "id": "dripping-pool",
+    "name": "a dark seep",
+    "description": "Water gathers in a shallow, black pool, fed drop by drop from the stone above. It looks cold and clean enough to drink, if you dared.",
+    "type": "scenery"
+  },
+  "bone-pile": {
+    "id": "bone-pile",
+    "name": "a bone pile",
+    "description": "A reeking midden of gnawed bones heaped against the wall — rat, and not only rat. A cracked helm and a delver's splintered femur lie among them.",
+    "type": "scenery"
   }
 }
