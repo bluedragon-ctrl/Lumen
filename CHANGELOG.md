@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Rim — first authored zone**: a 7-room starting area (replacing the
+  placeholder slice) — a lantern-lit village (plaza, inn, market, craftsmen's row,
+  descent gate, shaft mouth) over the first dark abyss room. Light gradient
+  bright→dim→dark from buildings to the descent.
+- **Friendly NPCs** with personality emotes (low-chance, ~once/10s): Maeve the
+  innkeeper, Garrick the quartermaster, Tobin the tinker-smith. Stationary,
+  non-hostile, examinable.
+- **Trading + shards currency**: a mob `shop` block (`sells`/`buys` at shard
+  prices) plus `list`/`buy`/`sell` commands. `shards` is the player's abstract
+  money (shown in the panel). Garrick buys luminous glands and sells torches —
+  the first economic loop (harvest light → fund light).
+- **Mob repop**: spawn rules take an optional `respawn` (ticks); a spawner below
+  its `max` refills one mob per interval into its home room. The cap counts a
+  spawner's mobs wherever they wandered, so roaming never multiplies them.
+- **Zone-scoped wandering**: `wander` is now a data-driven mob action with a
+  `scope` (`"zone"` confines a mob to its current zone, `"any"` crosses zones).
+  Replaces the old `move` action. Mobs no longer wander out of their area.
+- **Aggro/threat table** on mobs (`{ playerId: threat }`): attacking earns threat,
+  hostile mobs engage delvers present, and a mob in combat won't wander and
+  strikes its highest-threat target. Minimal seed for a fuller threat system.
+- Light-emitting entities (lightbugs, future glowing NPCs) now **glow** in the
+  room view via a generic `.chip.luminous` halo + pulse.
+
+### Changed
+- Persisted players with a now-missing `location` (e.g. after content rework) are
+  clamped to the start room on login instead of crashing.
+
+### Added
 - **Context-aware TAB completion**: the first word completes commands; the
   argument completes from what that command can act on — `remove`→equipped gear,
   `get`→ground items, `drop`/`equip`→inventory (equip only equippable),

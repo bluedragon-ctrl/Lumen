@@ -65,7 +65,13 @@ body {
 .chip.exit { color: var(--accent); cursor: pointer; }
 .chip.mob { border-color: #3a4750; }
 .chip.mob.hostile { border-color: var(--hostile); color: var(--hostile); }
-.chip.mob.luminous { border-color: var(--lumin); color: var(--lumin); }
+/* Any light-emitting entity (lightbug, glowing NPCs/mobs) glows in the room view. */
+.chip.luminous {
+  border-color: var(--lumin); color: var(--lumin);
+  box-shadow: 0 0 6px rgba(216, 200, 115, .35), inset 0 0 5px rgba(216, 200, 115, .12);
+  text-shadow: 0 0 5px rgba(216, 200, 115, .55);
+  animation: lumin-glow 2.4s ease-in-out infinite;
+}
 .chip.fixture { border-color: #4a4030; }
 .chip.player { border-color: var(--mana); color: var(--mana); }
 .chip.item { color: var(--text); }
@@ -92,8 +98,13 @@ body {
   50%      { text-shadow: 0 0 7px rgba(255, 255, 255, 1),   0 0 18px rgba(205, 228, 255, .75); }
 }
 @keyframes searing-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes lumin-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(216, 200, 115, .28), inset 0 0 4px rgba(216, 200, 115, .10); }
+  50%      { box-shadow: 0 0 10px rgba(216, 200, 115, .55), inset 0 0 7px rgba(216, 200, 115, .18); }
+}
 @media (prefers-reduced-motion: reduce) {
   .light-searing #room-name, .light-searing .room-desc, .light-searing::after { animation: none; }
+  .chip.luminous { animation: none; }
 }
 .light-unknown { background: var(--panel); }
 

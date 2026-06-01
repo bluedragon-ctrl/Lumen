@@ -33,8 +33,13 @@ function main() {
       if (!has(rooms, dest)) errs.push(`room ${id}: exit ${dir} -> missing room ${dest}`);
     for (const f of r.fixtures || [])
       if (!has(fixtures, f)) errs.push(`room ${id}: missing fixture ${f}`);
-    for (const s of r.spawns || [])
+    for (const s of r.spawns || []) {
       if (!has(mobs, s.mob)) errs.push(`room ${id}: spawn references missing mob ${s.mob}`);
+      if (s.max != null && (typeof s.max !== "number" || s.max <= 0))
+        errs.push(`room ${id}: spawn max must be a positive number`);
+      if (s.respawn != null && (typeof s.respawn !== "number" || s.respawn <= 0))
+        errs.push(`room ${id}: spawn respawn must be a positive number (ticks)`);
+    }
     for (const g of r.groundItems || [])
       if (!has(items, g.template)) errs.push(`room ${id}: groundItem missing template ${g.template}`);
   }
@@ -54,11 +59,20 @@ function main() {
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
+    if (m.shop) {
+      for (const kind of ["sells", "buys"])
+        for (const o of m.shop[kind] || []) {
+          if (!has(items, o.template)) errs.push(`mob ${id}: shop.${kind} missing template ${o.template}`);
+          if (typeof o.price !== "number" || o.price < 0) errs.push(`mob ${id}: shop.${kind} price for ${o.template} must be a non-negative number`);
+        }
+    }
     for (const a of m.actions || []) {
-      if (!["attack", "emote", "move", "idle"].includes(a.type))
+      if (!["attack", "emote", "wander", "idle"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
+      if (a.type === "wander" && a.scope != null && !["zone", "any"].includes(a.scope))
+        errs.push(`mob ${id}: wander scope must be "zone" or "any"`);
       if (a.weight != null && typeof a.weight !== "number")
         errs.push(`mob ${id}: action weight must be a number`);
     }

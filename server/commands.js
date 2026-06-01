@@ -10,6 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
+const { makeItemInstance } = require("./state");
 const accounts = require("./accounts");
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
@@ -27,6 +28,9 @@ const HELP = [
   "  attack | kill <target> — attack a creature (stop to break off)",
   "  equip | wield | wear <item> — equip from inventory (swaps current)",
   "  unequip | remove <item|slot> — return equipped gear to inventory",
+  "  list | shop           — see what a trader here buys and sells",
+  "  buy <item>            — buy from a trader here",
+  "  sell <item>           — sell to a trader here",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
@@ -189,6 +193,67 @@ function inventory(state, player) {
   return [{ type: "log", text: "You are carrying:\n" + lines.join("\n") }];
 }
 
+// A trader you can currently deal with: a mob in the room carrying a `shop` block,
+// visible in the present light. Returns { mob, t } or null.
+function shopHere(state, player) {
+  const rt = state.rooms[player.location];
+  if (!canSee(player.perception, rt.light)) return null;
+  for (const m of rt.mobs) {
+    const t = state.world.mobs[m.template];
+    if (t.shop) return { mob: m, t };
+  }
+  return null;
+}
+
+function shopList(state, player) {
+  const sh = shopHere(state, player);
+  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  const w = state.world;
+  const fmt = (o) => `  ${w.items[o.template].name} — ${o.price} shards`;
+  const lines = [`${sh.t.name} trades:`];
+  if ((sh.t.shop.sells || []).length) lines.push("Sells (you buy):", ...sh.t.shop.sells.map(fmt));
+  if ((sh.t.shop.buys || []).length) lines.push("Buys (you sell):", ...sh.t.shop.buys.map(fmt));
+  lines.push(`You have ${player.shards || 0} shards.`);
+  return [{ type: "log", text: lines.join("\n") }];
+}
+
+function buy(state, player, arg, ctx) {
+  if (!arg) return [{ type: "error", text: "Buy what?" }];
+  const sh = shopHere(state, player);
+  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  const w = state.world;
+  const ql = arg.toLowerCase();
+  const offer = (sh.t.shop.sells || []).find(
+    (s) => s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql)
+  );
+  if (!offer) return [{ type: "error", text: `${sh.t.name} doesn't sell "${arg}".` }];
+  const name = w.items[offer.template].name;
+  if ((player.shards || 0) < offer.price)
+    return [{ type: "error", text: `You can't afford ${name} — ${offer.price} shards, you have ${player.shards || 0}.` }];
+  player.shards -= offer.price;
+  addToInventory(player, makeItemInstance({ template: offer.template }, w), w);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} buys ${name} from ${sh.t.name}.` }, player.id);
+  return selfAndViews(state, player, `You buy ${name} for ${offer.price} shards. (${player.shards} left)`);
+}
+
+function sell(state, player, arg, ctx) {
+  if (!arg) return [{ type: "error", text: "Sell what?" }];
+  const sh = shopHere(state, player);
+  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  const w = state.world;
+  const idx = findItem(player.inventory, w, arg);
+  if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
+  const inst = player.inventory[idx];
+  const offer = (sh.t.shop.buys || []).find((b) => b.template === inst.template);
+  if (!offer) return [{ type: "error", text: `${sh.t.name} won't buy ${w.items[inst.template].name}.` }];
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(idx, 1);
+  player.shards = (player.shards || 0) + offer.price;
+  const name = w.items[offer.template].name;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} sells ${name} to ${sh.t.name}.` }, player.id);
+  return selfAndViews(state, player, `You sell ${name} for ${offer.price} shards. (${player.shards} total)`);
+}
+
 function say(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Say what?" }];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} says: ${text}` }, player.id);
@@ -284,6 +349,14 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "stop":
       player.pending = null;
       return [{ type: "log", text: "You break off your attack." }];
+    case "list":
+    case "shop":
+    case "wares":
+      return shopList(state, player);
+    case "buy":
+      return buy(state, player, arg, ctx);
+    case "sell":
+      return sell(state, player, arg, ctx);
     case "say":
       return say(state, player, arg, ctx);
     case "emote":

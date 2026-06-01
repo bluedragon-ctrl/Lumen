@@ -127,8 +127,26 @@ Damage = `roll(weapon dice) + (Might − 5) − target Armour` (min 1). Mob HP�
 death, loot dropped to the room, XP to the killer. Player HP≤0 → respawn at the
 rim, full HP, no penalty beyond lost progress (DESIGN v1).
 
+**Repop** is data-driven per spawn rule: `{ mob, max, respawn }`. Each tick a
+spawner below its `max` counts down `respawn` ticks and then puts one mob back in
+its home room (a `mob-spawn` event). The cap counts a spawner's mobs wherever they
+have since wandered, so roaming never multiplies the population. Omit `respawn`
+for a static one-time spawn. Cadence stays on the single tick — cheap integer
+countdowns, no separate timer (an event-scheduler is deferred until scale needs it).
+
 Each tick a mob takes **one weighted action** from its `actions` table
-(`attack` / `emote` / `move` / `idle`) among those currently available — so mobs
+(`attack` / `emote` / `wander` / `idle`) among those currently available — so mobs
 fight, mutter flavour lines, wander, or lurk with distinct personalities. Mob
 actions you can't see read as "Something …". Mobs act in their own room only (no
-cross-room pursuit yet); `move` lets them wander between rooms.
+cross-room pursuit yet); `wander` lets them roam between rooms, bounded by its
+`scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones).
+
+**Trading.** A mob with a `shop` block is a trader. In its room a player can `list`
+the wares, `buy <item>` (deducts **shards**, the player's currency, and hands over a
+fresh instance) and `sell <item>` (the trader's `buys` list pays shards for it).
+Shards are an abstract integer balance on the character, shown in the player panel.
+
+Mobs keep a minimal **aggro table** (`{ playerId: threat }`): attacking a mob earns
+threat and hostile mobs engage any delver present. A mob with live threat is *in
+combat* — it won't `wander` away and strikes its highest-threat target. Threat is
+dropped when a player leaves or dies (a fuller threat/decay/pursuit system later).

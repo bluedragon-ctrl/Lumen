@@ -164,7 +164,7 @@ document.getElementById("ex-back").addEventListener("click", () => sendCommand("
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {
   $("p-name").textContent = p.name;
-  $("p-level").textContent = `Lv ${p.level} · ${p.xp} xp`;
+  $("p-level").textContent = `Lv ${p.level} · ${p.xp} xp · ${p.shards || 0} shards`;
 
   // States
   const states = $("p-states");
@@ -253,7 +253,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "equip", "wield", "wear", "unequip", "remove",
-  "light", "douse", "extinguish", "ignite", "help",
+  "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
@@ -281,7 +281,7 @@ function argCandidates(cmd) {
       return out;
     }
     case "get": case "take": return room ? names(room.contents.items) : [];
-    case "drop": return p ? names(p.inventory) : [];
+    case "drop": case "sell": return p ? names(p.inventory) : [];
     case "equip": case "wield": case "wear": case "hold":
       return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];
     case "unequip": case "remove":

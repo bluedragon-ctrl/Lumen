@@ -230,6 +230,15 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-spawn") {
+    for (const o of state.playersIn(ev.roomId)) {
+      const text = canSeeMob(o, ev.light, ev.emitsLight) ? `${cap(ev.mobName)} appears.` : "Something stirs in the dark.";
+      sendToPlayer(o.id, { type: "log", text });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
   if (ev.type === "death" && ev.victimKind === "mob") {
     const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
     roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} dies.${lootTxt}` }, ev.killerId);

@@ -13,9 +13,9 @@
     "hostile": false,
     "xp": 2,
     "actions": [
-      { "type": "idle", "weight": 10 },
+      { "type": "idle", "weight": 15 },
       { "type": "emote", "weight": 3, "messages": ["pulses with soft light", "drifts in a lazy arc", "flickers"] },
-      { "type": "move", "weight": 2, "verb": "drifts off" }
+      { "type": "wander", "weight": 2, "verb": "drifts off", "scope": "zone" }
     ],
     "loot": [{ "template": "luminescent-gland", "chance": 0.5 }]
   },
@@ -36,7 +36,7 @@
       { "type": "attack", "weight": 7 },
       { "type": "idle", "weight": 4 },
       { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air"] },
-      { "type": "move", "weight": 1, "verb": "skitters into the dark" }
+      { "type": "wander", "weight": 1, "verb": "skitters into the dark", "scope": "zone" }
     ],
     "loot": [{ "template": "flint", "chance": 0.3 }]
   },
@@ -61,6 +61,58 @@
     "loot": [
       { "template": "vial", "chance": 0.6 },
       { "template": "rusted-blade", "chance": 0.2 }
+    ]
+  },
+  "rim-innkeeper": {
+    "id": "rim-innkeeper",
+    "name": "Maeve the innkeeper",
+    "description": "A stout, white-haired woman with flour on her apron and a kind, crinkled smile. She has kept the Lantern's Rest since before the last great delve, and remembers every delver who never came back up.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "attributes": { "might": 3, "vitality": 6, "intellect": 4, "wits": 5, "perception": 4 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
+    ]
+  },
+  "rim-shopkeeper": {
+    "id": "rim-shopkeeper",
+    "name": "Garrick the quartermaster",
+    "description": "A broad, sour-faced man with a salt-streaked beard and a coin-counter's squint. He sells dear, buys cheap, and dares you to argue about either.",
+    "maxHp": 22,
+    "speed": 12,
+    "armour": 0,
+    "attributes": { "might": 5, "vitality": 6, "intellect": 4, "wits": 5, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
+    ],
+    "shop": {
+      "sells": [{ "template": "torch", "price": 6 }],
+      "buys": [{ "template": "luminescent-gland", "price": 2 }]
+    }
+  },
+  "rim-smith": {
+    "id": "rim-smith",
+    "name": "Tobin the tinker-smith",
+    "description": "A wiry, soot-smudged man with singed eyebrows and a faraway look, forever halfway through three inventions at once and certain the next one will change everything.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "attributes": { "might": 5, "vitality": 5, "intellect": 6, "wits": 5, "perception": 4 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] }
     ]
   }
 }
