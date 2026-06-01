@@ -23,6 +23,7 @@ data/save/
 .DS_Store
 Thumbs.db
 
-# Claude Code local files (keep the shared preview launch config)
+# Claude Code local files (keep shared preview launch config + team settings/hooks)
 .claude/*
 !.claude/launch.json
+!.claude/settings.json
