@@ -229,6 +229,11 @@ class GameState {
     // A persisted location can name a room that no longer exists (e.g. content was
     // reworked since the save). Strand-proof it: fall back to the start room.
     if (!this.rooms[player.location]) player.location = this.world.playerTemplate.startLocation;
+    // Likewise, drop carried/equipped items whose template was removed since the
+    // save, so a content rework can't crash rendering on an orphaned instance.
+    player.inventory = (player.inventory || []).filter((i) => i && this.world.items[i.template]);
+    for (const slot of Object.keys(player.equipment || {}))
+      if (player.equipment[slot] && !this.world.items[player.equipment[slot].template]) player.equipment[slot] = null;
     this.players.set(player.id, player);
     return player;
   }
@@ -447,6 +452,16 @@ class GameState {
     }
     const xp = t.xp || 0;
     killer.xp = (killer.xp || 0) + xp;
+    // Shards drop on the floor (a shared world — anyone present can gather them),
+    // merging into an existing pile rather than littering separate stacks.
+    let shards = 0;
+    if (t.shards) shards = rollDice(t.shards);
+    if (shards > 0) {
+      const pile = rt.items.find((i) => i.template === "shards");
+      if (pile) pile.qty = (pile.qty || 1) + shards;
+      else rt.items.push(makeItemInstance({ template: "shards", qty: shards }, this.world));
+      loot.push(`${shards} shards`);
+    }
     return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId: killer.location, killerId: killer.id, loot, xp };
   }
 

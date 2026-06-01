@@ -88,7 +88,7 @@ A map of `roomId → room`.
     "ambientLight": 4,
     "exits": { "east": "settlement.market", "down": "shaft.landing-1" },
     "fixtures": ["alchemist-bench"],
-    "groundItems": [{ "template": "flint", "qty": 2 }],
+    "groundItems": [{ "template": "vial", "qty": 2 }],
     "spawns": [{ "mob": "lightbug", "max": 1, "respawn": 20 }]
   }
 }
@@ -135,9 +135,9 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
     "type": "armour", "slot": "body", "weight": 3,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
-  "flint": {
-    "id": "flint", "name": "a flint shard",
-    "description": "Strikes a spark.",
+  "vial": {
+    "id": "vial", "name": "an empty vial",
+    "description": "A small glass vial, stoppered with wax.",
     "type": "material", "weight": 0, "stackable": true
   }
 }
@@ -146,7 +146,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | Field        | Type    | Notes |
 |--------------|---------|-------|
 | `id`,`name`,`description` | string | `name` is the noun phrase used in text. |
-| `type`       | enum    | `light` \| `weapon` \| `armour` \| `consumable` \| `material` \| `misc`. |
+| `type`       | enum    | `light` \| `weapon` \| `armour` \| `consumable` \| `material` \| `currency` \| `misc`. `currency` (e.g. `shards`) is gathered into the player's balance by `get`, not stowed in inventory. |
 | `slot`       | enum?   | Equip slot: `hand` \| `body` \| `head` \| `light` … (omit if not equippable). |
 | `weight`     | number  | For future carry-capacity. |
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
@@ -203,6 +203,7 @@ A map of `mobId → template`.
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able. |
 | `shop`       | block?  | Makes the mob a trader: `{ "sells": [{template, price}], "buys": [{template, price}] }`. `price` is in **shards**. Players use `list`/`buy`/`sell` in the room. |
+| `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
 
 ### Mob actions (weighted)
@@ -298,7 +299,7 @@ balance, shown in the player panel). New characters start with the template's va
   "maxHp": 18, "maxMana": 10, "speed": 12,
   "perception": { "blindBelow": 1, "harmedAbove": 5 },
   "startLocation": "settlement.plaza",
-  "startInventory": [{ "template": "torch", "fuel": 200 }, { "template": "flint", "qty": 3 }],
+  "startInventory": [{ "template": "torch", "fuel": 200 }],
   "startEquipment": { "hand": null, "body": "leather-jerkin", "light": null }
 }
 ```
@@ -315,7 +316,7 @@ Two shapes are used wherever items appear in data:
 - **ItemInstance** (runtime, dynamic state): a concrete thing carrying a unique
   runtime `id` plus its own mutable state, e.g.
   `{ "id": "item.42", "template": "torch", "fuel": 150, "lit": true }`.
-  Stackable materials collapse to `{ "id": "item.7", "template": "flint", "qty": 3 }`.
+  Stackable materials collapse to `{ "id": "item.7", "template": "vial", "qty": 3 }`.
 
 ### Runtime entity ids
 

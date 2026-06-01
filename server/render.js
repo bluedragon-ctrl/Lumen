@@ -66,7 +66,7 @@ function buildRoomView(state, p) {
     if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous });
   }
   const items = see
-    ? rt.items.map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template }))
+    ? rt.items.map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
     : [];
   const fixtures = see
     ? rt.fixtures.map((f) => ({ id: f.id, name: w.fixtures[f.template].name, template: f.template }))

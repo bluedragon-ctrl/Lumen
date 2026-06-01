@@ -44,7 +44,7 @@
     "ambientLight": 4,
     "exits": { "east": "rim.plaza" },
     "fixtures": ["forge", "alchemist-bench"],
-    "groundItems": [],
+    "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 60 }]
   },
   "rim.gate": {
@@ -80,7 +80,7 @@
     "ambientLight": 0,
     "exits": { "up": "rim.descent" },
     "fixtures": [],
-    "groundItems": [{ "template": "vial", "qty": 1 }],
+    "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
     ]
