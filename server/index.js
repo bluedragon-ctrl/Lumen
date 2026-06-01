@@ -257,12 +257,46 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "item-regrow") {
+    for (const o of state.playersIn(ev.roomId)) {
+      if (canSee(o.perception, state.rooms[ev.roomId].light)) {
+        sendToPlayer(o.id, { type: "log", text: `${cap(ev.itemName)} has grown here.` });
+        sendToPlayer(o.id, buildRoomView(state, o));
+      }
+    }
+    return;
+  }
+
+  if (ev.type === "mob-hurt") {
+    const flavour = {
+      light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,
+      bleed: (n, d) => `${cap(n)} bleeds. (-${d})`,
+    };
+    const line = (flavour[ev.cause] || ((n, d) => `${cap(n)} is hurt. (-${d})`));
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: line(n, ev.damage) });
+    }
+    return;
+  }
+
+  if (ev.type === "player-hurt") {
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    const src = ev.cause === "light" ? "the searing light" : (ev.cause || "an unseen hurt");
+    sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
   if (ev.type === "death" && ev.victimKind === "mob") {
     const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
-    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} dies.${lootTxt}` }, ev.killerId);
+    const deathVerb = { light: "shrivels and dies in the light", bleed: "bleeds out and dies" }[ev.cause] || "dies";
+    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
     const killer = state.players.get(ev.killerId);
     if (killer) {
-      sendToPlayer(ev.killerId, { type: "log", text: `You slay ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
+      const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off" }[ev.cause] || "You slay";
+      sendToPlayer(ev.killerId, { type: "log", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
       sendToPlayer(ev.killerId, buildRoomView(state, killer));
       sendToPlayer(ev.killerId, buildPlayerView(state, killer));
     }

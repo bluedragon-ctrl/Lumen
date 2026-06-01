@@ -132,6 +132,20 @@ dropped to the room, **shards dropped as a floor pile anyone can `get`**, XP to 
 killer. Player HP≤0 → respawn at the rim, full HP, no penalty beyond lost progress
 (DESIGN v1).
 
+**Damage isn't only direct hits.** All HP loss flows through shared sinks
+(`_hurtMob` / `_hurtPlayer`) so a death can come from the room or an effect, not
+just a blow — spoils still drop where the victim stands, but XP is credited only
+when a player is clearly responsible (else the kill is pure environment).
+- **Light-bane** (`lightBane: { above, damage }` on a mob): each tick a mob in
+  room light *above* its threshold is seared for `roll(damage)` — light as a
+  weapon. Credited to the top-threat player if one is mid-fight. Carried by the
+  deep-dweller (sears above 2) and the mini-boss Gnaw (above 3): bring a bright
+  enough light and you can burn down a creature that won't flee it.
+- **Damage-over-time** (`damage-over-time` status effect, `{ damage, duration,
+  sourceId }`): a bleed/poison primitive ticked on **both players and mobs** by
+  `_tickEffects`; a DoT kill credits its recorded `sourceId`. The scaffolding is
+  in place; no bleed-inflicting content is authored yet.
+
 **Repop** is data-driven per spawn rule: `{ mob, max, respawn }`. Each tick a
 spawner below its `max` counts down `respawn` ticks and then puts one mob back in
 its home room (a `mob-spawn` event). The cap counts a spawner's mobs wherever they
@@ -144,7 +158,11 @@ Each tick a mob takes **one weighted action** from its `actions` table
 fight, mutter flavour lines, wander, or lurk with distinct personalities. Mob
 actions you can't see read as "Something …". Mobs act in their own room only (no
 cross-room pursuit yet); `wander` lets them roam between rooms, bounded by its
-`scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones).
+`scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones). A
+`flee` action (also `scope`-bounded) is a light trigger, not a weighted choice:
+the instant room light rises above its `lightAbove`, the mob bolts for a random
+exit, overriding everything else (even combat) — used by the dark-dwelling
+gloom-crawler, which flees light above 3.
 
 **Trading.** A mob with a `shop` block is a trader. Pricing is **data-driven from
 item `value`**, not a per-trader script. In its room a player can `list` the wares,

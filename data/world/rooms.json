@@ -78,11 +78,134 @@
     "description": "A rough chamber hewn or worn into the rock just below the rim. The shaft's faint light does not reach here; without a light of your own the dark is total. Something shifts against the far wall, just out of hearing. The way up is back the way you came.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "up": "rim.descent" },
+    "exits": { "up": "rim.descent", "east": "abyss.gallery", "north": "abyss.roost", "west": "abyss.tunnel", "south": "abyss.hollow" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
     ]
+  },
+  "abyss.gallery": {
+    "id": "abyss.gallery",
+    "zone": "abyss",
+    "name": "The Collapsed Gallery",
+    "description": "A worked passage that the rock has long since reclaimed — fallen beams and tumbled stone choke half of it. A crack in the ceiling lets down a grey thread of daylight, enough to see by. Rats nest in the rubble, fat and unafraid. The First Dark lies back to the west; the way deepens north and east.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
+  },
+  "abyss.warren": {
+    "id": "abyss.warren",
+    "zone": "abyss",
+    "name": "The Rat Warren",
+    "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The only way out is back west to the gallery.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "abyss.gallery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 35 }]
+  },
+  "abyss.fissure": {
+    "id": "abyss.fissure",
+    "zone": "abyss",
+    "name": "The Echoing Fissure",
+    "description": "A tall, narrow cleft in the rock where every sound comes back doubled. A thin seam of daylight falls from a crack overhead, and leathery wings stir in the shadows of the vaulted dark above. The gallery is south; a passage runs west toward a deeper roost.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "south": "abyss.gallery", "west": "abyss.roost" },
+    "fixtures": ["narrow-fissure"],
+    "groundItems": [],
+    "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 40 }]
+  },
+  "abyss.roost": {
+    "id": "abyss.roost",
+    "zone": "abyss",
+    "name": "The Bat Roost",
+    "description": "The ceiling vanishes upward into a dark, reeking vault thick with the rustle and chitter of roosting bats. A fissure far above lets down a wan grey light. Disturbed, the colony wheels and dives in erratic loops. The First Dark is south; the fissure echoes to the east.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "south": "abyss.first", "east": "abyss.fissure" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 35 }]
+  },
+  "abyss.tunnel": {
+    "id": "abyss.tunnel",
+    "zone": "abyss",
+    "name": "The Dripping Tunnel",
+    "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. The dark is absolute, and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "east": "abyss.first", "west": "abyss.grotto" },
+    "fixtures": ["dripping-pool"],
+    "groundItems": [],
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 45 }]
+  },
+  "abyss.grotto": {
+    "id": "abyss.grotto",
+    "zone": "abyss",
+    "name": "The Fungal Grotto",
+    "description": "A damp hollow where pale mushrooms push up between the stones in soft, ivory clusters. They are good eating, if you can gather them in the dark — and the dark here is not empty. The tunnel is east; a deeper recess glows faintly to the south.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "east": "abyss.tunnel", "south": "abyss.vault" },
+    "fixtures": [],
+    "groundItems": [{ "template": "palecap-mushroom", "qty": 1, "respawn": 120 }],
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 50 }]
+  },
+  "abyss.vault": {
+    "id": "abyss.vault",
+    "zone": "abyss",
+    "name": "The Spore Vault",
+    "description": "A close, cathedral-quiet chamber lit by its own cold green glow. A great cluster of witchglow fungus fans across the wall, and slender, luminous caps drip light from their gills. Nothing dark-dwelling will come near the glow — which is why the poison grows here in peace. The grotto is back north.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.grotto" },
+    "fixtures": ["witchglow-cluster"],
+    "groundItems": [{ "template": "witchglow-cap", "qty": 1, "respawn": 150 }],
+    "spawns": []
+  },
+  "abyss.hollow": {
+    "id": "abyss.hollow",
+    "zone": "abyss",
+    "name": "The Glimmer Hollow",
+    "description": "A wide, still cavern where lightbugs drift in lazy constellations, their soft glow rising and falling like slow breath. It is the one gentle place this side of the rim — a delver can rest here, and gather the cold light the bugs leave behind. The First Dark is north; the floor slopes down into a darker cut to the south.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.first", "south": "abyss.cut" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 25 }]
+  },
+  "abyss.cut": {
+    "id": "abyss.cut",
+    "zone": "abyss",
+    "name": "The Sunken Cut",
+    "description": "An old delver's dig, abandoned mid-work: a rusted pick, a snapped ladder, a trench cut into the floor and never finished. The dark has moved back in, and with it the vermin. Something larger has been dragging things down the passage to the south. The hollow's glow is faint to the north.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.hollow", "south": "abyss.den" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "giant-rat", "max": 2, "respawn": 40 },
+      { "mob": "cave-bat", "max": 1, "respawn": 45 }
+    ]
+  },
+  "abyss.den": {
+    "id": "abyss.den",
+    "zone": "abyss",
+    "name": "The Brood-Mother's Den",
+    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The only way out is north, behind you.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.cut" },
+    "fixtures": ["bone-pile"],
+    "groundItems": [],
+    "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 120 }]
   }
 }

@@ -143,9 +143,19 @@ class GameState {
     // Spawners drive repop: each remembers its room, mob, population cap, and a
     // countdown. A rule without `respawn` is static (spawned once, never refills).
     this.spawners = [];
+    // Harvesters regrow a picked-up floor item after a delay (mushrooms, seeps,
+    // …). A groundItem without `respawn` is static (placed once, gone when taken).
+    this.harvesters = [];
     for (const [id, room] of Object.entries(this.world.rooms)) {
       this.rooms[id] = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
-      for (const g of room.groundItems || []) this.rooms[id].items.push(makeItemInstance(g, this.world));
+      for (const g of room.groundItems || []) {
+        const inst = makeItemInstance(g, this.world);
+        if (g.respawn != null) {
+          inst.origin = { roomId: id, template: g.template, harvest: true }; // tags it for regrow tracking
+          this.harvesters.push({ roomId: id, template: g.template, qty: g.qty != null ? g.qty : 1, respawn: g.respawn, timer: g.respawn });
+        }
+        this.rooms[id].items.push(inst);
+      }
       for (const f of room.fixtures || []) {
         const inst = { id: entityId("fixture"), template: f };
         const ft = this.world.fixtures[f];
@@ -195,6 +205,27 @@ class GameState {
     }
   }
 
+  /**
+   * Regrow: each tick, any harvester whose home room no longer holds its tagged
+   * floor item counts down; at zero it places a fresh one and rearms. Dropping a
+   * matching item back on the floor (untagged) does not suppress regrow.
+   */
+  _harvestTick(events) {
+    for (const hv of this.harvesters) {
+      const present = this.rooms[hv.roomId].items.some(
+        (it) => it.origin && it.origin.harvest && it.origin.template === hv.template
+      );
+      if (present) { hv.timer = hv.respawn; continue; }
+      if (--hv.timer > 0) continue;
+      hv.timer = hv.respawn;
+      const inst = makeItemInstance({ template: hv.template, qty: hv.qty }, this.world);
+      inst.origin = { roomId: hv.roomId, template: hv.template, harvest: true };
+      this.rooms[hv.roomId].items.push(inst);
+      const t = this.world.items[hv.template];
+      events.push({ type: "item-regrow", roomId: hv.roomId, itemName: t.name });
+    }
+  }
+
   /** Players currently located in a room. */
   playersIn(roomId) {
     return [...this.players.values()].filter((p) => p.location === roomId);
@@ -217,7 +248,9 @@ class GameState {
     }
     for (const f of rt.fixtures) {
       const ft = this.world.fixtures[f.template];
-      if (ft && ft.switch && f.on) outputs.push(ft.switch.emitsLight || 0); // a lit lamp, etc.
+      if (!ft) continue;
+      if (ft.switch && f.on) outputs.push(ft.switch.emitsLight || 0); // a lit lamp, etc.
+      else if (ft.emitsLight) outputs.push(ft.emitsLight); // an always-glowing fixture (witchglow, sky-fissure)
     }
     for (const p of this.playersIn(roomId)) {
       const lightItem = p.equipment && p.equipment.light;
@@ -244,27 +277,74 @@ class GameState {
       type: spec.type,
       name: spec.name || spec.type,
       magnitude: spec.magnitude || 0,
+      damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
       remaining: spec.duration != null ? spec.duration : null, // null = permanent
       good: spec.good !== false,
     });
   }
 
-  /** Tick down active effects on all players; emit an event as each expires. */
+  /**
+   * Instantly restore hp and/or mana (a consumable's `restore` effect), clamping
+   * to the actor's maxima. Returns the amounts actually applied.
+   */
+  applyRestore(actor, spec) {
+    const out = { hp: 0, mana: 0 };
+    if (spec.hp) {
+      const before = actor.hp;
+      actor.hp = Math.min(actor.maxHp, actor.hp + spec.hp);
+      out.hp = actor.hp - before;
+    }
+    if (spec.mana) {
+      const before = actor.mana || 0;
+      actor.mana = Math.min(actor.maxMana, before + spec.mana);
+      out.mana = actor.mana - before;
+    }
+    return out;
+  }
+
+  /**
+   * Tick active status effects on every actor (players and mobs): first apply any
+   * `damage-over-time` (bleed/poison) through the shared damage sinks, then count
+   * down timed effects and announce expiries. A DoT that kills its host stops that
+   * actor's remaining ticks.
+   */
   _tickEffects(events) {
     for (const p of this.players.values()) {
-      if (!p.states || !p.states.length) continue;
-      const expired = [];
-      p.states = p.states.filter((s) => {
-        if (s.remaining == null) return true; // permanent
-        s.remaining -= 1;
-        if (s.remaining <= 0) {
-          expired.push(s);
-          return false;
-        }
-        return true;
-      });
-      for (const s of expired) events.push({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name });
+      if (!p.states || !p.states.length || p.hp <= 0) continue;
+      let dead = false;
+      for (const s of p.states) {
+        if (s.type !== "damage-over-time" || !s.damage) continue;
+        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed" })) { dead = true; break; }
+      }
+      if (!dead) this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
     }
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      for (const m of [...rt.mobs]) {
+        if (!m.states || !m.states.length) continue;
+        let dead = false;
+        for (const s of m.states) {
+          if (s.type !== "damage-over-time" || !s.damage) continue;
+          const src = s.sourceId ? this.players.get(s.sourceId) : null;
+          if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
+        }
+        if (!dead) this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, effectType: s.type, name: s.name }));
+      }
+    }
+  }
+
+  /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
+   *  any that reach zero. Permanent states (remaining == null) persist. */
+  _expireStates(actor, events, mkEvent) {
+    if (!actor.states) return;
+    const expired = [];
+    actor.states = actor.states.filter((s) => {
+      if (s.remaining == null) return true;
+      s.remaining -= 1;
+      if (s.remaining <= 0) { expired.push(s); return false; }
+      return true;
+    });
+    for (const s of expired) events.push(mkEvent(s));
   }
 
   /**
@@ -385,9 +465,11 @@ class GameState {
 
     for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
 
+    this._environmentTick(events); // light-bane and other room hazards, on fresh light
     this.resolvePlayerAttacks(events);
     this.resolveMobAI(events);
     this._respawnTick(events);
+    this._harvestTick(events);
     return events;
   }
 
@@ -494,6 +576,15 @@ class GameState {
     const roamDirs = this._zoneExits(roomId);
     const wanderDirs = (a) => (a.scope === "any" ? allDirs : roamDirs);
 
+    // Light-driven flight: a mob with a `flee` action bolts for a random exit the
+    // instant the room light rises above its tolerance. This overrides its normal
+    // action choice, even combat. With nowhere to run, it stands and acts as usual.
+    const flee = (t.actions || []).find((a) => a.type === "flee" && rt.light > (a.lightAbove || 0));
+    if (flee) {
+      const dirs = wanderDirs(flee);
+      if (dirs.length) return this._mobMove(m, t, roomId, events, flee.verb || "flees into the dark", dirs);
+    }
+
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
@@ -586,31 +677,101 @@ class GameState {
     });
   }
 
-  _killMob(mob, killer) {
+  /**
+   * Drop a slain mob's loot roll and shard roll onto `roomId`'s floor; returns
+   * the list of names dropped (shards as "N shards"). Shards merge into an
+   * existing pile rather than littering separate stacks. Shared by every death
+   * path — a direct kill, the room itself, a bleed tick.
+   */
+  _dropSpoils(mob, roomId) {
     const t = this.world.mobs[mob.template];
-    const rt = this.rooms[killer.location];
-    const idx = rt.mobs.indexOf(mob);
-    if (idx >= 0) rt.mobs.splice(idx, 1);
-    const loot = [];
+    const rt = this.rooms[roomId];
+    const dropped = [];
     for (const l of t.loot || []) {
       if (Math.random() < l.chance) {
         rt.items.push(makeItemInstance({ template: l.template }, this.world));
-        loot.push(this.world.items[l.template].name);
+        dropped.push(this.world.items[l.template].name);
       }
     }
+    if (t.shards) {
+      const shards = rollDice(t.shards);
+      if (shards > 0) {
+        const pile = rt.items.find((i) => i.template === "shards");
+        if (pile) pile.qty = (pile.qty || 1) + shards;
+        else rt.items.push(makeItemInstance({ template: "shards", qty: shards }, this.world));
+        dropped.push(`${shards} shards`);
+      }
+    }
+    return dropped;
+  }
+
+  /** A direct kill by a player (melee/spell): removes the mob, drops spoils, and
+   *  awards xp to the killer. Non-combat deaths go through `_hurtMob` instead. */
+  _killMob(mob, killer) {
+    const t = this.world.mobs[mob.template];
+    const roomId = killer.location;
+    const idx = this.rooms[roomId].mobs.indexOf(mob);
+    if (idx >= 0) this.rooms[roomId].mobs.splice(idx, 1);
+    const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
     killer.xp = (killer.xp || 0) + xp;
-    // Shards drop on the floor (a shared world — anyone present can gather them),
-    // merging into an existing pile rather than littering separate stacks.
-    let shards = 0;
-    if (t.shards) shards = rollDice(t.shards);
-    if (shards > 0) {
-      const pile = rt.items.find((i) => i.template === "shards");
-      if (pile) pile.qty = (pile.qty || 1) + shards;
-      else rt.items.push(makeItemInstance({ template: "shards", qty: shards }, this.world));
-      loot.push(`${shards} shards`);
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit" };
+  }
+
+  /**
+   * Apply `amount` damage to a mob from a source that isn't a direct hit — the
+   * room itself (light-bane), a bleed tick, etc. Pushes a `mob-hurt` event tagged
+   * with `cause`; on death drops spoils where the mob stands and pushes a `death`
+   * event. XP is credited only when a `killer` player is named (pure environment
+   * rewards no one). This is the shared "killed by something else" path. Returns
+   * the death event, or null if the mob survives.
+   */
+  _hurtMob(mob, roomId, amount, events, opts = {}) {
+    const { cause = "hit", killer = null } = opts;
+    const t = this.world.mobs[mob.template];
+    const rt = this.rooms[roomId];
+    mob.hp -= amount;
+    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: !!t.emitsLight, light: rt.light });
+    if (mob.hp > 0) return null;
+    const idx = rt.mobs.indexOf(mob);
+    if (idx >= 0) rt.mobs.splice(idx, 1);
+    const loot = this._dropSpoils(mob, roomId);
+    const xp = t.xp || 0;
+    if (killer) killer.xp = (killer.xp || 0) + xp;
+    rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause };
+    events.push(death);
+    return death;
+  }
+
+  /** Apply `amount` non-combat damage to a player (a bleed tick, the room). Pushes
+   *  a `player-hurt` event; routes death through the usual rim respawn. Returns the
+   *  death event, or null if the player survives. */
+  _hurtPlayer(player, amount, events, opts = {}) {
+    const { cause = "hit" } = opts;
+    player.hp -= amount;
+    events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
+    if (player.hp <= 0) {
+      const death = this._respawn(player, player.location);
+      events.push(death);
+      return death;
     }
-    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId: killer.location, killerId: killer.id, loot, xp };
+    return null;
+  }
+
+  /** Environmental damage: any mob whose `lightBane.above` is exceeded by its
+   *  room's light is seared this tick. Credits the top-threat player present (a
+   *  kill the player engineered with light) — otherwise it is pure environment. */
+  _environmentTick(events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      const playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
+      for (const m of [...rt.mobs]) {
+        const lb = this.world.mobs[m.template].lightBane;
+        if (!lb || rt.light <= (lb.above || 0)) continue;
+        const dmg = Math.max(1, rollDice(lb.damage));
+        this._hurtMob(m, roomId, dmg, events, { cause: "light", killer: this._topThreat(m, playersHere) });
+      }
+    }
   }
 
   /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */

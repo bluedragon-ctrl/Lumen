@@ -94,6 +94,34 @@
     "stackable": true,
     "scroll": { "spell": "spark" }
   },
+  "palecap-mushroom": {
+    "id": "palecap-mushroom",
+    "name": "a palecap mushroom",
+    "description": "A plump, ivory-capped mushroom on a stout stem. Mild and earthy — the kind delvers learn to cook before they learn to fight.",
+    "type": "material",
+    "weight": 0,
+    "value": 4,
+    "stackable": true
+  },
+  "witchglow-cap": {
+    "id": "witchglow-cap",
+    "name": "a witchglow cap",
+    "description": "A slender mushroom that drips a cold green light from its gills. Beautiful, and poison to eat — but the glow can be coaxed into a potion by a steady hand.",
+    "type": "material",
+    "weight": 0,
+    "value": 8,
+    "stackable": true
+  },
+  "mushroom-soup": {
+    "id": "mushroom-soup",
+    "name": "a bowl of pale mushroom soup",
+    "description": "A steaming bowl of soup, thick with palecap mushrooms and a little stolen warmth from the inn's hearth. Hearty fare for a delver — it mends body and mind alike.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 5,
+    "stackable": true,
+    "consumable": { "effect": { "type": "restore", "hp": 5, "mana": 5 } }
+  },
   "minor-light-potion": {
     "id": "minor-light-potion",
     "name": "a minor light potion",
