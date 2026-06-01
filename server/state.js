@@ -698,17 +698,22 @@ class GameState {
       if (dirs.length) return this._mobMove(m, t, roomId, events, flee.verb || "flees into the dark", dirs);
     }
 
+    // A mob attacks if it's hostile, OR if it's been provoked (a neutral creature
+    // that someone struck has live threat → it fights back). Shopkeepers et al.
+    // carry no `attack` block, so they stay passive even if hit.
+    const aggressive = t.hostile || inCombat;
+
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
-        if (a.type === "attack") return t.hostile && t.attack && playersHere.length > 0;
+        if (a.type === "attack") return aggressive && t.attack && playersHere.length > 0;
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
     } else {
       // Default behaviour for mobs without an actions table: attack if able.
-      options = t.hostile && t.attack && playersHere.length ? [{ type: "attack" }] : [];
+      options = aggressive && t.attack && playersHere.length ? [{ type: "attack" }] : [];
     }
 
     const choice = pickWeighted(options);

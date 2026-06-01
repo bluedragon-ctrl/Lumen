@@ -59,5 +59,11 @@
     "description": "A squat stone furnace with a clay crucible, kept hot by the row's shared bellows. Ore goes in raw and runs out in bars — the first step from rock to blade.",
     "type": "crafting",
     "station": "smelting"
+  },
+  "makers-mark": {
+    "id": "makers-mark",
+    "name": "a worn maker's mark",
+    "description": "Scratched low on a workbench leg, half-rubbed-away: a craftsman's sigil, and beneath it a tally of years. Someone worked this bench long before the shaft was sunk.",
+    "type": "scenery"
   }
 }

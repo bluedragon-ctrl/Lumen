@@ -101,8 +101,9 @@ The `room` view is filtered by what the viewer can perceive: in darkness the
 description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement
 (`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
-`attack`/`kill`/`stop`, `equip`/`wield`/`wear`, `unequip`/`remove`,
-`light [item]`/`douse`, `list`/`buy`/`sell`, `recipes`/`craft`, `drink`/`quaff`,
+`attack`/`kill`/`stop`, `search` (find hidden features), `equip`/`wield`/`wear`,
+`unequip`/`remove`, `light [item]`/`douse`, `list`/`buy`/`sell`, `recipes`/`craft`,
+`drink`/`quaff`,
 `use`/`switch` (operate a fixture here, else drink), `refuel`/`fill`, `help`, and admin
 `@`-commands. (`light` auto-swaps a spent source for a fuelled one.) Effects
 visible to other players in the room (speech, arrivals/departures, picking
@@ -176,6 +177,23 @@ Mobs keep a minimal **aggro table** (`{ playerId: threat }`): attacking a mob ea
 threat and hostile mobs engage any delver present. A mob with live threat is *in
 combat* — it won't `wander` away and strikes its highest-threat target. Threat is
 dropped when a player leaves or dies (a fuller threat/decay/pursuit system later).
+A **non-hostile** creature that is struck **retaliates** (it acts on the threat it
+gains), provided it has an `attack` block — so a neutral lurker fights back when
+provoked, while attack-less NPCs (shopkeepers) stay passive.
+
+### Hidden features (`search`)
+
+Any room feature can carry `hidden: { perception }` — groundItems, spawns, and
+fixture entries (a fixture entry may be a template string *or* `{ template, hidden }`),
+plus a parallel `room.hiddenExits: { <dir>: { to, perception, name } }`. Hidden
+features are withheld from the room view and can't be targeted until `search`
+reveals them. `search` reveals everything whose requirement is met by **effective
+Perception** = the attribute × `hitChance(band, light)` (the combat light tiers), so
+light is required to search well; it costs ~one action of energy. Permanent finds
+(exits/fixtures/objects) are recorded on `player.discovered` (persisted); hidden
+**mobs** are revealed ephemerally in `GameState.revealedMobs` (cleared on leaving the
+room or disconnecting) and stay unseen *and inert* until a delver who has revealed
+them provokes them.
 
 ### Crafting
 
