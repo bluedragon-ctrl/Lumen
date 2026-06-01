@@ -1,0 +1,11 @@
+{
+  "spark": {
+    "id": "spark",
+    "name": "Spark",
+    "description": "A snapping bolt of static light, conjured from the air and flung at a foe. The first cantrip every delver learns — cheap, quick, and bright enough to sting. It strikes true so long as you can see your mark; only a creature's Ward blunts it.",
+    "manaCost": 4,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage", "damageType": "magical", "damage": "1d4", "scale": { "attr": "intellect", "per": 4 } }
+  }
+}

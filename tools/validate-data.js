@@ -22,6 +22,7 @@ function main() {
   const mobs = read("data/world/mobs.json");
   const fixtures = read("data/world/fixtures.json");
   const recipes = read("data/world/recipes.json");
+  const spells = read("data/world/spells.json");
   const player = read("data/templates/player.json");
 
   const errs = [];
@@ -63,6 +64,10 @@ function main() {
       if (it.light.refuelPerUnit != null && (typeof it.light.refuelPerUnit !== "number" || it.light.refuelPerUnit <= 0))
         errs.push(`item ${id}: light.refuelPerUnit must be a positive number`);
     }
+    if (it.type === "scroll" && (!it.scroll || !it.scroll.spell))
+      errs.push(`item ${id}: scroll item needs a scroll.spell`);
+    if (it.scroll && it.scroll.spell && !has(spells, it.scroll.spell))
+      errs.push(`item ${id}: scroll.spell references missing spell ${it.scroll.spell}`);
     const eff = it.consumable && it.consumable.effect;
     if (eff != null) {
       if (typeof eff !== "object")
@@ -129,6 +134,32 @@ function main() {
       errs.push(`recipe ${id}: shards cost must be a non-negative number`);
   }
 
+  // Spells: data-driven casting (manaCost + an effect primitive). `damage` is
+  // instantaneous (dice + optional attribute scaling); `emit-light` is a status.
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light"];
+  for (const [id, sp] of Object.entries(spells)) {
+    if (sp.id !== id) errs.push(`spell ${id}: id field mismatch (${sp.id})`);
+    if (sp.manaCost != null && (typeof sp.manaCost !== "number" || sp.manaCost < 0))
+      errs.push(`spell ${id}: manaCost must be a non-negative number`);
+    const eff = sp.effect;
+    if (!eff || typeof eff !== "object" || !eff.type) {
+      errs.push(`spell ${id}: effect must be an object { type, ... }`);
+    } else if (!SPELL_EFFECT_TYPES.includes(eff.type)) {
+      errs.push(`spell ${id}: unknown effect type "${eff.type}" (known: ${SPELL_EFFECT_TYPES.join(", ")})`);
+    } else if (eff.type === "damage") {
+      if (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage))
+        errs.push(`spell ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
+      if (eff.scale != null) {
+        if (typeof eff.scale !== "object" || !eff.scale.attr) errs.push(`spell ${id}: effect.scale must be { attr, per }`);
+        else if (eff.scale.per != null && (typeof eff.scale.per !== "number" || eff.scale.per <= 0))
+          errs.push(`spell ${id}: effect.scale.per must be a positive number`);
+      }
+    } else if (eff.type === "emit-light") {
+      if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`spell ${id}: effect.magnitude must be a number`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+    }
+  }
+
   if (!has(rooms, player.startLocation))
     errs.push(`player: startLocation references missing room ${player.startLocation}`);
   for (const i of player.startInventory || [])
@@ -137,6 +168,8 @@ function main() {
     if (it !== null && !has(items, it)) errs.push(`player: startEquipment ${slot} missing template ${it}`);
   for (const rid of player.knownRecipes || [])
     if (!has(recipes, rid)) errs.push(`player: knownRecipes references missing recipe ${rid}`);
+  for (const sid of player.knownSpells || [])
+    if (!has(spells, sid)) errs.push(`player: knownSpells references missing spell ${sid}`);
 
   // Reachability from the starting room.
   const seen = new Set();
@@ -157,8 +190,8 @@ function main() {
   console.log(
     `OK: ${Object.keys(rooms).length} rooms, ${Object.keys(items).length} items, ` +
       `${Object.keys(mobs).length} mobs, ${Object.keys(fixtures).length} fixtures, ` +
-      `${Object.keys(recipes).length} recipes. All references resolve; ` +
-      `all rooms reachable from ${player.startLocation}.`
+      `${Object.keys(recipes).length} recipes, ${Object.keys(spells).length} spells. ` +
+      `All references resolve; all rooms reachable from ${player.startLocation}.`
   );
 }
 

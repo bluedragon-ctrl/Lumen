@@ -261,7 +261,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
-  "attack", "kill", "stop", "equip", "wield", "wear", "unequip", "remove",
+  "attack", "kill", "stop", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
   "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "help",
   "north", "south", "east", "west", "up", "down"];
@@ -305,6 +305,14 @@ function argCandidates(cmd) {
     case "unequip": case "remove":
       return p ? [...names(equipped()), ...Object.keys(p.equipment)] : [];
     case "attack": case "kill": case "k": return room ? names(room.contents.mobs) : [];
+    case "cast": case "c": {
+      // Spell names first, then targetable creatures (cast <spell> <target>).
+      const out = p ? (p.spells || []).map((s) => lastWord(s)) : [];
+      if (room) out.push(...names(room.contents.mobs));
+      return out;
+    }
+    case "learn": case "study":
+      return p ? p.inventory.filter((i) => i.type === "scroll").map((i) => lastWord(i.name)) : [];
     case "light": case "ignite": {
       const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
       if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));

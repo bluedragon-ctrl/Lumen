@@ -84,6 +84,16 @@
     "value": 6,
     "stackable": true
   },
+  "scroll-spark": {
+    "id": "scroll-spark",
+    "name": "a Scroll of Spark",
+    "description": "Crackling glyphs run the length of the brittle vellum, smelling faintly of a coming storm. Study it to learn the Spark cantrip — the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 25,
+    "stackable": true,
+    "scroll": { "spell": "spark" }
+  },
   "minor-light-potion": {
     "id": "minor-light-potion",
     "name": "a minor light potion",
