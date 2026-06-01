@@ -27,7 +27,7 @@ const HELP = [
   "  inventory | inv | i   — list what you are carrying",
   "  attack | kill <target> — attack a creature (stop to break off)",
   "  cast | c <spell> <target> — cast a spell you know at a creature",
-  "  learn | study <scroll> — learn a spell from a scroll (consumes it)",
+  "  learn | study <scroll|schematic> — learn a spell or recipe (consumes it)",
   "  spells                — list the spells you know",
   "  equip | wield | wear <item> — equip from inventory (swaps current)",
   "  unequip | remove <item|slot> — return equipped gear to inventory",
@@ -36,8 +36,9 @@ const HELP = [
   "  sell <item>           — sell to a trader here",
   "  recipes               — list recipes you know",
   "  craft | make <recipe> — craft at the matching station here",
-  "  drink | quaff <item>  — consume a potion",
-  "  use | switch <target> — operate a fixture (e.g. a lamp), or drink a potion",
+  "  mine | dig [vein]     — work ore loose from a vein in the room",
+  "  drink | quaff | eat <item> — consume a potion or food",
+  "  use | switch <target> — operate a fixture (e.g. a lamp), or use a carried item (potion, flare)",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
@@ -363,14 +364,17 @@ function refuel(state, player, arg, ctx) {
   return selfAndViews(state, player, `You refuel ${t.name} with ${w.items[lt.fuelItem].name}. (fuel ${inst.fuel}/${lt.fuelMax})`);
 }
 
-function drink(state, player, arg, ctx) {
+// Consume a carried consumable and apply its effect. `verb` is the word the
+// player reached for — `drink`/`eat` (ingestibles) or `use` (the catch-all that
+// also activates devices like a flare); it only shapes the flavour text.
+function drink(state, player, arg, ctx, verb = "use") {
   const w = state.world;
-  if (!arg) return [{ type: "error", text: "Drink what?" }];
+  if (!arg) return [{ type: "error", text: `What do you want to ${verb}?` }];
   const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory[idx];
   const t = w.items[inst.template];
-  if (t.type !== "consumable" || !t.consumable) return [{ type: "error", text: `You can't drink ${t.name}.` }];
+  if (t.type !== "consumable" || !t.consumable) return [{ type: "error", text: `You can't ${verb} ${t.name}.` }];
   const spec = t.consumable.effect;
   if (!spec || typeof spec !== "object" || !spec.type)
     return [{ type: "error", text: `${t.name} fizzles uselessly — nothing happens.` }];
@@ -380,20 +384,22 @@ function drink(state, player, arg, ctx) {
   // `restore` is instantaneous (heal hp/mana); everything else is a status effect.
   if (spec.type === "restore") {
     const r = state.applyRestore(player, spec);
-    ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks ${t.name}.` }, player.id);
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${t.name}.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     const parts = [];
     if (r.hp) parts.push(`+${r.hp} HP`);
     if (r.mana) parts.push(`+${r.mana} MP`);
     const gain = parts.length ? ` (${parts.join(", ")})` : " It does nothing for you.";
-    return selfAndViews(state, player, `You drink ${t.name}.${gain}`);
+    return selfAndViews(state, player, `You ${verb} ${t.name}.${gain}`);
   }
   state.applyEffect(player, spec);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks ${t.name}.` }, player.id);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${t.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  const flavour = EFFECT_FLAVOUR[spec.type] ? ` ${EFFECT_FLAVOUR[spec.type]}` : "";
-  return selfAndViews(state, player, `You drink ${t.name}.${flavour}`);
+  // An item may carry its own flavour line; otherwise fall back to the effect's.
+  const flavourText = t.consumable.flavour || EFFECT_FLAVOUR[spec.type];
+  const flavour = flavourText ? ` ${flavourText}` : "";
+  return selfAndViews(state, player, `You ${verb} ${t.name}.${flavour}`);
 }
 
 function craft(state, player, arg, ctx) {
@@ -449,6 +455,44 @@ function recipes(state, player) {
   return [{ type: "log", text: lines.join("\n") }];
 }
 
+// `mine` (alias `dig`): work ore loose from a resource vein in the room. Veins
+// hold a few charges and refill on a timer (see state._mineTick). Each swing
+// spends energy, so a seam can't be stripped in a single tick. Bare-handed for
+// now — a pickaxe may speed or improve the yield in a later pass.
+function mine(state, player, arg, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  if (!canSee(player.perception, rt.light))
+    return [{ type: "error", text: "It is too dark to find anything worth mining." }];
+  const veins = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].mine);
+  if (!veins.length) return [{ type: "error", text: "There is nothing to mine here." }];
+  let f;
+  if (arg) {
+    const ql = arg.toLowerCase();
+    f = veins.find((v) => v.template.toLowerCase().includes(ql) || w.fixtures[v.template].name.toLowerCase().includes(ql));
+    if (!f) return [{ type: "error", text: `There is no "${arg}" to mine here.` }];
+  } else if (veins.length === 1) {
+    f = veins[0];
+  } else {
+    return [{ type: "error", text: `Mine what? ${veins.map((v) => w.fixtures[v.template].name).join(", ")}.` }];
+  }
+  const ft = w.fixtures[f.template];
+  if (f.charges <= 0)
+    return [{ type: "error", text: `The seam is worked out for now — nothing more will come loose until it recovers.` }];
+  const cost = ft.mine.energy || player.speed; // ~one tick's worth of effort per swing
+  if (player.energy < cost)
+    return [{ type: "error", text: "You are too spent to swing again just yet." }];
+  player.energy -= cost;
+  f.charges -= 1;
+  const qty = ft.mine.yield || 1;
+  addToInventory(player, makeItemInstance({ template: ft.mine.template, qty }, w), w);
+  const oreName = w.items[ft.mine.template].name;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} works ${oreName} from ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const thin = f.charges <= 0 ? " The seam runs thin and gives no more." : "";
+  return selfAndViews(state, player, `You work ${oreName} loose.${thin}`);
+}
+
 function say(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Say what?" }];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} says: ${text}` }, player.id);
@@ -484,31 +528,48 @@ function attack(state, player, arg) {
   return [{ type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` }];
 }
 
-// `learn <scroll>` (alias `study`): inscribe a scroll's spell into memory,
-// consuming the scroll — one scroll, one permanent spell (mirrors recipes).
+// `learn <scroll|schematic>` (alias `study`): commit a scroll's spell or a
+// schematic's recipe to memory, consuming the item — one item, one permanent
+// thing learned. Scrolls teach spells (`scroll.spell`); recipe items teach
+// recipes (`recipe`). Both follow the same flow.
 function learn(state, player, arg, ctx) {
   const w = state.world;
-  if (!arg) return [{ type: "error", text: "Learn what? Study a scroll you're carrying." }];
+  if (!arg) return [{ type: "error", text: "Learn what? Study a scroll or schematic you're carrying." }];
   const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory[idx];
   const t = w.items[inst.template];
-  if (t.type !== "scroll" || !t.scroll || !t.scroll.spell)
-    return [{ type: "error", text: `There is nothing to learn from ${t.name}.` }];
-  const spell = w.spells[t.scroll.spell];
-  if (!spell) return [{ type: "error", text: `${t.name} is inscribed with a spell you can't decipher.` }];
-  if (!player.knownSpells) player.knownSpells = [];
-  if (player.knownSpells.includes(t.scroll.spell))
-    return [{ type: "error", text: `You already know ${spell.name}.` }];
-  player.knownSpells.push(t.scroll.spell);
-  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
-  else player.inventory.splice(idx, 1);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} studies ${t.name}, which crumbles to ash.` }, player.id);
-  ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(
-    state, player,
-    `You study ${t.name} and learn ${spell.name}. The scroll crumbles to ash. Cast it with \`cast ${t.scroll.spell} <target>\`.`
-  );
+
+  // Consume one of the item and report what was learned.
+  const consume = (line) => {
+    if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+    else player.inventory.splice(idx, 1);
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} studies ${t.name}.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, line);
+  };
+
+  if (t.scroll && t.scroll.spell) {
+    const spell = w.spells[t.scroll.spell];
+    if (!spell) return [{ type: "error", text: `${t.name} is inscribed with a spell you can't decipher.` }];
+    if (!player.knownSpells) player.knownSpells = [];
+    if (player.knownSpells.includes(t.scroll.spell))
+      return [{ type: "error", text: `You already know ${spell.name}.` }];
+    player.knownSpells.push(t.scroll.spell);
+    return consume(`You study ${t.name} and learn ${spell.name}. The scroll crumbles to ash. Cast it with \`cast ${t.scroll.spell} <target>\`.`);
+  }
+
+  if (t.recipe) {
+    const r = w.recipes[t.recipe];
+    if (!r) return [{ type: "error", text: `${t.name} describes a method you can't make sense of.` }];
+    if (!player.knownRecipes) player.knownRecipes = [];
+    if (player.knownRecipes.includes(t.recipe))
+      return [{ type: "error", text: `You already know how to make ${r.name || t.recipe}.` }];
+    player.knownRecipes.push(t.recipe);
+    return consume(`You study ${t.name} and learn to craft ${r.name || t.recipe}. Make it with \`craft ${(r.name || t.recipe).toLowerCase()}\` at the right station.`);
+  }
+
+  return [{ type: "error", text: `There is nothing to learn from ${t.name}.` }];
 }
 
 function spellList(state, player) {
@@ -606,8 +667,14 @@ function handleAdmin(state, player, verb, arg) {
     }
     case "@list-players":
       return [{ type: "log", text: "Delvers: " + (accounts.listNames().join(", ") || "(none)") }];
+    case "@shards": {
+      const n = parseInt(arg, 10);
+      if (!Number.isFinite(n) || n < 0) return [{ type: "error", text: "Usage: @shards <amount>" }];
+      player.shards = n;
+      return [{ type: "log", text: `Your purse now holds ${n} shards.` }];
+    }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }
@@ -671,7 +738,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return sell(state, player, arg, ctx);
     case "drink":
     case "quaff":
-      return drink(state, player, arg, ctx);
+      return drink(state, player, arg, ctx, "drink");
+    case "eat":
+      return drink(state, player, arg, ctx, "eat");
     case "refuel":
     case "fill":
       return refuel(state, player, arg, ctx);
@@ -683,6 +752,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "craft":
     case "make":
       return craft(state, player, arg, ctx);
+    case "mine":
+    case "dig":
+      return mine(state, player, arg, ctx);
     case "recipes":
       return recipes(state, player);
     case "say":

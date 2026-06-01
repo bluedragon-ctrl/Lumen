@@ -9,5 +9,62 @@
     ],
     "shards": 5,
     "output": { "template": "minor-light-potion", "qty": 1 }
+  },
+  "smelt-iron": {
+    "id": "smelt-iron",
+    "name": "Iron Bar",
+    "station": "smelting",
+    "inputs": [
+      { "template": "iron-ore", "qty": 2 }
+    ],
+    "shards": 2,
+    "output": { "template": "iron-bar", "qty": 1 }
+  },
+  "forge-iron-dagger": {
+    "id": "forge-iron-dagger",
+    "name": "Iron Dagger",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 5,
+    "output": { "template": "iron-dagger", "qty": 1 }
+  },
+  "glimmer-dust": {
+    "id": "glimmer-dust",
+    "name": "Glimmer Dust",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "crystal", "qty": 1 }
+    ],
+    "output": { "template": "glimmer-dust", "qty": 1 }
+  },
+  "pressed-glimmer-dust": {
+    "id": "pressed-glimmer-dust",
+    "name": "Pressed Glimmer Dust",
+    "station": "alchemy",
+    "inputs": [],
+    "shards": 70,
+    "output": { "template": "glimmer-dust", "qty": 1 }
+  },
+  "glimmersteel": {
+    "id": "glimmersteel",
+    "name": "Glimmersteel Bar",
+    "station": "smelting",
+    "inputs": [
+      { "template": "glimmer-dust", "qty": 1 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "output": { "template": "glimmersteel-bar", "qty": 1 }
+  },
+  "searing-flare": {
+    "id": "searing-flare",
+    "name": "Searing Flare",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "glimmer-dust", "qty": 1 },
+      { "template": "luminescent-gland", "qty": 1 }
+    ],
+    "output": { "template": "searing-flare", "qty": 1 }
   }
 }

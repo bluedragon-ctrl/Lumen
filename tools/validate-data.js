@@ -71,6 +71,10 @@ function main() {
       errs.push(`item ${id}: scroll item needs a scroll.spell`);
     if (it.scroll && it.scroll.spell && !has(spells, it.scroll.spell))
       errs.push(`item ${id}: scroll.spell references missing spell ${it.scroll.spell}`);
+    if (it.type === "recipe" && !it.recipe)
+      errs.push(`item ${id}: recipe item needs a recipe`);
+    if (it.recipe && !has(recipes, it.recipe))
+      errs.push(`item ${id}: recipe references missing recipe ${it.recipe}`);
     const eff = it.consumable && it.consumable.effect;
     if (eff != null) {
       if (typeof eff !== "object")
@@ -133,6 +137,15 @@ function main() {
         errs.push(`fixture ${id}: switch.emitsLight must be a non-negative number`);
       if (f.switch.on != null && typeof f.switch.on !== "boolean")
         errs.push(`fixture ${id}: switch.on must be a boolean`);
+    }
+    if (f.mine) {
+      if (!has(items, f.mine.template)) errs.push(`fixture ${id}: mine.template missing item ${f.mine.template}`);
+      for (const k of ["charges", "respawn"])
+        if (typeof f.mine[k] !== "number" || f.mine[k] <= 0) errs.push(`fixture ${id}: mine.${k} must be a positive number`);
+      if (f.mine.yield != null && (typeof f.mine.yield !== "number" || f.mine.yield <= 0))
+        errs.push(`fixture ${id}: mine.yield must be a positive number`);
+      if (f.mine.energy != null && (typeof f.mine.energy !== "number" || f.mine.energy < 0))
+        errs.push(`fixture ${id}: mine.energy must be a non-negative number`);
     }
   }
 

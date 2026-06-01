@@ -69,12 +69,12 @@
   },
   "crystal": {
     "id": "crystal",
-    "name": "a crystal",
-    "description": "A fist-sized shard of the deep's crystal, its facets holding a slow, captive glow. Shattered, it would yield a fortune in shards — but whole, a trader will pay well for it.",
+    "name": "a glimmer crystal",
+    "description": "A fist-sized shard of the deep's glimmer, its facets holding a slow, captive glow. Shattered, it would yield a fortune in shards — but whole, a trader will pay well for it, and a steady hand can grind it to dust.",
     "type": "treasure",
     "weight": 1,
-    "value": 45,
-    "sellValue": 45,
+    "value": 70,
+    "sellValue": 70,
     "stackable": true
   },
   "luminescent-gland": {
@@ -161,5 +161,71 @@
     "value": 45,
     "stackable": true,
     "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 3, "duration": 360 } }
+  },
+  "iron-ore": {
+    "id": "iron-ore",
+    "name": "a chunk of iron ore",
+    "description": "A heavy, rust-streaked lump of raw iron, still wearing its skin of stone. Worthless until a forge has had its way with it.",
+    "type": "material",
+    "weight": 2,
+    "value": 6,
+    "stackable": true
+  },
+  "iron-bar": {
+    "id": "iron-bar",
+    "name": "an iron bar",
+    "description": "A smelted ingot of dull grey iron, dense and cool in the hand. The smith's raw stock — the start of a blade, not the end of one.",
+    "type": "material",
+    "weight": 2,
+    "value": 18,
+    "stackable": true
+  },
+  "iron-dagger": {
+    "id": "iron-dagger",
+    "name": "an iron dagger",
+    "description": "A short, plain blade forged from abyssal iron. Light and quick in the hand, if unlovely — a thing a delver can make for themselves.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 24,
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 10 }
+  },
+  "glimmer-dust": {
+    "id": "glimmer-dust",
+    "name": "a measure of glimmer dust",
+    "description": "Glimmer ground to a fine, cold-glinting powder — crystal and coin alike end here. The smith's true reagent, and the alchemist's.",
+    "type": "material",
+    "weight": 0,
+    "value": 40,
+    "stackable": true
+  },
+  "glimmersteel-bar": {
+    "id": "glimmersteel-bar",
+    "name": "a glimmersteel bar",
+    "description": "Iron alloyed with glimmer, its grey shot through with threads of cold, captive light. Harder than honest steel, and dearer — stock for a finer class of gear.",
+    "type": "material",
+    "weight": 2,
+    "value": 90,
+    "stackable": true
+  },
+  "searing-flare": {
+    "id": "searing-flare",
+    "name": "a searing flare",
+    "description": "A waxed paper cartridge packed with glimmer dust and a lightbug's gland. Cracked alight, it floods the dark with a searing glare — blinding to wield by, and agony to anything that fears the light.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 25,
+    "stackable": true,
+    "consumable": { "flavour": "It erupts in a searing white glare — the dark flees the room and light-shy things recoil and shriek.", "effect": { "type": "emit-light", "name": "Searing Light", "magnitude": 10, "duration": 30 } }
+  },
+  "schematic-searing-flare": {
+    "id": "schematic-searing-flare",
+    "name": "a flare schematic",
+    "description": "One of Tobin's soot-smudged diagrams — this one actually legible: how to pack glimmer dust and a lightbug's gland into a flare that burns searing-bright. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 5,
+    "stackable": true,
+    "recipe": "searing-flare"
   }
 }

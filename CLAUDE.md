@@ -31,6 +31,11 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
 
 ## Layout
 
+> **This is a small codebase** — the spine is `server/commands.js`, `server/state.js`,
+> and `data/world/*.json` (each a few hundred lines). Read these directly rather than
+> spawning search agents; don't re-read a file an agent already reported on. The command
+> dispatcher is the `switch` in `commands.js`; the tick loop is `advance()` in `state.js`.
+
 - `server/` — game server (tick loop, combat, light, commands, state). See
   [server/README.md](server/README.md).
 - `data/world/*.json` — rooms, mobs, items, fixtures, recipes, spells.

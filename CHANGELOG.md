@@ -6,6 +6,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Mining** — a new `mine` (alias `dig`) command works ore loose from a resource
+  vein in the room. Veins are data-driven fixtures (`type: "resource"` + a `mine`
+  block: ore template, yield, charges, respawn, energy) that deplete as they're
+  worked and refill on a timer, like spawners and harvesters. Mining is heavy
+  work — each swing costs a large slice of energy, so a seam takes many ticks to
+  clear. The first **iron vein** sits in *The Collapsed Gallery*. `examine` shows a
+  vein's remaining yield.
+- **Iron crafting loop** — `iron ore` → smelt to an `iron bar` at a new **smelting
+  furnace** in *The Craftsmen's Row* (`smelting` station) → forge an `iron dagger`
+  (1d4, faster than the short sword) at the existing forge anvil. Both are `craft`
+  recipes (`craft iron bar`, `craft iron dagger`); new characters know both, so
+  mined ore has somewhere to go.
+- **Glimmer refining chain** — the old `crystal` is now a **glimmer crystal** (the
+  rarer, combat/quest-locked form of glimmer; shards are its loose, spendable form).
+  Either can be ground to **glimmer dust** — `craft glimmer dust` (1 crystal) or
+  `craft pressed` (70 shards) — a reagent worth less than its inputs, so refining is
+  a deliberate sink with no money loop. Dust + an iron bar smelts into a
+  **glimmersteel bar** (`craft glimmersteel`), stock for finer gear to come.
+- **Searing flare** — `craft flare` (1 glimmer dust + 1 luminescent gland, at the
+  alchemist's bench) makes a one-use flare you `use` to flood the room with searing
+  light (magnitude 10 for 30 ticks): it sears every light-bane creature present each
+  tick, while the glare drops everyone's hit chance — yours included — to the
+  "searing"-band penalty. A deliberate, double-edged tool. Its recipe isn't known by
+  default: **Tobin the tinker-smith** now sells a **flare schematic** (5 shards) you
+  `learn`/`study` to commit the method to memory.
+- **Consume routing** — `use <item>` is now the catch-all activator for carried
+  consumables (potions, flares), and `eat` joins `drink`/`quaff`; the verb you type
+  shapes the flavour ("You use/eat/drink …"), with `use` still toggling fixtures.
+- **Learn recipes from items** — `learn`/`study` now teaches **recipes** from a
+  schematic, not just spells from scrolls; both consume the item and follow the same
+  flow. New item `type: "recipe"` with a `recipe` field, validated against recipes.
+- **Admin** — `@shards <amount>` sets the caller's purse, for testing.
 - **Crystal** (placeholder name) — a sellable `treasure` item worth 45 shards.
   **Gnaw, the Brood-Mother** now drops one on death, giving her kill a payoff.
 - **Leather helm** (+1 armour, new `head` slot), sold by Garrick alongside the

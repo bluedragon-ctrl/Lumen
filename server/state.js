@@ -160,6 +160,7 @@ class GameState {
         const inst = { id: entityId("fixture"), template: f };
         const ft = this.world.fixtures[f];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
+        if (ft && ft.mine) { inst.charges = ft.mine.charges; inst.regrow = ft.mine.respawn; } // resource veins deplete as mined
         this.rooms[id].fixtures.push(inst);
       }
       for (const s of room.spawns || []) {
@@ -223,6 +224,25 @@ class GameState {
       this.rooms[hv.roomId].items.push(inst);
       const t = this.world.items[hv.template];
       events.push({ type: "item-regrow", roomId: hv.roomId, itemName: t.name });
+    }
+  }
+
+  /**
+   * Recover: each tick, any resource vein below its full charge count counts
+   * down; at zero it refills to full and rearms. The timer only begins once the
+   * seam has been worked below max, mirroring the spawner/harvester rhythm.
+   */
+  _mineTick(events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      for (const f of rt.fixtures) {
+        const ft = this.world.fixtures[f.template];
+        if (!ft || !ft.mine) continue;
+        if (f.charges >= ft.mine.charges) { f.regrow = ft.mine.respawn; continue; }
+        if (--f.regrow > 0) continue;
+        f.charges = ft.mine.charges;
+        f.regrow = ft.mine.respawn;
+        events.push({ type: "vein-recover", roomId, fixtureName: ft.name });
+      }
     }
   }
 
@@ -470,6 +490,7 @@ class GameState {
     this.resolveMobAI(events);
     this._respawnTick(events);
     this._harvestTick(events);
+    this._mineTick(events);
     return events;
   }
 
