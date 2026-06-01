@@ -74,9 +74,9 @@ Admin commands are prefixed with `@` (`@create-player`, `@list-players`, `@help`
 { "type": "log",    "text": "A lightbug drifts in." }  // event feed
 { "type": "error",  "text": "malformed message" }      // problems
 
-{ "type": "player", "player": { "name", "level", "xp", "hp", "maxHp",
-  "mana", "maxMana", "energy", "speed", "attributes", "perception",
-  "equipment", "inventory", "states" } }               // always full truth
+{ "type": "player", "player": { "name", "level", "xp", "shards", "hp", "maxHp",
+  "mana", "maxMana", "energy", "speed", "armour", "ward", "attributes",
+  "perception", "equipment", "inventory", "states", "recipes" } }  // always full truth
 
 { "type": "room", "room": { "id", "name", "depth",
   "light": { "value", "band" }, "canSee", "harmed",
@@ -102,8 +102,9 @@ description and most contents are withheld, but self-illuminating things (a
 lightbug) still appear. Commands handled today: `look [target]`, movement
 (`n/s/e/w/u/d`, `go <dir>`), `get`/`take`, `drop`, `inventory`, `say`, `emote`,
 `attack`/`kill`/`stop`, `equip`/`wield`/`wear`, `unequip`/`remove`,
-`light [item]`/`douse`, `help`, and admin `@`-commands. (`light` auto-swaps a
-spent source for a fuelled one.) Effects
+`light [item]`/`douse`, `list`/`buy`/`sell`, `recipes`/`craft`, `drink`/`quaff`,
+`use`/`switch` (operate a fixture here, else drink), `help`, and admin
+`@`-commands. (`light` auto-swaps a spent source for a fuelled one.) Effects
 visible to other players in the room (speech, arrivals/departures, picking
 things up, combat) are broadcast to them.
 
@@ -123,9 +124,13 @@ target (per-actor thresholds `blindBelow`/`dimBelow`/`harmedAbove`):
 dim/partial to clear *and* drops a light-sensitive deep-dweller into glare — a
 mutual, exploitable condition.
 
-Damage = `roll(weapon dice) + (Might − 5) − target Armour` (min 1). Mob HP≤0 →
-death, loot dropped to the room, XP to the killer. Player HP≤0 → respawn at the
-rim, full HP, no penalty beyond lost progress (DESIGN v1).
+Damage = `roll(dice) + (Might − 5) − mitigation` (min 1), where mitigation is the
+defender's **Armour** for physical damage or **Ward** for magical — every attack
+carries a damage type (physical today; Ward is groundwork for spells). Players sum
+Armour/Ward from gear; mobs have innate `armour`/`ward`. Mob HP≤0 → death, loot
+dropped to the room, **shards dropped as a floor pile anyone can `get`**, XP to the
+killer. Player HP≤0 → respawn at the rim, full HP, no penalty beyond lost progress
+(DESIGN v1).
 
 **Repop** is data-driven per spawn rule: `{ mob, max, respawn }`. Each tick a
 spawner below its `max` counts down `respawn` ticks and then puts one mob back in
@@ -150,3 +155,27 @@ Mobs keep a minimal **aggro table** (`{ playerId: threat }`): attacking a mob ea
 threat and hostile mobs engage any delver present. A mob with live threat is *in
 combat* — it won't `wander` away and strikes its highest-threat target. Threat is
 dropped when a player leaves or dies (a fuller threat/decay/pursuit system later).
+
+### Crafting
+
+`craft <recipe>` produces a recipe's `output` when the player is at a fixture whose
+`station` matches, **knows** the recipe (`knownRecipes`), and has the `inputs` plus
+any `shards` cost — all then consumed. `recipes` lists known recipes and flags which
+need a station you're not standing at. Shards are both currency and a crafting
+component (the abyss's reason-for-being), so recipes may spend them directly.
+
+### Status effects & potions
+
+Actors carry timed status effects (`player.states`) applied from a data-driven spec
+`{ type, name, magnitude, duration }` — the same primitive a potion or (later) a
+spell references. The tick loop counts down each effect and removes it on expiry.
+Implemented primitive: `emit-light` (the actor radiates `magnitude` light, summed
+into room light and shown as a glow). `drink`/`quaff`/`use <potion>` applies the
+item's `consumable.effect`.
+
+### Switchable fixtures
+
+A fixture template may carry a `switch` block (`{ emitsLight, on }`); each instance
+holds live on/off state. `use`/`switch <fixture>` toggles it and recomputes room
+light — e.g. the iron lamp at the shaft mouth adds 3 light when on. `use` operates a
+matching fixture in the room, otherwise falls back to drinking.

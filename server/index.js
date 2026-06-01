@@ -163,6 +163,18 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "effect-expired") {
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    const msg = ev.effectType === "emit-light" ? "The light beneath your skin fades." : `Your ${ev.name} fades.`;
+    sendToPlayer(ev.playerId, { type: "log", text: msg });
+    sendToPlayer(ev.playerId, buildRoomView(state, player));
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    // Others in the room may notice a glow going out / the room dimming.
+    roomCtx.refreshRoom(player.location, ev.playerId);
+    return;
+  }
+
   if (ev.type === "attack") {
     if (ev.by === "player") {
       // The attacker targeted it, so they always know what it is.

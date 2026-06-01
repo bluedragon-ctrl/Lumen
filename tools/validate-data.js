@@ -44,11 +44,22 @@ function main() {
       if (!has(items, g.template)) errs.push(`room ${id}: groundItem missing template ${g.template}`);
   }
 
+  const EFFECT_TYPES = ["emit-light"];
   for (const [id, it] of Object.entries(items)) {
     if (it.type === "weapon" && it.weapon) {
       for (const [kind, val] of Object.entries(it.weapon.damage || {}))
         if (typeof val !== "string" || !DICE_RE.test(val))
           errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
+    }
+    const eff = it.consumable && it.consumable.effect;
+    if (eff != null) {
+      if (typeof eff !== "object")
+        errs.push(`item ${id}: consumable.effect must be an effect object { type, ... }`);
+      else {
+        if (!EFFECT_TYPES.includes(eff.type)) errs.push(`item ${id}: unknown effect type "${eff.type}" (known: ${EFFECT_TYPES.join(", ")})`);
+        if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`item ${id}: effect.magnitude must be a number`);
+        if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`item ${id}: effect.duration must be a positive number (ticks)`);
+      }
     }
   }
 
@@ -61,6 +72,8 @@ function main() {
       errs.push(`mob ${id}: shards "${m.shards}" is not valid dice notation`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
+    if (m.ward != null && typeof m.ward !== "number")
+      errs.push(`mob ${id}: ward must be a number`);
     if (m.shop) {
       for (const kind of ["sells", "buys"])
         for (const o of m.shop[kind] || []) {
@@ -80,11 +93,27 @@ function main() {
     }
   }
 
+  for (const [id, f] of Object.entries(fixtures)) {
+    if (f.switch) {
+      if (f.switch.emitsLight != null && (typeof f.switch.emitsLight !== "number" || f.switch.emitsLight < 0))
+        errs.push(`fixture ${id}: switch.emitsLight must be a non-negative number`);
+      if (f.switch.on != null && typeof f.switch.on !== "boolean")
+        errs.push(`fixture ${id}: switch.on must be a boolean`);
+    }
+  }
+
+  const stations = new Set(Object.values(fixtures).map((f) => f.station).filter(Boolean));
   for (const [id, rc] of Object.entries(recipes)) {
-    for (const i of rc.inputs || [])
+    for (const i of rc.inputs || []) {
       if (!has(items, i.template)) errs.push(`recipe ${id}: input missing template ${i.template}`);
+      if (i.qty != null && (typeof i.qty !== "number" || i.qty <= 0)) errs.push(`recipe ${id}: input ${i.template} qty must be a positive number`);
+    }
     if (!rc.output || !has(items, rc.output.template))
       errs.push(`recipe ${id}: output missing template ${rc.output && rc.output.template}`);
+    if (rc.station == null || !stations.has(rc.station))
+      errs.push(`recipe ${id}: station "${rc.station}" has no matching fixture (known: ${[...stations].join(", ") || "none"})`);
+    if (rc.shards != null && (typeof rc.shards !== "number" || rc.shards < 0))
+      errs.push(`recipe ${id}: shards cost must be a non-negative number`);
   }
 
   if (!has(rooms, player.startLocation))
@@ -93,6 +122,8 @@ function main() {
     if (!has(items, i.template)) errs.push(`player: startInventory missing template ${i.template}`);
   for (const [slot, it] of Object.entries(player.startEquipment || {}))
     if (it !== null && !has(items, it)) errs.push(`player: startEquipment ${slot} missing template ${it}`);
+  for (const rid of player.knownRecipes || [])
+    if (!has(recipes, rid)) errs.push(`player: knownRecipes references missing recipe ${rid}`);
 
   // Reachability from the starting room.
   const seen = new Set();

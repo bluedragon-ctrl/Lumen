@@ -31,6 +31,10 @@ const HELP = [
   "  list | shop           — see what a trader here buys and sells",
   "  buy <item>            — buy from a trader here",
   "  sell <item>           — sell to a trader here",
+  "  recipes               — list recipes you know",
+  "  craft | make <recipe> — craft at the matching station here",
+  "  drink | quaff <item>  — consume a potion",
+  "  use | switch <target> — operate a fixture (e.g. a lamp), or drink a potion",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
@@ -59,6 +63,28 @@ function addToInventory(player, inst, world) {
     }
   }
   player.inventory.push(inst);
+}
+
+// Total quantity of a template carried (sums stacks).
+function countItem(player, template) {
+  return player.inventory.reduce((n, i) => (i.template === template ? n + (i.qty || 1) : n), 0);
+}
+
+// Remove `n` of a template from inventory (across stacks). Assumes enough is present.
+function removeItem(player, template, n) {
+  for (let i = player.inventory.length - 1; i >= 0 && n > 0; i--) {
+    const inst = player.inventory[i];
+    if (inst.template !== template) continue;
+    const have = inst.qty || 1;
+    if (have > n) inst.qty = have - n, (n = 0);
+    else (n -= have), player.inventory.splice(i, 1);
+  }
+}
+
+// Display name of the fixture that provides a crafting station (for hints).
+function stationLabel(world, station) {
+  const f = Object.values(world.fixtures).find((x) => x.station === station);
+  return f ? f.name : `a ${station} station`;
 }
 
 // Equip an instance into its template's slot, stowing whatever was there back to
@@ -264,6 +290,113 @@ function sell(state, player, arg, ctx) {
   return selfAndViews(state, player, `You sell ${name} for ${offer.price} shards. (${player.shards} total)`);
 }
 
+// Effect primitives this client knows how to flavour. The engine (state.js)
+// owns what each one *does*; this only narrates applying it.
+const EFFECT_FLAVOUR = {
+  "emit-light": "A soft light wells up beneath your skin.",
+};
+
+// Toggle a switchable fixture (a lamp, lever, …). Switching it may change room light.
+function toggleFixture(state, player, f, ctx) {
+  const ft = state.world.fixtures[f.template];
+  f.on = !f.on;
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} switches ${f.on ? "on" : "off"} ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const tail = ft.switch && ft.switch.emitsLight ? (f.on ? " It casts a steady glow." : " Its glow dies.") : "";
+  return selfAndViews(state, player, `You switch ${f.on ? "on" : "off"} ${ft.name}.${tail}`);
+}
+
+// `use <target>`: operate a switchable fixture here if it matches, else drink it.
+function use(state, player, arg, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  if (arg && canSee(player.perception, rt.light)) {
+    const ql = arg.toLowerCase();
+    const f = rt.fixtures.find((f) => {
+      const ft = w.fixtures[f.template];
+      return ft && ft.switch && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+    });
+    if (f) return toggleFixture(state, player, f, ctx);
+  }
+  return drink(state, player, arg, ctx);
+}
+
+function drink(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Drink what?" }];
+  const idx = findItem(player.inventory, w, arg);
+  if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
+  const inst = player.inventory[idx];
+  const t = w.items[inst.template];
+  if (t.type !== "consumable" || !t.consumable) return [{ type: "error", text: `You can't drink ${t.name}.` }];
+  const spec = t.consumable.effect;
+  if (!spec || typeof spec !== "object" || !spec.type)
+    return [{ type: "error", text: `${t.name} fizzles uselessly — nothing happens.` }];
+  // Consume one, then apply the effect primitive.
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(idx, 1);
+  state.applyEffect(player, spec);
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks ${t.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const flavour = EFFECT_FLAVOUR[spec.type] ? ` ${EFFECT_FLAVOUR[spec.type]}` : "";
+  return selfAndViews(state, player, `You drink ${t.name}.${flavour}`);
+}
+
+function craft(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Craft what? Try `recipes`." }];
+  const ql = arg.toLowerCase();
+  const entry = Object.entries(w.recipes).find(
+    ([id, r]) => id.toLowerCase() === ql || (r.name && r.name.toLowerCase().includes(ql))
+  );
+  if (!entry) return [{ type: "error", text: `You know no recipe for "${arg}".` }];
+  const [rid, r] = entry;
+  const label = r.name || rid;
+  if (!(player.knownRecipes || []).includes(rid))
+    return [{ type: "error", text: `You don't know how to make ${label}.` }];
+  // Must be at a fixture providing the recipe's station.
+  const rt = state.rooms[player.location];
+  const hasStation = rt.fixtures.some((f) => w.fixtures[f.template] && w.fixtures[f.template].station === r.station);
+  if (!hasStation) return [{ type: "error", text: `You need ${stationLabel(w, r.station)} to make ${label}.` }];
+  // Check material inputs and shard cost before consuming anything.
+  for (const inp of r.inputs || []) {
+    const need = inp.qty || 1;
+    const have = countItem(player, inp.template);
+    if (have < need)
+      return [{ type: "error", text: `You need ${need}× ${w.items[inp.template].name} (you have ${have}).` }];
+  }
+  const cost = r.shards || 0;
+  if ((player.shards || 0) < cost)
+    return [{ type: "error", text: `You need ${cost} shards (you have ${player.shards || 0}).` }];
+  // Consume, then produce.
+  for (const inp of r.inputs || []) removeItem(player, inp.template, inp.qty || 1);
+  if (cost) player.shards -= cost;
+  addToInventory(player, makeItemInstance({ template: r.output.template, qty: r.output.qty || 1 }, w), w);
+  const outName = w.items[r.output.template].name;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} works at ${stationLabel(w, r.station)}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(state, player, `You craft ${outName}.${cost ? ` (−${cost} shards)` : ""}`);
+}
+
+function recipes(state, player) {
+  const w = state.world;
+  const known = player.knownRecipes || [];
+  if (!known.length) return [{ type: "log", text: "You know no recipes." }];
+  const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
+  const lines = ["You know how to craft:"];
+  for (const rid of known) {
+    const r = w.recipes[rid];
+    if (!r) continue;
+    const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
+    if (r.shards) ins.push(`${r.shards} shards`);
+    const station = here.has(r.station) ? "" : ` — needs ${stationLabel(w, r.station)}`;
+    lines.push(`  ${r.name || rid}: ${ins.join(", ")} → ${w.items[r.output.template].name}${station}`);
+  }
+  return [{ type: "log", text: lines.join("\n") }];
+}
+
 function say(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Say what?" }];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} says: ${text}` }, player.id);
@@ -367,6 +500,19 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return buy(state, player, arg, ctx);
     case "sell":
       return sell(state, player, arg, ctx);
+    case "drink":
+    case "quaff":
+      return drink(state, player, arg, ctx);
+    case "use":
+    case "switch":
+    case "toggle":
+    case "flip":
+      return use(state, player, arg, ctx);
+    case "craft":
+    case "make":
+      return craft(state, player, arg, ctx);
+    case "recipes":
+      return recipes(state, player);
     case "say":
       return say(state, player, arg, ctx);
     case "emote":

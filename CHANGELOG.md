@@ -6,6 +6,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Crafting loop**: `craft <recipe>` at a matching station fixture consumes the
+  recipe's inputs (and an optional **shard cost**) and yields the output. Recipes
+  are **learned** (`knownRecipes` on the character; `recipes` lists them). First
+  recipe — Minor Light Potion (gland + vial + 5 shards) at the alchemist's bench.
+- **Status-effect primitive**: actors carry timed effects (`player.states`) from a
+  data-driven spec `{ type, magnitude, duration }`, reusable by potions and (later)
+  spells. First primitive `emit-light` makes the actor radiate light (summed into
+  room light, glows in the view, expires on its own countdown).
+- **Potions**: `drink`/`quaff`/`use <potion>` applies its effect. Minor Light Potion
+  (emit 1 light for 3 min) and a stronger Light Potion.
+- **Switchable fixtures**: a fixture can carry a `switch` block; `use`/`switch`
+  `<fixture>` toggles it. An iron **lamp** at the Mouth of the Shaft emits 3 light
+  when on (dim → bright), and lit fixtures glow in the room view.
+- **Shards drop on the floor** on a kill (a shared-world pile anyone can `get`,
+  tallying to their balance) instead of auto-crediting the killer. Gloom-crawler
+  drops 1d4 shards.
+- **Ward** — a second defence channel parallel to Armour: physical damage is
+  soaked by Armour, magical by Ward. Mobs gained an innate `ward` (deep-dweller 1).
+  Armour and Ward are now shown in the player panel.
+
+### Changed
+- Removed the mechanically-inert `flint` (template, starting inventory, loot);
+  `admit()` prunes orphaned-template items so older saves load cleanly.
+- Moved the empty vial from The First Dark to The Craftsmen's Row.
+
+### Added
 - **The Rim — first authored zone**: a 7-room starting area (replacing the
   placeholder slice) — a lantern-lit village (plaza, inn, market, craftsmen's row,
   descent gate, shaft mouth) over the first dark abyss room. Light gradient

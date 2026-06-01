@@ -153,7 +153,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. |
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
 | `armour`     | block?  | `{ armour, ward, speedPenalty }`. |
-| `consumable` | block?  | `{ effect, … }` (TBD with effects system). |
+| `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
 
 ### Dice notation
 
@@ -196,7 +196,8 @@ A map of `mobId → template`.
 | `id`,`name`,`description` | string | |
 | `maxHp`      | integer | Starting/full HP. |
 | `speed`      | integer | Action-point gain per tick (normal ≈ 12). |
-| `armour`     | integer?| Innate physical damage reduction (default 0), like a player's Armour. |
+| `armour`     | integer?| Innate **physical** damage reduction (default 0), like a player's Armour. |
+| `ward`       | integer?| Innate **magical** damage reduction (default 0), like a player's Ward. |
 | `attributes` | block   | `{ might, vitality, intellect, wits, perception }`. |
 | `perception` | block   | `{ blindBelow, harmedAbove }`. |
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
@@ -250,20 +251,28 @@ Room-anchored objects, primarily crafting stations.
     "id": "alchemist-bench", "name": "an alchemist's bench",
     "description": "Glass coils and a cold burner await reagents.",
     "type": "crafting", "station": "alchemy"
+  },
+  "lamp": {
+    "id": "lamp", "name": "an iron lamp",
+    "description": "A heavy iron lamp bolted to the rock; a lever turns the flame up or down.",
+    "type": "switch", "switch": { "emitsLight": 3, "on": false }
   }
 }
 ```
 
 | Field    | Type   | Notes |
 |----------|--------|-------|
-| `type`   | enum   | `crafting` \| `decoration` \| … |
+| `type`   | enum   | `crafting` \| `switch` \| `decoration` \| … |
 | `station`| string?| Crafting station tag recipes reference (e.g. `alchemy`, `forge`). |
+| `switch` | block? | Makes the fixture switchable: `{ emitsLight, on }`. `on` is the default state; each instance carries live on/off state. Toggled with `use <fixture>`. When on, `emitsLight` adds to room light (like a torch). |
 
 ---
 
 ## Recipe (static) — `data/world/recipes.json`
 
-A map of `recipeId → recipe`. Crafting happens via `use <components> on <fixture>`.
+A map of `recipeId → recipe`. Crafting happens via `craft <recipe>` while standing
+at a fixture whose `station` matches, and only for recipes the player has learned
+(`knownRecipes`). `recipes` lists what you know.
 
 ```json
 {
@@ -272,7 +281,8 @@ A map of `recipeId → recipe`. Crafting happens via `use <components> on <fixtu
     "name": "Minor Light Potion",
     "station": "alchemy",
     "inputs": [{ "template": "luminescent-gland", "qty": 1 }, { "template": "vial", "qty": 1 }],
-    "output": { "template": "light-potion", "qty": 1 }
+    "shards": 5,
+    "output": { "template": "minor-light-potion", "qty": 1 }
   }
 }
 ```
@@ -281,7 +291,35 @@ A map of `recipeId → recipe`. Crafting happens via `use <components> on <fixtu
 |----------|-------------|-------|
 | `station`| string      | Must match a fixture's `station` tag in the room. |
 | `inputs` | ItemRef[]   | Consumed components. |
+| `shards` | integer?    | Shards spent to craft (default 0) — shards are also a crafting component, not just currency. |
 | `output` | ItemRef     | Produced item. |
+
+---
+
+## Status effects (dynamic)
+
+Status effects are runtime buffs/debuffs carried on an actor (`player.states`, a
+runtime array). They are produced by a **data-driven primitive** so the same
+effect can be authored on a potion, a spell, or a mob ability.
+
+An **effect spec** is the descriptor authored on the source (e.g. a consumable's
+`effect`):
+
+```json
+{ "type": "emit-light", "name": "Light", "magnitude": 1, "duration": 180 }
+```
+
+| Field       | Type    | Notes |
+|-------------|---------|-------|
+| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch). |
+| `name`      | string  | Display label for the state chip. |
+| `magnitude` | number  | Effect strength (e.g. light output). |
+| `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |
+
+Applying an effect pushes a live instance `{ type, name, magnitude, remaining, good }`
+onto the actor; instances **stack** (each counts and each ticks down on its own).
+The tick loop decrements `remaining`, removes expired effects, and notifies the
+owner. New primitives plug in here without touching potions/spells that reference them.
 
 ---
 
@@ -291,16 +329,19 @@ The blueprint a new player is instantiated from.
 
 `shards` is the player's money (a special light-crystal currency; abstract integer
 balance, shown in the player panel). New characters start with the template's value.
+`knownRecipes` lists the recipe ids a fresh character can already `craft`; the field
+is backfilled from this template onto older saves that predate it.
 
 ```json
 {
   "level": 1, "xp": 0, "shards": 10,
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "maxHp": 18, "maxMana": 10, "speed": 12,
-  "perception": { "blindBelow": 1, "harmedAbove": 5 },
-  "startLocation": "settlement.plaza",
+  "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+  "startLocation": "rim.plaza",
   "startInventory": [{ "template": "torch", "fuel": 200 }],
-  "startEquipment": { "hand": null, "body": "leather-jerkin", "light": null }
+  "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null },
+  "knownRecipes": ["minor-light-potion"]
 }
 ```
 

@@ -152,6 +152,9 @@ body {
 .attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin: 6px 0; }
 .attrs div { display: flex; justify-content: space-between; }
 .attrs dt { color: var(--muted); }
+.attrs .defence { grid-column: 1 / -1; }
+.attrs .defence.first { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--edge); }
+.attrs .defence dd { color: var(--accent); }
 .list { list-style: none; margin: 0; padding: 0; }
 .list li { padding: 2px 0; display: flex; justify-content: space-between; gap: 8px; }
 .list li .sub { color: var(--muted); font-size: 12px; }

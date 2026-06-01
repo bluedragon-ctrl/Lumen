@@ -97,7 +97,7 @@ The **fuel clock** (your light burning down) is the heartbeat: how deep can you 
 ### 3.7 Crafting (station-based)
 
 - Crafting requires **room fixtures** (stations), not crafting-anywhere.
-- `use <components> on <fixture>` → product, per recipe. E.g. components on an alchemist bench → potion.
+- `craft <recipe>` at a fixture whose station matches → product, consuming the recipe's inputs and any shard cost. Recipes must be **known** (`knownRecipes`); `recipes` lists them. E.g. at an alchemist's bench: gland + vial + shards → light potion.
 - Stations mostly live at the **settlement up top** (reinforces descend-and-return); rare deep stations can be a risky shortcut.
 - Gives rooms *functional* meaning beyond geography.
 
