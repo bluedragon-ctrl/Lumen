@@ -65,7 +65,8 @@ Accounts persist as one JSON file per character under `data/runtime/players/`
 { "type": "command", "text": "look" }
 ```
 
-Admin commands are prefixed with `@` (`@create-player`, `@list-players`, `@help`).
+Admin commands are prefixed with `@` (`@create-player`, `@list-players`,
+`@shards <n>`, `@attr <attribute> <value>`, `@help`).
 
 **Server → Client**
 
@@ -75,8 +76,8 @@ Admin commands are prefixed with `@` (`@create-player`, `@list-players`, `@help`
 { "type": "error",  "text": "malformed message" }      // problems
 
 { "type": "player", "player": { "name", "level", "xp", "shards", "hp", "maxHp",
-  "mana", "maxMana", "energy", "speed", "armour", "ward", "attributes",
-  "perception", "equipment", "inventory", "states", "recipes" } }  // always full truth
+  "mana", "maxMana", "energy", "speed", "armour", "ward", "evasion", "crit",
+  "attributes", "perception", "equipment", "inventory", "states", "recipes" } }  // always full truth
 
 { "type": "room", "room": { "id", "name", "depth",
   "light": { "value", "band" }, "canSee", "harmed",
@@ -123,12 +124,18 @@ target (per-actor thresholds `blindBelow`/`dimBelow`/`harmedAbove`):
 (`blindBelow`…below `dimBelow`) → 50%; **clear** (`dimBelow`…`harmedAbove`) →
 100%; **glare** (above `harmedAbove`) → 50%. So lighting a torch lifts you from
 dim/partial to clear *and* drops a light-sensitive deep-dweller into glare — a
-mutual, exploitable condition.
+mutual, exploitable condition. The light tier is then nudged by the attacker's
+**Perception** (`+2%`/pt to hit) and the defender's **Wits** (`−2%`/pt evasion),
+clamped to `[5%, 100%]` — so accuracy can compensate for darkness, and a dodgy
+defender slips blows (mobs carry an optional `attack.hitBonus` / `evasion`).
 
-Damage = `roll(dice) + (Might − 5) − mitigation` (min 1), where mitigation is the
+Damage = `roll(dice) + floor(Might/4) − mitigation` (min 1), where the Might bonus
+comes from the weapon's `scale` (default `{might,4}`) and mitigation is the
 defender's **Armour** for physical damage or **Ward** for magical — every attack
-carries a damage type (physical today; Ward is groundwork for spells). Players sum
-Armour/Ward from gear; mobs have innate `armour`/`ward`. Mob HP≤0 → death, loot
+carries a damage type (physical today; Ward is groundwork for spells). A
+**critical hit** (`Perception×1%`, or a mob's `attack.crit`) doubles the offensive
+roll before mitigation. Players sum Armour/Ward from gear plus innate Ward from
+**Wits** (`×2`); mobs have innate `armour`/`ward`. Mob HP≤0 → death, loot
 dropped to the room, **shards dropped as a floor pile anyone can `get`**, XP to the
 killer. Player HP≤0 → respawn at the rim, full HP, no penalty beyond lost progress
 (DESIGN v1).

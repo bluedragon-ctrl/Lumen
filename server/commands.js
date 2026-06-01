@@ -700,8 +700,21 @@ function handleAdmin(state, player, verb, arg) {
       player.shards = n;
       return [{ type: "log", text: `Your purse now holds ${n} shards.` }];
     }
+    case "@attr": {
+      const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
+      const [name, raw] = arg.split(/\s+/);
+      const attr = (name || "").toLowerCase();
+      const n = parseInt(raw, 10);
+      if (!ATTRS.includes(attr) || !Number.isFinite(n) || n < 1)
+        return [{ type: "error", text: `Usage: @attr <${ATTRS.join("|")}> <value≥1>` }];
+      player.attributes[attr] = n;
+      state.deriveStats(player); // recompute maxHp/maxMana/sight from the new attributes
+      player.hp = Math.min(player.hp, player.maxHp);
+      player.mana = Math.min(player.mana || 0, player.maxMana);
+      return selfAndViews(state, player, `Your ${attr} is now ${n}.`);
+    }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @attr <attribute> <value>" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }

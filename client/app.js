@@ -179,7 +179,8 @@ function renderPlayer(p) {
     states.appendChild(el);
   }
 
-  // Attributes, then derived defences (Armour vs physical, Ward vs magical).
+  // Attributes, then derived stats: defences (Armour vs physical, Ward vs
+  // magical), evasion (dodge from Wits) and crit chance (from Perception).
   const attrs = $("p-attrs");
   attrs.innerHTML = "";
   for (const [k, v] of Object.entries(p.attributes)) {
@@ -187,10 +188,11 @@ function renderPlayer(p) {
     wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
     attrs.appendChild(wrap);
   }
-  [["armour", p.armour], ["ward", p.ward]].forEach(([k, v], i) => {
+  const pct = (f) => `${Math.round((f || 0) * 100)}%`;
+  [["armour", p.armour || 0], ["ward", p.ward || 0], ["evasion", pct(p.evasion)], ["crit", pct(p.crit)]].forEach(([k, v], i) => {
     const wrap = document.createElement("div");
     wrap.className = "defence" + (i === 0 ? " first" : "");
-    wrap.innerHTML = `<dt>${k}</dt><dd>${v || 0}</dd>`;
+    wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
     attrs.appendChild(wrap);
   });
 

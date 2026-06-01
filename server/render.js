@@ -40,7 +40,9 @@ function buildPlayerView(state, p) {
       energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
       speed: p.speed,
       armour: defence.armour,
-      ward: defence.ward,
+      ward: defence.ward, // gear Ward + innate Ward from Wits
+      evasion: defence.evasion, // Wits-derived dodge (fraction, e.g. 0.06)
+      crit: ((p.attributes && p.attributes.perception) || 0) * 0.01, // Perception crit chance (fraction)
       attributes: p.attributes,
       perception: p.perception,
       equipment,
