@@ -164,8 +164,18 @@ function get(state, player, arg, ctx) {
   const idx = findItem(rt.items, state.world, arg);
   if (idx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
   const inst = rt.items.splice(idx, 1)[0];
+  const t = state.world.items[inst.template];
+  // Currency isn't carried as an item — gathering it tallies to the purse.
+  if (t.type === "currency") {
+    const amt = inst.qty || 1;
+    player.shards = (player.shards || 0) + amt;
+    const noun = `${amt} shard${amt === 1 ? "" : "s"}`;
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} gathers ${noun}.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You gather ${noun}. (${player.shards} total)`);
+  }
   addToInventory(player, inst, state.world);
-  const name = state.world.items[inst.template].name;
+  const name = t.name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} picks up ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You pick up ${name}.`);

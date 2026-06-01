@@ -44,11 +44,11 @@
     "weight": 3,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
-  "flint": {
-    "id": "flint",
-    "name": "a flint shard",
-    "description": "Strikes a spark against steel.",
-    "type": "material",
+  "shards": {
+    "id": "shards",
+    "name": "shards",
+    "description": "Motes of crystallised light scattered on the stone — the Rim's coin. Gather them and they tally to your purse.",
+    "type": "currency",
     "weight": 0,
     "stackable": true
   },

@@ -101,7 +101,7 @@ function renderRoom(room) {
     const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
     c.appendChild(chip(m.name, cls, () => sendCommand("look " + m.id)));
   }
-  for (const it of items) c.appendChild(chip(it.name, "item", () => sendCommand("look " + it.id)));
+  for (const it of items) c.appendChild(chip(it.qty != null ? `${it.name} ×${it.qty}` : it.name, "item", () => sendCommand("look " + it.id)));
   for (const f of fixtures) c.appendChild(chip(f.name, "fixture", () => sendCommand("look " + f.id)));
   if (!players.length && !mobs.length && !items.length && !fixtures.length && room.canSee) {
     c.appendChild(label("nothing of note here."));

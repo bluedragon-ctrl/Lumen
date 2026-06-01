@@ -9,8 +9,7 @@
   "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
   "startLocation": "rim.plaza",
   "startInventory": [
-    { "template": "torch", "fuel": 200 },
-    { "template": "flint", "qty": 3 }
+    { "template": "torch", "fuel": 200 }
   ],
   "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null }
 }
