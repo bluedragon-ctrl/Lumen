@@ -126,6 +126,33 @@ function actorEmitLight(actor) {
   return sum;
 }
 
+// --- Hidden features (search) ----------------------------------------------
+// A room feature (item, fixture, exit, mob) may carry a `hidden: { perception }`
+// block; it is omitted from a player's view until they `search` and meet the
+// requirement. Permanent finds (items/fixtures/exits) are recorded per-player as
+// stable discovery keys on `player.discovered`; mob reveals are ephemeral
+// (in-memory, current-visit only — see GameState.revealedMobs).
+const discoveryKey = (roomId, kind, ident) => `${roomId}|${kind}|${ident}`;
+const isDiscovered = (player, key) => Array.isArray(player.discovered) && player.discovered.includes(key);
+
+/** Effective Perception for searching: the attribute scaled by how well the player
+ *  sees the room — the same light tiers combat uses (darkness ×0.05, dim/glare
+ *  ×0.5, clear ×1.0). So light is required to find what's hidden. */
+function effectivePerception(player, light) {
+  const per = (player.attributes && player.attributes.perception) || 0;
+  return per * hitChance(player.perception, light);
+}
+
+// Visibility predicates — a hidden feature is shown only once discovered/revealed.
+// Reused by the room view (render.js) and command resolvers so filtering matches.
+const itemVisibleTo = (player, inst) => !inst.hidden || isDiscovered(player, inst.discoveryKey);
+const fixtureVisibleTo = (player, inst) => !inst.hidden || isDiscovered(player, inst.discoveryKey);
+const mobVisibleTo = (state, player, mob) => {
+  if (!mob.hidden) return true;
+  const set = state.revealedMobs.get(player.id);
+  return !!(set && set.has(mob.id));
+};
+
 /**
  * Authoritative in-memory world state (DESIGN.md §6.1). Owns all dynamic state:
  * per-room mob/item instances and connected players. Static content lives in `world`.
@@ -136,6 +163,7 @@ class GameState {
     this.tick = 0;
     this.players = new Map(); // playerId -> player instance
     this.rooms = {}; // roomId -> { mobs:[], items:[], light:int }
+    this.revealedMobs = new Map(); // playerId -> Set(mob runtime id); ephemeral hidden-mob reveals
     this._initRooms();
   }
 
@@ -154,28 +182,33 @@ class GameState {
           inst.origin = { roomId: id, template: g.template, harvest: true }; // tags it for regrow tracking
           this.harvesters.push({ roomId: id, template: g.template, qty: g.qty != null ? g.qty : 1, respawn: g.respawn, timer: g.respawn });
         }
+        if (g.hidden) { inst.hidden = g.hidden; inst.discoveryKey = discoveryKey(id, "item", g.template); }
         this.rooms[id].items.push(inst);
       }
       for (const f of room.fixtures || []) {
-        const inst = { id: entityId("fixture"), template: f };
-        const ft = this.world.fixtures[f];
+        // A fixture entry is a template string, or an object `{ template, hidden }`.
+        const tmplId = typeof f === "string" ? f : f.template;
+        const inst = { id: entityId("fixture"), template: tmplId };
+        const ft = this.world.fixtures[tmplId];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
         if (ft && ft.mine) { inst.charges = ft.mine.charges; inst.regrow = ft.mine.respawn; } // resource veins deplete as mined
+        if (typeof f === "object" && f.hidden) { inst.hidden = f.hidden; inst.discoveryKey = discoveryKey(id, "fix", tmplId); }
         this.rooms[id].fixtures.push(inst);
       }
       for (const s of room.spawns || []) {
         const max = s.max != null ? s.max : 1;
-        for (let i = 0; i < max; i++) this._spawnMob(id, s.mob);
-        if (s.respawn != null) this.spawners.push({ roomId: id, mob: s.mob, max, respawn: s.respawn, timer: s.respawn });
+        for (let i = 0; i < max; i++) this._spawnMob(id, s.mob, s.hidden);
+        if (s.respawn != null) this.spawners.push({ roomId: id, mob: s.mob, max, respawn: s.respawn, timer: s.respawn, hidden: s.hidden });
       }
       this.rooms[id].light = this.computeRoomLight(id);
     }
   }
 
   /** Create a mob instance, tag it with the spawner that owns it, and place it. */
-  _spawnMob(roomId, mobId) {
+  _spawnMob(roomId, mobId, hidden) {
     const m = makeMobInstance(mobId, this.world);
     m.origin = { roomId, mob: mobId }; // which spawner this counts against (survives wandering)
+    if (hidden) m.hidden = hidden; // a lurker — unseen/inert until a delver searches it out
     this.rooms[roomId].mobs.push(m);
     return m;
   }
@@ -199,7 +232,7 @@ class GameState {
       if (this._countOwned(sp.roomId, sp.mob) >= sp.max) { sp.timer = sp.respawn; continue; }
       if (--sp.timer > 0) continue;
       sp.timer = sp.respawn;
-      const m = this._spawnMob(sp.roomId, sp.mob);
+      const m = this._spawnMob(sp.roomId, sp.mob, sp.hidden);
       const t = this.world.mobs[sp.mob];
       const light = this.rooms[sp.roomId].light = this.computeRoomLight(sp.roomId);
       events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light });
@@ -425,6 +458,7 @@ class GameState {
     if (!Array.isArray(player.states)) player.states = [];
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
+    if (!Array.isArray(player.discovered)) player.discovered = []; // permanently-found hidden features (keys)
     if (player.maxMana == null) player.maxMana = this.world.playerTemplate.maxMana;
     if (player.mana == null) player.mana = player.maxMana;
     // manaRegen is a global tuning constant (not per-character progress), so always
@@ -436,6 +470,57 @@ class GameState {
 
   removePlayer(playerId) {
     this.players.delete(playerId);
+    this.revealedMobs.delete(playerId); // drop ephemeral hidden-mob reveals on disconnect
+  }
+
+  /** Forget a player's ephemeral hidden-mob reveals (e.g. on leaving a room). */
+  clearRevealedMobs(playerId) {
+    this.revealedMobs.delete(playerId);
+  }
+
+  /**
+   * `search` the current room: reveal every hidden feature whose requirement is met
+   * by the player's effective Perception (attribute × light tier — so light matters).
+   * Permanent finds (items/fixtures/exits) are recorded on `player.discovered`;
+   * hidden mobs are revealed ephemerally (this visit only). Returns { found, any }.
+   */
+  search(player) {
+    const roomId = player.location;
+    const room = this.world.rooms[roomId];
+    const rt = this.rooms[roomId];
+    const eff = effectivePerception(player, rt.light);
+    if (!Array.isArray(player.discovered)) player.discovered = [];
+    const found = [];
+
+    for (const inst of rt.items) {
+      if (inst.hidden && !isDiscovered(player, inst.discoveryKey) && inst.hidden.perception <= eff) {
+        player.discovered.push(inst.discoveryKey);
+        found.push(this.world.items[inst.template].name);
+      }
+    }
+    for (const inst of rt.fixtures) {
+      if (inst.hidden && !isDiscovered(player, inst.discoveryKey) && inst.hidden.perception <= eff) {
+        player.discovered.push(inst.discoveryKey);
+        found.push(this.world.fixtures[inst.template].name);
+      }
+    }
+    for (const [dir, h] of Object.entries(room.hiddenExits || {})) {
+      const key = discoveryKey(roomId, "exit", dir);
+      if (!isDiscovered(player, key) && (h.perception || 0) <= eff) {
+        player.discovered.push(key);
+        found.push(h.name || `a passage ${dir}`);
+      }
+    }
+    let set = this.revealedMobs.get(player.id);
+    for (const m of rt.mobs) {
+      if (!m.hidden) continue;
+      if (!set) { set = new Set(); this.revealedMobs.set(player.id, set); }
+      if (!set.has(m.id) && m.hidden.perception <= eff) {
+        set.add(m.id);
+        found.push(this.world.mobs[m.template].name);
+      }
+    }
+    return { found, any: found.length > 0 };
   }
 
   /**
@@ -583,7 +668,14 @@ class GameState {
 
   _mobAct(m, t, roomId, events) {
     const rt = this.rooms[roomId];
-    const playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
+    let playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
+
+    // A hidden lurker is inert toward anyone who hasn't searched it out (reveal-on-
+    // find, no ambush): only delvers who have revealed it perceive — and provoke — it.
+    if (m.hidden) {
+      playersHere = playersHere.filter((p) => mobVisibleTo(this, p, m));
+      if (playersHere.length === 0) return;
+    }
 
     // Threat: hostile mobs engage any delver present; drop threat toward those
     // who have left/died. A mob with live threat is "in combat" and won't wander.
@@ -808,4 +900,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE };
+module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, isDiscovered, discoveryKey };

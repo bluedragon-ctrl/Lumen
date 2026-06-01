@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, sellValueOf } = require("./state");
+const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
 
 function itemView(inst, world) {
   if (!inst) return null;
@@ -68,17 +68,19 @@ function buildRoomView(state, p) {
   const light = rt.light;
   const see = canSee(p.perception, light);
 
+  // Hidden features stay out of the view until this player has searched them out.
   const mobs = [];
   for (const m of rt.mobs) {
+    if (!mobVisibleTo(state, p, m)) continue;
     const t = w.mobs[m.template];
     const luminous = !!t.emitsLight;
     if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous });
   }
   const items = see
-    ? rt.items.map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
+    ? rt.items.filter((i) => itemVisibleTo(p, i)).map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
     : [];
   const fixtures = see
-    ? rt.fixtures.map((f) => {
+    ? rt.fixtures.filter((f) => fixtureVisibleTo(p, f)).map((f) => {
         const ft = w.fixtures[f.template];
         return { id: f.id, name: ft.name, template: f.template, lit: ft.switch ? !!f.on : undefined };
       })
@@ -102,7 +104,11 @@ function buildRoomView(state, p) {
       canSee: see,
       harmed: isHarmedByLight(p.perception, light),
       description: see ? room.description : null,
-      exits: Object.keys(room.exits || {}),
+      // Normal exits, plus any hidden exits this player has discovered.
+      exits: [
+        ...Object.keys(room.exits || {}),
+        ...Object.keys(room.hiddenExits || {}).filter((dir) => isDiscovered(p, discoveryKey(room.id, "exit", dir))),
+      ],
       contents: { players, mobs, items, fixtures },
     },
   };
@@ -168,6 +174,7 @@ function buildExamineView(state, p, q) {
   const tooDim = { hints: ["Too dim to make out details."] };
 
   for (const m of rt.mobs) {
+    if (!mobVisibleTo(state, p, m)) continue; // a hidden lurker isn't examinable until searched out
     const t = w.mobs[m.template];
     if ((see || t.emitsLight) && hit(m.id, t.name)) {
       const attack = { actions: [{ label: "Attack", command: `attack ${m.id}` }] };
@@ -183,6 +190,7 @@ function buildExamineView(state, p, q) {
   }
   if (see) {
     for (const i of rt.items) {
+      if (!itemVisibleTo(p, i)) continue;
       const t = w.items[i.template];
       if (hit(i.id, t.name))
         return detailed
@@ -190,6 +198,7 @@ function buildExamineView(state, p, q) {
           : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const f of rt.fixtures) {
+      if (!fixtureVisibleTo(p, f)) continue;
       const t = w.fixtures[f.template];
       if (hit(f.id, t.name)) {
         if (!detailed) return entity("fixture", f.id, t.name, null, { dim: true, ...tooDim });
