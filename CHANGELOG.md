@@ -6,22 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- **Attributes now drive derived stats** (DESIGN.md §3.2). The five attributes
-  start at **3** and each feeds a live effect: **Might** adds `floor(Might/4)` to
-  melee damage (data-driven via a weapon's `scale`, default `{might,4}`);
-  **Intellect** sets `maxMana` (`Int×4`) on top of the existing spell scaling;
-  **Vitality** sets `maxHp` (`Vit×5`); **Wits** is a pure defence stat — innate
-  Ward (`Wits×2`, magic resist) plus **evasion** (`−Wits×2%` to an attacker's hit
-  chance); **Perception** adds `+2%`/pt to hit (compensating darkness), a
-  `Perception×1%` **critical-hit** chance (doubles damage), and deeper low-light
-  sight (every +5 over baseline lowers the dim-sight threshold). Derived stats are
-  recomputed from attributes on character creation and on every login (so tuning
-  applies to existing saves), with current HP/Mana clamped to the new maxima.
-- **Critical hits** are bidirectional and narrated ("A critical hit!"). Mobs gained
-  optional `attack.crit`, `attack.hitBonus`, and `evasion` fields (all default 0, so
-  no existing mob changes), mirroring the player Perception/Wits effects.
-- **Admin** — `@attr <attribute> <value>` sets one of the caller's attributes and
-  re-derives their stats live, for testing and tuning.
+- **`search` command + hidden features** — `search` combs the current room for
+  concealed exits, objects, fixtures, and creatures, gated by your **effective
+  Perception**: your Perception attribute scaled by how well you can see the room
+  (the same light tiers combat uses — darkness ×0.05, dim/glare ×0.5, clear ×1.0).
+  So you must bring light to find what's hidden. Searching costs a slice of energy.
+  Features carry a `hidden: { perception }` requirement (on a room's groundItem,
+  spawn, or fixture entry, or in a new `room.hiddenExits` map). Found exits,
+  fixtures, and objects are remembered **per-player, permanently** (`player.discovered`,
+  persisted); hidden **creatures** are revealed **ephemerally** (only for the current
+  room visit). First secrets: a **worn maker's mark** in the Craftsmen's Row, a
+  **15-shard cache** in the Collapsed Gallery, a **concealed crawlway** linking the
+  Spore Vault and the Echoing Fissure, and **a cave lurker** in the Sunken Cut.
+- **Neutral retaliation** — a non-hostile creature that gets attacked now fights
+  back (it acts on the threat it gains), where before only `hostile` mobs ever
+  struck. Gated on having an `attack` block, so friendly NPCs (shopkeepers) stay
+  passive. This lets the new **cave lurker** be neutral until provoked: unseen and
+  inert until you `search` it out, harmless once revealed, dangerous only if you
+  strike first.
 - **Mining** — a new `mine` (alias `dig`) command works ore loose from a resource
   vein in the room. Veins are data-driven fixtures (`type: "resource"` + a `mine`
   block: ore template, yield, charges, respawn, energy) that deplete as they're

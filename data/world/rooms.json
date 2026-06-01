@@ -43,7 +43,7 @@
     "depth": 0,
     "ambientLight": 4,
     "exits": { "east": "rim.plaza" },
-    "fixtures": ["forge", "alchemist-bench", "smelter"],
+    "fixtures": ["forge", "alchemist-bench", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 60 }]
   },
@@ -94,7 +94,7 @@
     "ambientLight": 1,
     "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren" },
     "fixtures": ["iron-vein"],
-    "groundItems": [],
+    "groundItems": [{ "template": "shards", "qty": 15, "hidden": { "perception": 3 } }],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
   },
   "abyss.warren": {
@@ -117,6 +117,7 @@
     "depth": 1,
     "ambientLight": 0,
     "exits": { "south": "abyss.gallery", "west": "abyss.roost" },
+    "hiddenExits": { "east": { "to": "abyss.vault", "perception": 3, "name": "a concealed crawlway" } },
     "fixtures": ["narrow-fissure"],
     "groundItems": [],
     "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 40 }]
@@ -165,6 +166,7 @@
     "depth": 1,
     "ambientLight": 0,
     "exits": { "north": "abyss.grotto" },
+    "hiddenExits": { "west": { "to": "abyss.fissure", "perception": 3, "name": "a concealed crawlway" } },
     "fixtures": ["witchglow-cluster"],
     "groundItems": [{ "template": "witchglow-cap", "qty": 1, "respawn": 150 }],
     "spawns": []
@@ -193,7 +195,8 @@
     "groundItems": [],
     "spawns": [
       { "mob": "giant-rat", "max": 2, "respawn": 40 },
-      { "mob": "cave-bat", "max": 1, "respawn": 45 }
+      { "mob": "cave-bat", "max": 1, "respawn": 45 },
+      { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
   "abyss.den": {

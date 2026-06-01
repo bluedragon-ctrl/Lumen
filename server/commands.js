@@ -10,7 +10,11 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE } = require("./state");
+const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
+
+// Searching the room for hidden features costs roughly one action's worth of
+// energy, so it competes with attacking and can't be spammed mid-combat.
+const SEARCH_COST = 12;
 const accounts = require("./accounts");
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
@@ -20,6 +24,7 @@ const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
 const HELP = [
   "Commands:",
   "  look | examine | x [target] — view the room, or examine something",
+  "  search                — comb the room for hidden things (needs light + Perception)",
   "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
   "  go <dir> | move <dir> — move",
   "  get | take <target>   — pick up an item",
@@ -105,9 +110,14 @@ function equipItem(player, inst, world) {
 
 function move(state, player, dir, ctx) {
   const room = state.world.rooms[player.location];
-  const dest = room.exits && room.exits[dir];
+  // A normal exit, or a hidden one this player has already discovered (an
+  // undiscovered hidden exit reads exactly like no exit — it isn't leaked).
+  let dest = room.exits && room.exits[dir];
+  if (!dest && room.hiddenExits && room.hiddenExits[dir] && isDiscovered(player, discoveryKey(player.location, "exit", dir)))
+    dest = room.hiddenExits[dir].to;
   if (!dest) return [{ type: "error", text: `You can't go ${dir} from here.` }];
   player.pending = null; // moving breaks off any attack
+  state.clearRevealedMobs(player.id); // leaving the room re-hides any lurkers you'd spotted
   const from = player.location;
   ctx.toRoom(from, { type: "log", text: `${player.name} leaves ${dir}.` }, player.id);
   player.location = dest;
@@ -192,9 +202,11 @@ function get(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Get what?" }];
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light)) return [{ type: "error", text: "It is too dark to find anything." }];
-  const idx = findItem(rt.items, state.world, arg);
-  if (idx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
-  const inst = rt.items.splice(idx, 1)[0];
+  // Undiscovered hidden items aren't pickable by name — you must `search` first.
+  const visible = rt.items.filter((i) => itemVisibleTo(player, i));
+  const vIdx = findItem(visible, state.world, arg);
+  if (vIdx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
+  const inst = rt.items.splice(rt.items.indexOf(visible[vIdx]), 1)[0];
   const t = state.world.items[inst.template];
   // Currency isn't carried as an item — gathering it tallies to the purse.
   if (t.type === "currency") {
@@ -330,7 +342,7 @@ function use(state, player, arg, ctx) {
     const ql = arg.toLowerCase();
     const f = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
-      return ft && ft.switch && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+      return ft && ft.switch && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
     if (f) return toggleFixture(state, player, f, ctx);
   }
@@ -521,11 +533,26 @@ function attack(state, player, arg) {
   const ql = arg.toLowerCase();
   const mob = rt.mobs.find((m) => {
     const t = state.world.mobs[m.template];
-    return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
   return [{ type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` }];
+}
+
+// `search`: comb the current room for hidden features (exits, stashes, fixtures,
+// lurkers). Effective Perception — your attribute scaled by how well you see the
+// room (the combat light tiers) — gates what you turn up, so light is required to
+// search well. Costs a slice of energy so it competes with acting in combat.
+function search(state, player, ctx) {
+  if (player.energy < SEARCH_COST)
+    return [{ type: "error", text: "You need a moment to catch your breath before searching again." }];
+  player.energy -= SEARCH_COST;
+  const { found, any } = state.search(player);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} searches around.` }, player.id);
+  if (!any) return selfAndViews(state, player, "You search the area, but find nothing you didn't already know.");
+  ctx.refreshRoom(player.location, player.id); // a revealed lurker may now be visible to others too
+  return selfAndViews(state, player, `You search the area. You discover ${found.join(", ")}!`);
 }
 
 // `learn <scroll|schematic>` (alias `study`): commit a scroll's spell or a
@@ -710,6 +737,8 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "exam":
     case "x":
       return arg ? lookAt(state, player, arg) : [buildRoomView(state, player)];
+    case "search":
+      return search(state, player, ctx);
     case "go":
     case "move": {
       let d = arg.toLowerCase();

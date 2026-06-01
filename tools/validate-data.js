@@ -27,24 +27,43 @@ function main() {
 
   const errs = [];
 
+  // A `hidden: { perception }` block gates a feature behind `search` (positive req).
+  const checkHidden = (h, where) => {
+    if (h == null) return;
+    if (typeof h !== "object" || typeof h.perception !== "number" || h.perception <= 0)
+      errs.push(`${where}: hidden.perception must be a positive number`);
+  };
+
   for (const [id, r] of Object.entries(rooms)) {
     if (r.id !== id) errs.push(`room ${id}: id field mismatch (${r.id})`);
     if (r.zone != null && typeof r.zone !== "string") errs.push(`room ${id}: zone must be a string`);
     for (const [dir, dest] of Object.entries(r.exits || {}))
       if (!has(rooms, dest)) errs.push(`room ${id}: exit ${dir} -> missing room ${dest}`);
-    for (const f of r.fixtures || [])
-      if (!has(fixtures, f)) errs.push(`room ${id}: missing fixture ${f}`);
+    // Hidden exits are a parallel map of { to, perception } — gated, but still edges.
+    for (const [dir, h] of Object.entries(r.hiddenExits || {})) {
+      if (!h || !has(rooms, h.to)) errs.push(`room ${id}: hiddenExit ${dir} -> missing room ${h && h.to}`);
+      if (typeof h.perception !== "number" || h.perception <= 0)
+        errs.push(`room ${id}: hiddenExit ${dir} perception must be a positive number`);
+    }
+    for (const f of r.fixtures || []) {
+      // A fixture entry is a template string, or an object { template, hidden }.
+      const fid = typeof f === "string" ? f : f.template;
+      if (!has(fixtures, fid)) errs.push(`room ${id}: missing fixture ${fid}`);
+      if (typeof f === "object") checkHidden(f.hidden, `room ${id} fixture ${fid}`);
+    }
     for (const s of r.spawns || []) {
       if (!has(mobs, s.mob)) errs.push(`room ${id}: spawn references missing mob ${s.mob}`);
       if (s.max != null && (typeof s.max !== "number" || s.max <= 0))
         errs.push(`room ${id}: spawn max must be a positive number`);
       if (s.respawn != null && (typeof s.respawn !== "number" || s.respawn <= 0))
         errs.push(`room ${id}: spawn respawn must be a positive number (ticks)`);
+      checkHidden(s.hidden, `room ${id} spawn ${s.mob}`);
     }
     for (const g of r.groundItems || []) {
       if (!has(items, g.template)) errs.push(`room ${id}: groundItem missing template ${g.template}`);
       if (g.respawn != null && (typeof g.respawn !== "number" || g.respawn <= 0))
         errs.push(`room ${id}: groundItem respawn must be a positive number (ticks)`);
+      checkHidden(g.hidden, `room ${id} groundItem ${g.template}`);
     }
   }
 
@@ -208,6 +227,8 @@ function main() {
     if (seen.has(c) || !rooms[c]) continue;
     seen.add(c);
     for (const dest of Object.values(rooms[c].exits || {})) stack.push(dest);
+    // A hidden exit still connects rooms — a room reachable only via one is reachable.
+    for (const h of Object.values(rooms[c].hiddenExits || {})) if (h && h.to) stack.push(h.to);
   }
   for (const id of Object.keys(rooms))
     if (!seen.has(id)) errs.push(`room ${id}: NOT reachable from start (${player.startLocation})`);

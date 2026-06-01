@@ -194,5 +194,27 @@
     "shop": {
       "sells": [{ "template": "schematic-searing-flare", "price": 5 }]
     }
+  },
+  "cave-lurker": {
+    "id": "cave-lurker",
+    "name": "a cave lurker",
+    "description": "A knot of stone-grey limbs folded against the ceiling, still as the rock until prey passes beneath. It drops without a sound.",
+    "maxHp": 12,
+    "speed": 11,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 5, "intellect": 0, "wits": 6, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "lurk",
+    "hostile": false,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 10,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["shifts its grip on the rock", "unfolds a grey limb, then stills", "watches, unblinking"] }
+    ],
+    "loot": []
   }
 }
