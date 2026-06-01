@@ -26,6 +26,9 @@ const HELP = [
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
   "  attack | kill <target> — attack a creature (stop to break off)",
+  "  cast | c <spell> <target> — cast a spell you know at a creature",
+  "  learn | study <scroll> — learn a spell from a scroll (consumes it)",
+  "  spells                — list the spells you know",
   "  equip | wield | wear <item> — equip from inventory (swaps current)",
   "  unequip | remove <item|slot> — return equipped gear to inventory",
   "  list | shop           — see what a trader here buys and sells",
@@ -470,6 +473,115 @@ function attack(state, player, arg) {
   return [{ type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` }];
 }
 
+// `learn <scroll>` (alias `study`): inscribe a scroll's spell into memory,
+// consuming the scroll — one scroll, one permanent spell (mirrors recipes).
+function learn(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Learn what? Study a scroll you're carrying." }];
+  const idx = findItem(player.inventory, w, arg);
+  if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
+  const inst = player.inventory[idx];
+  const t = w.items[inst.template];
+  if (t.type !== "scroll" || !t.scroll || !t.scroll.spell)
+    return [{ type: "error", text: `There is nothing to learn from ${t.name}.` }];
+  const spell = w.spells[t.scroll.spell];
+  if (!spell) return [{ type: "error", text: `${t.name} is inscribed with a spell you can't decipher.` }];
+  if (!player.knownSpells) player.knownSpells = [];
+  if (player.knownSpells.includes(t.scroll.spell))
+    return [{ type: "error", text: `You already know ${spell.name}.` }];
+  player.knownSpells.push(t.scroll.spell);
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(idx, 1);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} studies ${t.name}, which crumbles to ash.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(
+    state, player,
+    `You study ${t.name} and learn ${spell.name}. The scroll crumbles to ash. Cast it with \`cast ${t.scroll.spell} <target>\`.`
+  );
+}
+
+function spellList(state, player) {
+  const w = state.world;
+  const known = player.knownSpells || [];
+  if (!known.length) return [{ type: "log", text: "You know no spells. Study a scroll to learn one." }];
+  const lines = ["You know how to cast:"];
+  for (const id of known) {
+    const s = w.spells[id];
+    if (!s) continue;
+    let tail = "";
+    if (s.effect && s.effect.type === "damage")
+      tail = ` — ${s.effect.damage} ${s.effect.damageType || "physical"} damage` +
+        (s.effect.scale ? ` (+${s.effect.scale.attr}/${s.effect.scale.per})` : "");
+    lines.push(`  ${s.name}: ${s.manaCost || 0} mana${tail}`);
+  }
+  lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
+  return [{ type: "log", text: lines.join("\n") }];
+}
+
+// `cast <spell> [at] <target>`: spend mana to hurl a known spell at a creature
+// you can perceive. Resolution (Ward resist, Intellect-scaled damage, threat,
+// kill) lives in state.castSpell; this handles targeting and narration.
+function cast(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Cast what? Try `spells`." }];
+  const tokens = arg.trim().split(/\s+/);
+  // Match the longest leading run of tokens that names a known spell (spell
+  // names are usually one word); the remainder is the target.
+  const known = player.knownSpells || [];
+  let spellId = null;
+  let rest = tokens.slice();
+  for (let n = Math.min(3, tokens.length); n >= 1 && !spellId; n--) {
+    const phrase = tokens.slice(0, n).join(" ").toLowerCase();
+    const hit = known.find((id) => {
+      const s = w.spells[id];
+      return s && (id.toLowerCase() === phrase || s.name.toLowerCase() === phrase);
+    });
+    if (hit) { spellId = hit; rest = tokens.slice(n); }
+  }
+  if (!spellId) return [{ type: "error", text: `You don't know any spell called "${tokens[0]}". Try \`spells\`.` }];
+  const spell = w.spells[spellId];
+  if (rest[0] && rest[0].toLowerCase() === "at") rest = rest.slice(1); // `cast spark at lightbug`
+  const targetQ = rest.join(" ");
+
+  if (Math.floor(player.mana || 0) < (spell.manaCost || 0))
+    return [{ type: "error", text: `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).` }];
+  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
+
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const ql = targetQ.toLowerCase();
+  const mob = rt.mobs.find((m) => {
+    const t = w.mobs[m.template];
+    return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+  });
+  if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
+
+  const mt = w.mobs[mob.template];
+  const verb = spell.name.toLowerCase();
+  const res = state.castSpell(player, spell, mob);
+
+  if (res.resisted) {
+    ctx.toRoom(player.location, { type: "log", text: `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`);
+  }
+
+  if (res.killed) {
+    const d = res.death;
+    const lootTxt = d.loot && d.loot.length ? ` It leaves behind ${d.loot.join(", ")}.` : "";
+    ctx.toRoom(player.location, { type: "log", text: `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(
+      state, player,
+      `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`
+    );
+  }
+
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
+}
+
 /** Admin-only commands, prefixed with '@'. */
 function handleAdmin(state, player, verb, arg) {
   if (!player.isAdmin) return [{ type: "error", text: "You lack the authority for that." }];
@@ -530,6 +642,14 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "stop":
       player.pending = null;
       return [{ type: "log", text: "You break off your attack." }];
+    case "cast":
+    case "c":
+      return cast(state, player, arg, ctx);
+    case "learn":
+    case "study":
+      return learn(state, player, arg, ctx);
+    case "spells":
+      return spellList(state, player);
     case "list":
     case "shop":
     case "wares":

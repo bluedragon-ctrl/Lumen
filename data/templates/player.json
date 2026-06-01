@@ -5,12 +5,15 @@
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "maxHp": 18,
   "maxMana": 10,
+  "manaRegen": 0.125,
   "speed": 12,
   "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
   "startLocation": "rim.plaza",
   "startInventory": [
-    { "template": "torch", "fuel": 200 }
+    { "template": "torch", "fuel": 200 },
+    { "template": "scroll-spark" }
   ],
   "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null },
-  "knownRecipes": ["minor-light-potion"]
+  "knownRecipes": ["minor-light-potion"],
+  "knownSpells": []
 }

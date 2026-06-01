@@ -34,7 +34,7 @@ function buildPlayerView(state, p) {
       shards: p.shards || 0,
       hp: p.hp,
       maxHp: p.maxHp,
-      mana: p.mana,
+      mana: Math.floor(p.mana || 0),
       maxMana: p.maxMana,
       energy: p.energy,
       energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
@@ -50,6 +50,7 @@ function buildPlayerView(state, p) {
         good: s.good !== false,
       })),
       recipes: (p.knownRecipes || []).map((id) => (w.recipes[id] ? w.recipes[id].name : id)),
+      spells: (p.knownSpells || []).map((id) => (w.spells[id] ? w.spells[id].name : id)),
     },
   };
 }
@@ -130,6 +131,10 @@ function itemSpecLines(tmpl, w) {
   if (eff && typeof eff === "object") {
     if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
     else lines.push(`drink: ${eff.type}`);
+  }
+  if (tmpl.scroll && tmpl.scroll.spell) {
+    const s = w.spells[tmpl.scroll.spell];
+    lines.push(`study: learn ${s ? s.name : tmpl.scroll.spell}`);
   }
   if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}`);
   return lines;

@@ -30,6 +30,19 @@ function playerDefence(world, player) {
 
 const mightMod = (attrs) => ((attrs && attrs.might != null ? attrs.might : 5) - 5);
 
+// A spell's flat damage bonus from a scaling attribute, e.g. {attr:"intellect", per:4}
+// adds floor(intellect / 4). No `scale` block → no attribute bonus.
+function spellScaleBonus(attrs, scale) {
+  if (!scale || !scale.attr) return 0;
+  const v = (attrs && attrs[scale.attr] != null) ? attrs[scale.attr] : 0;
+  return Math.floor(v / (scale.per || 1));
+}
+
+// Ward resists hostile magic as an all-or-nothing fizzle: each point of the
+// target's Ward is this much chance to negate the spell entirely (works for
+// damage and effect spells alike). 0.01 = 1% per point.
+const WARD_RESIST_PER_POINT = 0.01;
+
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
 function pickWeighted(options) {
   const total = options.reduce((s, o) => s + (o.weight || 1), 0);
@@ -273,6 +286,7 @@ class GameState {
       maxHp: t.maxHp,
       mana: t.maxMana,
       maxMana: t.maxMana,
+      manaRegen: t.manaRegen || 0,
       speed: t.speed,
       energy: 0,
       perception: { ...t.perception },
@@ -281,6 +295,7 @@ class GameState {
       inventory: (t.startInventory || []).map((ref) => makeItemInstance(ref, this.world)),
       states: [], // active status effects (see applyEffect / _tickEffects)
       knownRecipes: [...(t.knownRecipes || [])],
+      knownSpells: [...(t.knownSpells || [])],
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
       player.equipment[slot] =
@@ -306,9 +321,15 @@ class GameState {
     player.inventory = (player.inventory || []).filter((i) => i && this.world.items[i.template]);
     for (const slot of Object.keys(player.equipment || {}))
       if (player.equipment[slot] && !this.world.items[player.equipment[slot].template]) player.equipment[slot] = null;
-    // Backfill fields added after this save was written (e.g. effects, recipes).
+    // Backfill fields added after this save was written (e.g. effects, recipes, spells).
     if (!Array.isArray(player.states)) player.states = [];
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
+    if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
+    if (player.maxMana == null) player.maxMana = this.world.playerTemplate.maxMana;
+    if (player.mana == null) player.mana = player.maxMana;
+    // manaRegen is a global tuning constant (not per-character progress), so always
+    // re-sync it from the template — tuning changes then apply to existing saves too.
+    player.manaRegen = this.world.playerTemplate.manaRegen || 0;
     this.players.set(player.id, player);
     return player;
   }
@@ -329,7 +350,17 @@ class GameState {
     this.tick++;
     const events = [];
 
-    for (const p of this.players.values()) p.energy = Math.min(p.energy + p.speed, p.speed * 3);
+    for (const p of this.players.values()) {
+      p.energy = Math.min(p.energy + p.speed, p.speed * 3);
+      // Mana trickles back each tick (fractional; rendered floored). Spells spend
+      // it. When the *displayed* (floored) value ticks up, flag a vitals refresh
+      // so an idle player actually sees the bar fill (views aren't pushed per tick).
+      if (p.manaRegen && p.mana < p.maxMana) {
+        const before = Math.floor(p.mana || 0);
+        p.mana = Math.min(p.maxMana, (p.mana || 0) + p.manaRegen);
+        if (Math.floor(p.mana) !== before) events.push({ type: "vitals", playerId: p.id });
+      }
+    }
     for (const rt of Object.values(this.rooms)) {
       for (const m of rt.mobs) {
         const speed = this.world.mobs[m.template].speed || 10;
@@ -393,6 +424,45 @@ class GameState {
         }
       }
     }
+  }
+
+  /**
+   * Resolve an immediate spell cast by a player at a mob. Spends mana, rolls the
+   * target's Ward to (maybe) fizzle the whole spell, then applies the effect
+   * primitive — today only `damage` (dice + scaling-attribute bonus). Hostile
+   * spells earn the target's threat even when resisted. Returns a result the
+   * caller narrates: { resisted } | { damage, killed, death }.
+   *
+   * Mana and target validation happen in the command handler; by here the cast
+   * is committed.
+   */
+  castSpell(player, spell, mob) {
+    const w = this.world;
+    const eff = spell.effect || {};
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+
+    const ward = w.mobs[mob.template].ward || 0;
+    if (spell.hostile && ward > 0 && Math.random() < ward * WARD_RESIST_PER_POINT) {
+      this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
+      return { resisted: true };
+    }
+
+    const result = { resisted: false };
+    if (eff.type === "damage") {
+      const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(player.attributes, eff.scale));
+      this._addThreat(mob, player.id, Math.max(1, damage));
+      mob.hp -= damage;
+      result.damage = damage;
+      if (mob.hp <= 0) {
+        result.killed = true;
+        result.death = this._killMob(mob, player); // removes mob, drops loot/shards, awards xp
+      }
+    } else if (spell.hostile) {
+      this._addThreat(mob, player.id, 1);
+    }
+    // A kill may remove a luminous mob; refresh the room's light either way.
+    this.rooms[player.location].light = this.computeRoomLight(player.location);
+    return result;
   }
 
   /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */

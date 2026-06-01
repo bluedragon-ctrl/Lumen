@@ -163,6 +163,12 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "vitals") {
+    const player = state.players.get(ev.playerId);
+    if (player) sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
   if (ev.type === "effect-expired") {
     const player = state.players.get(ev.playerId);
     if (!player) return;
