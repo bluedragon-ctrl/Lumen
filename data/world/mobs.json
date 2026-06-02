@@ -273,6 +273,7 @@
     "shards": "1d2",
     "actions": [
       { "type": "attack", "weight": 6 },
+      { "type": "wander", "weight": 3, "scope": "zone", "verb": "slinks off into the dark" },
       { "type": "idle", "weight": 4 },
       { "type": "emote", "weight": 2, "messages": ["growls low in its throat", "slinks along the wall, hackles up", "bares yellowed teeth"] }
     ],

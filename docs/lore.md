@@ -100,6 +100,9 @@ orders the whole upper ecosystem:
   the **weak** — the wounded, the dying, and above all **outsiders** drifting down with
   the Rush. The Abyss eats the newcomers.
 
+*(Saprophytic fungi — like the dark grottoes' palecaps — need no light; it is **moss** and
+the **glowing fungus** that mark a lit patch, and there the grazers gather.)*
+
 Light adaptation here is ordinary **ecology**, not glimmer's work (that mutation is a
 separate, deeper overlay). Creatures sort into the light-tolerant, the light-fearing,
 and surface animals gone feral:
