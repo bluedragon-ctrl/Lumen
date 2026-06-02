@@ -138,7 +138,7 @@
   "rim-innkeeper": {
     "id": "rim-innkeeper",
     "name": "Maeve the innkeeper",
-    "description": "A stout, white-haired woman with flour on her apron and a kind, crinkled smile. She has kept the Lantern's Rest since before the last great delve, and remembers every delver who never came back up.",
+    "description": "A stout, white-haired woman with flour on her apron and a kind, crinkled smile. She came with the first wave of the rush and raised the Lantern's Rest from green timber; since then she has watched delvers go down full of hope, and remembers every one who never came back up.",
     "maxHp": 20,
     "speed": 12,
     "armour": 0,
@@ -172,7 +172,7 @@
       { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "scroll-spark" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }]
     }
   },
   "rim-smith": {
@@ -193,6 +193,43 @@
     ],
     "shop": {
       "sells": [{ "template": "schematic-searing-flare", "price": 5 }]
+    }
+  },
+  "rim-hatcher": {
+    "id": "rim-hatcher",
+    "name": "Wick the lightbug-keeper",
+    "description": "A slight, soft-spoken woman, half-lit blue by the cells she tends, with a gauze net over one shoulder and a lightbug or two riding her sleeve. She talks to the bugs more than to delvers, and swears the wild ones down in the hollow sing back.",
+    "maxHp": 18,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 5, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "checks a clutch of pale eggs against the glow", "murmurs something fond to a drifting mote", "wipes the condensation from a glass cell"] }
+    ]
+  },
+  "rim-mage": {
+    "id": "rim-mage",
+    "name": "Vesper the glimmer-mage",
+    "description": "A tall, composed woman in ink-dark robes sewn with faint glimmer-thread, so that she seems lit from within in the gloom. She came to the Rim as the scholars did — for the glimmer, and the questions its light raises — and measures every delver who darkens her door with a cool, appraising eye.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 1,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 8, "wits": 6, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
+    ],
+    "shop": {
+      "sells": [{ "template": "scroll-spark" }]
     }
   },
   "cave-lurker": {

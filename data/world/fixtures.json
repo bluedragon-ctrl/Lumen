@@ -65,5 +65,11 @@
     "name": "a worn maker's mark",
     "description": "Scratched low on a workbench leg, half-rubbed-away: a craftsman's sigil, and beneath it a tally of years. Someone worked this bench long before the shaft was sunk.",
     "type": "scenery"
+  },
+  "umbral-relief": {
+    "id": "umbral-relief",
+    "name": "an Umbral relief",
+    "description": "Carved deep into the smooth-cut wall: tall, slender figures with wide, lightless eyes, processing toward something the rockfall has long since buried. The work is patient and very old — whoever cut it was here ages before the first prospector ever sank a shaft.",
+    "type": "scenery"
   }
 }
