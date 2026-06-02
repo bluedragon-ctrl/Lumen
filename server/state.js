@@ -22,17 +22,37 @@ function weaponOf(world, player) {
   return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, onHit: null }; // unarmed
 }
 
-/** A player's reflect ("thorns") block, from the first equipped armour piece that
- *  carries one — the defender-side mirror of a mob's `spikes`. Null if unspiked.
- *  (No seeded gear has `armour.spikes` yet; this readies player armour to punish
- *  melee exactly as a thornbug does — see GameState.applyHitOutcome.) */
-function playerSpikes(world, player) {
+// --- Defender-side triggers (onDamage) -------------------------------------
+// `onDamage` is the general "when I'm struck" list, the defender-side mirror of
+// the attacker's `onHit`. Each entry is an effect spec plus two extra axes the
+// attacker side never needs: `target` ("attacker" — reflect/retaliate — or
+// "self" — e.g. draw mana off a blow; default "attacker") and `on` (which damage
+// sources fire it; default ["melee"], with "spell" reserved for a later castSpell
+// wiring). `spikes: { damage, chance? }` is kept as terse authoring sugar for the
+// commonest entry — a flat melee reflect — normalized here into an onDamage entry.
+const spikesEntry = (s) => ({ type: "damage", damage: s.damage, chance: s.chance, target: "attacker", cause: "spikes", on: ["melee"] });
+
+/** A mob's resolved onDamage triggers: explicit `onDamage` entries plus its
+ *  `spikes` sugar (a reflect entry). */
+function mobOnDamage(t) {
+  const list = Array.isArray(t.onDamage) ? [...t.onDamage] : [];
+  if (t.spikes) list.push(spikesEntry(t.spikes));
+  return list;
+}
+
+/** A player's resolved onDamage triggers, gathered across equipped armour
+ *  (`armour.onDamage` entries plus `armour.spikes` sugar). Lets gear punish or
+ *  profit from being hit exactly as a mob does — none seeded yet. */
+function playerOnDamage(world, player) {
+  const list = [];
   for (const inst of Object.values(player.equipment || {})) {
     if (!inst) continue;
     const t = world.items[inst.template];
-    if (t && t.armour && t.armour.spikes) return t.armour.spikes;
+    if (!t || !t.armour) continue;
+    if (Array.isArray(t.armour.onDamage)) list.push(...t.armour.onDamage);
+    if (t.armour.spikes) list.push(spikesEntry(t.armour.spikes));
   }
-  return null;
+  return list;
 }
 
 // Each point of Wits grants this much innate Ward (magic resist) and this much
@@ -648,47 +668,88 @@ class GameState {
     return events;
   }
 
+  /** Narrate a status effect taking hold on an actor (player or mob). */
+  _narrateEffectApplied(events, who, name) {
+    if (who.kind === "mob")
+      events.push({ type: "mob-effect-applied", roomId: who.roomId, mobId: who.id, mobName: who.name, name, emitsLight: who.emitsLight, light: this.rooms[who.roomId].light });
+    else
+      events.push({ type: "effect-applied", playerId: who.id, name });
+  }
+
+  /** Roll an effect spec's `chance` (default 1). True → it fires this hit. */
+  _rollChance(spec) {
+    return spec.chance == null || Math.random() < spec.chance;
+  }
+
+  /**
+   * Apply one effect spec to a target actor, dispatching by type: instant
+   * `damage` goes through the target's hurt sink (returns its death event, if
+   * any); `restore` tops up hp/mana; everything else (`damage-over-time`,
+   * `emit-light`, …) is a status via applyEffect. `creditId`, when set, stamps
+   * the spec's `sourceId` so a DoT this lands credits that player on a kill.
+   * Used for both attacker `onHit` (target = defender) and defender `onDamage`
+   * (target = attacker or self).
+   */
+  _applyTriggerEffect(events, spec, target, hurt, creditId) {
+    if (spec.type === "damage")
+      return hurt(Math.max(1, rollDice(spec.damage)), spec.cause || "spikes");
+    if (spec.type === "restore") {
+      const got = this.applyRestore(target.actor, spec);
+      if (target.kind === "player" && (got.hp || got.mana)) events.push({ type: "trigger-restore", playerId: target.id, hp: got.hp, mana: got.mana });
+      return null;
+    }
+    const s = creditId ? { ...spec, sourceId: creditId } : spec;
+    this.applyEffect(target.actor, s);
+    this._narrateEffectApplied(events, target, s.name || s.type);
+    return null;
+  }
+
   /**
    * Process the outcome of one resolved **melee** swing, for either direction
    * (player→mob or mob→player), from a single place so both get the data-driven
    * contact triggers identically. Pushes the `attack` event, applies damage via
    * the caller's `defender.deal` sink, then on a *landed* hit fires:
-   *   • attacker `onHit` — for each effect spec, roll its `chance` (default 1)
-   *     then applyEffect on the still-living defender. A player attacker stamps
-   *     `sourceId` so a poison kill credits them (mirrors the bleed DoT path); a
-   *     mob attacker leaves it null (its venom rewards no one). Re-applying each
-   *     hit pushes an independent instance — DoTs stack, by design.
-   *   • defender `spikes` — reflect rollDice(spikes.damage) back at the attacker
-   *     through their hurt sink (cause "spikes"). Fires on contact regardless of
-   *     whether the defender has an attack of its own (a thornbug's only danger),
-   *     and even on the blow that kills the defender. Flat/small — bypasses armour.
-   * Spells/ranged never call this — onHit and spikes are melee-contact only. The
-   * `castSpell` path is where a spell-borne onHit would hook in a later pass.
+   *   • attacker `onHit` — effect specs applied to the still-living defender (a
+   *     venomous bite, a debuff). A player attacker stamps `sourceId` so a poison
+   *     kill credits them; a mob's venom credits no one. Each hit stacks an
+   *     independent instance, by design.
+   *   • defender `onDamage` — the general "when struck" list (reflect, retaliate,
+   *     draw mana off the blow). Each entry targets the `attacker` (default) or
+   *     `self`, and fires only for a matching damage `source` (default melee).
+   *     `spikes` is normalized into this list (see mobOnDamage/playerOnDamage).
+   *     A reflected DoT credits the *defender* if it's a player (mirror of onHit).
+   * `source` is the damage origin ("melee"); spells/ranged don't call this yet —
+   * the `castSpell` path is where `on: ["spell"]` entries would later hook.
    * Returns { defenderDeath, attackerDeath } (each a death event or null) so the
    * caller can stop its swing loop and skip double-processing a death.
    */
-  applyHitOutcome({ r, events, attackEvent, attacker, defender }) {
+  applyHitOutcome({ r, events, attackEvent, source = "melee", attacker, defender }) {
     events.push(attackEvent);
-    const defenderDeath = defender.deal(r.damage); // damage + threat/kill (or respawn); pushes its own death event
+    let defenderDeath = defender.deal(r.damage); // damage + threat/kill (or respawn); pushes its own death event
     let attackerDeath = null;
     if (!r.hit) return { defenderDeath, attackerDeath };
+
     // Attacker onHit → the defender (only meaningful while it still lives).
     if (attacker.onHit && !defenderDeath) {
       for (const spec of attacker.onHit) {
-        if (spec.chance != null && Math.random() >= spec.chance) continue;
-        const s = attacker.sourceId ? { ...spec, sourceId: attacker.sourceId } : spec;
-        this.applyEffect(defender.actor, s);
-        if (defender.kind === "mob")
-          events.push({ type: "mob-effect-applied", roomId: defender.roomId, mobId: defender.id, mobName: defender.name, name: s.name || s.type, emitsLight: defender.emitsLight, light: this.rooms[defender.roomId].light });
-        else
-          events.push({ type: "effect-applied", playerId: defender.id, name: s.name || s.type });
+        if (!this._rollChance(spec)) continue;
+        this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
       }
     }
-    // Defender spikes → the attacker (contact reflect; the attacker's sink pushes
-    // its own hurt/death events). A killed attacker stops here.
-    const spk = defender.spikes;
-    if (spk && (spk.chance == null || Math.random() < spk.chance))
-      attackerDeath = attacker.reflectSink(Math.max(1, rollDice(spk.damage)));
+
+    // Defender onDamage → the attacker (reflect/retaliate) or self (mana-on-hit).
+    // Reflect fires on contact regardless of whether the defender has an attack of
+    // its own, and even on the blow that kills it.
+    for (const entry of defender.onDamage || []) {
+      if (!(entry.on || ["melee"]).includes(source)) continue;
+      if (!this._rollChance(entry)) continue;
+      const toAttacker = (entry.target || "attacker") === "attacker";
+      const target = toAttacker ? attacker : defender;
+      // A defender-applied DoT on the attacker credits the defender if it's a player.
+      const credit = toAttacker ? defender.sourceId : null;
+      const death = this._applyTriggerEffect(events, entry, target, target.hurt, credit);
+      if (death) { if (toAttacker) attackerDeath = attackerDeath || death; else defenderDeath = defenderDeath || death; }
+    }
     return { defenderDeath, attackerDeath };
   }
 
@@ -729,22 +790,25 @@ class GameState {
         const { attackerDeath } = this.applyHitOutcome({
           r, events, attackEvent,
           attacker: {
+            actor: p, kind: "player", id: p.id, name: p.name, emitsLight: false, roomId: p.location,
             onHit: weapon.onHit,
             sourceId: p.id, // a player-applied DoT credits them on the kill
-            reflectSink: (dmg) => this._hurtPlayer(p, dmg, events, { cause: "spikes" }),
+            hurt: (dmg, cause) => this._hurtPlayer(p, dmg, events, { cause }), // reflect lands here
           },
           defender: {
             actor: mob, kind: "mob", id: mob.id, name: mobName, emitsLight: mobEmits,
-            roomId: p.location, spikes: mt.spikes,
+            roomId: p.location, onDamage: mobOnDamage(mt),
+            sourceId: null, // a mob defender's retaliatory DoT credits no one
             deal: (dmg) => {
               this._addThreat(mob, p.id, Math.max(1, dmg)); // attacking it earns its ire
               mob.hp -= dmg;
               if (mob.hp <= 0) { const d = this._killMob(mob, p); events.push(d); p.pending = null; return d; }
               return null;
             },
+            hurt: (dmg, cause) => this._hurtMob(mob, p.location, dmg, events, { cause }), // self-damage onDamage (rare)
           },
         });
-        if (attackerDeath) break; // the mob's spikes killed the player — they've respawned away
+        if (attackerDeath) break; // a reflect killed the player — they've respawned away
       }
     }
   }
@@ -924,19 +988,22 @@ class GameState {
     this.applyHitOutcome({
       r, events, attackEvent,
       attacker: {
+        actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: !!t.emitsLight, roomId,
         onHit: t.attack.onHit,
         sourceId: null, // a mob's venom credits no one
-        // Reflect onto the mob; the struck player (if still up) gets the kill credit.
-        reflectSink: (dmg) => this._hurtMob(m, roomId, dmg, events, { cause: "spikes", killer: target.hp > 0 ? target : null }),
+        // Reflect/retaliate lands on the mob; the struck player (if up) gets the credit.
+        hurt: (dmg, cause) => this._hurtMob(m, roomId, dmg, events, { cause, killer: target.hp > 0 ? target : null }),
       },
       defender: {
-        actor: target, kind: "player", id: target.id, name: target.name,
-        spikes: playerSpikes(this.world, target), // player armour thorns (none seeded yet)
+        actor: target, kind: "player", id: target.id, name: target.name, emitsLight: false, roomId,
+        onDamage: playerOnDamage(this.world, target), // player armour triggers (none seeded yet)
+        sourceId: target.id, // a player's reflected DoT credits them
         deal: (dmg) => {
           target.hp -= dmg;
           if (target.hp <= 0) { const d = this._respawn(target, roomId); events.push(d); return d; }
           return null;
         },
+        hurt: (dmg, cause) => this._hurtPlayer(target, dmg, events, { cause }), // self-damage onDamage (rare)
       },
     });
   }

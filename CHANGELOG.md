@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Generalized defender-side triggers — `onDamage`** — the narrow reflect-only
+  `spikes` is now a special case of a general **when-struck** trigger list,
+  mirroring the attacker's `onHit` through the same `applyHitOutcome` dispatch. An
+  `onDamage` entry is any effect spec (instant `damage`, `damage-over-time`,
+  `restore`, `emit-light`) plus two axes the attacker side doesn't need: `target`
+  (`"attacker"` to reflect/retaliate, `"self"` to e.g. draw mana off a blow;
+  default `"attacker"`) and `on` (which damage sources fire it; default
+  `["melee"]`, with `"spell"` reserved for a later `castSpell` wiring). A
+  `target: "attacker"` DoT credits a defending player on the kill, mirroring
+  `onHit`. **`spikes` is kept as terse sugar** for the commonest entry (a flat
+  melee reflect), so existing data (the thornbug) is unchanged. Lives on a mob's
+  `onDamage` and, identically, on an item's `armour.onDamage` — ready to power
+  player gear (mana-leech mail, retaliatory plate) as pure data. Validator and
+  [docs/data-model.md](docs/data-model.md) updated; verified by simulation.
 - **Combat triggers — on-hit effects (`onHit`) & reflect (`spikes`)** — two
   symmetric, data-driven melee primitives wired through one shared strike-outcome
   path (`applyHitOutcome`) so player→mob and mob→player both get them. **`onHit`**

@@ -190,6 +190,20 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "trigger-restore") {
+    // A defender-side onDamage `restore` (e.g. armour that draws mana off a blow).
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    const parts = [];
+    if (ev.hp) parts.push(`${ev.hp} health`);
+    if (ev.mana) parts.push(`${ev.mana} mana`);
+    if (parts.length) {
+      sendToPlayer(ev.playerId, { type: "log", text: `The blow feeds you ${parts.join(" and ")}.` });
+      sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    }
+    return;
+  }
+
   if (ev.type === "mob-effect-applied") {
     // A player's on-hit effect (e.g. a venom-coated weapon) took hold on a mob.
     for (const o of state.playersIn(ev.roomId)) {
