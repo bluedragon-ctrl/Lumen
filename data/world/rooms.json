@@ -27,7 +27,7 @@
     "id": "rim.market",
     "zone": "rim",
     "name": "The Rim Market",
-    "description": "A huddle of stalls under oiled canvas, hung with torches, coils of rope, and racks of plain steel. The quartermaster trades in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; the soft glow of the lightbug hatchery spills from a stall-row to the north.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls, the soft glow of the lightbug hatchery draws you north.",
     "depth": 0,
     "ambientLight": 4,
     "exits": { "west": "rim.plaza", "north": "rim.hatchery" },
