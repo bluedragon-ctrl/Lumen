@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   market) for a scholar-mage NPC (**Vesper**), a future trader and quest-giver
   (no stock yet — trades TBD). The **alchemist's bench** moves here from the
   Craftsmen's Row (alchemy recipes now craft at the Mage's Shed); the Row keeps the
-  forge and smelter for metalwork.
+  forge and smelter for metalwork. The **Scroll of Spark** moves to Vesper's stock
+  (from Garrick), making her the Rim's source for spells.
 - **The Lightbug Hatchery + Wick the keeper** — a new Rim room (north off the
   market) where lightbugs are farmed for portable light and luminous glands, tended
   by a passive keeper NPC (**Wick**). The wild lightbugs in the abyss are now framed

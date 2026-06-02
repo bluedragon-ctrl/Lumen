@@ -172,7 +172,7 @@
       { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "scroll-spark" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }]
     }
   },
   "rim-smith": {
@@ -227,7 +227,10 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
-    ]
+    ],
+    "shop": {
+      "sells": [{ "template": "scroll-spark" }]
+    }
   },
   "cave-lurker": {
     "id": "cave-lurker",
