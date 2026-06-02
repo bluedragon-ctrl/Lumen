@@ -27,10 +27,10 @@
     "id": "rim.market",
     "zone": "rim",
     "name": "The Rim Market",
-    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls, the soft glow of the lightbug hatchery draws you north.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, and a mage's shed stands apart to the east.",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "west": "rim.plaza", "north": "rim.hatchery" },
+    "exits": { "west": "rim.plaza", "north": "rim.hatchery", "east": "rim.mageshed" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 60 }]
@@ -50,15 +50,27 @@
       { "mob": "lightbug", "max": 3, "respawn": 20 }
     ]
   },
+  "rim.mageshed": {
+    "id": "rim.mageshed",
+    "zone": "rim",
+    "name": "The Mage's Shed",
+    "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. The market lane lies back west.",
+    "depth": 0,
+    "ambientLight": 4,
+    "exits": { "west": "rim.market" },
+    "fixtures": ["alchemist-bench"],
+    "groundItems": [],
+    "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 60 }]
+  },
   "rim.workshop": {
     "id": "rim.workshop",
     "zone": "rim",
     "name": "The Craftsmen's Row",
-    "description": "A narrow lane of workshops, ringing with the smith's hammer and sharp with the alchemist's fumes. A coal forge glows beside a bench of glass coils and burners; this is where the Rim turns raw spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
+    "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
     "depth": 0,
     "ambientLight": 4,
     "exits": { "east": "rim.plaza" },
-    "fixtures": ["forge", "alchemist-bench", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
+    "fixtures": ["forge", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 60 }]
   },

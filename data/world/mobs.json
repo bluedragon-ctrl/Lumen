@@ -212,6 +212,23 @@
       { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "checks a clutch of pale eggs against the glow", "murmurs something fond to a drifting mote", "wipes the condensation from a glass cell"] }
     ]
   },
+  "rim-mage": {
+    "id": "rim-mage",
+    "name": "Vesper the glimmer-mage",
+    "description": "A tall, composed woman in ink-dark robes sewn with faint glimmer-thread, so that she seems lit from within in the gloom. She came to the Rim as the scholars did — for the glimmer, and the questions its light raises — and measures every delver who darkens her door with a cool, appraising eye.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 1,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 8, "wits": 6, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
+    ]
+  },
   "cave-lurker": {
     "id": "cave-lurker",
     "name": "a cave lurker",

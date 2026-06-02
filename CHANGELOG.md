@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Mage's Shed + Vesper the glimmer-mage** — a new Rim room (east off the
+  market) for a scholar-mage NPC (**Vesper**), a future trader and quest-giver
+  (no stock yet — trades TBD). The **alchemist's bench** moves here from the
+  Craftsmen's Row (alchemy recipes now craft at the Mage's Shed); the Row keeps the
+  forge and smelter for metalwork.
 - **The Lightbug Hatchery + Wick the keeper** — a new Rim room (north off the
   market) where lightbugs are farmed for portable light and luminous glands, tended
   by a passive keeper NPC (**Wick**). The wild lightbugs in the abyss are now framed
