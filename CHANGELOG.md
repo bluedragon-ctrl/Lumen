@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Top-floor fauna (templates + materials + lore)** — ten new creature templates
+  fleshing out the upper Abyss as a living, light-sorted ecosystem: the **feral
+  mongrel** (surface dog gone wild), the **stonebug** and **thornbug** (armoured
+  pillbug grazers that bite back), the **grub** (prey base), the **scour-slug**
+  (light-vulnerable cleaner), the **cave centipede** (margin-hunter, deadly in dim
+  light), the **pale salamander** and **tremor-mole** (light-fearing, flee), and the
+  **pale crayfish** (aggressive) and **blind cave-fish** of the pools. Each yields a
+  **material** — **chitin plate** (stonebug), **chitin spike** (thornbug), **slug
+  slime** (scour-slug), **grub**, **venom gland** (centipede), **salamander tail** —
+  the biological half of the crafting economy beside iron/glimmer. Grounded in a new
+  **"Top-floor fauna & the lit food web"** section in [docs/lore.md](docs/lore.md):
+  vegetation grows only in light, so grazers gather at lit patches and hunters work
+  the dim margins. **These are dormant templates** — not yet spawned in any room, and
+  with no recipes consuming the materials; both come in later PRs. (Thornbug spikes
+  and centipede venom are flavour for now; the on-hit mechanics are future work.)
 - **Light-roused aggression (`lightAggro`)** — a mob may now carry a
   `lightAggro: { above }` block: it stays calm in the dark but is provoked to
   attack once room light rises past `above` (the inverse of `flee`, which repels).

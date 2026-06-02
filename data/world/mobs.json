@@ -255,5 +255,215 @@
       { "type": "emote", "weight": 2, "messages": ["shifts its grip on the rock", "unfolds a grey limb, then stills", "watches, unblinking"] }
     ],
     "loot": []
+  },
+  "feral-mongrel": {
+    "id": "feral-mongrel",
+    "name": "a feral mongrel",
+    "description": "A gaunt, scab-eared dog gone wild in the dark, one of the many that followed the Rush down and were left behind. It runs down whatever is slower or weaker than itself.",
+    "maxHp": 11,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 5, "vitality": 4, "intellect": 1, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 6,
+    "shards": "1d2",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["growls low in its throat", "slinks along the wall, hackles up", "bares yellowed teeth"] }
+    ],
+    "loot": []
+  },
+  "stonebug": {
+    "id": "stonebug",
+    "name": "a stonebug",
+    "description": "A boulder of overlapping grey plate, grazing the lit moss with slow, patient mandibles. It curls into an armoured ball at the first sign of trouble.",
+    "maxHp": 24,
+    "speed": 8,
+    "armour": 3,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 10, "intellect": 0, "wits": 3, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "attack": { "damage": "1d3", "actionCost": 14 },
+    "xp": 10,
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 5 },
+      { "type": "emote", "weight": 2, "messages": ["grazes at the moss with slow mandibles", "trundles a slow half-circle", "tucks its plates tighter, then relaxes"] }
+    ],
+    "loot": [{ "template": "chitin-plate", "chance": 1 }]
+  },
+  "thornbug": {
+    "id": "thornbug",
+    "name": "a thornbug",
+    "description": "A squat, hand-sized pillbug bristling with chitinous spines, trundling between the glowing caps it feeds on. Handling one is its own punishment.",
+    "maxHp": 10,
+    "speed": 9,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 4, "intellect": 0, "wits": 4, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "attack": { "damage": "1d3", "actionCost": 13 },
+    "xp": 7,
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 5 },
+      { "type": "emote", "weight": 2, "messages": ["bristles its spines", "rasps at a glowing cap", "rolls half-shut, then unfurls"] }
+    ],
+    "loot": [{ "template": "chitin-spike", "chance": 1 }]
+  },
+  "grub": {
+    "id": "grub",
+    "name": "a grub",
+    "description": "A pale, finger-length larva that chews slow trails through the fungus. Half the dark's hunters fatten on them; delvers use them for bait.",
+    "maxHp": 4,
+    "speed": 6,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 1, "vitality": 2, "intellect": 0, "wits": 2, "perception": 2 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "xp": 1,
+    "actions": [
+      { "type": "idle", "weight": 8 },
+      { "type": "emote", "weight": 2, "messages": ["chews a slow trail through the fungus", "inches blindly over the stone"] }
+    ],
+    "loot": [{ "template": "grub", "chance": 1 }]
+  },
+  "scour-slug": {
+    "id": "scour-slug",
+    "name": "a scour-slug",
+    "description": "A grey slug the length of a forearm, hauling itself over stone and bone alike and leaving a clean track behind. It eats whatever the dark discards — including the dead.",
+    "maxHp": 12,
+    "speed": 7,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 3, "vitality": 6, "intellect": 0, "wits": 3, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "attack": { "damage": "1d2", "actionCost": 14 },
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "xp": 5,
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 6 },
+      { "type": "emote", "weight": 2, "messages": ["hauls itself over the stone, leaving a clean track", "gropes blindly at a smear of lichen", "recoils from the light, then creeps on"] }
+    ],
+    "loot": [{ "template": "slug-slime", "chance": 1 }]
+  },
+  "cave-centipede": {
+    "id": "cave-centipede",
+    "name": "a cave centipede",
+    "description": "A whip-fast length of armoured segments and skittering legs, fond of the dim edges where prey strays from the light. Its bite festers.",
+    "maxHp": 13,
+    "speed": 13,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 5, "intellect": 0, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d4", "actionCost": 11 },
+    "xp": 9,
+    "shards": "1d3",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["pours over the rock on a hundred legs", "rears, antennae testing the air", "skitters along the dim edge of the light"] }
+    ],
+    "loot": [{ "template": "venom-gland", "chance": 0.7 }]
+  },
+  "pale-salamander": {
+    "id": "pale-salamander",
+    "name": "a pale salamander",
+    "description": "A blind, milk-white salamander haunting the damp near the pools, its skin flinching from any glow. Bring a light and it is gone into a crack before you place it.",
+    "maxHp": 7,
+    "speed": 11,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 2, "vitality": 3, "intellect": 0, "wits": 5, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "wander",
+    "hostile": false,
+    "lightBane": { "above": 2, "damage": "1d2" },
+    "xp": 4,
+    "actions": [
+      { "type": "flee", "lightAbove": 2, "verb": "flinches from the light and slips into a crack", "scope": "zone" },
+      { "type": "idle", "weight": 6 },
+      { "type": "emote", "weight": 2, "messages": ["basks still in the damp", "flicks a pale, blind head", "slides closer to the water"] }
+    ],
+    "loot": [{ "template": "salamander-tail", "chance": 0.8 }]
+  },
+  "tremor-mole": {
+    "id": "tremor-mole",
+    "name": "a tremor-mole",
+    "description": "A pallid, eyeless burrower that reads the stone by footfall. It surfaces only in the dark; the faintest light sends it digging.",
+    "maxHp": 8,
+    "speed": 11,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 4, "intellect": 1, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
+    "behavior": "wander",
+    "hostile": false,
+    "attack": { "damage": "1d3", "actionCost": 12 },
+    "xp": 5,
+    "actions": [
+      { "type": "flee", "lightAbove": 1, "verb": "startles and digs out of sight", "scope": "zone" },
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 5 },
+      { "type": "emote", "weight": 2, "messages": ["reads the stone with trembling whiskers", "noses blindly through the grit", "freezes, listening through the rock"] }
+    ],
+    "loot": []
+  },
+  "pale-crayfish": {
+    "id": "pale-crayfish",
+    "name": "a pale crayfish",
+    "description": "A translucent, eyeless crayfish picking through the silt of the deep pools, claws raised at anything that nears its water.",
+    "maxHp": 11,
+    "speed": 9,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 5, "vitality": 5, "intellect": 0, "wits": 4, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 6,
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["clacks its pincers", "scuttles sideways over the silt", "raises its claws in threat"] }
+    ],
+    "loot": []
+  },
+  "blind-cave-fish": {
+    "id": "blind-cave-fish",
+    "name": "a blind cave-fish",
+    "description": "A pale, eyeless fish drifting the still pools, reading the water for whatever falls in. A staple catch for camps that learn the trick of it.",
+    "maxHp": 5,
+    "speed": 9,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 1, "vitality": 2, "intellect": 0, "wits": 4, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "xp": 2,
+    "actions": [
+      { "type": "idle", "weight": 7 },
+      { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] }
+    ],
+    "loot": []
   }
 }

@@ -227,5 +227,59 @@
     "value": 5,
     "stackable": true,
     "recipe": "searing-flare"
+  },
+  "chitin-plate": {
+    "id": "chitin-plate",
+    "name": "a chitin plate",
+    "description": "A broad scute of grey shell prised from a stonebug, dense and faintly ridged. Worked right, it turns a blade as well as boiled leather.",
+    "type": "material",
+    "weight": 1,
+    "value": 9,
+    "stackable": true
+  },
+  "chitin-spike": {
+    "id": "chitin-spike",
+    "name": "a chitin spike",
+    "description": "A hand-length barb snapped from a thornbug, needle-sharp and still wet at the root. The sort of thing a smith sets into a club, or a fool sets into their palm.",
+    "type": "material",
+    "weight": 0,
+    "value": 6,
+    "stackable": true
+  },
+  "slug-slime": {
+    "id": "slug-slime",
+    "name": "a glob of slug-slime",
+    "description": "A cold, stringy smear scraped from a scour-slug, clear as spit and twice as sticky. An alchemist's binder — a little goes into a great many things.",
+    "type": "material",
+    "weight": 0,
+    "value": 3,
+    "stackable": true
+  },
+  "grub": {
+    "id": "grub",
+    "name": "a grub",
+    "description": "A pale, soft larva, limp and finger-length. Cheap food in a pinch, and the surest bait for what swims in the deep pools.",
+    "type": "material",
+    "weight": 0,
+    "value": 2,
+    "stackable": true
+  },
+  "venom-gland": {
+    "id": "venom-gland",
+    "name": "a venom gland",
+    "description": "A taut, amber sac cut from a cave centipede's head, heavy with its festering bite. Handled carefully, it is an alchemist's prize; handled poorly, a mistake.",
+    "type": "material",
+    "weight": 0,
+    "value": 12,
+    "stackable": true
+  },
+  "salamander-tail": {
+    "id": "salamander-tail",
+    "name": "a salamander tail",
+    "description": "The shed tail of a pale salamander, still faintly twitching — the creature grows another. Alchemists prize that knack, distilling it into salves that knit flesh.",
+    "type": "material",
+    "weight": 0,
+    "value": 9,
+    "stackable": true
   }
 }
