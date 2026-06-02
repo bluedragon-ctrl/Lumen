@@ -71,5 +71,18 @@
     "name": "an Umbral relief",
     "description": "Carved deep into the smooth-cut wall: tall, slender figures with wide, lightless eyes, processing toward something the rockfall has long since buried. The work is patient and very old — whoever cut it was here ages before the first prospector ever sank a shaft.",
     "type": "scenery"
+  },
+  "glowmoss": {
+    "id": "glowmoss",
+    "name": "a swathe of glowmoss",
+    "description": "A thick swathe of moss clinging to the stone, breathing a cold, steady light of its own — kin to the witchglow, but wholesome, and cropped close wherever the deep's grazers can reach it.",
+    "type": "scenery",
+    "emitsLight": 2
+  },
+  "shaft-winch": {
+    "id": "shaft-winch",
+    "name": "a timber winch",
+    "description": "A heavy timber winch bolted at the lip of the shaft, its drum wound with new rope. Rig the lines and it would lower a delver into the dark below — but no one has dared yet.",
+    "type": "scenery"
   }
 }

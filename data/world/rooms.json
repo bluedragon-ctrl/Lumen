@@ -168,10 +168,13 @@
     "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. The dark is absolute, and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "east": "abyss.first", "west": "abyss.grotto" },
+    "exits": { "east": "abyss.first", "west": "abyss.grotto", "south": "abyss.pool" },
     "fixtures": ["dripping-pool"],
     "groundItems": [],
-    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 45 }]
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 1, "respawn": 45 },
+      { "mob": "tremor-mole", "max": 1, "respawn": 60 }
+    ]
   },
   "abyss.grotto": {
     "id": "abyss.grotto",
@@ -180,7 +183,7 @@
     "description": "A damp hollow where pale mushrooms push up between the stones in soft, ivory clusters. They are good eating, if you can gather them in the dark — and the dark here is not empty. The tunnel is east; a deeper recess glows faintly to the south.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "east": "abyss.tunnel", "south": "abyss.vault" },
+    "exits": { "east": "abyss.tunnel", "south": "abyss.vault", "west": "abyss.garden" },
     "fixtures": [],
     "groundItems": [{ "template": "palecap-mushroom", "qty": 1, "respawn": 120 }],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 50 }]
@@ -189,14 +192,14 @@
     "id": "abyss.vault",
     "zone": "abyss",
     "name": "The Spore Vault",
-    "description": "A close, cathedral-quiet chamber lit by its own cold green glow. A great cluster of witchglow fungus fans across the wall, and slender, luminous caps drip light from their gills. Nothing dark-dwelling will come near the glow — which is why the poison grows here in peace. The grotto is back north.",
+    "description": "A close, cathedral-quiet chamber lit by its own cold green glow. A great cluster of witchglow fungus fans across the wall, and slender, luminous caps drip light from their gills. Nothing dark-dwelling will come near the glow — which is why the poison grows here undisturbed, all but the armoured pillbugs that crop the glow and take no harm from it. The grotto is back north.",
     "depth": 1,
     "ambientLight": 0,
     "exits": { "north": "abyss.grotto" },
     "hiddenExits": { "west": { "to": "abyss.fissure", "perception": 3, "name": "a concealed crawlway" } },
     "fixtures": ["witchglow-cluster"],
     "groundItems": [{ "template": "witchglow-cap", "qty": 1, "respawn": 150 }],
-    "spawns": []
+    "spawns": [{ "mob": "thornbug", "max": 1, "respawn": 90 }]
   },
   "abyss.hollow": {
     "id": "abyss.hollow",
@@ -205,7 +208,7 @@
     "description": "A wide, still cavern where lightbugs drift in lazy constellations, their soft glow rising and falling like slow breath. It is the one gentle place this side of the rim — a delver can rest here, and gather the cold light the bugs leave behind. The First Dark is north; the floor slopes down into a darker cut to the south.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.first", "south": "abyss.cut" },
+    "exits": { "north": "abyss.first", "south": "abyss.cut", "west": "abyss.road" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 25 }]
@@ -223,6 +226,8 @@
     "spawns": [
       { "mob": "giant-rat", "max": 2, "respawn": 40 },
       { "mob": "cave-bat", "max": 1, "respawn": 45 },
+      { "mob": "feral-mongrel", "max": 1, "respawn": 90 },
+      { "mob": "scour-slug", "max": 1, "respawn": 80 },
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
@@ -237,5 +242,65 @@
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 120 }]
+  },
+  "abyss.road": {
+    "id": "abyss.road",
+    "zone": "abyss",
+    "name": "The Prospector's Road",
+    "description": "A square-cut passage of old Umbral stonework that the rush has claimed for its own. Rim-strung lightbug lanterns hang at intervals down its length, so that here — almost alone in the abyss — a delver walks in steady light, and the floor is worn smooth by the traffic of those going down and coming up. The lightbug hollow glows to the east; the passage falls away west toward the next shaft, and a cold green light leaks from a side-gallery to the north.",
+    "depth": 1,
+    "ambientLight": 3,
+    "exits": { "east": "abyss.hollow", "west": "abyss.shaft", "north": "abyss.garden" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 2, "respawn": 25 },
+      { "mob": "stonebug", "max": 1, "respawn": 90 }
+    ]
+  },
+  "abyss.shaft": {
+    "id": "abyss.shaft",
+    "zone": "abyss",
+    "name": "The Lower Shaft",
+    "description": "The road ends at the head of the next descent: a worked landing that breaks off into a black, gaping shaft — the way to the levels below. A timber winch leans over the drop, its drum wound with fresh-tarred rope, and a board nailed to the rock tallies the price of light against the dark to come. No one has rigged the lines down yet — for now the shaft only breathes its cold up into the lantern-light. The road runs back east.",
+    "depth": 1,
+    "ambientLight": 2,
+    "exits": { "east": "abyss.road" },
+    "fixtures": ["shaft-winch"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "abyss.garden": {
+    "id": "abyss.garden",
+    "zone": "abyss",
+    "name": "The Moss Garden",
+    "description": "A broad shelf of rock furred thick with pale glowing moss, breathing a soft light of its own — a rare patch of true growth in the starved dark. Boulder-backed pillbugs crop the glow at their leisure, and smaller things trundle and chew among them; it is almost a peaceful place. Almost — for a long, segmented shape works the unlit margins, waiting for something to stray off the light. The road lies south; a darker fungal passage runs west.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "south": "abyss.road", "west": "abyss.grotto" },
+    "fixtures": ["glowmoss"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 1, "respawn": 90 },
+      { "mob": "thornbug", "max": 1, "respawn": 70 },
+      { "mob": "grub", "max": 2, "respawn": 60 },
+      { "mob": "cave-centipede", "max": 1, "respawn": 60 }
+    ]
+  },
+  "abyss.pool": {
+    "id": "abyss.pool",
+    "zone": "abyss",
+    "name": "The Sunless Pool",
+    "description": "The seep of the tunnels gathers here into a still black mere that drowns the cavern floor, its surface unbroken but for the slow drip out of the dark overhead. Pale, eyeless things drift and scuttle beneath the water's skin, and at its edge something soft flinches back from your light. The dripping tunnel is back north; a low passage east rejoins the lightbug hollow.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.tunnel", "east": "abyss.hollow" },
+    "fixtures": ["dripping-pool"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-crayfish", "max": 1, "respawn": 60 },
+      { "mob": "blind-cave-fish", "max": 2, "respawn": 40 },
+      { "mob": "pale-salamander", "max": 1, "respawn": 50 }
+    ]
   }
 }

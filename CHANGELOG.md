@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **First-level expansion — the Prospector's Road + four rooms** — the abyss's first
+  level gains a **relatively safe, lit spine** (First Dark → Lightbug Hollow → **the
+  Prospector's Road** → **the Lower Shaft**), the route delvers actually walk, with
+  danger now **opt-in** off the trail. The **Lower Shaft** stubs the descent to Level
+  2 (its `down` exit waits until that level is built). Two new branch rooms put the
+  fauna to work: **the Moss Garden** (grazers — stonebug/thornbug/grub — cropping a
+  glowmoss patch while a **cave centipede** works the dark margin) and **the Sunless
+  Pool** (a flooded cavern with an aggressive **pale crayfish**, **blind cave-fish**,
+  and a light-shy **pale salamander**). Two new loops connect the level (first–hollow–
+  road–garden–grotto–tunnel, and tunnel–pool–hollow), so it is no longer pure dead-end
+  spokes. The **feral mongrel** becomes the level's single **roving** threat (it now
+  `wander`s zone-wide from the Sunken Cut, the one thing that keeps the road only
+  *relatively* safe). Remaining fauna find homes via spawn tweaks: a **scour-slug** and
+  the mongrel in the Sunken Cut, a **tremor-mole** in the Dripping Tunnel, a **thornbug**
+  cropping the witchglow in the Spore Vault. New scenery fixtures: **glowmoss** (a
+  wholesome light source) and a **shaft-winch**.
 - **Top-floor fauna (templates + materials + lore)** — ten new creature templates
   fleshing out the upper Abyss as a living, light-sorted ecosystem: the **feral
   mongrel** (surface dog gone wild), the **stonebug** and **thornbug** (armoured
