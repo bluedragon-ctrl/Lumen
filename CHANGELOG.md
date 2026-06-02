@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Lightbug Hatchery + Wick the keeper** — a new Rim room (north off the
+  market) where lightbugs are farmed for portable light and luminous glands, tended
+  by a passive keeper NPC (**Wick**). The wild lightbugs in the abyss are now framed
+  as the source the Rim breeds from. An **Umbral relief** scenery fixture (a very old
+  carving) appears in *The Collapsed Gallery*, the first hint of the Umbrals.
 - **`search` command + hidden features** — `search` combs the current room for
   concealed exits, objects, fixtures, and creatures, gated by your **effective
   Perception**: your Perception attribute scaled by how well you can see the room
@@ -61,6 +66,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Leather helm** (+1 armour, new `head` slot), sold by Garrick alongside the
   **leather jerkin** (now also on his shelf). New characters start **without** the
   jerkin, and the `body`/`head` slots seed empty so `unequip` works from the start.
+
+### Changed
+- **Lore-consistency pass over the Rim and the abyss' first level** (against
+  [docs/lore.md](docs/lore.md)): the Rim now reads as a recently-sprung **Glimmer
+  Rush boomtown** rather than an old town, and names glimmer as the trade; Maeve's
+  bio drops the (non-canon) "last great delve"; the Collapsed Gallery's ancient
+  worked stone is now **Umbral** (not "old diggers"), while the Sunken Cut is plainly
+  a **prospector's** recent dig; *The Glimmer Hollow* is renamed *The Lightbug
+  Hollow* so the glimmer *mineral* and lightbug *bioluminescence* stop colliding.
+  Lightbug spawns moved from the plaza to the new hatchery.
 
 ### Fixed
 - Mob wandering no longer causes difficulty spikes: only **lightbugs** wander now.

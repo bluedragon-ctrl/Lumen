@@ -138,7 +138,7 @@
   "rim-innkeeper": {
     "id": "rim-innkeeper",
     "name": "Maeve the innkeeper",
-    "description": "A stout, white-haired woman with flour on her apron and a kind, crinkled smile. She has kept the Lantern's Rest since before the last great delve, and remembers every delver who never came back up.",
+    "description": "A stout, white-haired woman with flour on her apron and a kind, crinkled smile. She came with the first wave of the rush and raised the Lantern's Rest from green timber; since then she has watched delvers go down full of hope, and remembers every one who never came back up.",
     "maxHp": 20,
     "speed": 12,
     "armour": 0,
@@ -194,6 +194,23 @@
     "shop": {
       "sells": [{ "template": "schematic-searing-flare", "price": 5 }]
     }
+  },
+  "rim-hatcher": {
+    "id": "rim-hatcher",
+    "name": "Wick the lightbug-keeper",
+    "description": "A slight, soft-spoken woman, half-lit blue by the cells she tends, with a gauze net over one shoulder and a lightbug or two riding her sleeve. She talks to the bugs more than to delvers, and swears the wild ones down in the hollow sing back.",
+    "maxHp": 18,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 5, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "checks a clutch of pale eggs against the glow", "murmurs something fond to a drifting mote", "wipes the condensation from a glass cell"] }
+    ]
   },
   "cave-lurker": {
     "id": "cave-lurker",
