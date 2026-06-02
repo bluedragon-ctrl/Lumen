@@ -4,6 +4,11 @@
 
 > Status: **draft (v0.1.0)** — living document, refined collaboratively before implementation.
 
+> **World & lore:** the canon setting (the Abyss, glimmer, the Glimmer Rush, the
+> Rim, the Umbrals, the threat ladder) lives in [docs/lore.md](docs/lore.md). This
+> document covers *systems and mechanics*; that one covers *fiction*. Keep content
+> consistent with it.
+
 ---
 
 ## 1. Pillars
