@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by a passive keeper NPC (**Wick**). The wild lightbugs in the abyss are now framed
   as the source the Rim breeds from. An **Umbral relief** scenery fixture (a very old
   carving) appears in *The Collapsed Gallery*, the first hint of the Umbrals.
+- **World & lore reference** ([docs/lore.md](docs/lore.md)) — canon for the Abyss,
+  glimmer (the frozen light of the Dark Star), the Glimmer Rush, the Rim, the
+  Umbrals (and their glimmer-mutated deep-dweller kin), the depth-scaled threat
+  ladder, and consistency rules for authored/AI-generated content. Linked from
+  `DESIGN.md` and `CLAUDE.md`.
 - **`search` command + hidden features** — `search` combs the current room for
   concealed exits, objects, fixtures, and creatures, gated by your **effective
   Perception**: your Perception attribute scaled by how well you can see the room
