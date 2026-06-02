@@ -189,7 +189,9 @@ function buildExamineView(state, p, q) {
       // Telegraph the data-driven combat triggers (see applyHitOutcome).
       if (t.attack && Array.isArray(t.attack.onHit) && t.attack.onHit.some((o) => o.type === "damage-over-time"))
         hints.push("Venomous — its bite festers.");
-      if (t.spikes) hints.push("Spined — striking it draws blood.");
+      // Spined if it has `spikes` sugar or any onDamage entry that hits the attacker back.
+      const retaliates = (t.onDamage || []).some((e) => (e.target || "attacker") === "attacker" && (e.type === "damage" || e.type === "damage-over-time"));
+      if (t.spikes || retaliates) hints.push("Spined — striking it draws blood.");
       if (t.shop) hints.push("Trades here — try `list`, then `buy <item>` / `sell <item>`.");
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],

@@ -93,6 +93,28 @@ function main() {
     if (s.chance != null && (typeof s.chance !== "number" || s.chance <= 0 || s.chance > 1)) errs.push(`${where}: spikes.chance must be a number in (0,1]`);
   };
 
+  // `onDamage` is the general defender-side trigger (mob-level / item `armour.onDamage`):
+  // a list of effect specs, each with a `target` (attacker/self), a `chance`, and an
+  // `on` source filter. `spikes` is terse sugar for the commonest entry (melee reflect).
+  const ONDAMAGE_TYPES = ["damage", "emit-light", "restore", "damage-over-time"];
+  const SOURCES = ["melee", "spell"];
+  const checkOnDamage = (arr, where) => {
+    if (arr == null) return;
+    if (!Array.isArray(arr)) { errs.push(`${where}: onDamage must be an array of effect specs`); return; }
+    for (const e of arr) {
+      if (!e || typeof e !== "object") { errs.push(`${where}: onDamage entry must be an object { type, ... }`); continue; }
+      if (!ONDAMAGE_TYPES.includes(e.type)) errs.push(`${where}: onDamage unknown type "${e.type}" (known: ${ONDAMAGE_TYPES.join(", ")})`);
+      if (e.target != null && !["self", "attacker"].includes(e.target)) errs.push(`${where}: onDamage target must be "self" or "attacker"`);
+      if (e.on != null && (!Array.isArray(e.on) || !e.on.every((s) => SOURCES.includes(s)))) errs.push(`${where}: onDamage.on must be an array drawn from ${SOURCES.join(", ")}`);
+      if ((e.type === "damage" || e.type === "damage-over-time") && (typeof e.damage !== "string" || !DICE_RE.test(e.damage)))
+        errs.push(`${where}: onDamage ${e.type} needs valid dice (got "${e.damage}")`);
+      if (e.duration != null && (typeof e.duration !== "number" || e.duration <= 0)) errs.push(`${where}: onDamage duration must be a positive number (ticks)`);
+      if (e.hp != null && typeof e.hp !== "number") errs.push(`${where}: onDamage hp must be a number`);
+      if (e.mana != null && typeof e.mana !== "number") errs.push(`${where}: onDamage mana must be a number`);
+      if (e.chance != null && (typeof e.chance !== "number" || e.chance <= 0 || e.chance > 1)) errs.push(`${where}: onDamage chance must be a number in (0,1]`);
+    }
+  };
+
   for (const [id, it] of Object.entries(items)) {
     // Every tradeable item needs a buy `value`; currency (shards) is exempt.
     if (it.type !== "currency") {
@@ -107,7 +129,7 @@ function main() {
           errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
     }
     if (it.weapon) checkOnHit(it.weapon.onHit, `item ${id} weapon`); // player on-hit effects (forward-ready)
-    if (it.armour) checkSpikes(it.armour.spikes, `item ${id} armour`); // player thorns (forward-ready)
+    if (it.armour) { checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); } // player thorns / when-struck triggers (forward-ready)
     if (it.light && it.light.fuelItem) {
       if (!has(items, it.light.fuelItem)) errs.push(`item ${id}: light.fuelItem references missing template ${it.light.fuelItem}`);
       if (it.light.refuelPerUnit != null && (typeof it.light.refuelPerUnit !== "number" || it.light.refuelPerUnit <= 0))
@@ -143,7 +165,8 @@ function main() {
     if (m.attack && (typeof m.attack.damage !== "string" || !DICE_RE.test(m.attack.damage)))
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
     if (m.attack) checkOnHit(m.attack.onHit, `mob ${id} attack`); // bite poisons, etc.
-    checkSpikes(m.spikes, `mob ${id}`); // contact reflect (thornbug)
+    checkSpikes(m.spikes, `mob ${id}`); // contact reflect sugar (thornbug)
+    checkOnDamage(m.onDamage, `mob ${id}`); // general when-struck triggers
     if (m.shards != null && (typeof m.shards !== "string" || !DICE_RE.test(m.shards)))
       errs.push(`mob ${id}: shards "${m.shards}" is not valid dice notation`);
     if (m.lightBane) {

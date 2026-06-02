@@ -206,7 +206,8 @@ A map of `mobId → template`.
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able. |
 | `attack`     | block?  | Melee profile: `{ damage (dice), actionCost, type?, bonus?, crit?, hitBonus?, onHit? }`. `onHit` (see below) lands effects on a struck defender. |
-| `spikes`     | block?  | Melee **reflect** ("thorns"): `{ damage (dice), chance? }`. Anyone who lands a melee hit on this mob takes the reflected damage back (contact only — spells/ranged are exempt). Fires even if the mob has no `attack` of its own. |
+| `onDamage`   | block?  | General **when-struck** triggers (see below): a list of effect specs that fire when this mob is hit — reflect damage, retaliate with a DoT, or buff itself. Same shape on an item's `armour.onDamage`. |
+| `spikes`     | block?  | Terse sugar for the commonest `onDamage` entry — a flat melee **reflect** ("thorns"): `{ damage (dice), chance? }`. Anyone who lands a melee hit takes the damage back. Fires even if the mob has no `attack` of its own. Equivalent to `onDamage: [{ type: "damage", damage, target: "attacker" }]`. |
 | `shop`       | block?  | Makes the mob a trader: `{ "sells": [{ template, price? }] }` — its stock, each sold at the item's `value` (or an optional `price` override). There is **no buy list**: the trader buys *any* valued item from a player at its `sellValue`. Players use `list`/`buy`/`sell` in the room. |
 | `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
@@ -234,31 +235,53 @@ when there's an exit). This gives mobs fight/emote/flee/idle personalities.
 | `idle`  | Do nothing this turn — raise its weight to keep a mob calm/quiet. | — |
 | `loot`       | LootRule[] | `{ template, chance }`, chance 0..1. |
 
-### Combat triggers — `onHit` & `spikes`
+### Combat triggers — `onHit` & `onDamage`
 
-Two symmetric, data-driven melee primitives, resolved in one place
-(`GameState.applyHitOutcome`) for both attack directions:
+Two symmetric, data-driven primitives, resolved in one place
+(`GameState.applyHitOutcome`) for both attack directions. `onHit` is the
+**attacker** side ("I landed a hit"); `onDamage` is the **defender** side
+("I was struck").
 
-- **`onHit`** (attacker side) — a list of effect specs applied to the defender on
-  a *landed* hit. Lives on a mob's `attack.onHit` and, identically, on an item's
-  `weapon.onHit` (so player weapons reuse it). Each entry is an `applyEffect` spec
-  (`emit-light` / `restore` / `damage-over-time`) plus an optional `chance`
-  (default 1). When the attacker is a **player**, the engine stamps `sourceId` so a
-  poison kill credits them (like a bleed); a **mob's** venom credits no one.
-  Re-applying each hit stacks independent instances. DoT ticks bypass armour
-  (it's poison, not a blow).
+**`onHit`** — a list of effect specs applied to the defender on a *landed* hit.
+Lives on a mob's `attack.onHit` and, identically, on an item's `weapon.onHit` (so
+player weapons reuse it). Each entry is an `applyEffect` spec (`emit-light` /
+`restore` / `damage-over-time`) plus an optional `chance` (default 1). When the
+attacker is a **player**, the engine stamps `sourceId` so a poison kill credits
+them (like a bleed); a **mob's** venom credits no one. Re-applying each hit stacks
+independent instances. DoT ticks bypass armour (it's poison, not a blow).
 
-  ```json
-  "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
-  ```
+```json
+"onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
+```
 
-- **`spikes`** (defender side) — flat melee reflect. Lives on a mob's top-level
-  `spikes` and, identically, on an item's `armour.spikes` (player thorns).
-  `{ damage (dice), chance? }`. Small and flat — bypasses the attacker's armour.
-  Melee contact only; spell/ranged attackers are never pricked.
+**`onDamage`** — a list of effect specs that fire when the bearer is struck. Lives
+on a mob's top-level `onDamage` and, identically, on an item's `armour.onDamage`.
+Each entry is the same effect-spec shape as `onHit` (plus a `type: "damage"` for an
+instant flat hit), with two extra axes the attacker side never needs:
 
-Both are **melee-only** in v1. The `castSpell` path is where a spell-borne `onHit`
-would later hook.
+| Field    | Default       | Meaning |
+|----------|---------------|---------|
+| `target` | `"attacker"`  | Who the effect lands on: `"attacker"` (reflect / retaliate) or `"self"` (e.g. draw mana off the blow). |
+| `on`     | `["melee"]`   | Which damage sources fire it. `"spell"` is reserved — spell hits don't route through this path **yet**, so an `on: ["spell"]` entry is forward-ready but inert until `castSpell` is wired. |
+
+A `target: "attacker"` DoT credits the **defender** on a kill if the defender is a
+player (the mirror of `onHit`'s credit). Instant `damage` and reflected DoTs bypass
+the attacker's armour.
+
+```json
+"onDamage": [
+  { "type": "damage",           "damage": "1d3", "target": "attacker" },
+  { "type": "restore",          "mana": 2,        "target": "self"     },
+  { "type": "damage-over-time", "name": "thornvenom", "damage": "1d2", "duration": 3, "target": "attacker" }
+]
+```
+
+**`spikes`** is terse authoring sugar for the single commonest `onDamage` entry — a
+flat melee reflect — normalized into `{ type: "damage", damage, target: "attacker" }`.
+
+Reflect/retaliate is **melee-contact only** today (the `on` default). `onHit` and
+`onDamage` share the same dispatch, so a later `on: ["spell"]` wiring (and any
+future `onDeath` lifecycle trigger) slots in without reshaping the data.
 
 ### Aggro / threat (runtime)
 
