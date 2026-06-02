@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Combat triggers — on-hit effects (`onHit`) & reflect (`spikes`)** — two
+  symmetric, data-driven melee primitives wired through one shared strike-outcome
+  path (`applyHitOutcome`) so player→mob and mob→player both get them. **`onHit`**
+  (attacker side) lands a list of effect specs — e.g. a `damage-over-time` venom —
+  on the defender when a blow connects; a player attacker is credited if the DoT
+  lands the kill. **`spikes`** (defender side) reflects flat contact damage back at
+  anyone who strikes it in melee. Both are melee-only (spells/ranged are exempt);
+  DoT ticks bypass armour, reflect is small and flat. Lights up the two fauna that
+  shipped flavour-only: the **cave centipede**'s bite now festers (venom DoT) and
+  the **thornbug** now punishes handling (spikes). The same `weapon.onHit` /
+  `armour.spikes` blocks are ready to power player gear in a later PR. `examine`
+  telegraphs both ("Venomous — its bite festers." / "Spined — striking it draws
+  blood."); validator and [docs/data-model.md](docs/data-model.md) updated.
 - **Top-floor fauna (templates + materials + lore)** — ten new creature templates
   fleshing out the upper Abyss as a living, light-sorted ecosystem: the **feral
   mongrel** (surface dog gone wild), the **stonebug** and **thornbug** (armoured
