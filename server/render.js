@@ -181,7 +181,11 @@ function buildExamineView(state, p, q) {
     if ((see || t.emitsLight) && hit(m.id, t.name)) {
       const attack = { actions: [{ label: "Attack", command: `attack ${m.id}` }] };
       if (!detailed) return entity("mob", m.id, t.name, null, { dim: true, ...tooDim, ...attack });
-      const hints = [t.hostile ? "Hostile — it may attack if it senses you." : "It seems harmless."];
+      const hints = [
+        t.hostile ? "Hostile — it may attack if it senses you."
+          : t.lightAggro ? "Calm in the dark — light rouses it."
+          : "It seems harmless.",
+      ];
       if (t.shop) hints.push("Trades here — try `list`, then `buy <item>` / `sell <item>`.");
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],

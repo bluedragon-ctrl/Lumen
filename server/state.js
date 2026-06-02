@@ -761,9 +761,13 @@ class GameState {
     }
 
     // A mob attacks if it's hostile, OR if it's been provoked (a neutral creature
-    // that someone struck has live threat → it fights back). Shopkeepers et al.
-    // carry no `attack` block, so they stay passive even if hit.
-    const aggressive = t.hostile || inCombat;
+    // that someone struck has live threat → it fights back), OR if the room light
+    // has risen past its `lightAggro` tolerance (a calm creature roused by light —
+    // the inverse of `flee`). Shopkeepers et al. carry no `attack` block, so they
+    // stay passive even if hit. Note: above `flee`'s threshold, flight wins (it
+    // returned earlier); lightAggro bites in the band between calm and flight.
+    const lightProvoked = t.lightAggro && rt.light > (t.lightAggro.above || 0);
+    const aggressive = t.hostile || inCombat || lightProvoked;
 
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
