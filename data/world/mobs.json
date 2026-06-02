@@ -312,6 +312,7 @@
     "behavior": "wander",
     "hostile": false,
     "attack": { "damage": "1d3", "actionCost": 13 },
+    "spikes": { "damage": "1d3", "chance": 1 },
     "xp": 7,
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -373,7 +374,11 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
     "behavior": "hunt",
     "hostile": true,
-    "attack": { "damage": "1d4", "actionCost": 11 },
+    "attack": {
+      "damage": "1d4",
+      "actionCost": 11,
+      "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
+    },
     "xp": 9,
     "shards": "1d3",
     "actions": [

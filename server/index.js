@@ -181,6 +181,24 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "effect-applied") {
+    // A trigger (e.g. a venomous bite) just landed a status effect on a player.
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    sendToPlayer(ev.playerId, { type: "log", text: `The ${ev.name} takes hold.` });
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
+  if (ev.type === "mob-effect-applied") {
+    // A player's on-hit effect (e.g. a venom-coated weapon) took hold on a mob.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `The ${ev.name} takes hold of ${n}.` });
+    }
+    return;
+  }
+
   if (ev.type === "attack") {
     if (ev.by === "player") {
       // The attacker targeted it, so they always know what it is.
@@ -280,6 +298,8 @@ function dispatchEvent(ev) {
     const flavour = {
       light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,
       bleed: (n, d) => `${cap(n)} bleeds. (-${d})`,
+      venom: (n, d) => `${cap(n)} shudders as the venom bites. (-${d})`,
+      spikes: (n, d) => `The spines bite back at ${n} for ${d}. (-${d})`,
     };
     const line = (flavour[ev.cause] || ((n, d) => `${cap(n)} is hurt. (-${d})`));
     for (const o of state.playersIn(ev.roomId)) {
@@ -292,7 +312,7 @@ function dispatchEvent(ev) {
   if (ev.type === "player-hurt") {
     const player = state.players.get(ev.playerId);
     if (!player) return;
-    const src = ev.cause === "light" ? "the searing light" : (ev.cause || "an unseen hurt");
+    const src = { light: "the searing light", spikes: "the spines", venom: "venom", bleed: "your wounds" }[ev.cause] || ev.cause || "an unseen hurt";
     sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
     return;
@@ -300,11 +320,11 @@ function dispatchEvent(ev) {
 
   if (ev.type === "death" && ev.victimKind === "mob") {
     const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
-    const deathVerb = { light: "shrivels and dies in the light", bleed: "bleeds out and dies" }[ev.cause] || "dies";
+    const deathVerb = { light: "shrivels and dies in the light", bleed: "bleeds out and dies", venom: "succumbs to the venom and dies", spikes: "is impaled on its own spines and dies" }[ev.cause] || "dies";
     roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
     const killer = state.players.get(ev.killerId);
     if (killer) {
-      const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off" }[ev.cause] || "You slay";
+      const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off", venom: "Your venom finishes off", spikes: "Your thorns finish off" }[ev.cause] || "You slay";
       sendToPlayer(ev.killerId, { type: "log", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
       sendToPlayer(ev.killerId, buildRoomView(state, killer));
       sendToPlayer(ev.killerId, buildPlayerView(state, killer));

@@ -68,6 +68,31 @@ function main() {
   }
 
   const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
+
+  // Combat triggers (see GameState.applyHitOutcome): `onHit` is a list of effect
+  // specs an attacker lands on a hit (mob `attack.onHit` / item `weapon.onHit`);
+  // `spikes` is a defender's melee reflect (mob-level / item `armour.spikes`).
+  const checkOnHit = (arr, where) => {
+    if (arr == null) return;
+    if (!Array.isArray(arr)) { errs.push(`${where}: onHit must be an array of effect specs`); return; }
+    for (const spec of arr) {
+      if (!spec || typeof spec !== "object") { errs.push(`${where}: onHit entry must be an object { type, ... }`); continue; }
+      if (!EFFECT_TYPES.includes(spec.type)) errs.push(`${where}: onHit unknown effect type "${spec.type}" (known: ${EFFECT_TYPES.join(", ")})`);
+      if (spec.type === "damage-over-time" && (typeof spec.damage !== "string" || !DICE_RE.test(spec.damage)))
+        errs.push(`${where}: onHit damage-over-time needs valid dice (got "${spec.damage}")`);
+      if (spec.duration != null && (typeof spec.duration !== "number" || spec.duration <= 0))
+        errs.push(`${where}: onHit duration must be a positive number (ticks)`);
+      if (spec.chance != null && (typeof spec.chance !== "number" || spec.chance <= 0 || spec.chance > 1))
+        errs.push(`${where}: onHit chance must be a number in (0,1]`);
+    }
+  };
+  const checkSpikes = (s, where) => {
+    if (s == null) return;
+    if (typeof s !== "object") { errs.push(`${where}: spikes must be an object { damage, chance? }`); return; }
+    if (typeof s.damage !== "string" || !DICE_RE.test(s.damage)) errs.push(`${where}: spikes.damage "${s.damage}" is not valid dice notation`);
+    if (s.chance != null && (typeof s.chance !== "number" || s.chance <= 0 || s.chance > 1)) errs.push(`${where}: spikes.chance must be a number in (0,1]`);
+  };
+
   for (const [id, it] of Object.entries(items)) {
     // Every tradeable item needs a buy `value`; currency (shards) is exempt.
     if (it.type !== "currency") {
@@ -81,6 +106,8 @@ function main() {
         if (typeof val !== "string" || !DICE_RE.test(val))
           errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
     }
+    if (it.weapon) checkOnHit(it.weapon.onHit, `item ${id} weapon`); // player on-hit effects (forward-ready)
+    if (it.armour) checkSpikes(it.armour.spikes, `item ${id} armour`); // player thorns (forward-ready)
     if (it.light && it.light.fuelItem) {
       if (!has(items, it.light.fuelItem)) errs.push(`item ${id}: light.fuelItem references missing template ${it.light.fuelItem}`);
       if (it.light.refuelPerUnit != null && (typeof it.light.refuelPerUnit !== "number" || it.light.refuelPerUnit <= 0))
@@ -115,6 +142,8 @@ function main() {
       if (!has(items, l.template)) errs.push(`mob ${id}: loot references missing template ${l.template}`);
     if (m.attack && (typeof m.attack.damage !== "string" || !DICE_RE.test(m.attack.damage)))
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
+    if (m.attack) checkOnHit(m.attack.onHit, `mob ${id} attack`); // bite poisons, etc.
+    checkSpikes(m.spikes, `mob ${id}`); // contact reflect (thornbug)
     if (m.shards != null && (typeof m.shards !== "string" || !DICE_RE.test(m.shards)))
       errs.push(`mob ${id}: shards "${m.shards}" is not valid dice notation`);
     if (m.lightBane) {

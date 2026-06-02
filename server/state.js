@@ -16,9 +16,23 @@ function weaponOf(world, player) {
       dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2",
       actionCost: t.weapon.actionCost || 12,
       scale: t.weapon.scale || MELEE_SCALE,
+      onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
     };
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE }; // unarmed
+  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, onHit: null }; // unarmed
+}
+
+/** A player's reflect ("thorns") block, from the first equipped armour piece that
+ *  carries one — the defender-side mirror of a mob's `spikes`. Null if unspiked.
+ *  (No seeded gear has `armour.spikes` yet; this readies player armour to punish
+ *  melee exactly as a thornbug does — see GameState.applyHitOutcome.) */
+function playerSpikes(world, player) {
+  for (const inst of Object.values(player.equipment || {})) {
+    if (!inst) continue;
+    const t = world.items[inst.template];
+    if (t && t.armour && t.armour.spikes) return t.armour.spikes;
+  }
+  return null;
 }
 
 // Each point of Wits grants this much innate Ward (magic resist) and this much
@@ -634,6 +648,50 @@ class GameState {
     return events;
   }
 
+  /**
+   * Process the outcome of one resolved **melee** swing, for either direction
+   * (player→mob or mob→player), from a single place so both get the data-driven
+   * contact triggers identically. Pushes the `attack` event, applies damage via
+   * the caller's `defender.deal` sink, then on a *landed* hit fires:
+   *   • attacker `onHit` — for each effect spec, roll its `chance` (default 1)
+   *     then applyEffect on the still-living defender. A player attacker stamps
+   *     `sourceId` so a poison kill credits them (mirrors the bleed DoT path); a
+   *     mob attacker leaves it null (its venom rewards no one). Re-applying each
+   *     hit pushes an independent instance — DoTs stack, by design.
+   *   • defender `spikes` — reflect rollDice(spikes.damage) back at the attacker
+   *     through their hurt sink (cause "spikes"). Fires on contact regardless of
+   *     whether the defender has an attack of its own (a thornbug's only danger),
+   *     and even on the blow that kills the defender. Flat/small — bypasses armour.
+   * Spells/ranged never call this — onHit and spikes are melee-contact only. The
+   * `castSpell` path is where a spell-borne onHit would hook in a later pass.
+   * Returns { defenderDeath, attackerDeath } (each a death event or null) so the
+   * caller can stop its swing loop and skip double-processing a death.
+   */
+  applyHitOutcome({ r, events, attackEvent, attacker, defender }) {
+    events.push(attackEvent);
+    const defenderDeath = defender.deal(r.damage); // damage + threat/kill (or respawn); pushes its own death event
+    let attackerDeath = null;
+    if (!r.hit) return { defenderDeath, attackerDeath };
+    // Attacker onHit → the defender (only meaningful while it still lives).
+    if (attacker.onHit && !defenderDeath) {
+      for (const spec of attacker.onHit) {
+        if (spec.chance != null && Math.random() >= spec.chance) continue;
+        const s = attacker.sourceId ? { ...spec, sourceId: attacker.sourceId } : spec;
+        this.applyEffect(defender.actor, s);
+        if (defender.kind === "mob")
+          events.push({ type: "mob-effect-applied", roomId: defender.roomId, mobId: defender.id, mobName: defender.name, name: s.name || s.type, emitsLight: defender.emitsLight, light: this.rooms[defender.roomId].light });
+        else
+          events.push({ type: "effect-applied", playerId: defender.id, name: s.name || s.type });
+      }
+    }
+    // Defender spikes → the attacker (contact reflect; the attacker's sink pushes
+    // its own hurt/death events). A killed attacker stops here.
+    const spk = defender.spikes;
+    if (spk && (spk.chance == null || Math.random() < spk.chance))
+      attackerDeath = attacker.reflectSink(Math.max(1, rollDice(spk.damage)));
+    return { defenderDeath, attackerDeath };
+  }
+
   /** Player pending-attacks. Accuracy gated by light; multiple swings if energy allows. */
   resolvePlayerAttacks(events) {
     const w = this.world;
@@ -656,22 +714,37 @@ class GameState {
         dmgBonus: spellScaleBonus(p.attributes, weapon.scale),
         crit: per * CRIT_PER_PERCEPTION,
       };
-      while (p.energy >= weapon.actionCost && mob.hp > 0) {
+      const mobName = w.mobs[mob.template].name;
+      const mobEmits = !!w.mobs[mob.template].emitsLight;
+      // Stop swinging if the mob dies OR a spike reflect kills the player mid-loop.
+      while (p.energy >= weapon.actionCost && mob.hp > 0 && p.hp > 0) {
         p.energy -= weapon.actionCost;
         const r = strike(attacker, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
-        events.push({
+        const attackEvent = {
           type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
-          targetId: mob.id, targetName: w.mobs[mob.template].name, hit: r.hit, sighted: r.sighted,
+          targetId: mob.id, targetName: mobName, hit: r.hit, sighted: r.sighted,
           damage: r.damage, crit: r.crit, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
-          light: rt.light, targetEmitsLight: !!w.mobs[mob.template].emitsLight,
+          light: rt.light, targetEmitsLight: mobEmits,
+        };
+        const { attackerDeath } = this.applyHitOutcome({
+          r, events, attackEvent,
+          attacker: {
+            onHit: weapon.onHit,
+            sourceId: p.id, // a player-applied DoT credits them on the kill
+            reflectSink: (dmg) => this._hurtPlayer(p, dmg, events, { cause: "spikes" }),
+          },
+          defender: {
+            actor: mob, kind: "mob", id: mob.id, name: mobName, emitsLight: mobEmits,
+            roomId: p.location, spikes: mt.spikes,
+            deal: (dmg) => {
+              this._addThreat(mob, p.id, Math.max(1, dmg)); // attacking it earns its ire
+              mob.hp -= dmg;
+              if (mob.hp <= 0) { const d = this._killMob(mob, p); events.push(d); p.pending = null; return d; }
+              return null;
+            },
+          },
         });
-        this._addThreat(mob, p.id, Math.max(1, r.damage)); // attacking it earns its ire
-        mob.hp -= r.damage;
-        if (mob.hp <= 0) {
-          events.push(this._killMob(mob, p));
-          p.pending = null;
-          break;
-        }
+        if (attackerDeath) break; // the mob's spikes killed the player — they've respawned away
       }
     }
   }
@@ -842,14 +915,30 @@ class GameState {
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
     };
     const r = strike(attacker, playerDefence(this.world, target), rt.light, t.attack.damage, t.attack.type || "physical");
-    events.push({
+    const attackEvent = {
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
       targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
       damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
       light: rt.light, attackerEmitsLight: !!t.emitsLight,
+    };
+    this.applyHitOutcome({
+      r, events, attackEvent,
+      attacker: {
+        onHit: t.attack.onHit,
+        sourceId: null, // a mob's venom credits no one
+        // Reflect onto the mob; the struck player (if still up) gets the kill credit.
+        reflectSink: (dmg) => this._hurtMob(m, roomId, dmg, events, { cause: "spikes", killer: target.hp > 0 ? target : null }),
+      },
+      defender: {
+        actor: target, kind: "player", id: target.id, name: target.name,
+        spikes: playerSpikes(this.world, target), // player armour thorns (none seeded yet)
+        deal: (dmg) => {
+          target.hp -= dmg;
+          if (target.hp <= 0) { const d = this._respawn(target, roomId); events.push(d); return d; }
+          return null;
+        },
+      },
     });
-    target.hp -= r.damage;
-    if (target.hp <= 0) events.push(this._respawn(target, roomId));
   }
 
   _mobMove(m, t, roomId, events, verb, exits) {

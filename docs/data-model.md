@@ -205,6 +205,8 @@ A map of `mobId → template`.
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able. |
+| `attack`     | block?  | Melee profile: `{ damage (dice), actionCost, type?, bonus?, crit?, hitBonus?, onHit? }`. `onHit` (see below) lands effects on a struck defender. |
+| `spikes`     | block?  | Melee **reflect** ("thorns"): `{ damage (dice), chance? }`. Anyone who lands a melee hit on this mob takes the reflected damage back (contact only — spells/ranged are exempt). Fires even if the mob has no `attack` of its own. |
 | `shop`       | block?  | Makes the mob a trader: `{ "sells": [{ template, price? }] }` — its stock, each sold at the item's `value` (or an optional `price` override). There is **no buy list**: the trader buys *any* valued item from a player at its `sellValue`. Players use `list`/`buy`/`sell` in the room. |
 | `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
@@ -231,6 +233,32 @@ when there's an exit). This gives mobs fight/emote/flee/idle personalities.
 | `wander`| Walk to a random adjacent room (carrying its light if it glows). **Suppressed while the mob is in combat** (has live threat). | `verb` (display, e.g. "flees"); `scope`: `"zone"` (default — only rooms sharing the mob's current `zone`) or `"any"` (cross-zone). |
 | `idle`  | Do nothing this turn — raise its weight to keep a mob calm/quiet. | — |
 | `loot`       | LootRule[] | `{ template, chance }`, chance 0..1. |
+
+### Combat triggers — `onHit` & `spikes`
+
+Two symmetric, data-driven melee primitives, resolved in one place
+(`GameState.applyHitOutcome`) for both attack directions:
+
+- **`onHit`** (attacker side) — a list of effect specs applied to the defender on
+  a *landed* hit. Lives on a mob's `attack.onHit` and, identically, on an item's
+  `weapon.onHit` (so player weapons reuse it). Each entry is an `applyEffect` spec
+  (`emit-light` / `restore` / `damage-over-time`) plus an optional `chance`
+  (default 1). When the attacker is a **player**, the engine stamps `sourceId` so a
+  poison kill credits them (like a bleed); a **mob's** venom credits no one.
+  Re-applying each hit stacks independent instances. DoT ticks bypass armour
+  (it's poison, not a blow).
+
+  ```json
+  "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
+  ```
+
+- **`spikes`** (defender side) — flat melee reflect. Lives on a mob's top-level
+  `spikes` and, identically, on an item's `armour.spikes` (player thorns).
+  `{ damage (dice), chance? }`. Small and flat — bypasses the attacker's armour.
+  Melee contact only; spell/ranged attackers are never pricked.
+
+Both are **melee-only** in v1. The `castSpell` path is where a spell-borne `onHit`
+would later hook.
 
 ### Aggro / threat (runtime)
 

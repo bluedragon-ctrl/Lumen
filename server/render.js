@@ -186,6 +186,10 @@ function buildExamineView(state, p, q) {
           : t.lightAggro ? "Calm in the dark — light rouses it."
           : "It seems harmless.",
       ];
+      // Telegraph the data-driven combat triggers (see applyHitOutcome).
+      if (t.attack && Array.isArray(t.attack.onHit) && t.attack.onHit.some((o) => o.type === "damage-over-time"))
+        hints.push("Venomous — its bite festers.");
+      if (t.spikes) hints.push("Spined — striking it draws blood.");
       if (t.shop) hints.push("Trades here — try `list`, then `buy <item>` / `sell <item>`.");
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
