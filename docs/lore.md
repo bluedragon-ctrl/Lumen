@@ -86,6 +86,35 @@ Only partially explored; hazards scale with depth.
   (environmental storytelling and loot).
 - **Major lurking dangers**, half-legend until met — see below.
 
+## Top-floor fauna & the lit food web
+
+Vegetation in the Abyss is scarce and **grows only where there is light** — moss and
+fungus cluster under bioluminescent fixtures and glowing mushrooms. This single fact
+orders the whole upper ecosystem:
+
+- **Grazers come to the light to feed** (pillbugs, grubs), so prey concentrates in lit
+  patches.
+- **Hunters follow the prey** — but the light-fearing ones (gloom-crawlers, centipedes)
+  work the **dim margins** where grazers stray, never the bright centre.
+- **Almost everything is an opportunist.** Most creatures are omnivores that will prey on
+  the **weak** — the wounded, the dying, and above all **outsiders** drifting down with
+  the Rush. The Abyss eats the newcomers.
+
+Light adaptation here is ordinary **ecology**, not glimmer's work (that mutation is a
+separate, deeper overlay). Creatures sort into the light-tolerant, the light-fearing,
+and surface animals gone feral:
+
+- **Outsiders (top floor):** giant rats, cave bats, feral mongrels.
+- **Grazers & cleaners:** stonebugs (and bristling thornbugs), grubs, scour-slugs.
+- **Hunters:** cave centipedes, cave lurkers, gloom-crawlers.
+- **Pool life:** pale crayfish, blind cave-fish.
+- **Light-fearing:** pale salamanders, tremor-moles.
+- **Luminous:** lightbugs (partially farmed at the Rim).
+
+Most fauna yield **materials** — chitin plate, spikes, venom glands, slug slime, grubs,
+salamander tails, luminescent glands — the biological half of the crafting economy,
+beside the mineral half (iron, glimmer).
+
 ## The threat ladder (escalation by depth)
 
 A legible progression for hanging future content on:
