@@ -122,6 +122,9 @@ function main() {
       if (typeof m.lightBane.damage !== "string" || !DICE_RE.test(m.lightBane.damage))
         errs.push(`mob ${id}: lightBane.damage "${m.lightBane.damage}" is not valid dice notation`);
     }
+    // A calm mob roused to attack once room light exceeds `above` (inverse of flee).
+    if (m.lightAggro && typeof m.lightAggro.above !== "number")
+      errs.push(`mob ${id}: lightAggro.above must be a number`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")

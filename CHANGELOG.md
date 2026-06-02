@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Light-roused aggression (`lightAggro`)** — a mob may now carry a
+  `lightAggro: { above }` block: it stays calm in the dark but is provoked to
+  attack once room light rises past `above` (the inverse of `flee`, which repels).
+  This makes light a *risk* as well as a tool — you light a room to see and search
+  it, but some creatures wake when you do. First user: the **gloom-crawler**, now
+  a four-step light ladder — calm in darkness (0), deadly in dim light (1–2),
+  enraged but glare-blinded in bright light (3, via its existing `harmedAbove`),
+  and singed then fleeing above that (4+, `lightBane` + `flee`). It is now
+  `hostile: false` by default; `examine` telegraphs "Calm in the dark — light
+  rouses it." Once it lands a hit it holds its threat (dousing your light mid-fight
+  won't instantly calm it) — full threat decay is future work.
 - **The Mage's Shed + Vesper the glimmer-mage** — a new Rim room (east off the
   market) for a scholar-mage NPC (**Vesper**), a future trader and quest-giver
   (no stock yet — trades TBD). The **alchemist's bench** moves here from the
