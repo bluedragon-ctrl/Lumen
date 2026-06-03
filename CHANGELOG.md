@@ -24,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   needing to manually type `attack <mob>`. If already in combat with another
   target, they stay focused on their current opponent. Eliminates input delay
   during multi-mob engagements, mirroring classic MUD behavior.
+### Fixed
+- **Mob status-effect expiry now announced** — when a status effect (venom,
+  bleed, glow, …) wears off a mob, players in the room now see a message
+  (e.g. "The venom drains from the cave bat."), gated by `canSeeMob` like other
+  mob events. The `mob-effect-expired` event had no dispatch handler and was
+  silently dropped; it mirrors the player-side `effect-expired`.
+- **Tab key command completion** — autocompleted commands now include a trailing
+  space, allowing players to immediately continue typing the argument without
+  manually adding a space. Improves rapid command entry.
+### Added (continued)
 - **Multiplayer test subagent** — a `multiplayer-tester` agent
   ([.claude/agents/multiplayer-tester.md](.claude/agents/multiplayer-tester.md),
   runs on Sonnet) that drives several browser clients at once to verify
