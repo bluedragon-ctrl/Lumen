@@ -134,10 +134,14 @@ function itemSpecLines(tmpl, w) {
   if (tmpl.weapon) {
     const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
     lines.push(`damage: ${dmg}`, `action cost: ${tmpl.weapon.actionCost}`);
+    const sc = tmpl.weapon.scale;
+    if (sc && sc.attr) lines.push(`scales with: ${sc.attr} / ${sc.per || 1}`);
   }
   if (tmpl.armour) {
     lines.push(`armour ${tmpl.armour.armour}, ward ${tmpl.armour.ward}`);
     if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
+    const mod = tmpl.armour.attrMod;
+    if (mod) lines.push(...Object.entries(mod).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`));
   }
   if (tmpl.light) {
     lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);

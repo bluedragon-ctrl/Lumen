@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Prospector gear at the quartermaster** — Garrick now stocks three basic
+  pieces alongside the leather kit: **a prospector's hatchet** (a slow, heavy
+  `1d8` axe that scales its bite with Might — `floor(Might/2)`, the first weapon
+  to scale faster than the default `Might/4`), **an iron helm**, and **an iron
+  cuirass** (both armour 2). The two iron pieces hit harder on protection than
+  boiled leather but carry a new **`attrMod`** cost: each dulls **Wits −1**, and
+  since Wits feeds Ward and evasion, heavy iron trades awareness for plate.
+- **Gear can now modify attributes (`armour.attrMod`).** A general
+  `{ "attrMod": { "wits": -1, … } }` block on armour shifts the wearer's
+  effective attributes (floored at 0), flowing through to-hit, melee/spell
+  damage, Ward and evasion via a single `effectiveAttributes` helper. Item
+  examine shows the modifier, and weapons now display their damage `scale`.
 - **Player levels & attribute training (`train`)** — XP is now spent, not just
   hoarded. `xp` is a lifetime total; reaching the next level costs
   `XP_BASE × XP_GROWTH^(level-1)` (defaults **100**, doubling each level — all in

@@ -174,7 +174,7 @@
       { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }]
     }
   },
   "rim-smith": {

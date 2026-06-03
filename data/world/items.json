@@ -39,6 +39,16 @@
     "value": 8,
     "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
   },
+  "prospectors-hatchet": {
+    "id": "prospectors-hatchet",
+    "name": "a prospector's hatchet",
+    "description": "A heavy, short-hafted axe meant for splitting kindling and prising ore from stone, pressed into harder service. It is slow to swing, but a strong arm makes it bite deep.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 3,
+    "value": 26,
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 } }
+  },
   "leather-jerkin": {
     "id": "leather-jerkin",
     "name": "a leather jerkin",
@@ -49,6 +59,16 @@
     "value": 16,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
   },
+  "iron-cuirass": {
+    "id": "iron-cuirass",
+    "name": "an iron cuirass",
+    "description": "A heavy front-and-back plate of beaten abyssal iron, strapped over the shoulders. It turns a blade far better than hide — but the weight rides hard on a delver, and its muffling shell dulls the wariness that keeps one alive down here.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 8,
+    "value": 44,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
+  },
   "leather-helm": {
     "id": "leather-helm",
     "name": "a leather helm",
@@ -58,6 +78,16 @@
     "weight": 1,
     "value": 12,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 0 }
+  },
+  "iron-helm": {
+    "id": "iron-helm",
+    "name": "an iron helm",
+    "description": "A plain dome of beaten iron with a narrow face-bar, dented from older heads than yours. It shrugs off blows a leather cap never could — but it sits heavy and close, and the muffled hush inside dulls a delver's ear for the dark.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 3,
+    "value": 26,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
   },
   "shards": {
     "id": "shards",

@@ -95,9 +95,27 @@ const MANA_PER_INTELLECT = 4;
 const ATTR_BASELINE = 3; // starting value of every attribute
 const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimBelow by 1
 
+/** A player's effective attributes: base attributes plus any flat modifiers
+ *  from equipped gear (`armour.attrMod`, e.g. heavy iron that dulls Wits).
+ *  Each result is floored at 0. The single source for attribute reads at combat
+ *  time, so a penalty (or bonus) on gear flows through to-hit, melee damage,
+ *  Ward and evasion alike. */
+function effectiveAttributes(world, player) {
+  const attrs = { ...(player.attributes || {}) };
+  for (const inst of Object.values(player.equipment || {})) {
+    if (!inst) continue;
+    const t = world.items[inst.template];
+    const mod = t && t.armour && t.armour.attrMod;
+    if (!mod) continue;
+    for (const [k, v] of Object.entries(mod)) attrs[k] = Math.max(0, (attrs[k] || 0) + v);
+  }
+  return attrs;
+}
+
 /** Defensive profile of a player: Armour (vs physical) and Ward (vs magical)
  *  from equipped gear plus innate Ward from Wits, and Wits-derived evasion.
- *  Mirrors the {armour, ward} block on armour items. */
+ *  Mirrors the {armour, ward} block on armour items. Wits is read effective —
+ *  heavy gear that dulls Wits costs both Ward and evasion. */
 function playerDefence(world, player) {
   let armour = 0;
   let ward = 0;
@@ -109,7 +127,7 @@ function playerDefence(world, player) {
       ward += t.armour.ward || 0;
     }
   }
-  const wits = (player.attributes && player.attributes.wits) || 0;
+  const wits = effectiveAttributes(world, player).wits || 0;
   ward += wits * WARD_PER_WITS;
   return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
@@ -905,11 +923,12 @@ class GameState {
       const weapon = weaponOf(w, p);
       const mt = w.mobs[mob.template];
       const mobDef = { armour: mt.armour || 0, ward: mt.ward || 0, evasion: mt.evasion || 0 };
-      const per = (p.attributes && p.attributes.perception) || 0;
+      const attrs = effectiveAttributes(w, p);
+      const per = attrs.perception || 0;
       const attacker = {
         band: p.perception,
         hitBonus: per * HIT_PER_PERCEPTION,
-        dmgBonus: spellScaleBonus(p.attributes, weapon.scale),
+        dmgBonus: spellScaleBonus(attrs, weapon.scale),
         crit: per * CRIT_PER_PERCEPTION,
       };
       const mobName = w.mobs[mob.template].name;
@@ -976,7 +995,7 @@ class GameState {
 
     const result = { resisted: false };
     if (eff.type === "damage") {
-      const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(player.attributes, eff.scale));
+      const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(effectiveAttributes(w, player), eff.scale));
       this._addThreat(mob, player.id, Math.max(1, damage));
       mob.hp -= damage;
       result.damage = damage;
