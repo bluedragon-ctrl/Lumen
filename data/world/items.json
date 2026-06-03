@@ -259,10 +259,66 @@
     "id": "grub",
     "name": "a grub",
     "description": "A pale, soft larva, limp and finger-length. Cheap food in a pinch, and the surest bait for what swims in the deep pools.",
-    "type": "material",
+    "type": "consumable",
     "weight": 0,
     "value": 2,
-    "stackable": true
+    "stackable": true,
+    "consumable": {
+      "flavour": "You swallow the raw grub down whole, trying not to taste it. Cold and soft, it is barely a mouthful — but it is something.",
+      "effect": { "type": "restore", "hp": 1 }
+    }
+  },
+  "roasted-grubs": {
+    "id": "roasted-grubs",
+    "name": "a handful of roasted grubs",
+    "description": "Fat grubs roasted on the hearthstones until they crisp and split. They pop between the teeth — poor man's fare, but hot and honest, and they sit far better cooked than raw.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 3,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You crunch through the roasted grubs. Greasy and warm, they take the worst of the edge off your hunger.",
+      "effect": { "type": "restore", "hp": 4 }
+    }
+  },
+  "bug-meat": {
+    "id": "bug-meat",
+    "name": "a cut of bug-meat",
+    "description": "A pale, rubbery slab of muscle prised from under a grazer's shell, faintly sweet and slick with juice. It sits ill raw — but meat is meat this side of the dark, and the broth-pots of the Rim are not fussy.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 4,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You gnaw down the raw bug-meat. It is tough and cold and graceless going down, but it quiets the hollow in your gut.",
+      "effect": { "type": "restore", "hp": 3 }
+    }
+  },
+  "cooked-skewer": {
+    "id": "cooked-skewer",
+    "name": "a bug-meat skewer",
+    "description": "Cubes of bug-meat charred over the inn's hearth and slid steaming off an iron spit. The heat renders the rubber out of it; it eats hot, savoury, and almost respectable.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 9,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the skewer hot off the spit. The seared meat is rich and filling, and strength flows back into your limbs.",
+      "effect": { "type": "restore", "hp": 8 }
+    }
+  },
+  "beer": {
+    "id": "beer",
+    "name": "a mug of beer",
+    "description": "A dented tin mug of the Rim's own small beer — thin, cloudy, and faintly bitter with cave-hops, brewed in the cellar under the Lantern's Rest. It will not get a delver drunk, but it steadies the nerves and washes the rock-dust from the throat.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 3,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the beer down. It is thin and bitter, but a little of the day's weight lifts with it.",
+      "effect": { "type": "restore", "hp": 2, "mana": 4 }
+    }
   },
   "venom-gland": {
     "id": "venom-gland",

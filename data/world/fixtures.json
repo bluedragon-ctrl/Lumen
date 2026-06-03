@@ -13,6 +13,13 @@
     "type": "crafting",
     "station": "smithing"
   },
+  "hearth": {
+    "id": "hearth",
+    "name": "the inn's hearth",
+    "description": "A great stone hearth banked with glowing coals, a soot-blackened cauldron swinging on an iron arm above the flames and a row of spits laid across the embers. Maeve's broth-pot is never quite empty, and there is always room for a delver to cook their own catch.",
+    "type": "crafting",
+    "station": "cooking"
+  },
   "lamp": {
     "id": "lamp",
     "name": "an iron lamp",
