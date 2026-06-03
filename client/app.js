@@ -50,7 +50,6 @@ function handle(msg) {
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
-    case "combat-auto-start": addLine(`⚔ You engage the ${msg.targetName} in combat!`, "log"); break;
     case "room": lastRoom = msg.room; renderRoom(msg.room); break;
     case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
@@ -100,10 +99,12 @@ function renderRoom(room) {
   c.innerHTML = "";
   const { players, mobs, items, fixtures } = room.contents;
   // Clicks address entities by their unique id (unambiguous), not by name.
-  for (const p of players) c.appendChild(chip(p.name, "player" + (p.luminous ? " luminous" : ""), () => sendCommand("look " + p.id)));
+  // A posture tag (e.g. "Bob (asleep)") surfaces sit/sleep to others in the room.
+  const posture = (e) => (e.posture ? ` (${e.posture})` : "");
+  for (const p of players) c.appendChild(chip(p.name + posture(p), "player" + (p.luminous ? " luminous" : ""), () => sendCommand("look " + p.id)));
   for (const m of mobs) {
     const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
-    c.appendChild(chip(m.name, cls, () => sendCommand("look " + m.id)));
+    c.appendChild(chip(m.name + posture(m), cls, () => sendCommand("look " + m.id)));
   }
   for (const it of items) c.appendChild(chip(it.qty != null ? `${it.name} ×${it.qty}` : it.name, "item", () => sendCommand("look " + it.id)));
   for (const f of fixtures) c.appendChild(chip(f.name, "fixture" + (f.lit ? " luminous" : ""), () => sendCommand("look " + f.id)));
@@ -167,7 +168,7 @@ document.getElementById("ex-back").addEventListener("click", () => sendCommand("
 
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {
-  $("p-name").textContent = p.name;
+  $("p-name").textContent = p.name + (p.posture && p.posture !== "standing" ? ` · ${p.posture}` : "");
   $("p-level").textContent = `Lv ${p.level} · ${p.xp} xp · ${p.shards || 0} shards`;
 
   // States
@@ -264,7 +265,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 
 // --- Command input: history + TAB completion -------------------------------
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
-  "attack", "kill", "stop", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
+  "attack", "kill", "stop", "sit", "sleep", "stand", "wake", "rest", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
   "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "help",
   "north", "south", "east", "west", "up", "down"];

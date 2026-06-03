@@ -274,6 +274,33 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "combat-auto-start") {
+    // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
+    // player they've engaged, so the swings on following ticks aren't a mystery.
+    sendToPlayer(ev.playerId, { type: "log", text: `You turn on ${ev.targetName} and fight back!` });
+    return;
+  }
+
+  if (ev.type === "player-woke") {
+    // A blow jolted a resting/sleeping delver to their feet (see state._mobAttack).
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    sendToPlayer(ev.playerId, { type: "log", text: "The blow jolts you awake — you scramble to your feet!" });
+    sendToPlayer(ev.playerId, buildRoomView(state, player)); // sight returns now they're up
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
+  if (ev.type === "mob-woke") {
+    // A struck dozing creature rouses; everyone who can see it learns it's awake.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} wakes, roused by the attack!` });
+      sendToPlayer(o.id, buildRoomView(state, o)); // drop the sitting/asleep tag
+    }
+    return;
+  }
+
   if (ev.type === "mob-emote") {
     for (const o of state.playersIn(ev.roomId)) {
       const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";

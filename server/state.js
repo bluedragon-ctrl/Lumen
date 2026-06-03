@@ -6,6 +6,22 @@ const { rollDice } = require("./dice");
 // added to physical damage. Mirrors a spell's `effect.scale`.
 const MELEE_SCALE = { attr: "might", per: 4 };
 
+// Rest recovery: a resting actor regains 1 HP and 1 MP every N ticks. Sitting is
+// the lighter rest; sleeping the deeper (and blinding) one. Standing never regains
+// HP (only the slow innate mana trickle). Posture is a shared actor concept —
+// players use it for recovery + social; mobs use it to author dozing/resting NPCs.
+const SIT_RECOVER_TICKS = 5;
+const SLEEP_RECOVER_TICKS = 2;
+const RESTING = (actor) => actor.posture === "sitting" || actor.posture === "sleeping";
+
+/** Posture-aware sight: a *sleeping* actor perceives nothing — its room view goes
+ *  dark and its own sight-gated rolls flail — regardless of room light. Sitting and
+ *  standing use the actor's real perception band. Shared by render and targeting. */
+function canPerceive(actor, light) {
+  if (actor.posture === "sleeping") return false;
+  return canSee(actor.perception, light);
+}
+
 /** The attacker's effective weapon: equipped hand weapon, or unarmed. `scale`
  *  is the attribute the weapon's damage grows with (default Might/4). */
 function weaponOf(world, player) {
@@ -186,6 +202,7 @@ function makeMobInstance(mobId, world) {
     maxHp: tmpl.maxHp,
     energy: 0, // accumulated action points
     aggro: {}, // playerId -> threat; minimal threat table, see _addThreat()
+    posture: tmpl.posture || "standing", // authored dozing/resting NPCs; inert until roused
   };
 }
 
@@ -552,6 +569,8 @@ class GameState {
       equipment: {},
       inventory: (t.startInventory || []).map((ref) => makeItemInstance(ref, this.world)),
       states: [], // active status effects (see applyEffect / _tickEffects)
+      posture: "standing", // sit/sleep for rest recovery; resets to standing on login
+      restTicks: 0, // counts ticks toward the next rest-recovery point (see _recoverTick)
       knownRecipes: [...(t.knownRecipes || [])],
       knownSpells: [...(t.knownSpells || [])],
     };
@@ -587,6 +606,10 @@ class GameState {
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
     if (!Array.isArray(player.discovered)) player.discovered = []; // permanently-found hidden features (keys)
+    // Posture always resets to standing on login — a delver wakes up when they
+    // reconnect, so a save can't strand them blind and asleep.
+    player.posture = "standing";
+    player.restTicks = 0;
     if (player.maxMana == null) player.maxMana = this.world.playerTemplate.maxMana;
     if (player.mana == null) player.mana = player.maxMana;
     player.hp = Math.min(player.hp, player.maxHp);
@@ -657,6 +680,43 @@ class GameState {
   }
 
   /**
+   * Per-tick vitals recovery for a player. Resting (sit/sleep) regains 1 HP and
+   * 1 MP on a posture-set cadence and *replaces* the standing mana trickle while
+   * it lasts; standing keeps the slow innate mana trickle and never regains HP.
+   * Flags a `vitals` refresh whenever a *displayed* value changes, so an idle
+   * resting player actually sees the bars climb (views aren't pushed every tick).
+   */
+  _recoverTick(p, events) {
+    if (p.hp <= 0) return; // the dead don't mend; respawn restores them
+    const every = p.posture === "sleeping" ? SLEEP_RECOVER_TICKS : p.posture === "sitting" ? SIT_RECOVER_TICKS : 0;
+    if (every) {
+      if (p.hp >= p.maxHp && p.mana >= p.maxMana) { p.restTicks = 0; return; } // fully mended
+      if (++p.restTicks < every) return;
+      p.restTicks = 0;
+      const hpBefore = p.hp;
+      const manaBefore = Math.floor(p.mana || 0);
+      p.hp = Math.min(p.maxHp, p.hp + 1);
+      p.mana = Math.min(p.maxMana, (p.mana || 0) + 1);
+      if (p.hp !== hpBefore || Math.floor(p.mana) !== manaBefore) events.push({ type: "vitals", playerId: p.id });
+      return;
+    }
+    // Standing: only the slow innate mana trickle (fractional, rendered floored).
+    p.restTicks = 0;
+    if (p.manaRegen && p.mana < p.maxMana) {
+      const before = Math.floor(p.mana || 0);
+      p.mana = Math.min(p.maxMana, (p.mana || 0) + p.manaRegen);
+      if (Math.floor(p.mana) !== before) events.push({ type: "vitals", playerId: p.id });
+    }
+  }
+
+  /** Rouse a resting actor (player or mob) to standing — they share `posture`.
+   *  Returns true if it actually changed, so callers can announce the waking. */
+  _rouse(actor) {
+    if (RESTING(actor)) { actor.posture = "standing"; actor.restTicks = 0; return true; }
+    return false;
+  }
+
+  /**
    * Advance the world one tick:
    *   1. accrue action-point energy (capped) for all actors
    *   2. burn fuel on lit lights (→ light-out events)
@@ -670,14 +730,7 @@ class GameState {
 
     for (const p of this.players.values()) {
       p.energy = Math.min(p.energy + p.speed, p.speed * 3);
-      // Mana trickles back each tick (fractional; rendered floored). Spells spend
-      // it. When the *displayed* (floored) value ticks up, flag a vitals refresh
-      // so an idle player actually sees the bar fill (views aren't pushed per tick).
-      if (p.manaRegen && p.mana < p.maxMana) {
-        const before = Math.floor(p.mana || 0);
-        p.mana = Math.min(p.maxMana, (p.mana || 0) + p.manaRegen);
-        if (Math.floor(p.mana) !== before) events.push({ type: "vitals", playerId: p.id });
-      }
+      this._recoverTick(p, events);
     }
     for (const rt of Object.values(this.rooms)) {
       for (const m of rt.mobs) {
@@ -829,6 +882,9 @@ class GameState {
       };
       const mobName = w.mobs[mob.template].name;
       const mobEmits = !!w.mobs[mob.template].emitsLight;
+      // A dozing/resting mob is jolted awake the instant a delver strikes it —
+      // the authored ambush payoff: free opening blows, then it fights back.
+      if (this._rouse(mob)) events.push({ type: "mob-woke", roomId: p.location, mobId: mob.id, mobName, emitsLight: mobEmits, light: rt.light });
       // Stop swinging if the mob dies OR a spike reflect kills the player mid-loop.
       while (p.energy >= weapon.actionCost && mob.hp > 0 && p.hp > 0) {
         p.energy -= weapon.actionCost;
@@ -902,6 +958,12 @@ class GameState {
     // A kill may remove a luminous mob; refresh the room's light either way.
     this.rooms[player.location].light = this.computeRoomLight(player.location);
 
+    // A hostile spell rouses a resting mob just as a blow does (only if it survived).
+    if (spell.hostile && mob.hp > 0 && this._rouse(mob)) {
+      const t = w.mobs[mob.template];
+      events.push({ type: "mob-woke", roomId: player.location, mobId: mob.id, mobName: t.name, emitsLight: !!t.emitsLight, light: this.rooms[player.location].light });
+    }
+
     // Auto-retaliate on hostile spell: if the player isn't already attacking something, target this mob
     if (spell.hostile && !player.pending && player.hp > 0 && mob.hp > 0) {
       player.pending = { type: "attack", targetId: mob.id };
@@ -916,6 +978,7 @@ class GameState {
   resolveMobAI(events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
+        if (RESTING(m)) continue; // a sitting/sleeping mob is inert until struck (see _rouse)
         const t = this.world.mobs[m.template];
         const cost = (t.attack && t.attack.actionCost) || 12;
         if (m.energy < cost) continue;
@@ -1067,6 +1130,10 @@ class GameState {
       },
     });
 
+    // A blow rouses a resting target — you can't sleep through being hit. (A
+    // sleeping delver is blind, so the first they know of a threat is this strike.)
+    if (target.hp > 0 && this._rouse(target)) events.push({ type: "player-woke", playerId: target.id });
+
     // Auto-retaliate: if the player isn't already attacking something, target this mob
     if (!target.pending && target.hp > 0) {
       target.pending = { type: "attack", targetId: m.id };
@@ -1201,4 +1268,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, isDiscovered, discoveryKey };
+module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey };
