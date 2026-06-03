@@ -139,6 +139,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   jerkin, and the `body`/`head` slots seed empty so `unequip` works from the start.
 
 ### Changed
+- **Tick-loop scaling (no behaviour change)** — three hot paths that rescanned
+  the whole world each tick are now index-backed, so cost tracks active rooms
+  rather than total world size:
+  - a **room→players occupancy index** (`playersByRoom`) makes `state.playersIn`
+    O(occupants) instead of a full player scan; every `player.location` write now
+    routes through `setPlayerLocation`/`admit`/`removePlayer` to keep it honest.
+  - the **per-tick light recompute** skips rooms with no players and no mobs —
+    their light can't change between the events that already recompute it.
+  - **spawner population** is tracked with a running per-spawner count
+    (`_countOwned` is now a map lookup) instead of rescanning every room's mobs
+    for each spawner each tick.
 - **Lore-consistency pass over the Rim and the abyss' first level** (against
   [docs/lore.md](docs/lore.md)): the Rim now reads as a recently-sprung **Glimmer
   Rush boomtown** rather than an old town, and names glimmer as the trade; Maeve's

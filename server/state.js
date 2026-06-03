@@ -232,8 +232,10 @@ class GameState {
     this.world = world;
     this.tick = 0;
     this.players = new Map(); // playerId -> player instance
+    this.playersByRoom = new Map(); // roomId -> Set(player instance); kept in sync with player.location
     this.rooms = {}; // roomId -> { mobs:[], items:[], light:int }
     this.revealedMobs = new Map(); // playerId -> Set(mob runtime id); ephemeral hidden-mob reveals
+    this.ownedCounts = new Map(); // `${roomId}|${mob}` -> living mobs from that spawner (see _countOwned)
     this._initRooms();
   }
 
@@ -280,16 +282,30 @@ class GameState {
     m.origin = { roomId, mob: mobId }; // which spawner this counts against (survives wandering)
     if (hidden) m.hidden = hidden; // a lurker — unseen/inert until a delver searches it out
     this.rooms[roomId].mobs.push(m);
+    this._adjustOwned(m, +1);
     return m;
+  }
+
+  // --- Spawner population accounting -----------------------------------------
+  // A spawner is identified by its (home room, mob) pair; mobs tag themselves
+  // with that pair via `origin` at spawn and keep it as they wander. Rather than
+  // rescan the whole world each tick, we keep a running per-spawner live count,
+  // bumped at spawn (_spawnMob) and at death (every mob-removal path).
+  _ownerKey(origin) {
+    return origin ? `${origin.roomId}|${origin.mob}` : null;
+  }
+  /** Bump a mob's spawner count by `delta` (+1 spawned, −1 removed). */
+  _adjustOwned(mob, delta) {
+    const k = this._ownerKey(mob.origin);
+    if (!k) return;
+    const n = (this.ownedCounts.get(k) || 0) + delta;
+    if (n > 0) this.ownedCounts.set(k, n);
+    else this.ownedCounts.delete(k);
   }
 
   /** Living mobs that belong to a spawner, wherever they have since wandered. */
   _countOwned(roomId, mobId) {
-    let n = 0;
-    for (const rt of Object.values(this.rooms))
-      for (const m of rt.mobs)
-        if (m.origin && m.origin.roomId === roomId && m.origin.mob === mobId) n++;
-    return n;
+    return this.ownedCounts.get(`${roomId}|${mobId}`) || 0;
   }
 
   /**
@@ -349,9 +365,31 @@ class GameState {
     }
   }
 
-  /** Players currently located in a room. */
+  /** Players currently located in a room. O(occupants) via the room index. */
   playersIn(roomId) {
-    return [...this.players.values()].filter((p) => p.location === roomId);
+    const set = this.playersByRoom.get(roomId);
+    return set ? [...set] : [];
+  }
+
+  // --- Room occupancy index --------------------------------------------------
+  // `playersByRoom` mirrors every player's `location`, so `playersIn` (called
+  // for each room every tick, and on every broadcast) stays O(occupants) rather
+  // than rescanning all players. Every write to `player.location` MUST go through
+  // setPlayerLocation (or admit/removePlayer) to keep the index honest.
+  _indexPlayer(player) {
+    let set = this.playersByRoom.get(player.location);
+    if (!set) { set = new Set(); this.playersByRoom.set(player.location, set); }
+    set.add(player);
+  }
+  _deindexPlayer(player) {
+    const set = this.playersByRoom.get(player.location);
+    if (set) { set.delete(player); if (set.size === 0) this.playersByRoom.delete(player.location); }
+  }
+  /** Move a player to a new room, keeping the occupancy index in sync. */
+  setPlayerLocation(player, roomId) {
+    this._deindexPlayer(player);
+    player.location = roomId;
+    this._indexPlayer(player);
   }
 
   /**
@@ -554,10 +592,13 @@ class GameState {
     // re-sync it from the template — tuning changes then apply to existing saves too.
     player.manaRegen = this.world.playerTemplate.manaRegen || 0;
     this.players.set(player.id, player);
+    this._indexPlayer(player); // location is final by here — add to the occupancy index
     return player;
   }
 
   removePlayer(playerId) {
+    const player = this.players.get(playerId);
+    if (player) this._deindexPlayer(player);
     this.players.delete(playerId);
     this.revealedMobs.delete(playerId); // drop ephemeral hidden-mob reveals on disconnect
   }
@@ -657,7 +698,15 @@ class GameState {
 
     this._tickEffects(events);
 
-    for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
+    // Per-tick light only changes where a dynamic source lives: a player (burning
+    // fuel, an emit-light effect) or a mob (luminous, or an expiring light effect).
+    // Rooms with neither hold their last value — ambient and fixtures are static
+    // between events, which already recompute the affected room (move/toggle/spawn).
+    for (const [id, rt] of Object.entries(this.rooms)) {
+      const here = this.playersByRoom.get(id);
+      if (rt.mobs.length === 0 && (!here || here.size === 0)) continue;
+      rt.light = this.computeRoomLight(id);
+    }
 
     this._environmentTick(events); // light-bane and other room hazards, on fresh light
     this.resolvePlayerAttacks(events);
@@ -1058,6 +1107,7 @@ class GameState {
     const roomId = killer.location;
     const idx = this.rooms[roomId].mobs.indexOf(mob);
     if (idx >= 0) this.rooms[roomId].mobs.splice(idx, 1);
+    this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
     killer.xp = (killer.xp || 0) + xp;
@@ -1081,6 +1131,7 @@ class GameState {
     if (mob.hp > 0) return null;
     const idx = rt.mobs.indexOf(mob);
     if (idx >= 0) rt.mobs.splice(idx, 1);
+    this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
     if (killer) killer.xp = (killer.xp || 0) + xp;
@@ -1124,7 +1175,7 @@ class GameState {
   _respawn(player, deathRoom) {
     const start = this.world.playerTemplate.startLocation;
     player.hp = player.maxHp;
-    player.location = start;
+    this.setPlayerLocation(player, start);
     player.pending = null;
     player.energy = 0;
     this.rooms[start].light = this.computeRoomLight(start);
