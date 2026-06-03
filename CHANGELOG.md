@@ -33,6 +33,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `EXPLORE_XP` (default **5**, in `config.js`), tracked per player in
     `visitedRooms`. Rewards descent into new ground; each room pays once. Existing
     saves seed `visitedRooms` with the current room (no retroactive windfall).
+- **Cooking — the inn's hearth & three meals** — the Lantern's Rest gains a
+  `hearth` crafting fixture (new `cooking` station), turning the inn's
+  long-described hearth into a usable cook-pot. Every delver now starts knowing
+  three cooking recipes: **Mushroom Soup** (`palecap-mushroom ×2`, finally making
+  Maeve's signature craftable rather than buy-only), **Bug-Meat Skewer**
+  (`bug-meat ×1` → a hearty `+8 HP` meal), and **Roasted Grubs** (`grub ×3` → a
+  cheap `+4 HP` snack). Raw **grubs** are now edible too (`+1 HP`, "cheap food in a
+  pinch"), keeping their bait identity reserved for a future fishing pass. **Maeve
+  now sells all three cooked dishes** alongside the soup. Closes the
+  farm → cook → heal loop entirely from the Rim's agricultural quarter.
+- **Beer at the Lantern's Rest** — Maeve now sells a **mug of beer**, the Rim's
+  own cellar-brewed small beer: a light refreshment (`+2 HP / +4 MP`) that steadies
+  the nerves between descents. Groundwork for later brewing/cooking recipes that
+  use it as an ingredient.
+- **An "agricultural" quarter at the Rim** — two new rooms grow off the Lightbug
+  Hatchery, turning it into the settlement's farming corner:
+  - **The Stockpens** (`rim.corral`, north of the hatchery) — the Rim pens
+    **stonebugs** here, fattened for meat, shell, and tallow, tended by **Bray the
+    stockherd** (who also sells meat). The penned bugs are non-hostile, so a green
+    delver can learn the melee + loot loop safely (auto-retaliation still makes
+    them swing back when struck) before braving the descent. Bugs now yield a new
+    **bug-meat** drop — from stonebugs (always) and thornbugs (sometimes) — a
+    cheap, raw-edible food that mends a little HP.
+  - **The Mushroom Beds** (`rim.mushroomfarm`, west of the hatchery) — lit by the
+    hatchery's spillover bug-glow (fungus grows only under light), the beds yield a
+    **regrowing crop of palecap mushrooms** (harvested off the floor, regrows on a
+    tick) and a couple of grazing **grubs** for the picking.
 - **Sit & sleep — rest & recovery (`sit` / `sleep` / `stand`)** — posture is now a
   first-class actor state and the **only** way to recover HP (mana still trickles
   while standing). `sit` (alias `rest`) mends **1 HP and 1 MP every 5 ticks**;
