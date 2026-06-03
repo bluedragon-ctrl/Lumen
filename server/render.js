@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
+const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, matchesQuery } = require("./state");
 
 function itemView(inst, world) {
   if (!inst) return null;
@@ -172,7 +172,7 @@ function buildExamineView(state, p, q) {
   const dimBelow = p.perception && p.perception.dimBelow != null ? p.perception.dimBelow : p.perception.blindBelow;
   const detailed = light >= dimBelow;
   const ql = (q || "").toLowerCase();
-  const hit = (id, name) => id.toLowerCase() === ql || name.toLowerCase().includes(ql);
+  const hit = (id, name) => matchesQuery(id, name, ql);
   const tooDim = { hints: ["Too dim to make out details."] };
 
   for (const m of rt.mobs) {

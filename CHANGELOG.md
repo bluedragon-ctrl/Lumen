@@ -139,6 +139,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   jerkin, and the `body`/`head` slots seed empty so `unequip` works from the start.
 
 ### Changed
+- **Internal cleanup (no behaviour change)** — de-duplicated repeated logic so new
+  content and commands have a single place to hook:
+  - one shared targeting matcher (`matchesQuery`, id-exact or name-substring)
+    replaces ~8 hand-rolled copies across `get`/`equip`/`unequip`/`buy`/`use`/
+    `refuel`/`attack`/`cast` and the examine view;
+  - one `consumeOne` helper for "spend one from a stack, else remove it" replaces
+    the four copies in `drink`/`learn`/`sell`/`refuel`;
+  - the two combat directions build their `attack` event through one
+    `makeAttackEvent` factory so the payload shape can't drift;
+  - `index.js`'s event fan-out is now a keyed `EVENT_HANDLERS` table instead of a
+    long `if (ev.type === …)` ladder — adding an event type is a new entry;
+  - melee `weaponOf` now derives `damageType` from the weapon's `damage` block, so
+    a `magical` weapon is mitigated by Ward (the path `strike` already supported
+    but melee never populated). Existing physical weapons are unaffected.
 - **Tick-loop scaling (no behaviour change)** — three hot paths that rescanned
   the whole world each tick are now index-backed, so cost tracks active rooms
   rather than total world size:

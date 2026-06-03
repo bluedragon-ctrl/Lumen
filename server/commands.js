@@ -10,7 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
+const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, matchesQuery } = require("./state");
 
 // Searching the room for hidden features costs roughly one action's worth of
 // energy, so it competes with attacking and can't be spammed mid-combat.
@@ -60,7 +60,16 @@ const selfAndViews = (state, player, line) => [
 // Find an item instance by id (exact) or name (substring) within a list.
 function findItem(list, world, q) {
   const ql = q.toLowerCase();
-  return list.findIndex((i) => i.id.toLowerCase() === ql || world.items[i.template].name.toLowerCase().includes(ql));
+  return list.findIndex((i) => matchesQuery(i.id, world.items[i.template].name, ql));
+}
+
+// Spend one unit of the inventory item at index `idx`: decrement a stack, or
+// remove the instance outright when it's the last one (or unstacked). The shared
+// "consume one" used by drink/eat, learn, sell, and refuel.
+function consumeOne(player, idx) {
+  const inst = player.inventory[idx];
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(idx, 1);
 }
 
 function addToInventory(player, inst, world) {
@@ -86,8 +95,8 @@ function removeItem(player, template, n) {
     const inst = player.inventory[i];
     if (inst.template !== template) continue;
     const have = inst.qty || 1;
-    if (have > n) inst.qty = have - n, (n = 0);
-    else (n -= have), player.inventory.splice(i, 1);
+    if (have > n) { inst.qty = have - n; n = 0; }
+    else { n -= have; player.inventory.splice(i, 1); }
   }
 }
 
@@ -183,7 +192,7 @@ function unequip(state, player, arg, ctx) {
   if (player.equipment[ql] !== undefined) slot = ql; // a slot name (hand/body/light)
   else
     for (const [s, inst] of Object.entries(player.equipment)) {
-      if (inst && (inst.id.toLowerCase() === ql || w.items[inst.template].name.toLowerCase().includes(ql))) {
+      if (inst && matchesQuery(inst.id, w.items[inst.template].name, ql)) {
         slot = s;
         break;
       }
@@ -284,9 +293,7 @@ function buy(state, player, arg, ctx) {
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
   const ql = arg.toLowerCase();
-  const offer = (sh.t.shop.sells || []).find(
-    (s) => s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql)
-  );
+  const offer = (sh.t.shop.sells || []).find((s) => matchesQuery(s.template, w.items[s.template].name, ql));
   if (!offer) return [{ type: "error", text: `${sh.t.name} doesn't sell "${arg}".` }];
   const name = w.items[offer.template].name;
   const price = buyPrice(offer, w.items[offer.template]);
@@ -310,8 +317,7 @@ function sell(state, player, arg, ctx) {
   // The trader buys any valued item at its sell value — no per-trader buy list.
   const price = sellValueOf(t);
   if (!t.value || price <= 0) return [{ type: "error", text: `${sh.t.name} won't give you anything for ${t.name}.` }];
-  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
-  else player.inventory.splice(idx, 1);
+  consumeOne(player, idx);
   player.shards = (player.shards || 0) + price;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} sells ${t.name} to ${sh.t.name}.` }, player.id);
   return selfAndViews(state, player, `You sell ${t.name} for ${price} shards. (${player.shards} total)`);
@@ -342,7 +348,7 @@ function use(state, player, arg, ctx) {
     const ql = arg.toLowerCase();
     const f = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
-      return ft && ft.switch && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+      return ft && ft.switch && fixtureVisibleTo(player, f) && matchesQuery(f.id, ft.name, ql);
     });
     if (f) return toggleFixture(state, player, f, ctx);
   }
@@ -357,9 +363,7 @@ function refuel(state, player, arg, ctx) {
   const ql = arg.toLowerCase();
   // A light source matching arg, equipped or in the pack.
   const candidates = [player.equipment && player.equipment.light, ...player.inventory].filter(Boolean);
-  const inst = candidates.find(
-    (i) => w.items[i.template].light && (i.id.toLowerCase() === ql || w.items[i.template].name.toLowerCase().includes(ql))
-  );
+  const inst = candidates.find((i) => w.items[i.template].light && matchesQuery(i.id, w.items[i.template].name, ql));
   if (!inst) return [{ type: "error", text: `You have no light source "${arg}" to refuel.` }];
   const t = w.items[inst.template];
   const lt = t.light;
@@ -367,9 +371,7 @@ function refuel(state, player, arg, ctx) {
   if (inst.fuel >= lt.fuelMax) return [{ type: "error", text: `${t.name} is already full.` }];
   const fidx = player.inventory.findIndex((i) => i.template === lt.fuelItem);
   if (fidx < 0) return [{ type: "error", text: `You need ${w.items[lt.fuelItem].name} to refuel ${t.name}.` }];
-  const fuelItem = player.inventory[fidx];
-  if (fuelItem.qty != null && fuelItem.qty > 1) fuelItem.qty -= 1;
-  else player.inventory.splice(fidx, 1);
+  consumeOne(player, fidx);
   inst.fuel = Math.min(lt.fuelMax, (inst.fuel || 0) + (lt.refuelPerUnit || lt.fuelMax));
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
@@ -391,8 +393,7 @@ function drink(state, player, arg, ctx, verb = "use") {
   if (!spec || typeof spec !== "object" || !spec.type)
     return [{ type: "error", text: `${t.name} fizzles uselessly — nothing happens.` }];
   // Consume one, then apply the effect primitive.
-  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
-  else player.inventory.splice(idx, 1);
+  consumeOne(player, idx);
   // `restore` is instantaneous (heal hp/mana); everything else is a status effect.
   if (spec.type === "restore") {
     const r = state.applyRestore(player, spec);
@@ -533,7 +534,7 @@ function attack(state, player, arg) {
   const ql = arg.toLowerCase();
   const mob = rt.mobs.find((m) => {
     const t = state.world.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(m.id, t.name, ql);
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
@@ -569,8 +570,7 @@ function learn(state, player, arg, ctx) {
 
   // Consume one of the item and report what was learned.
   const consume = (line) => {
-    if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
-    else player.inventory.splice(idx, 1);
+    consumeOne(player, idx);
     ctx.toRoom(player.location, { type: "log", text: `${player.name} studies ${t.name}.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     return selfAndViews(state, player, line);
@@ -651,7 +651,7 @@ function cast(state, player, arg, ctx) {
   const ql = targetQ.toLowerCase();
   const mob = rt.mobs.find((m) => {
     const t = w.mobs[m.template];
-    return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+    return (see || t.emitsLight) && matchesQuery(m.id, t.name, ql);
   });
   if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
 

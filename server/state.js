@@ -7,19 +7,40 @@ const { rollDice } = require("./dice");
 const MELEE_SCALE = { attr: "might", per: 4 };
 
 /** The attacker's effective weapon: equipped hand weapon, or unarmed. `scale`
- *  is the attribute the weapon's damage grows with (default Might/4). */
+ *  is the attribute the weapon's damage grows with (default Might/4). `damageType`
+ *  is read from the `weapon.damage` block (its single key — `physical`/`magical`),
+ *  so a magical weapon is mitigated by Ward, a physical one by Armour. */
 function weaponOf(world, player) {
   const hand = player.equipment && player.equipment.hand;
   if (hand) {
     const t = world.items[hand.template];
-    if (t.weapon) return {
-      dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2",
-      actionCost: t.weapon.actionCost || 12,
-      scale: t.weapon.scale || MELEE_SCALE,
-      onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
-    };
+    if (t.weapon) {
+      const [damageType, dice] = Object.entries(t.weapon.damage || {})[0] || ["physical", "1d2"];
+      return {
+        dice: dice || "1d2",
+        damageType: damageType || "physical",
+        actionCost: t.weapon.actionCost || 12,
+        scale: t.weapon.scale || MELEE_SCALE,
+        onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
+      };
+    }
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, onHit: null }; // unarmed
+  return { dice: "1d2", damageType: "physical", actionCost: 10, scale: MELEE_SCALE, onHit: null }; // unarmed
+}
+
+/** Build the `attack` event both combat directions emit, from a single shape so
+ *  player→mob and mob→player can't drift. `emits` is the relevant actor's
+ *  light-emission flag — the target's (player attack) or the attacker's (mob
+ *  attack) — which `index.js` uses to decide whether bystanders learn its name. */
+function makeAttackEvent({ by, attackerId, attackerName, roomId, target, targetName, emits, r, light }) {
+  const ev = {
+    type: "attack", by, attackerId, attackerName, roomId,
+    targetId: target.id, targetName, hit: r.hit, sighted: r.sighted,
+    damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
+    light,
+  };
+  ev[by === "player" ? "targetEmitsLight" : "attackerEmitsLight"] = emits;
+  return ev;
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------
@@ -212,6 +233,12 @@ function effectivePerception(player, light) {
   const per = (player.attributes && player.attributes.perception) || 0;
   return per * hitChance(player.perception, light);
 }
+
+// The one targeting rule every command and the examine view share: a query
+// (already lowercased) matches an entity by its runtime/template id (exact) or by
+// its display name (substring). Centralised so the match semantics stay uniform.
+const matchesQuery = (idOrTemplate, name, ql) =>
+  idOrTemplate.toLowerCase() === ql || name.toLowerCase().includes(ql);
 
 // Visibility predicates — a hidden feature is shown only once discovered/revealed.
 // Reused by the room view (render.js) and command resolvers so filtering matches.
@@ -829,13 +856,11 @@ class GameState {
       // Stop swinging if the mob dies OR a spike reflect kills the player mid-loop.
       while (p.energy >= weapon.actionCost && mob.hp > 0 && p.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(attacker, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
-        const attackEvent = {
-          type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
-          targetId: mob.id, targetName: mobName, hit: r.hit, sighted: r.sighted,
-          damage: r.damage, crit: r.crit, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
-          light: rt.light, targetEmitsLight: mobEmits,
-        };
+        const r = strike(attacker, mobDef, rt.light, weapon.dice, weapon.damageType);
+        const attackEvent = makeAttackEvent({
+          by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
+          target: mob, targetName: mobName, emits: mobEmits, r, light: rt.light,
+        });
         const { attackerDeath } = this.applyHitOutcome({
           r, events, attackEvent,
           attacker: {
@@ -1028,12 +1053,10 @@ class GameState {
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
     };
     const r = strike(attacker, playerDefence(this.world, target), rt.light, t.attack.damage, t.attack.type || "physical");
-    const attackEvent = {
-      type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
-      targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
-      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
-      light: rt.light, attackerEmitsLight: !!t.emitsLight,
-    };
+    const attackEvent = makeAttackEvent({
+      by: "mob", attackerId: m.id, attackerName: t.name, roomId,
+      target, targetName: target.name, emits: !!t.emitsLight, r, light: rt.light,
+    });
     this.applyHitOutcome({
       r, events, attackEvent,
       attacker: {
@@ -1184,4 +1207,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, isDiscovered, discoveryKey };
+module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, isDiscovered, discoveryKey, matchesQuery };
