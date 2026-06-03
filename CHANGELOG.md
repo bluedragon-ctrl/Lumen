@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Multiplayer test subagent** — a `multiplayer-tester` agent
+  ([.claude/agents/multiplayer-tester.md](.claude/agents/multiplayer-tester.md),
+  runs on Sonnet) that drives several browser clients at once to verify
+  cross-player sync: item drop/pickup & inventory, light-level broadcasting,
+  player movement/room-leaving, and combat/aggro/healing state. Reports pass/fail
+  with concrete evidence (console broadcasts, light meter, room contents). Manually
+  verified the first three scenarios pass against the current build.
 - **Generalized defender-side triggers — `onDamage`** — the narrow reflect-only
   `spikes` is now a special case of a general **when-struck** trigger list,
   mirroring the attacker's `onHit` through the same `applyHitOutcome` dispatch. An

@@ -27,3 +27,4 @@ Thumbs.db
 .claude/*
 !.claude/launch.json
 !.claude/settings.json
+!.claude/agents/
