@@ -120,7 +120,7 @@ function move(state, player, dir, ctx) {
   state.clearRevealedMobs(player.id); // leaving the room re-hides any lurkers you'd spotted
   const from = player.location;
   ctx.toRoom(from, { type: "log", text: `${player.name} leaves ${dir}.` }, player.id);
-  player.location = dest;
+  state.setPlayerLocation(player, dest);
   state.rooms[dest].light = state.computeRoomLight(dest);
   state.rooms[from].light = state.computeRoomLight(from);
   ctx.refreshRoom(from, player.id);
