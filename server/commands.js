@@ -31,6 +31,9 @@ const HELP = [
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
   "  attack | kill <target> — attack a creature (stop to break off)",
+  "  sit | rest            — sit to recover HP/MP slowly (1 per 5 ticks)",
+  "  sleep                 — sleep to recover faster (1 per 2 ticks), but blind",
+  "  stand | wake          — get up; moving or attacking also stands you",
   "  cast | c <spell> <target> — cast a spell you know at a creature",
   "  learn | study <scroll|schematic> — learn a spell or recipe (consumes it)",
   "  spells                — list the spells you know",
@@ -108,7 +111,47 @@ function equipItem(player, inst, world) {
   return prev;
 }
 
+// --- Posture (sit / sleep / stand) -----------------------------------------
+// Posture drives rest recovery (see state._recoverTick) and is social. Sleeping
+// also blinds you (your room view goes dark). Each spec carries the self/room
+// lines for entering it.
+const POSTURES = {
+  sit: { name: "sitting", self: "You settle down and sit, catching your breath.", room: (n) => `${n} sits down to rest.` },
+  sleep: { name: "sleeping", self: "You lie down and close your eyes. Sleep takes you, and the dark with it.", room: (n) => `${n} lies down and falls asleep.` },
+  stand: { name: "standing", self: "You stand up.", room: (n) => `${n} stands up.` },
+};
+
+// Set the player's posture (sit/sleep/stand). Resting is barred mid-fight; the
+// change broadcasts to the room and refreshes others' view (the posture tag).
+function setPosture(state, player, key, ctx) {
+  const spec = POSTURES[key];
+  if (player.posture === spec.name) {
+    const already = { sitting: "You are already sitting.", sleeping: "You are already asleep.", standing: "You are already on your feet." };
+    return [{ type: "log", text: already[spec.name] }];
+  }
+  if ((key === "sit" || key === "sleep") && player.pending)
+    return [{ type: "error", text: "You can't rest in the middle of a fight." }];
+  const wasSleeping = player.posture === "sleeping";
+  player.posture = spec.name;
+  player.restTicks = 0;
+  ctx.toRoom(player.location, { type: "log", text: spec.room(player.name) }, player.id);
+  ctx.refreshRoom(player.location, player.id); // others see the posture tag change
+  const self = key === "stand" && wasSleeping ? "You wake and climb to your feet." : spec.self;
+  return selfAndViews(state, player, self);
+}
+
+// Move/attack/cast rouse a resting player first (decision: auto-stand, then act).
+// Pure state change — returns true if it actually stood the player up, so callers
+// can prepend a brief "you got up" note where it reads naturally.
+function autoStand(player) {
+  if (!player.posture || player.posture === "standing") return false;
+  player.posture = "standing";
+  player.restTicks = 0;
+  return true;
+}
+
 function move(state, player, dir, ctx) {
+  autoStand(player); // you stand before you walk (sit/sleep don't block movement)
   const room = state.world.rooms[player.location];
   // A normal exit, or a hidden one this player has already discovered (an
   // undiscovered hidden exit reads exactly like no exit — it isn't leaked).
@@ -528,6 +571,7 @@ function lookAt(state, player, arg) {
 // allows (see state.resolveCombat). You can only target what you can perceive.
 function attack(state, player, arg) {
   if (!arg) return [{ type: "error", text: "Attack what?" }];
+  const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const ql = arg.toLowerCase();
@@ -537,7 +581,8 @@ function attack(state, player, arg) {
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
-  return [{ type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` }];
+  const ready = { type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
+  return woke ? [{ type: "log", text: "You scramble to your feet." }, ready] : [ready];
 }
 
 // `search`: comb the current room for hidden features (exits, stashes, fixtures,
@@ -646,6 +691,7 @@ function cast(state, player, arg, ctx) {
     return [{ type: "error", text: `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).` }];
   if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
 
+  autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const ql = targetQ.toLowerCase();
@@ -762,6 +808,15 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "stop":
       player.pending = null;
       return [{ type: "log", text: "You break off your attack." }];
+    case "sit":
+    case "rest":
+      return setPosture(state, player, "sit", ctx);
+    case "sleep":
+      return setPosture(state, player, "sleep", ctx);
+    case "stand":
+    case "wake":
+    case "wakeup":
+      return setPosture(state, player, "stand", ctx);
     case "cast":
     case "c":
       return cast(state, player, arg, ctx);

@@ -188,6 +188,29 @@ A **non-hostile** creature that is struck **retaliates** (it acts on the threat 
 gains), provided it has an `attack` block — so a neutral lurker fights back when
 provoked, while attack-less NPCs (shopkeepers) stay passive.
 
+### Posture — sit, sleep & rest recovery
+
+Every actor (players and mobs) carries a **posture**: `standing` (default),
+`sitting`, or `sleeping`. For players it's both a **recovery** mechanism and a
+social one — HP does not regenerate while standing (only mana trickles), so resting
+is the way to heal:
+
+- `sit` (alias `rest`) — mends **1 HP and 1 MP every 5 ticks**; no effect on sight.
+- `sleep` — mends **1 HP and 1 MP every 2 ticks**, but you go **blind**: while asleep
+  your perception reads as 0 and the room as dark, so your room view is withheld.
+- `stand` (alias `wake`) — get up. Moving, attacking, or casting **auto-stands** you
+  first; being **struck** (melee or a hostile spell) instantly rouses you to standing
+  *and* into the fight (auto-retaliation). Resting is barred mid-fight, and rest
+  recovery *replaces* the standing mana trickle (no stacking).
+
+Posture changes broadcast to the room and are tagged in others' views ("Bob (asleep)").
+A player's posture **resets to standing on login** (a save can't strand you blind).
+
+Mobs use the same field for **room/encounter design**: a mob template may declare
+`"posture": "sitting"` or `"sleeping"` to author a dozing guardian or resting NPC.
+A resting mob is **inert** — it won't wander, attack, or emote — until a blow
+**rouses** it (a `mob-woke` event), giving authored ambush-style openings.
+
 ### Hidden features (`search`)
 
 Any room feature can carry `hidden: { perception }` — groundItems, spawns, and
