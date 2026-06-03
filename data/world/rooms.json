@@ -75,10 +75,10 @@
     "exits": { "east": "rim.hatchery" },
     "fixtures": [],
     "groundItems": [
-      { "template": "palecap-mushroom", "qty": 2, "respawn": 30 }
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 120 }
     ],
     "spawns": [
-      { "mob": "grub", "max": 2, "respawn": 30 }
+      { "mob": "grub", "max": 2, "respawn": 120 }
     ]
   },
   "rim.mageshed": {

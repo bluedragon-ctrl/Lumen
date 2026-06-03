@@ -667,6 +667,9 @@ class GameState {
     // manaRegen is a global tuning constant (not per-character progress), so always
     // re-sync it from the template — tuning changes then apply to existing saves too.
     player.manaRegen = this.world.playerTemplate.manaRegen || 0;
+    // Admin always knows every recipe — handy for testing. Re-synced on each
+    // login, so recipes added to the world after the admin save are picked up.
+    if (player.isAdmin) player.knownRecipes = Object.keys(this.world.recipes);
     this.players.set(player.id, player);
     this._indexPlayer(player); // location is final by here — add to the occupancy index
     return player;

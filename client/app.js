@@ -383,7 +383,8 @@ function handleTab() {
   if (tabState && tabState.base === value) {
     // cycle
     tabState.idx = (tabState.idx + 1) % tabState.matches.length;
-    cmdEl.value = head + tabState.matches[tabState.idx] + " ";
+    cmdEl.value = tabState.head + tabState.matches[tabState.idx] + " ";
+    tabState.base = cmdEl.value;
     return;
   }
   const matches = completionCandidates(value).filter((c) => c.startsWith(token));
@@ -393,7 +394,7 @@ function handleTab() {
     tabState = null;
   } else {
     cmdEl.value = head + matches[0] + " ";
-    tabState = { base: cmdEl.value, matches, idx: 0 };
+    tabState = { base: cmdEl.value, head, matches, idx: 0 };
   }
 }
 

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Admin knows every recipe (testing aid)** — on login the auto-created `admin`
+  is granted all recipes in the world (re-synced each login, so recipes added
+  later are picked up automatically). Lets a maintainer exercise any `craft`
+  without first hunting down the scroll. Non-admin players are unaffected.
 - **Prospector gear at the quartermaster** — Garrick now stocks three basic
   pieces alongside the leather kit: **a prospector's hatchet** (a slow, heavy
   `1d8` axe that scales its bite with Might — `floor(Might/2)`, the first weapon
@@ -99,6 +103,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tab key command completion** — autocompleted commands now include a trailing
   space, allowing players to immediately continue typing the argument without
   manually adding a space. Improves rapid command entry.
+- **Grub corpse renamed to disambiguate from the live mob** — killing a grub
+  dropped an item also called "a grub", so the living larva and its remains read
+  identically in room and inventory listings. The dropped item is now **"a dead
+  grub"** (`grub` template id unchanged, so recipes/`get grub` still work).
+- **Mushroom Beds regrew too fast** — the farm's palecap mushrooms and grubs
+  refilled on a 30-tick (30s) timer, trivializing the gather loop. Both now
+  `respawn: 120` (2 minutes), matching the abyss palecap and giving the harvest
+  a meaningful wait.
+- **Tab cycling through multiple completions** — repeatedly pressing Tab now
+  rotates through all matching proposals again. The trailing-space change broke
+  cycling: the stored cycle-`base` wasn't updated after each rotation, and the
+  `head` (text before the token) was recomputed from a value that now ended in a
+  space — so the second Tab fell through and recompleted from scratch instead of
+  advancing. The cycle now keeps the original `head` and refreshes its `base`.
 ### Added (continued)
 - **Multiplayer test subagent** — a `multiplayer-tester` agent
   ([.claude/agents/multiplayer-tester.md](.claude/agents/multiplayer-tester.md),
