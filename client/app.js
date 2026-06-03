@@ -315,12 +315,9 @@ function argCandidates(cmd) {
     }
     case "learn": case "study":
       return p ? p.inventory.filter((i) => i.type === "scroll").map((i) => lastWord(i.name)) : [];
-    case "light": case "ignite": {
-      const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
-      if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
-      return out;
-    }
+    case "light": case "ignite":
     case "refuel": case "fill": {
+      // Both act on a light source: carried lights, plus the equipped one.
       const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
       if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
       return out;
