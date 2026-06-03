@@ -11,6 +11,7 @@
   --mana: #5b86c4;
   --hostile: #d07f7f;
   --lumin: #d8c873;
+  --gold: #f2c14e;
 }
 
 * { box-sizing: border-box; }
@@ -45,6 +46,7 @@ body {
 .line-error { color: var(--hostile); }
 .line-echo { color: var(--muted); }
 .line-log { color: var(--text); }
+.line-gold { color: var(--gold); font-weight: 600; text-shadow: 0 0 6px rgba(242, 193, 78, .35); }
 
 /* Inspect (room view, tinted by light) --------------------------------- */
 #inspect { grid-area: inspect; padding: 10px 12px; position: relative; transition: background .4s, color .4s, filter .4s; }

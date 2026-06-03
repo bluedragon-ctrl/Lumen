@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Player levels & attribute training (`train`)** — XP is now spent, not just
+  hoarded. `xp` is a lifetime total; reaching the next level costs
+  `XP_BASE × XP_GROWTH^(level-1)` (defaults **100**, doubling each level — all in
+  `config.js`). Each level grants **2 attribute points** (`POINTS_PER_LEVEL`),
+  banked as `unspentPoints`. Spend them with **`train <attribute>`** (might,
+  vitality, intellect, wits, perception); `train` with no argument shows your
+  level, XP progress, and unspent points. Raising vitality/intellect lifts the
+  HP/MP cap and grants that capacity immediately (current pools rise by the same
+  delta — felt at once, but no free heal). A level-up hails the slayer in **gold**
+  in the console and broadcasts the moment to the room. The player panel shows
+  unspent points next to the level. Existing saves backfill `unspentPoints` to 0.
 - **Sit & sleep — rest & recovery (`sit` / `sleep` / `stand`)** — posture is now a
   first-class actor state and the **only** way to recover HP (mana still trickles
   while standing). `sit` (alias `rest`) mends **1 HP and 1 MP every 5 ticks**;

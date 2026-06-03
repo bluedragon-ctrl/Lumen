@@ -383,6 +383,12 @@ function dispatchEvent(ev) {
     if (killer) {
       const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off", venom: "Your venom finishes off", spikes: "Your thorns finish off" }[ev.cause] || "You slay";
       sendToPlayer(ev.killerId, { type: "log", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
+      // A kill may push the slayer over one or more level thresholds: hail them
+      // in gold and let the room share the moment.
+      for (const up of ev.levelUps || []) {
+        sendToPlayer(ev.killerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
+        roomCtx.toRoom(ev.roomId, { type: "gold", text: `${killer.name} reaches level ${up.level}!` }, ev.killerId);
+      }
       sendToPlayer(ev.killerId, buildRoomView(state, killer));
       sendToPlayer(ev.killerId, buildPlayerView(state, killer));
     }

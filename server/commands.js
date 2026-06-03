@@ -10,7 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
+const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
 
 // Searching the room for hidden features costs roughly one action's worth of
 // energy, so it competes with attacking and can't be spammed mid-combat.
@@ -37,6 +37,7 @@ const HELP = [
   "  cast | c <spell> <target> — cast a spell you know at a creature",
   "  learn | study <scroll|schematic> — learn a spell or recipe (consumes it)",
   "  spells                — list the spells you know",
+  "  train [attribute]     — spend a level-up point on an attribute (no arg: show progress)",
   "  equip | wield | wear <item> — equip from inventory (swaps current)",
   "  unequip | remove <item|slot> — return equipped gear to inventory",
   "  list | shop           — see what a trader here buys and sells",
@@ -727,8 +728,37 @@ function cast(state, player, arg, ctx) {
   return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
 }
 
+// Attributes a player can raise with banked level-up points.
+const TRAINABLE = ["might", "vitality", "intellect", "wits", "perception"];
+
+/** Spend a banked attribute point on `arg`, or — with no arg — report leveling
+ *  progress. Raising vitality/intellect lifts the HP/MP cap; the new capacity is
+ *  granted immediately (current pools rise by the same delta) so the point is felt
+ *  at once, without being a free heal. */
+function train(state, player, arg) {
+  const pts = player.unspentPoints || 0;
+  const attr = (arg || "").trim().toLowerCase();
+  if (!attr) {
+    const next = xpForLevel((player.level || 1) + 1);
+    const ptLine = pts ? `${pts} unspent point${pts === 1 ? "" : "s"} — train: ${TRAINABLE.join(", ")}` : "No unspent points — defeat foes to level up.";
+    return [{ type: "log", text: `Level ${player.level} · ${player.xp}/${next} xp.\n${ptLine}` }];
+  }
+  if (!TRAINABLE.includes(attr)) return [{ type: "error", text: `You can train: ${TRAINABLE.join(", ")}.` }];
+  if (pts <= 0) return [{ type: "error", text: "You have no points to spend. Defeat foes to gain levels." }];
+  const prevHp = player.maxHp;
+  const prevMana = player.maxMana;
+  player.attributes[attr] = (player.attributes[attr] || 0) + 1;
+  player.unspentPoints = pts - 1;
+  state.deriveStats(player); // recompute maxHp/maxMana/sight from the new attribute
+  player.hp = Math.min(player.maxHp, player.hp + (player.maxHp - prevHp));
+  player.mana = Math.min(player.maxMana, (player.mana || 0) + (player.maxMana - prevMana));
+  const left = player.unspentPoints;
+  const tail = left ? ` (${left} point${left === 1 ? "" : "s"} left)` : "";
+  return selfAndViews(state, player, `You train ${attr} to ${player.attributes[attr]}.${tail}`);
+}
+
 /** Admin-only commands, prefixed with '@'. */
-function handleAdmin(state, player, verb, arg) {
+function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
   if (!player.isAdmin) return [{ type: "error", text: "You lack the authority for that." }];
   switch (verb) {
     case "@create-player": {
@@ -746,6 +776,18 @@ function handleAdmin(state, player, verb, arg) {
       player.shards = n;
       return [{ type: "log", text: `Your purse now holds ${n} shards.` }];
     }
+    case "@xp": {
+      const n = parseInt(arg, 10);
+      if (!Number.isFinite(n) || n < 1) return [{ type: "error", text: "Usage: @xp <amount≥1>" }];
+      const ups = state.awardXp(player, n); // mirrors a kill's award, level-ups and all
+      const out = [{ type: "log", text: `You gain ${n} xp.` }];
+      for (const up of ups) {
+        out.push({ type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
+        ctx.toRoom(player.location, { type: "gold", text: `${player.name} reaches level ${up.level}!` }, player.id);
+      }
+      out.push(buildPlayerView(state, player));
+      return out;
+    }
     case "@attr": {
       const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
       const [name, raw] = arg.split(/\s+/);
@@ -760,7 +802,7 @@ function handleAdmin(state, player, verb, arg) {
       return selfAndViews(state, player, `Your ${attr} is now ${n}.`);
     }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @attr <attribute> <value>" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }
@@ -770,7 +812,7 @@ function execute(state, player, input, ctx = NOOP_CTX) {
   const parts = (input || "").trim().split(/\s+/);
   let verb = (parts[0] || "").toLowerCase();
   const arg = parts.slice(1).join(" ");
-  if (verb.startsWith("@")) return handleAdmin(state, player, verb, arg);
+  if (verb.startsWith("@")) return handleAdmin(state, player, verb, arg, ctx);
   if (DIR_ALIAS[verb]) verb = DIR_ALIAS[verb];
   if (DIRS.includes(verb)) return move(state, player, verb, ctx);
 
@@ -825,6 +867,8 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return learn(state, player, arg, ctx);
     case "spells":
       return spellList(state, player);
+    case "train":
+      return train(state, player, arg);
     case "list":
     case "shop":
     case "wares":

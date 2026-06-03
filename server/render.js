@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey } = require("./state");
+const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel } = require("./state");
 
 // How a posture reads to OTHERS in the room (the social tag). Standing is the
 // default and shows nothing.
@@ -35,6 +35,8 @@ function buildPlayerView(state, p) {
       name: p.name,
       level: p.level,
       xp: p.xp,
+      xpNext: xpForLevel((p.level || 1) + 1), // lifetime XP needed for the next level
+      unspentPoints: p.unspentPoints || 0, // banked attribute points to `train`
       shards: p.shards || 0,
       hp: p.hp,
       maxHp: p.maxHp,
