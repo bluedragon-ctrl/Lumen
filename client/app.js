@@ -50,6 +50,7 @@ function handle(msg) {
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
+    case "gold": addLine(msg.text, "gold"); break;
     case "room": lastRoom = msg.room; renderRoom(msg.room); break;
     case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
@@ -169,7 +170,8 @@ document.getElementById("ex-back").addEventListener("click", () => sendCommand("
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {
   $("p-name").textContent = p.name + (p.posture && p.posture !== "standing" ? ` · ${p.posture}` : "");
-  $("p-level").textContent = `Lv ${p.level} · ${p.xp} xp · ${p.shards || 0} shards`;
+  const pts = p.unspentPoints ? ` · ${p.unspentPoints} pt${p.unspentPoints === 1 ? "" : "s"}` : "";
+  $("p-level").textContent = `Lv ${p.level}${pts} · ${p.xp} xp · ${p.shards || 0} shards`;
 
   // States
   const states = $("p-states");
@@ -267,7 +269,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "sit", "sleep", "stand", "wake", "rest", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
-  "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "help",
+  "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "train", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
@@ -304,6 +306,7 @@ function argCandidates(cmd) {
       return out;
     }
     case "craft": case "make": return p ? (p.recipes || []).map((r) => lastWord(r)) : [];
+    case "train": return ["might", "vitality", "intellect", "wits", "perception"];
     case "equip": case "wield": case "wear": case "hold":
       return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];
     case "unequip": case "remove":

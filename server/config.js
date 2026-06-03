@@ -10,4 +10,16 @@ module.exports = {
   RUNTIME_DIR: path.resolve(__dirname, "..", "data", "runtime"),
   CLIENT_DIR: path.resolve(__dirname, "..", "client"),
   VERSION: require("../package.json").version,
+
+  // Leveling: `xp` is a lifetime total. The XP increment for level N→N+1 is
+  // XP_BASE * XP_GROWTH^(N-1) — so 1→2 costs XP_BASE, and each further level
+  // costs XP_GROWTH× the last. Each level gained grants POINTS_PER_LEVEL
+  // attribute points to spend with `train`.
+  XP_BASE: 100,
+  XP_GROWTH: 2,
+  POINTS_PER_LEVEL: 2,
+  // One-off XP the first time a delver sets foot in a room (rewards descent;
+  // each room pays once, tracked per player in `visitedRooms`). Crafting XP is
+  // not a constant — it equals the output's sale value (see commands.js craft).
+  EXPLORE_XP: 5,
 };

@@ -1,6 +1,17 @@
 "use strict";
 const { effectiveLight, canSee, hitChance } = require("./light");
 const { rollDice } = require("./dice");
+const { XP_BASE, XP_GROWTH, POINTS_PER_LEVEL } = require("./config");
+
+/** Cumulative lifetime XP required to *reach* `level` (level 1 = 0). The
+ *  increment for each step is XP_BASE * XP_GROWTH^(step-1), so successive levels
+ *  cost XP_GROWTH× the last. See config.XP_BASE/XP_GROWTH. */
+function xpForLevel(level) {
+  let total = 0;
+  let step = XP_BASE;
+  for (let l = 1; l < level; l++) { total += step; step *= XP_GROWTH; }
+  return total;
+}
 
 // Default melee scaling when a weapon omits its own `scale`: floor(Might / 4)
 // added to physical damage. Mirrors a spell's `effect.scale`.
@@ -547,6 +558,21 @@ class GameState {
     player.perception = { blindBelow: band.blindBelow, dimBelow, harmedAbove: band.harmedAbove };
   }
 
+  /** Credit `amount` lifetime XP to a player and resolve any level-ups it
+   *  crosses. Mutates `xp`, `level` and `unspentPoints`; returns one
+   *  `{ level, points }` per level gained (a big award can cross several). The
+   *  caller narrates/broadcasts these (see index.js `level-up` handling). */
+  awardXp(player, amount) {
+    player.xp = (player.xp || 0) + (amount || 0);
+    const ups = [];
+    while (player.xp >= xpForLevel((player.level || 1) + 1)) {
+      player.level = (player.level || 1) + 1;
+      player.unspentPoints = (player.unspentPoints || 0) + POINTS_PER_LEVEL;
+      ups.push({ level: player.level, points: POINTS_PER_LEVEL });
+    }
+    return ups;
+  }
+
   /**
    * Build a fresh character from the static template. Returns plain player data;
    * it is NOT added to the live world (that's `admit`). Used both for new
@@ -560,6 +586,7 @@ class GameState {
       isAdmin: !!opts.isAdmin,
       level: t.level,
       xp: t.xp,
+      unspentPoints: 0, // attribute points banked from level-ups, spent via `train`
       shards: t.shards || 0,
       attributes: { ...t.attributes },
       manaRegen: t.manaRegen || 0,
@@ -573,6 +600,7 @@ class GameState {
       restTicks: 0, // counts ticks toward the next rest-recovery point (see _recoverTick)
       knownRecipes: [...(t.knownRecipes || [])],
       knownSpells: [...(t.knownSpells || [])],
+      visitedRooms: [t.startLocation], // first-entry explore XP; the spawn room is free
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
       player.equipment[slot] =
@@ -606,6 +634,10 @@ class GameState {
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
     if (!Array.isArray(player.discovered)) player.discovered = []; // permanently-found hidden features (keys)
+    if (player.unspentPoints == null) player.unspentPoints = 0; // banked attribute points (leveling added later)
+    // Explore XP added later: seed with the current room so a pre-existing delver
+    // isn't paid for re-treading ground, then earns from the next new room on.
+    if (!Array.isArray(player.visitedRooms)) player.visitedRooms = [player.location];
     // Posture always resets to standing on login — a delver wakes up when they
     // reconnect, so a save can't strand them blind and asleep.
     player.posture = "standing";
@@ -1073,6 +1105,29 @@ class GameState {
     mob.aggro[playerId] = (mob.aggro[playerId] || 0) + amount;
   }
 
+  /** Award `xp` to everyone who earned a mob's death — the finisher (always, even
+   *  if a remote DoT landed the blow) plus anyone with a threat entry who is still
+   *  present and alive. Model A: each participant gets the FULL value (co-op, no
+   *  division — grouping is rewarded, not taxed). Returns [{ playerId, levelUps }]
+   *  so the caller can narrate the credit and broadcast any level-ups. */
+  _awardKillXp(mob, primaryKiller, xp, roomId) {
+    const out = [];
+    const credited = new Set();
+    if (primaryKiller) {
+      out.push({ playerId: primaryKiller.id, levelUps: this.awardXp(primaryKiller, xp) });
+      credited.add(primaryKiller.id);
+    }
+    for (const id of Object.keys(mob.aggro || {})) {
+      if (credited.has(id)) continue;
+      if (!(mob.aggro[id] > 0)) continue; // a hostile mob seeds 0-threat entries for everyone present (AI targeting); mere presence isn't participation — you must have traded blows
+      const pl = this.players.get(id);
+      if (!pl || pl.hp <= 0 || pl.location !== roomId) continue; // present and alive
+      out.push({ playerId: id, levelUps: this.awardXp(pl, xp) });
+      credited.add(id);
+    }
+    return out;
+  }
+
   /** Forget players no longer present/alive. (Later: decay instead of hard drop.) */
   _pruneAggro(mob, playersHere) {
     if (!mob.aggro) { mob.aggro = {}; return; }
@@ -1194,8 +1249,8 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    killer.xp = (killer.xp || 0) + xp;
-    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit" };
+    const participants = this._awardKillXp(mob, killer, xp, roomId); // shared credit (Model A)
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit", participants };
   }
 
   /**
@@ -1218,9 +1273,9 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    if (killer) killer.xp = (killer.xp || 0) + xp;
+    const participants = killer ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit (Model A)
     rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause };
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause, participants };
     events.push(death);
     return death;
   }
@@ -1268,4 +1323,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey };
+module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };
