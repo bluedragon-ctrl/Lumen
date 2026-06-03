@@ -600,6 +600,7 @@ class GameState {
       restTicks: 0, // counts ticks toward the next rest-recovery point (see _recoverTick)
       knownRecipes: [...(t.knownRecipes || [])],
       knownSpells: [...(t.knownSpells || [])],
+      visitedRooms: [t.startLocation], // first-entry explore XP; the spawn room is free
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
       player.equipment[slot] =
@@ -634,6 +635,9 @@ class GameState {
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
     if (!Array.isArray(player.discovered)) player.discovered = []; // permanently-found hidden features (keys)
     if (player.unspentPoints == null) player.unspentPoints = 0; // banked attribute points (leveling added later)
+    // Explore XP added later: seed with the current room so a pre-existing delver
+    // isn't paid for re-treading ground, then earns from the next new room on.
+    if (!Array.isArray(player.visitedRooms)) player.visitedRooms = [player.location];
     // Posture always resets to standing on login — a delver wakes up when they
     // reconnect, so a save can't strand them blind and asleep.
     player.posture = "standing";
@@ -1101,6 +1105,29 @@ class GameState {
     mob.aggro[playerId] = (mob.aggro[playerId] || 0) + amount;
   }
 
+  /** Award `xp` to everyone who earned a mob's death — the finisher (always, even
+   *  if a remote DoT landed the blow) plus anyone with a threat entry who is still
+   *  present and alive. Model A: each participant gets the FULL value (co-op, no
+   *  division — grouping is rewarded, not taxed). Returns [{ playerId, levelUps }]
+   *  so the caller can narrate the credit and broadcast any level-ups. */
+  _awardKillXp(mob, primaryKiller, xp, roomId) {
+    const out = [];
+    const credited = new Set();
+    if (primaryKiller) {
+      out.push({ playerId: primaryKiller.id, levelUps: this.awardXp(primaryKiller, xp) });
+      credited.add(primaryKiller.id);
+    }
+    for (const id of Object.keys(mob.aggro || {})) {
+      if (credited.has(id)) continue;
+      if (!(mob.aggro[id] > 0)) continue; // a hostile mob seeds 0-threat entries for everyone present (AI targeting); mere presence isn't participation — you must have traded blows
+      const pl = this.players.get(id);
+      if (!pl || pl.hp <= 0 || pl.location !== roomId) continue; // present and alive
+      out.push({ playerId: id, levelUps: this.awardXp(pl, xp) });
+      credited.add(id);
+    }
+    return out;
+  }
+
   /** Forget players no longer present/alive. (Later: decay instead of hard drop.) */
   _pruneAggro(mob, playersHere) {
     if (!mob.aggro) { mob.aggro = {}; return; }
@@ -1222,8 +1249,8 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    const levelUps = this.awardXp(killer, xp);
-    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit", levelUps };
+    const participants = this._awardKillXp(mob, killer, xp, roomId); // shared credit (Model A)
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit", participants };
   }
 
   /**
@@ -1246,9 +1273,9 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    const levelUps = killer ? this.awardXp(killer, xp) : [];
+    const participants = killer ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit (Model A)
     rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause, levelUps };
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause, participants };
     events.push(death);
     return death;
   }

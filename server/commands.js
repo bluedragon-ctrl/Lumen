@@ -11,6 +11,7 @@
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
 const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { EXPLORE_XP } = require("./config");
 
 // Searching the room for hidden features costs roughly one action's worth of
 // energy, so it competes with attacking and can't be spammed mid-combat.
@@ -60,6 +61,17 @@ const selfAndViews = (state, player, line) => [
   buildRoomView(state, player),
   buildPlayerView(state, player),
 ];
+
+// Append gold level-up lines for `ups` to a command's outgoing messages and
+// broadcast each to the room — the command-path mirror of the kill handler's
+// gold hail (index.js). Call AFTER awarding XP but the player view in `out`
+// must already reflect the new level (build views after awardXp).
+function announceLevelUps(player, ups, ctx, out) {
+  for (const up of ups || []) {
+    out.push({ type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
+    ctx.toRoom(player.location, { type: "gold", text: `${player.name} reaches level ${up.level}!` }, player.id);
+  }
+}
 
 // Find an item instance by id (exact) or name (substring) within a list.
 function findItem(list, world, q) {
@@ -170,7 +182,21 @@ function move(state, player, dir, ctx) {
   ctx.refreshRoom(from, player.id);
   ctx.toRoom(dest, { type: "log", text: `${player.name} arrives.` }, player.id);
   ctx.refreshRoom(dest, player.id);
-  return selfAndViews(state, player, `You go ${dir}.`);
+  // First time here? A one-off exploration reward (rewards pushing into new ground;
+  // each room pays once). Award before building views so the player view is current.
+  let tail = "";
+  let ups = [];
+  if (!Array.isArray(player.visitedRooms)) player.visitedRooms = [];
+  if (!player.visitedRooms.includes(dest)) {
+    player.visitedRooms.push(dest);
+    if (EXPLORE_XP) {
+      ups = state.awardXp(player, EXPLORE_XP);
+      tail = ` You map new ground. (+${EXPLORE_XP} xp)`;
+    }
+  }
+  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}`);
+  announceLevelUps(player, ups, ctx, msgs);
+  return msgs;
 }
 
 const fueledLightIdx = (player, w) =>
@@ -491,7 +517,14 @@ function craft(state, player, arg, ctx) {
   const outName = w.items[r.output.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} works at ${stationLabel(w, r.station)}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You craft ${outName}.${cost ? ` (−${cost} shards)` : ""}`);
+  // Crafting XP = the output's sale value × quantity: it scales with the worth of
+  // what you made (and thus the rarity/cost of its inputs), so spamming a cheap
+  // recipe pays almost nothing. Award before building views so XP shows current.
+  const xp = sellValueOf(w.items[r.output.template]) * (r.output.qty || 1);
+  const ups = xp ? state.awardXp(player, xp) : [];
+  const msgs = selfAndViews(state, player, `You craft ${outName}.${cost ? ` (−${cost} shards)` : ""}${xp ? ` (+${xp} xp)` : ""}`);
+  announceLevelUps(player, ups, ctx, msgs);
+  return msgs;
 }
 
 function recipes(state, player) {
@@ -781,10 +814,7 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       if (!Number.isFinite(n) || n < 1) return [{ type: "error", text: "Usage: @xp <amount≥1>" }];
       const ups = state.awardXp(player, n); // mirrors a kill's award, level-ups and all
       const out = [{ type: "log", text: `You gain ${n} xp.` }];
-      for (const up of ups) {
-        out.push({ type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
-        ctx.toRoom(player.location, { type: "gold", text: `${player.name} reaches level ${up.level}!` }, player.id);
-      }
+      announceLevelUps(player, ups, ctx, out);
       out.push(buildPlayerView(state, player));
       return out;
     }

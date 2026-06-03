@@ -383,14 +383,20 @@ function dispatchEvent(ev) {
     if (killer) {
       const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off", venom: "Your venom finishes off", spikes: "Your thorns finish off" }[ev.cause] || "You slay";
       sendToPlayer(ev.killerId, { type: "log", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
-      // A kill may push the slayer over one or more level thresholds: hail them
-      // in gold and let the room share the moment.
-      for (const up of ev.levelUps || []) {
-        sendToPlayer(ev.killerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
-        roomCtx.toRoom(ev.roomId, { type: "gold", text: `${killer.name} reaches level ${up.level}!` }, ev.killerId);
-      }
       sendToPlayer(ev.killerId, buildRoomView(state, killer));
-      sendToPlayer(ev.killerId, buildPlayerView(state, killer));
+    }
+    // Shared kill XP (Model A): every participant gets the full value. The finisher
+    // already saw their xp in the slay line; co-fighters get an assist note. A kill
+    // may push anyone over a level threshold — hail them in gold and tell the room.
+    for (const a of ev.participants || []) {
+      const pl = state.players.get(a.playerId);
+      if (!pl) continue;
+      if (a.playerId !== ev.killerId && ev.xp) sendToPlayer(a.playerId, { type: "log", text: `You help bring down ${ev.victimName}. (+${ev.xp} xp)` });
+      for (const up of a.levelUps || []) {
+        sendToPlayer(a.playerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
+        roomCtx.toRoom(ev.roomId, { type: "gold", text: `${pl.name} reaches level ${up.level}!` }, a.playerId);
+      }
+      sendToPlayer(a.playerId, buildPlayerView(state, pl));
     }
     roomCtx.refreshRoom(ev.roomId, ev.killerId);
     return;

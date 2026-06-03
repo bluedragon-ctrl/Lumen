@@ -18,4 +18,8 @@ module.exports = {
   XP_BASE: 100,
   XP_GROWTH: 2,
   POINTS_PER_LEVEL: 2,
+  // One-off XP the first time a delver sets foot in a room (rewards descent;
+  // each room pays once, tracked per player in `visitedRooms`). Crafting XP is
+  // not a constant — it equals the output's sale value (see commands.js craft).
+  EXPLORE_XP: 5,
 };

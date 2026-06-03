@@ -17,6 +17,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   delta — felt at once, but no free heal). A level-up hails the slayer in **gold**
   in the console and broadcasts the moment to the room. The player panel shows
   unspent points next to the level. Existing saves backfill `unspentPoints` to 0.
+- **More ways to earn XP (kills aren't the only source).**
+  - **Shared kill XP** — everyone who fought a mob now earns the **full** XP when it
+    dies, not just whoever landed the killing blow. Participants are read from the
+    mob's existing threat table — anyone who actually traded blows with it (dealt
+    damage or was struck, i.e. threat > 0), plus the finisher; merely standing in
+    the room with a hostile mob doesn't count. So grouping is rewarded rather than
+    taxed, without letting a bystander leech. The finisher sees `(+N xp)` in
+    the slay line; co-fighters get a "you help bring down …" assist note. Co-op,
+    no division (Model A); threat-weighting can layer on later.
+  - **Crafting XP** — a successful `craft` grants XP equal to the output's **sale
+    value × quantity**, so the reward scales with what you made (and thus the
+    rarity/cost of its inputs); spamming a cheap recipe pays almost nothing.
+  - **Exploration XP** — the **first** time a delver enters a room they earn
+    `EXPLORE_XP` (default **5**, in `config.js`), tracked per player in
+    `visitedRooms`. Rewards descent into new ground; each room pays once. Existing
+    saves seed `visitedRooms` with the current room (no retroactive windfall).
 - **Sit & sleep — rest & recovery (`sit` / `sleep` / `stand`)** — posture is now a
   first-class actor state and the **only** way to recover HP (mana still trickles
   while standing). `sit` (alias `rest`) mends **1 HP and 1 MP every 5 ticks**;
