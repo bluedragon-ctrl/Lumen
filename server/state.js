@@ -212,6 +212,23 @@ function makeItemInstance(ref, world) {
   return inst;
 }
 
+/**
+ * Drop an item instance onto a room floor, merging into an existing stack of the
+ * same stackable template (so three dead grubs read as "a dead grub ×3", not three
+ * separate piles). Mirrors `addToInventory` on the carry side.
+ */
+function addToFloor(rt, inst, world) {
+  const t = world.items[inst.template];
+  if (t.stackable) {
+    const ex = rt.items.find((i) => i.template === inst.template);
+    if (ex) {
+      ex.qty = (ex.qty || 1) + (inst.qty || 1);
+      return;
+    }
+  }
+  rt.items.push(inst);
+}
+
 // --- Economy ---------------------------------------------------------------
 // Every (non-currency) item carries a `value` — the price to buy it from a
 // trader. A trader pays SELL_RATE of that value when buying an item from a
@@ -486,6 +503,7 @@ class GameState {
       magnitude: spec.magnitude || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
+      source: spec.source || null, // "item" = sustained by worn/carried gear; survives death
       remaining: spec.duration != null ? spec.duration : null, // null = permanent
       good: spec.good !== false,
     });
@@ -800,7 +818,11 @@ class GameState {
         if (li.fuel <= 0) {
           li.fuel = 0;
           li.lit = false;
-          events.push({ type: "light-out", playerId: p.id, item: li.template });
+          // A non-refuellable light (a torch) is spent for good when it burns out —
+          // there's nothing to refill, so the husk just clutters the slot. Consume it.
+          const consumed = !(tmpl.light && tmpl.light.fuelItem);
+          if (consumed) p.equipment.light = null;
+          events.push({ type: "light-out", playerId: p.id, item: li.template, consumed });
         }
       }
     }
@@ -1245,16 +1267,14 @@ class GameState {
     const dropped = [];
     for (const l of t.loot || []) {
       if (Math.random() < l.chance) {
-        rt.items.push(makeItemInstance({ template: l.template }, this.world));
+        addToFloor(rt, makeItemInstance({ template: l.template }, this.world), this.world);
         dropped.push(this.world.items[l.template].name);
       }
     }
     if (t.shards) {
       const shards = rollDice(t.shards);
       if (shards > 0) {
-        const pile = rt.items.find((i) => i.template === "shards");
-        if (pile) pile.qty = (pile.qty || 1) + shards;
-        else rt.items.push(makeItemInstance({ template: "shards", qty: shards }, this.world));
+        addToFloor(rt, makeItemInstance({ template: "shards", qty: shards }, this.world), this.world);
         dropped.push(`${shards} shards`);
       }
     }
@@ -1336,6 +1356,13 @@ class GameState {
   _respawn(player, deathRoom) {
     const start = this.world.playerTemplate.startLocation;
     player.hp = player.maxHp;
+    // Death snuffs every carried light source — you wake at the rim in the dark.
+    for (const inst of [...Object.values(player.equipment || {}), ...(player.inventory || [])])
+      if (inst && inst.lit) inst.lit = false;
+    // Transient effects (potions, venom, bleeds, glows) end on death. Effects
+    // sustained by worn/carried gear (source "item") persist — the gear is still
+    // on you when you respawn.
+    player.states = (player.states || []).filter((s) => s.source === "item");
     this.setPlayerLocation(player, start);
     player.pending = null;
     player.energy = 0;
@@ -1345,4 +1372,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };

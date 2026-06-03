@@ -170,8 +170,13 @@ document.getElementById("ex-back").addEventListener("click", () => sendCommand("
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {
   $("p-name").textContent = p.name + (p.posture && p.posture !== "standing" ? ` · ${p.posture}` : "");
-  const pts = p.unspentPoints ? ` · ${p.unspentPoints} pt${p.unspentPoints === 1 ? "" : "s"}` : "";
-  $("p-level").textContent = `Lv ${p.level}${pts} · ${p.xp} xp · ${p.shards || 0} shards`;
+  // Unspent training points only show when you have some, in gold so they catch
+  // the eye (prompting a visit to `train`).
+  const pts = p.unspentPoints
+    ? ` · <span class="train-pts">${p.unspentPoints} pt${p.unspentPoints === 1 ? "" : "s"}</span>`
+    : "";
+  $("p-level").innerHTML = `Lv ${p.level}${pts} · ${p.xp} xp`;
+  $("p-shards").textContent = `${p.shards || 0} shards`;
 
   // States
   const states = $("p-states");
@@ -305,7 +310,16 @@ function argCandidates(cmd) {
       if (p) out.push(...p.inventory.filter((i) => i.type === "consumable").map((i) => lastWord(i.name)));
       return out;
     }
-    case "craft": case "make": return p ? (p.recipes || []).map((r) => lastWord(r)) : [];
+    // Recipe names are multi-word ("Iron Dagger"); complete the whole name (lowercased)
+    // rather than just the last word, matching what `learn` tells you to type and what
+    // the server's craft matcher accepts.
+    case "craft": case "make": return p ? (p.recipes || []).map((r) => r.toLowerCase()) : [];
+    case "buy": {
+      // Wares of any trader in the room (their `sells` list, item names).
+      const out = [];
+      if (room) for (const m of room.contents.mobs) if (m.sells) out.push(...m.sells.map(lastWord));
+      return out;
+    }
     case "train": return ["might", "vitality", "intellect", "wits", "perception"];
     case "equip": case "wield": case "wear": case "hold":
       return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];

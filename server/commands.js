@@ -10,7 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { makeItemInstance, addToFloor, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
 const { EXPLORE_XP } = require("./config");
 
 // Searching the room for hidden features costs roughly one action's worth of
@@ -299,7 +299,7 @@ function drop(state, player, arg, ctx) {
   const idx = findItem(player.inventory, state.world, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory.splice(idx, 1)[0];
-  state.rooms[player.location].items.push(inst);
+  addToFloor(state.rooms[player.location], inst, state.world);
   const name = state.world.items[inst.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} drops ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);

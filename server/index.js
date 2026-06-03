@@ -157,7 +157,11 @@ function dispatchEvent(ev) {
   if (ev.type === "light-out") {
     const player = state.players.get(ev.playerId);
     if (!player) return;
-    sendToPlayer(ev.playerId, { type: "log", text: `${world.items[ev.item].name} gutters out. Darkness closes in.` });
+    const itemName = world.items[ev.item].name;
+    const text = ev.consumed
+      ? `${itemName} gutters out, burns to ash, and crumbles away. Darkness closes in.`
+      : `${itemName} gutters out. Darkness closes in.`;
+    sendToPlayer(ev.playerId, { type: "log", text });
     sendToPlayer(ev.playerId, buildRoomView(state, player));
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
     return;

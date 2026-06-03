@@ -5,7 +5,8 @@
       "name": "lumen",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
-      "port": 3737
+      "port": 3737,
+      "autoPort": true
     }
   ]
 }

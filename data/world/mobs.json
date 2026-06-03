@@ -199,8 +199,8 @@
   },
   "rim-hatcher": {
     "id": "rim-hatcher",
-    "name": "Wick the lightbug-keeper",
-    "description": "A slight, soft-spoken woman, half-lit blue by the cells she tends, with a gauze net over one shoulder and a lightbug or two riding her sleeve. She talks to the bugs more than to delvers, and swears the wild ones down in the hollow sing back.",
+    "name": "Wick the rim-farmer",
+    "description": "A slight, soft-spoken woman, half-lit blue by the cells she tends, with a gauze net over one shoulder, a goad-stick through her belt, and a lightbug or two riding her sleeve. She works the three sheds single-handed now — the bug-cells, the stonebug pens, and the mushroom beds — and talks to her stock more than to delvers, swearing the wild bugs down in the hollow sing back.",
     "maxHp": 18,
     "speed": 12,
     "armour": 0,
@@ -211,24 +211,7 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "checks a clutch of pale eggs against the glow", "murmurs something fond to a drifting mote", "wipes the condensation from a glass cell"] }
-    ]
-  },
-  "rim-stockherd": {
-    "id": "rim-stockherd",
-    "name": "Bray the stockherd",
-    "description": "A heavyset, slow-moving man in a hide apron stiff with old work, a worn goad-stick across his shoulders. He talks to his stonebugs in a low, patient drone and reckons them better company than most delvers — quieter, he says, and they never run up a tab.",
-    "maxHp": 22,
-    "speed": 12,
-    "armour": 0,
-    "ward": 0,
-    "attributes": { "might": 6, "vitality": 6, "intellect": 3, "wits": 4, "perception": 4 },
-    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
-    "behavior": "passive",
-    "hostile": false,
-    "actions": [
-      { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the nearest pen", "drones something low and fond to the grazing herd", "checks the churned ground for a strayed bug", "wipes his hands on the stiff hide apron"] }
+      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the pens", "picks a bold grub off the mushroom beds and pockets it for bait", "checks a clutch of pale eggs against the glow", "wipes her hands on a work-stiff apron"] }
     ],
     "shop": {
       "sells": [{ "template": "bug-meat" }]
