@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Auto-retaliation on being hit** — when a player is struck by a mob or
+  targeted by a hostile spell, they now automatically engage in combat without
+  needing to manually type `attack <mob>`. If already in combat with another
+  target, they stay focused on their current opponent. Eliminates input delay
+  during multi-mob engagements, mirroring classic MUD behavior.
+### Fixed
+- **Tab key command completion** — autocompleted commands now include a trailing
+  space, allowing players to immediately continue typing the argument without
+  manually adding a space. Improves rapid command entry.
+### Added (continued)
 - **Multiplayer test subagent** — a `multiplayer-tester` agent
   ([.claude/agents/multiplayer-tester.md](.claude/agents/multiplayer-tester.md),
   runs on Sonnet) that drives several browser clients at once to verify

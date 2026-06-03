@@ -50,6 +50,7 @@ function handle(msg) {
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
+    case "combat-auto-start": addLine(`⚔ You engage the ${msg.targetName} in combat!`, "log"); break;
     case "room": lastRoom = msg.room; renderRoom(msg.room); break;
     case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
@@ -378,16 +379,16 @@ function handleTab() {
   if (tabState && tabState.base === value) {
     // cycle
     tabState.idx = (tabState.idx + 1) % tabState.matches.length;
-    cmdEl.value = head + tabState.matches[tabState.idx];
+    cmdEl.value = head + tabState.matches[tabState.idx] + " ";
     return;
   }
   const matches = completionCandidates(value).filter((c) => c.startsWith(token));
   if (!matches.length) return;
   if (matches.length === 1) {
-    cmdEl.value = head + matches[0];
+    cmdEl.value = head + matches[0] + " ";
     tabState = null;
   } else {
-    cmdEl.value = head + matches[0];
+    cmdEl.value = head + matches[0] + " ";
     tabState = { base: cmdEl.value, matches, idx: 0 };
   }
 }
