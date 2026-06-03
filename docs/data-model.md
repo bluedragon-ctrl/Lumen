@@ -211,6 +211,7 @@ A map of `mobId → template`.
 | `shop`       | block?  | Makes the mob a trader: `{ "sells": [{ template, price? }] }` — its stock, each sold at the item's `value` (or an optional `price` override). There is **no buy list**: the trader buys *any* valued item from a player at its `sellValue`. Players use `list`/`buy`/`sell` in the room. |
 | `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
+| `posture`    | enum?   | Starting posture: `standing` (default) \| `sitting` \| `sleeping`. A `sitting`/`sleeping` mob is **inert** — it won't wander, attack, or emote — until a blow (melee or hostile spell) **rouses** it to standing. Authors dozing guardians / resting NPCs and ambush openings. |
 
 ### Mob actions (weighted)
 

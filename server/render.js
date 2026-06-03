@@ -5,7 +5,11 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey } = require("./state");
+const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey } = require("./state");
+
+// How a posture reads to OTHERS in the room (the social tag). Standing is the
+// default and shows nothing.
+const POSTURE_LABEL = { sitting: "sitting", sleeping: "asleep" };
 
 function itemView(inst, world) {
   if (!inst) return null;
@@ -39,6 +43,8 @@ function buildPlayerView(state, p) {
       energy: p.energy,
       energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
       speed: p.speed,
+      posture: p.posture || "standing", // sit/sleep for rest recovery
+
       armour: defence.armour,
       ward: defence.ward, // gear Ward + innate Ward from Wits
       evasion: defence.evasion, // Wits-derived dodge (fraction, e.g. 0.06)
@@ -68,7 +74,7 @@ function buildRoomView(state, p) {
   const room = w.rooms[p.location];
   const rt = state.rooms[p.location];
   const light = rt.light;
-  const see = canSee(p.perception, light);
+  const see = canPerceive(p, light); // a sleeping viewer is blind, room light notwithstanding
 
   // Hidden features stay out of the view until this player has searched them out.
   const mobs = [];
@@ -76,7 +82,7 @@ function buildRoomView(state, p) {
     if (!mobVisibleTo(state, p, m)) continue;
     const t = w.mobs[m.template];
     const luminous = !!t.emitsLight;
-    if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous });
+    if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous, posture: POSTURE_LABEL[m.posture] || undefined });
   }
   const items = see
     ? rt.items.filter((i) => itemVisibleTo(p, i)).map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
@@ -93,7 +99,7 @@ function buildRoomView(state, p) {
   for (const o of state.playersIn(p.location)) {
     if (o.id === p.id) continue;
     const luminous = actorEmitLight(o) > 0;
-    if (see || luminous) players.push({ id: o.id, name: o.name, luminous });
+    if (see || luminous) players.push({ id: o.id, name: o.name, luminous, posture: POSTURE_LABEL[o.posture] || undefined });
   }
 
   return {
@@ -166,11 +172,11 @@ function buildExamineView(state, p, q) {
   const w = state.world;
   const rt = state.rooms[p.location];
   const light = rt.light;
-  const see = canSee(p.perception, light);
+  const see = canPerceive(p, light); // a sleeping examiner perceives nothing
   // Detail (HP, description, specs) only at *clear* sight; in the partial/dim
   // tier you make out what a thing is, but not its particulars.
   const dimBelow = p.perception && p.perception.dimBelow != null ? p.perception.dimBelow : p.perception.blindBelow;
-  const detailed = light >= dimBelow;
+  const detailed = see && light >= dimBelow;
   const ql = (q || "").toLowerCase();
   const hit = (id, name) => id.toLowerCase() === ql || name.toLowerCase().includes(ql);
   const tooDim = { hints: ["Too dim to make out details."] };
@@ -186,6 +192,9 @@ function buildExamineView(state, p, q) {
           : t.lightAggro ? "Calm in the dark — light rouses it."
           : "It seems harmless.",
       ];
+      // A dozing/resting creature is inert until struck — telegraph the opening.
+      if (m.posture === "sleeping") hints.push("Asleep — it hasn't noticed you. Strike and it wakes.");
+      else if (m.posture === "sitting") hints.push("At rest — not yet roused.");
       // Telegraph the data-driven combat triggers (see applyHitOutcome).
       if (t.attack && Array.isArray(t.attack.onHit) && t.attack.onHit.some((o) => o.type === "damage-over-time"))
         hints.push("Venomous — its bite festers.");
@@ -236,10 +245,11 @@ function buildExamineView(state, p, q) {
       }
     }
     for (const o of state.playersIn(p.location)) {
-      if (o.id !== p.id && hit(o.id, o.name))
-        return detailed
-          ? entity("player", o.id, o.name, "A fellow delver.", { bars: [{ label: "HP", value: o.hp, max: o.maxHp, kind: "hp" }] })
-          : entity("player", o.id, o.name, null, { dim: true, ...tooDim });
+      if (o.id !== p.id && hit(o.id, o.name)) {
+        if (!detailed) return entity("player", o.id, o.name, null, { dim: true, ...tooDim });
+        const phint = o.posture === "sleeping" ? ["Asleep."] : o.posture === "sitting" ? ["Sitting, at rest."] : [];
+        return entity("player", o.id, o.name, "A fellow delver.", { bars: [{ label: "HP", value: o.hp, max: o.maxHp, kind: "hp" }], hints: phint });
+      }
     }
   }
   // Carried items are always examined clearly (in hand).

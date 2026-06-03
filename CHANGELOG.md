@@ -6,16 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Sit & sleep — rest & recovery (`sit` / `sleep` / `stand`)** — posture is now a
+  first-class actor state and the **only** way to recover HP (mana still trickles
+  while standing). `sit` (alias `rest`) mends **1 HP and 1 MP every 5 ticks**;
+  `sleep` mends **1 HP and 1 MP every 2 ticks** but blinds you — while asleep your
+  perception reads as 0 and the room as dark, so you can't see what's around you.
+  Sitting has no effect on sight. Being struck (melee or hostile spell) instantly
+  **rouses you to standing** and (via auto-retaliation) into the fight; moving,
+  attacking, or casting also stands you first. Resting is barred mid-fight. Rest
+  recovery *replaces* the standing mana trickle (no double-dipping). Posture is
+  **shared with mobs**: a mob template may declare `"posture": "sitting" | "sleeping"`
+  to author a dozing guardian or resting NPC — inert (no wander/attack/emote) until
+  a blow wakes it, enabling ambush-style openings. Posture is broadcast to the room
+  and tagged in others' views ("Bob (asleep)"); resets to standing on login.
 - **Auto-retaliation on being hit** — when a player is struck by a mob or
   targeted by a hostile spell, they now automatically engage in combat without
   needing to manually type `attack <mob>`. If already in combat with another
   target, they stay focused on their current opponent. Eliminates input delay
   during multi-mob engagements, mirroring classic MUD behavior.
-### Fixed
-- **Tab key command completion** — autocompleted commands now include a trailing
-  space, allowing players to immediately continue typing the argument without
-  manually adding a space. Improves rapid command entry.
-### Added (continued)
 - **Multiplayer test subagent** — a `multiplayer-tester` agent
   ([.claude/agents/multiplayer-tester.md](.claude/agents/multiplayer-tester.md),
   runs on Sonnet) that drives several browser clients at once to verify
@@ -170,6 +178,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Lightbug spawns moved from the plaza to the new hatchery.
 
 ### Fixed
+- **Tab key command completion** — autocompleted commands now include a trailing
+  space, so players can immediately type the argument without manually adding a
+  space. Improves rapid command entry.
+- **Auto-retaliation events now reach the client** — `combat-auto-start` (and the
+  new `player-woke` / `mob-woke`) had no handler in the tick-event dispatcher, so
+  the "you fight back" line was silently dropped; all three are now narrated.
 - Mob wandering no longer causes difficulty spikes: only **lightbugs** wander now.
   Gloom-crawlers, giant rats, and cave bats stay in their authored rooms (the
   crawler still *flees* a bright light), so hostiles no longer drift together into

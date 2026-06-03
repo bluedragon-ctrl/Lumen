@@ -177,6 +177,9 @@ function main() {
     // A calm mob roused to attack once room light exceeds `above` (inverse of flee).
     if (m.lightAggro && typeof m.lightAggro.above !== "number")
       errs.push(`mob ${id}: lightAggro.above must be a number`);
+    // Authored starting posture — a dozing/resting mob is inert until struck.
+    if (m.posture != null && !["standing", "sitting", "sleeping"].includes(m.posture))
+      errs.push(`mob ${id}: posture must be "standing", "sitting", or "sleeping"`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")
