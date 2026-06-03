@@ -84,7 +84,11 @@ function buildRoomView(state, p) {
     if (!mobVisibleTo(state, p, m)) continue;
     const t = w.mobs[m.template];
     const luminous = !!t.emitsLight;
-    if (see || luminous) mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous, posture: POSTURE_LABEL[m.posture] || undefined });
+    if (see || luminous) {
+      // A trader exposes the names of its wares so the client can Tab-complete `buy`.
+      const sells = t.shop && t.shop.sells ? t.shop.sells.map((o) => w.items[o.template].name) : undefined;
+      mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous, posture: POSTURE_LABEL[m.posture] || undefined, sells });
+    }
   }
   const items = see
     ? rt.items.filter((i) => itemVisibleTo(p, i)).map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))

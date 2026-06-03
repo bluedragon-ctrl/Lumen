@@ -149,6 +149,8 @@ body {
 #player { grid-area: player; padding: 10px 12px; }
 .player-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
 #p-name { font-weight: 700; color: var(--accent); }
+.shards-line { margin-bottom: 8px; }
+.train-pts { color: var(--gold); font-weight: 600; }
 .muted { color: var(--muted); }
 #player h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; border-bottom: 1px solid var(--edge); padding-bottom: 3px; }
 .attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin: 6px 0; }

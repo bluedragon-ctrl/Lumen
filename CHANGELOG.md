@@ -94,7 +94,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   needing to manually type `attack <mob>`. If already in combat with another
   target, they stay focused on their current opponent. Eliminates input delay
   during multi-mob engagements, mirroring classic MUD behavior.
+### Changed
+- **One farmer for the Rim's farming quarter** — removed **Bray the stockherd**
+  and re-cast **Wick** (formerly the lightbug-keeper) as **Wick the rim-farmer**,
+  who now tends all three farming sheds — the hatchery, the stockpens, and the
+  mushroom beds — single-handed from the hatchery hub. She inherits Bray's
+  **bug-meat** trade, so the meat is still purchasable, and the stockpen/mushroom-
+  bed room descriptions now name her as their keeper.
+- **Spent torches crumble away** — when a non-refuellable light (a torch) burns
+  its last fuel, it's now consumed entirely instead of lingering as a dead husk
+  in the light slot ("gutters out, burns to ash, and crumbles away"). Refuellable
+  lights (the lantern) still keep their shell so you can `refuel` them.
+- **`buy` now Tab-completes** — the argument cycles through the wares of any
+  trader in the room (the client now receives each shop's `sells` list), matching
+  the existing completion for `get`/`sell`/etc.
+- **Player panel header reflow** — shards moved to their own line below
+  `Lv · pts · xp` (the four-part line no longer overflows narrow panels), and
+  unspent training points now render in gold so they catch the eye and prompt a
+  visit to `train`. Points still only appear when you actually have some.
+
 ### Fixed
+- **Stackable loot now merges on the floor** — dead grubs, chitin, and other
+  stackable drops were each pushed as a separate floor entry, so a cleared nest
+  read as a wall of identical "a dead grub" lines instead of "a dead grub ×3".
+  A new shared `addToFloor` helper merges into an existing stack (mirroring
+  `addToInventory`), used by both mob loot drops and the `drop` command. (The
+  items were already flagged `stackable`; only the floor side failed to merge.)
+- **Death snuffs your lights and clears transient effects** — respawning at the
+  rim now extinguishes every carried light (equipped or stowed) and ends any
+  active status effects (potions, venom, bleeds, glows). Effects sustained by
+  worn/carried gear (tagged `source: "item"`) persist, since the gear is still on
+  you when you wake.
+- **Tab completion now works for `craft`/`make`** — recipe names are multi-word
+  ("Iron Dagger", "Minor Light Potion"), but the completion candidates were run
+  through `lastWord`, collapsing them to just the trailing word ("dagger",
+  "potion", "bar"). Typing `craft iron`+Tab matched nothing and did nothing. The
+  argument now completes against the full lowercased recipe name — exactly what
+  `learn` tells you to type and what the server's craft matcher accepts.
 - **Mob status-effect expiry now announced** — when a status effect (venom,
   bleed, glow, …) wears off a mob, players in the room now see a message
   (e.g. "The venom drains from the cave bat."), gated by `canSeeMob` like other
