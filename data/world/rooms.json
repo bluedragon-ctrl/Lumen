@@ -19,7 +19,7 @@
     "depth": 0,
     "ambientLight": 5,
     "exits": { "south": "rim.plaza" },
-    "fixtures": [],
+    "fixtures": ["hearth"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 60 }]
   },
@@ -39,15 +39,46 @@
     "id": "rim.hatchery",
     "zone": "rim",
     "name": "The Lightbug Hatchery",
-    "description": "A long shed of stacked glass cells aglow with captive lightbugs, their massed shimmer washing the canvas walls a soft blue-white. Down in the abyss the bugs drift wild; here the Rim breeds them — for the steady, fuel-free light a delver can carry, and for the luminous glands the alchemists prize. The keeper moves along the cells with a long gauze net. The market lies back south.",
+    "description": "A long shed of stacked glass cells aglow with captive lightbugs, their massed shimmer washing the canvas walls a soft blue-white. Down in the abyss the bugs drift wild; here the Rim breeds them — for the steady, fuel-free light a delver can carry, and for the luminous glands the alchemists prize. The keeper moves along the cells with a long gauze net. The market lies back south; a smell of churned moss and livestock drifts in from the stockpens to the north, and to the west the bug-glow bleeds through into the mushroom beds.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "south": "rim.market" },
+    "exits": { "south": "rim.market", "north": "rim.corral", "west": "rim.mushroomfarm" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "rim-hatcher", "max": 1, "respawn": 60 },
       { "mob": "lightbug", "max": 3, "respawn": 20 }
+    ]
+  },
+  "rim.corral": {
+    "id": "rim.corral",
+    "zone": "rim",
+    "name": "The Stockpens",
+    "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. New hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "south": "rim.hatchery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "rim-stockherd", "max": 1, "respawn": 60 },
+      { "mob": "stonebug", "max": 3, "respawn": 30 }
+    ]
+  },
+  "rim.mushroomfarm": {
+    "id": "rim.mushroomfarm",
+    "zone": "rim",
+    "name": "The Mushroom Beds",
+    "description": "Stacked timber beds of dark, dampened soil run the length of a low canvas lean-to, each one furred with the plump, ivory palecaps the Rim cooks down for broth. There are no lanterns here — the beds drink the blue bug-light bleeding through the shared wall from the hatchery, for in the dark, fungus grows only where the light reaches. Pale grubs inch over the richest beds, fattening on the crop; the keeper lets them be, and picks them off for bait when they grow bold. The hatchery is back east.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "east": "rim.hatchery" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 30 }
+    ],
+    "spawns": [
+      { "mob": "grub", "max": 2, "respawn": 30 }
     ]
   },
   "rim.mageshed": {

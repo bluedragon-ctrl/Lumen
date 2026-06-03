@@ -154,7 +154,7 @@
       { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
     ],
     "shop": {
-      "sells": [{ "template": "mushroom-soup" }]
+      "sells": [{ "template": "mushroom-soup" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "beer" }]
     }
   },
   "rim-shopkeeper": {
@@ -213,6 +213,26 @@
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "checks a clutch of pale eggs against the glow", "murmurs something fond to a drifting mote", "wipes the condensation from a glass cell"] }
     ]
+  },
+  "rim-stockherd": {
+    "id": "rim-stockherd",
+    "name": "Bray the stockherd",
+    "description": "A heavyset, slow-moving man in a hide apron stiff with old work, a worn goad-stick across his shoulders. He talks to his stonebugs in a low, patient drone and reckons them better company than most delvers — quieter, he says, and they never run up a tab.",
+    "maxHp": 22,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 6, "intellect": 3, "wits": 4, "perception": 4 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the nearest pen", "drones something low and fond to the grazing herd", "checks the churned ground for a strayed bug", "wipes his hands on the stiff hide apron"] }
+    ],
+    "shop": {
+      "sells": [{ "template": "bug-meat" }]
+    }
   },
   "rim-mage": {
     "id": "rim-mage",
@@ -297,7 +317,7 @@
       { "type": "idle", "weight": 5 },
       { "type": "emote", "weight": 2, "messages": ["grazes at the moss with slow mandibles", "trundles a slow half-circle", "tucks its plates tighter, then relaxes"] }
     ],
-    "loot": [{ "template": "chitin-plate", "chance": 1 }]
+    "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "bug-meat", "chance": 1 }]
   },
   "thornbug": {
     "id": "thornbug",
@@ -319,7 +339,7 @@
       { "type": "idle", "weight": 5 },
       { "type": "emote", "weight": 2, "messages": ["bristles its spines", "rasps at a glowing cap", "rolls half-shut, then unfurls"] }
     ],
-    "loot": [{ "template": "chitin-spike", "chance": 1 }]
+    "loot": [{ "template": "chitin-spike", "chance": 1 }, { "template": "bug-meat", "chance": 0.5 }]
   },
   "grub": {
     "id": "grub",

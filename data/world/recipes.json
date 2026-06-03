@@ -66,5 +66,32 @@
       { "template": "luminescent-gland", "qty": 1 }
     ],
     "output": { "template": "searing-flare", "qty": 1 }
+  },
+  "mushroom-soup": {
+    "id": "mushroom-soup",
+    "name": "Mushroom Soup",
+    "station": "cooking",
+    "inputs": [
+      { "template": "palecap-mushroom", "qty": 2 }
+    ],
+    "output": { "template": "mushroom-soup", "qty": 1 }
+  },
+  "cooked-skewer": {
+    "id": "cooked-skewer",
+    "name": "Bug-Meat Skewer",
+    "station": "cooking",
+    "inputs": [
+      { "template": "bug-meat", "qty": 1 }
+    ],
+    "output": { "template": "cooked-skewer", "qty": 1 }
+  },
+  "roasted-grubs": {
+    "id": "roasted-grubs",
+    "name": "Roasted Grubs",
+    "station": "cooking",
+    "inputs": [
+      { "template": "grub", "qty": 3 }
+    ],
+    "output": { "template": "roasted-grubs", "qty": 1 }
   }
 }
