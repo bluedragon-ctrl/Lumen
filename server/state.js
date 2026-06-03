@@ -870,9 +870,9 @@ class GameState {
    * caller narrates: { resisted } | { damage, killed, death }.
    *
    * Mana and target validation happen in the command handler; by here the cast
-   * is committed.
+   * is committed. `events` is optional and used to push auto-retaliation events.
    */
-  castSpell(player, spell, mob) {
+  castSpell(player, spell, mob, events = []) {
     const w = this.world;
     const eff = spell.effect || {};
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
@@ -898,6 +898,14 @@ class GameState {
     }
     // A kill may remove a luminous mob; refresh the room's light either way.
     this.rooms[player.location].light = this.computeRoomLight(player.location);
+
+    // Auto-retaliate on hostile spell: if the player isn't already attacking something, target this mob
+    if (spell.hostile && !player.pending && player.hp > 0 && mob.hp > 0) {
+      player.pending = { type: "attack", targetId: mob.id };
+      const t = w.mobs[mob.template];
+      events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
+    }
+
     return result;
   }
 
@@ -1055,6 +1063,12 @@ class GameState {
         hurt: (dmg, cause) => this._hurtPlayer(target, dmg, events, { cause }), // self-damage onDamage (rare)
       },
     });
+
+    // Auto-retaliate: if the player isn't already attacking something, target this mob
+    if (!target.pending && target.hp > 0) {
+      target.pending = { type: "attack", targetId: m.id };
+      events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+    }
   }
 
   _mobMove(m, t, roomId, events, verb, exits) {
