@@ -213,6 +213,22 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-effect-expired") {
+    // A status effect (venom/bleed/glow) wore off a mob — mirror of player effect-expired.
+    const flavour = {
+      venom: (n) => `The venom drains from ${n}.`,
+      bleed: (n) => `${cap(n)}'s wounds close.`,
+    };
+    const line = ev.effectType === "emit-light"
+      ? (n) => `The glow fades from ${n}.`
+      : (flavour[ev.name] || ((n) => `The ${ev.name} fades from ${n}.`));
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: line(n) });
+    }
+    return;
+  }
+
   if (ev.type === "attack") {
     if (ev.by === "player") {
       // The attacker targeted it, so they always know what it is.

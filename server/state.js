@@ -489,7 +489,10 @@ class GameState {
           const src = s.sourceId ? this.players.get(s.sourceId) : null;
           if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
         }
-        if (!dead) this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, effectType: s.type, name: s.name }));
+        if (!dead) {
+          const t = this.world.mobs[m.template];
+          this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, mobName: t.name, effectType: s.type, name: s.name, emitsLight: !!t.emitsLight, light: rt.light }));
+        }
       }
     }
   }
