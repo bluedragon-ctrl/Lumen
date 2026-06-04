@@ -81,6 +81,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     (`faction:"player"` + `ownerId`) for live mob-vs-mob testing.
 
 ### Changed
+- **Summon kills now share XP with the owner.** When an allied summon helps wear
+  down a mob, its contribution credits its **owner** in the kill's participation
+  share — so a delver whose pet did the work no longer misses out when something
+  else lands the final blow. (The finisher case was already credited.) Owner is
+  credited once, only if present and alive, like any participant; a wild mob's
+  threat key still credits no one.
 - **Ward is now a percent defence, not flat mitigation.** Ward's core role is a
   **percent chance to negate a hostile *spell* outright** (1 ward = 1%, **uncapped** —
   ward 100+ shrugs magic off entirely), shared by both directions via a single
