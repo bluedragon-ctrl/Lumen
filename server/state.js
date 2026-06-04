@@ -281,6 +281,10 @@ function makeMobInstance(mobId, world) {
     // (kill credit, future pet upkeep); null for wild creatures.
     faction: "wild",
     ownerId: null,
+    summonerId: null, // who conjured it (player or mob id); null if not summoned
+    summonGroup: null, // per-owner recast-cap key (defaults to the source spell id)
+    expiresIn: null, // ticks until it winks out; null = permanent
+    noSpoils: false, // summoned creatures drop no loot/XP on any death
     posture: tmpl.posture || "standing", // authored dozing/resting NPCs; inert until roused
   };
 }
@@ -386,6 +390,100 @@ class GameState {
     this.rooms[roomId].mobs.push(m);
     this._adjustOwned(m, +1);
     return m;
+  }
+
+  /**
+   * The summon primitive. Conjures `count` instances of `mobId` into `roomId`,
+   * stamped with faction/ownership/lifetime, and places them WITHOUT a spawner
+   * `origin` (so they never respawn or count against a room's spawn cap). Used by
+   * both the player Summon spell (faction "player", an ownerId, a lifetime) and a
+   * mob `summon` action (faction "wild", a summonerId, permanent). Pushes one
+   * `summon` event for narration. Returns the new instances.
+   */
+  _summon({ roomId, mobId, count = 1, faction = "wild", ownerId = null, summonerId = null, group = null, lifetime = null, by = "mob", byName = null, verb = null }, events = []) {
+    const t = this.world.mobs[mobId];
+    if (!t) throw new Error(`summon: unknown mob template ${mobId}`);
+    const made = [];
+    for (let i = 0; i < count; i++) {
+      const m = makeMobInstance(mobId, this.world);
+      m.faction = faction;
+      m.ownerId = ownerId;
+      m.summonerId = summonerId;
+      m.summonGroup = group;
+      m.expiresIn = lifetime;
+      m.noSpoils = true;
+      this.rooms[roomId].mobs.push(m);
+      made.push(m);
+    }
+    this.rooms[roomId].light = this.computeRoomLight(roomId); // a glowing summon lights the room
+    events.push({
+      type: "summon", roomId, by, byId: by === "player" ? ownerId : summonerId, byName,
+      mobTemplate: mobId, mobName: t.name, emitsLight: !!t.emitsLight,
+      count: made.length, light: this.rooms[roomId].light, verb,
+    });
+    return made;
+  }
+
+  /** Remove a summoned mob from the world silently — no corpse, loot, XP, or death
+   *  event, just a `summon-end`. Finds the mob's room by scan (few summons exist). */
+  _dismissSummon(mob, reason, events = []) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      const idx = rt.mobs.indexOf(mob);
+      if (idx < 0) continue;
+      rt.mobs.splice(idx, 1);
+      mob.hp = 0; // mark gone for any lingering reference
+      rt.light = this.computeRoomLight(roomId);
+      const t = this.world.mobs[mob.template];
+      events.push({ type: "summon-end", roomId, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, reason });
+      return;
+    }
+  }
+
+  /** Dismiss every summon owned by `ownerId` (owner death/disconnect). */
+  _dismissOwnedSummons(ownerId, reason, events = []) {
+    const owned = [];
+    for (const rt of Object.values(this.rooms)) for (const m of rt.mobs) if (m.ownerId === ownerId) owned.push(m);
+    for (const m of owned) this._dismissSummon(m, reason, events);
+    return events;
+  }
+
+  /** Relocate a player's owned summons from `from` to `dest` (follow on move).
+   *  Returns [{ mobName, emitsLight }] for the caller to narrate. Recomputes light
+   *  in both rooms if anything moved. Wild (ownerless) summons never follow. */
+  _moveSummonsWith(player, from, dest) {
+    const rtFrom = this.rooms[from], rtDest = this.rooms[dest];
+    const moved = [];
+    for (const m of [...rtFrom.mobs]) {
+      if (m.ownerId !== player.id) continue;
+      const idx = rtFrom.mobs.indexOf(m);
+      if (idx >= 0) rtFrom.mobs.splice(idx, 1);
+      rtDest.mobs.push(m);
+      const t = this.world.mobs[m.template];
+      moved.push({ mobName: t.name, emitsLight: !!t.emitsLight });
+    }
+    if (moved.length) {
+      rtFrom.light = this.computeRoomLight(from);
+      rtDest.light = this.computeRoomLight(dest);
+    }
+    return moved;
+  }
+
+  /** Count living summons sharing a `summonerId` (a mob's living brood). */
+  _broodCount(summonerId) {
+    let n = 0;
+    for (const rt of Object.values(this.rooms)) for (const m of rt.mobs) if (m.summonerId === summonerId && m.hp > 0) n++;
+    return n;
+  }
+
+  /** Tick summon lifetimes: decrement `expiresIn`, wink out at zero. */
+  _summonTick(events) {
+    for (const rt of Object.values(this.rooms)) {
+      for (const m of [...rt.mobs]) {
+        if (m.expiresIn == null) continue;
+        m.expiresIn -= 1;
+        if (m.expiresIn <= 0) this._dismissSummon(m, "expired", events);
+      }
+    }
   }
 
   // --- Spawner population accounting -----------------------------------------
@@ -772,9 +870,14 @@ class GameState {
 
   removePlayer(playerId) {
     const player = this.players.get(playerId);
-    if (player) this._deindexPlayer(player);
+    const events = [];
+    if (player) {
+      this._dismissOwnedSummons(player.id, "owner-gone", events); // disconnect unravels summons
+      this._deindexPlayer(player);
+    }
     this.players.delete(playerId);
     this.revealedMobs.delete(playerId); // drop ephemeral hidden-mob reveals on disconnect
+    return events;
   }
 
   /** Forget a player's ephemeral hidden-mob reveals (e.g. on leaving a room). */
@@ -921,6 +1024,7 @@ class GameState {
     this.resolveMobAI(events);
     this._respawnTick(events);
     this._harvestTick(events);
+    this._summonTick(events);
     this._mineTick(events);
     return events;
   }
@@ -1166,6 +1270,30 @@ class GameState {
     return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
   }
 
+  /**
+   * Resolve a player summon spell (effect.type "summon"). Spends mana/shards,
+   * dismisses this caster's existing summons of the same `group` (recast replaces,
+   * resetting the timer), then conjures the new one(s) via `_summon`. The per-owner
+   * cap of one-per-group is enforced purely by the dismiss step. Returns
+   * { mob, count, replaced } for the caller to narrate.
+   */
+  castSummon(player, spell, events = []) {
+    const eff = spell.effect || {};
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    const group = eff.group || spell.id;
+    const existing = [];
+    for (const rt of Object.values(this.rooms))
+      for (const m of rt.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
+    for (const m of existing) this._dismissSummon(m, "recast", events);
+    const made = this._summon({
+      roomId: player.location, mobId: eff.mob, count: eff.count || 1,
+      faction: "player", ownerId: player.id, summonerId: player.id, group,
+      lifetime: eff.duration != null ? eff.duration : null, by: "player", byName: player.name,
+    }, events);
+    return { mob: this.world.mobs[eff.mob], count: made.length, replaced: existing.length };
+  }
+
   /** Support-spell threat (the deferred aggro hook): healing/buffing an ally makes
    *  whatever is currently fighting that ally turn on the caster too. `amount`
    *  mirrors the damage→threat convention — the HP/mana mended, or a flat 1 for a
@@ -1251,6 +1379,7 @@ class GameState {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return aggressive && t.attack && enemies.length > 0;
         if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && enemies.length > 0;
+        if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && enemies.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
@@ -1264,6 +1393,7 @@ class GameState {
     if (!choice || choice.type === "idle") return;
     if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, enemies);
     if (choice.type === "cast") return this._mobCast(m, t, roomId, events, enemies, choice.spell);
+    if (choice.type === "summon") return this._mobSummon(m, t, roomId, events, choice);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
@@ -1407,7 +1537,7 @@ class GameState {
       sourceId: player.id, // a player's reflected DoT credits them
       deal: (dmg) => {
         player.hp -= dmg;
-        if (player.hp <= 0) { const d = this._respawn(player, roomId); events.push(d); return d; }
+        if (player.hp <= 0) { const d = this._respawn(player, roomId, events); events.push(d); return d; }
         return null;
       },
       hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
@@ -1472,6 +1602,21 @@ class GameState {
     }
   }
 
+  /** A mob summons reinforcements (the `summon` action). Conjures up to its
+   *  `count`, never exceeding the living-brood `max`, on the mob's own faction
+   *  (allies that fight alongside it, not each other). Permanent, spoil-less. */
+  _mobSummon(m, t, roomId, events, action) {
+    const max = action.max != null ? action.max : Infinity;
+    const room = this._broodCount(m.id);
+    const count = Math.min(action.count || 1, max - room);
+    if (count <= 0) return;
+    this._summon({
+      roomId, mobId: action.mob, count, faction: m.faction || "wild",
+      ownerId: null, summonerId: m.id, group: null, lifetime: null,
+      by: "mob", byName: t.name, verb: action.verb || null,
+    }, events);
+  }
+
   /** A mob casts a hostile spell at its highest-threat enemy — a player OR an
    *  opposing-faction mob (mirror of _mobAttack for the `cast` action). The target's
    *  Ward gets a wholesale negation roll (see wardNegates); a spell that lands deals
@@ -1501,7 +1646,7 @@ class GameState {
         if (target.actor.hp <= 0) {
           killed = true;
           death = isPlayer
-            ? this._respawn(target.actor, roomId)
+            ? this._respawn(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
       } else {
@@ -1549,6 +1694,7 @@ class GameState {
    * path — a direct kill, the room itself, a bleed tick.
    */
   _dropSpoils(mob, roomId) {
+    if (mob.noSpoils) return [];
     const t = this.world.mobs[mob.template];
     const rt = this.rooms[roomId];
     const dropped = [];
@@ -1587,7 +1733,7 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    const participants = this._awardKillXp(mob, killerPlayer, xp, roomId); // shared credit (Model A)
+    const participants = mob.noSpoils ? [] : this._awardKillXp(mob, killerPlayer, xp, roomId); // shared credit (Model A); summons award nothing
     this.rooms[roomId].light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
     return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killerPlayer ? killerPlayer.id : null, loot, xp: participants.length ? xp : 0, cause, participants };
   }
@@ -1612,9 +1758,9 @@ class GameState {
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    const participants = killer ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit (Model A)
+    const participants = (killer && !mob.noSpoils) ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit; summons award nothing
     rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause, participants };
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: (killer && !mob.noSpoils) ? xp : 0, cause, participants };
     events.push(death);
     return death;
   }
@@ -1627,7 +1773,7 @@ class GameState {
     player.hp -= amount;
     events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
     if (player.hp <= 0) {
-      const death = this._respawn(player, player.location);
+      const death = this._respawn(player, player.location, events);
       events.push(death);
       return death;
     }
@@ -1650,7 +1796,7 @@ class GameState {
   }
 
   /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */
-  _respawn(player, deathRoom) {
+  _respawn(player, deathRoom, events = []) {
     const start = this.world.playerTemplate.startLocation;
     player.hp = player.maxHp;
     // Death snuffs every carried light source — you wake at the rim in the dark.
@@ -1665,6 +1811,7 @@ class GameState {
     player.energy = 0;
     this.rooms[start].light = this.computeRoomLight(start);
     this.rooms[deathRoom].light = this.computeRoomLight(deathRoom);
+    this._dismissOwnedSummons(player.id, "owner-gone", events); // a falling delver's summons unravel
     return { type: "death", victimKind: "player", victimId: player.id, victimName: player.name, roomId: deathRoom, respawnRoom: start };
   }
 }

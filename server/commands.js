@@ -179,6 +179,13 @@ function move(state, player, dir, ctx) {
   state.setPlayerLocation(player, dest);
   state.rooms[dest].light = state.computeRoomLight(dest);
   state.rooms[from].light = state.computeRoomLight(from);
+  // Owned summons follow their delver between rooms (wild summons stay put).
+  const followed = state._moveSummonsWith(player, from, dest);
+  for (const f of followed) {
+    const Name = f.mobName.charAt(0).toUpperCase() + f.mobName.slice(1);
+    ctx.toRoom(from, { type: "log", text: `${Name} slips away after ${player.name}.` }, player.id);
+    ctx.toRoom(dest, { type: "log", text: `${Name} drifts in at ${player.name}'s heel.` }, player.id);
+  }
   ctx.refreshRoom(from, player.id);
   ctx.toRoom(dest, { type: "log", text: `${player.name} arrives.` }, player.id);
   ctx.refreshRoom(dest, player.id);
@@ -194,7 +201,8 @@ function move(state, player, dir, ctx) {
       tail = ` You map new ground. (+${EXPLORE_XP} xp)`;
     }
   }
-  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}`);
+  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
+  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}`);
   announceLevelUps(player, ups, ctx, msgs);
   return msgs;
 }
@@ -738,6 +746,9 @@ function cast(state, player, arg, ctx) {
 
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
 
+  // Summon spells are self-centred (no creature target) — conjure at the caster.
+  if (spell.effect && spell.effect.type === "summon") return castSummon(state, player, spell, ctx);
+
   // Beneficial spells (no `hostile` flag) mend rather than harm — they have their
   // own targeting (self by default, an ally delver, or any creature in the room).
   if (!spell.hostile) return castSupport(state, player, spell, targetQ, ctx);
@@ -854,6 +865,19 @@ function castSupport(state, player, spell, targetQ, ctx) {
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a crust of hardened glimmer grants ${grant} for ${fmtTicks(res.duration)}.`);
   }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
+}
+
+// Cast a summon spell. Resolution (mana, recast-replace, conjuring) lives in
+// state.castSummon; this narrates. The summon is self-centred — it appears in the
+// caster's room and fights autonomously via the faction AI.
+function castSummon(state, player, spell, ctx) {
+  const res = state.castSummon(player, spell);
+  const name = res.mob.name;
+  const bare = name.replace(/^an? /i, ""); // "a Wisp" -> "Wisp" for the possessive clause
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} traces a binding-glyph, and ${name} coalesces from the gloom.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const replaced = res.replaced ? ` Your previous ${bare} unravels into motes.` : "";
+  return selfAndViews(state, player, `You weave the glimmer into shape, and ${name} answers your call.${replaced}`);
 }
 
 // Attributes a player can raise with banked level-up points.

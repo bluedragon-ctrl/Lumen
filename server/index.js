@@ -144,7 +144,7 @@ wss.on("connection", (ws) => {
         }
         console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
       }
-      state.removePlayer(ws.playerId);
+      for (const ev of state.removePlayer(ws.playerId)) dispatchEvent(ev);
       connections.delete(ws.playerId);
     }
   });
@@ -388,6 +388,31 @@ function dispatchEvent(ev) {
     for (const o of state.playersIn(ev.to)) {
       const n = canSeeMob(o, ev.lightTo, ev.emitsLight) ? ev.mobName : "something";
       sendToPlayer(o.id, { type: "log", text: `${cap(n)} slinks in.` });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
+  if (ev.type === "summon") {
+    // A creature was conjured into the room (player Summon spell or a mob's
+    // reinforcement action). A mob summoner narrates its `verb`; a player summon
+    // is narrated by the cast command, so the tick path here is mainly for mobs.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const line = ev.verb && ev.byName
+        ? `${cap(ev.byName)} ${ev.verb}.`
+        : `${cap(n)} coalesces from the gloom.`;
+      sendToPlayer(o.id, { type: "log", text: line });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
+  if (ev.type === "summon-end") {
+    // A summon unravelled (timer expired, recast, or owner gone) — no corpse/loot.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} unravels into motes and is gone.` });
       sendToPlayer(o.id, buildRoomView(state, o));
     }
     return;

@@ -34,5 +34,12 @@
       "ward": { "base": 0, "scale": { "attr": "intellect", "per": 1 } },
       "good": true
     }
+  },
+  "summon-wisp": {
+    "id": "summon-wisp",
+    "name": "Summon Wisp",
+    "description": "A weave that coaxes a knot of loose glimmer into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its cold light at your foes, but the binding frays — in a few minutes the glimmer slips free and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
+    "manaCost": 10,
+    "effect": { "type": "summon", "mob": "wisp", "count": 1, "duration": 180, "group": "summon-wisp" }
   }
 }

@@ -234,6 +234,7 @@ when there's an exit). This gives mobs fight/emote/flee/idle personalities.
 | `emote` | Broadcast a flavour line to the room (a name you can't see reads as "Something …"). | `messages: string[]` |
 | `wander`| Walk to a random adjacent room (carrying its light if it glows). **Suppressed while the mob is in combat** (has live threat). | `verb` (display, e.g. "flees"); `scope`: `"zone"` (default — only rooms sharing the mob's current `zone`) or `"any"` (cross-zone). |
 | `idle`  | Do nothing this turn — raise its weight to keep a mob calm/quiet. | — |
+| `summon`| Conjure reinforcements of the mob's own faction (allies that fight alongside it), up to a living-brood `max`; available only while in combat. | `mob` (template id), `count` (per cast), `max` (max living brood), `verb` (display line) |
 | `loot`       | LootRule[] | `{ template, chance }`, chance 0..1. |
 
 ### Combat triggers — `onHit` & `onDamage`
@@ -296,9 +297,18 @@ spawn as an enemy or as a player-allied creature. Every mob instance carries:
 
 Faction defines *sides*; `hostile`/provocation still gate whether a creature
 actually engages. A `"wild"` mob's enemies are players + `"player"`-faction mobs; a
-`"player"` mob's enemies are `"wild"` mobs. This is the substrate a later **summon**
-sits on (an allied mob spawned `faction:"player"` + `ownerId`). The admin
+`"player"` mob's enemies are `"wild"` mobs. This is the substrate **summons** sit on
+(an allied mob spawned `faction:"player"` + `ownerId`). The admin
 `@spawn <mobId> [count] [wild|player]` sets it for live testing.
+
+**Summon instance fields.** Summoned instances also carry `summonerId` (the
+conjurer's id — player or mob), `summonGroup` (the recast-cap key), `expiresIn`
+(ticks until it winks out; `null` = permanent), and `noSpoils: true` (no loot or
+XP on death, however it dies). They carry no spawner `origin`, so they never respawn
+and never count against a room's spawn cap. Instance `faction`/`ownerId` (above)
+decide allegiance and ownership; owned summons follow their player between rooms and
+are dismissed (silently — a `summon-end`, no corpse) on the timer, the owner's death,
+or disconnect.
 
 ### Aggro / threat (runtime)
 
@@ -384,7 +394,7 @@ An **effect spec** is the descriptor authored on the source (e.g. a consumable's
 
 | Field       | Type    | Notes |
 |-------------|---------|-------|
-| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch). |
+| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch); `summon` (see below). |
 | `name`      | string  | Display label for the state chip. |
 | `magnitude` | number  | Effect strength (e.g. light output). |
 | `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |
@@ -393,6 +403,20 @@ Applying an effect pushes a live instance `{ type, name, magnitude, remaining, g
 onto the actor; instances **stack** (each counts and each ticks down on its own).
 The tick loop decrements `remaining`, removes expired effects, and notifies the
 owner. New primitives plug in here without touching potions/spells that reference them.
+
+The **`summon`** effect type is the exception — it conjures creatures rather than
+pushing a state onto the caster:
+
+```json
+{ "type": "summon", "mob": "wisp", "count": 1, "duration": 180, "group": "summon-wisp" }
+```
+
+`summon` conjures `count` instances of `mob` for `duration` ticks (omit `duration`
+for a permanent summon), tagged to the caster. `group` (defaults to the spell id)
+scopes the recast cap: recasting a spell of the same group dismisses the caster's
+previous summon of that group before conjuring the new one. The conjured instances
+spawn `faction:"player"` + `ownerId` (so they fight for and follow the caster); see
+[Summon instance fields](#faction--ownership-runtime) below.
 
 ---
 

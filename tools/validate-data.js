@@ -193,13 +193,18 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "cast", "emote", "wander", "idle", "flee"].includes(a.type))
+      if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
       if (a.type === "cast") {
         if (!a.spell || !has(spells, a.spell)) errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
         else if (!spells[a.spell].hostile) errs.push(`mob ${id}: cast action spell ${a.spell} must be hostile`);
+      }
+      if (a.type === "summon") {
+        if (!a.mob || !has(mobs, a.mob)) errs.push(`mob ${id}: summon action references missing mob ${a.mob}`);
+        if (a.count != null && (typeof a.count !== "number" || a.count <= 0)) errs.push(`mob ${id}: summon count must be a positive number`);
+        if (a.max != null && (typeof a.max !== "number" || a.max <= 0)) errs.push(`mob ${id}: summon max must be a positive number`);
       }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
@@ -248,7 +253,7 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect"];
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect", "summon"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {
@@ -296,6 +301,11 @@ function main() {
       if (eff.armour == null && eff.ward == null) errs.push(`spell ${id}: protect effect needs at least one of armour/ward`);
       chkAmount(eff.armour, `spell ${id}: effect.armour`);
       chkAmount(eff.ward, `spell ${id}: effect.ward`);
+    } else if (eff.type === "summon") {
+      if (!eff.mob || !has(mobs, eff.mob)) errs.push(`spell ${id}: summon effect references missing mob ${eff.mob}`);
+      if (eff.count != null && (typeof eff.count !== "number" || eff.count <= 0)) errs.push(`spell ${id}: summon count must be a positive number`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: summon duration must be a positive number (ticks)`);
+      if (eff.group != null && typeof eff.group !== "string") errs.push(`spell ${id}: summon group must be a string`);
     }
   }
 
