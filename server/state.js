@@ -1361,6 +1361,8 @@ class GameState {
     // A sitting mob that engaged stood up in _engageTell; one still seated noticed
     // nobody worth rising for this action — stay at rest (no wander/emote).
     if (m.posture === "sitting") return;
+    // A `helper` piles into any fight a same-faction ally is already in.
+    if (t.helper) this._assistPass(m, t, enemies, rt.light, roomId, events);
     const engagedTargets = enemies.filter((c) => this._isEngaged(m, t, c));
     const inCombat = this._alerted(m); // alerted (combat threat or live detection) → won't wander
 
@@ -1497,6 +1499,33 @@ class GameState {
     if (!(mob.detect && mob.detect[c.id] >= AGGRO_ENGAGE)) return false;
     if (t.ambush) return c.kind === "player" && c.actor.posture === "sleeping";
     return true;
+  }
+
+  /** A `helper` mob piles into a fight a same-faction ally is already in: for each
+   *  present enemy that another same-faction combatant in the room holds combat
+   *  threat on (a mob's `aggro`, or a player ally's `pending` target), the helper
+   *  engages it too — seeding combat threat so it commits and stays in. Gated by
+   *  the helper's own sight (it must perceive the enemy — no joining a fight in the
+   *  dark, asleep), and announced once per enemy it newly joins on. */
+  _assistPass(mob, t, enemies, light, roomId, events) {
+    if (mob.posture === "sleeping" || noticeChance(t.perception, light) <= 0) return;
+    const myFaction = combatantFaction(mob, "mob");
+    const allies = this._combatantsIn(roomId).filter((c) => c.id !== mob.id && c.faction === myFaction);
+    if (!allies.length) return;
+    for (const e of enemies) {
+      if (mob.aggro && mob.aggro[e.id] > 0) continue; // already in this fight — no re-announce
+      const allyFighting = allies.some((a) =>
+        (a.kind === "mob" && a.actor.aggro && a.actor.aggro[e.id] > 0) ||
+        (a.kind === "player" && a.actor.pending && a.actor.pending.targetId === e.id));
+      if (!allyFighting) continue;
+      this._addThreat(mob, e.id, AGGRO_ENGAGE); // join the fight — committed like a full notice
+      events.push({
+        type: "mob-assist", roomId, mobId: mob.id, mobName: t.name,
+        targetId: e.id, targetKind: e.kind,
+        targetName: e.kind === "player" ? e.actor.name : this.world.mobs[e.actor.template].name,
+        light: this.rooms[roomId].light, emitsLight: !!t.emitsLight,
+      });
+    }
   }
 
   /** Alerted = holds any combat threat or any live detection. An alerted mob is
