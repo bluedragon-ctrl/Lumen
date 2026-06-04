@@ -193,10 +193,14 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "emote", "wander", "idle", "flee"].includes(a.type))
+      if (!["attack", "cast", "emote", "wander", "idle", "flee"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
+      if (a.type === "cast") {
+        if (!a.spell || !has(spells, a.spell)) errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
+        else if (!spells[a.spell].hostile) errs.push(`mob ${id}: cast action spell ${a.spell} must be hostile`);
+      }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
       if (a.type === "flee" && a.lightAbove != null && typeof a.lightAbove !== "number")
@@ -241,12 +245,27 @@ function main() {
   }
 
   // Spells: data-driven casting (manaCost + an effect primitive). `damage` is
-  // instantaneous (dice + optional attribute scaling); `emit-light` is a status.
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light"];
+  // instantaneous (dice + optional attribute scaling); `emit-light`,
+  // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
+  // protect grants timed armour/ward).
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect"];
+  // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
+  // protect effect's armour/ward components.
+  const chkAmount = (a, where) => {
+    if (a == null || typeof a === "number") return;
+    if (typeof a !== "object") return void errs.push(`${where} must be a number or { base, scale }`);
+    if (a.base != null && typeof a.base !== "number") errs.push(`${where}.base must be a number`);
+    if (a.scale != null) {
+      if (typeof a.scale !== "object" || !a.scale.attr) errs.push(`${where}.scale must be { attr, per }`);
+      else if (a.scale.per != null && (typeof a.scale.per !== "number" || a.scale.per <= 0)) errs.push(`${where}.scale.per must be a positive number`);
+    }
+  };
   for (const [id, sp] of Object.entries(spells)) {
     if (sp.id !== id) errs.push(`spell ${id}: id field mismatch (${sp.id})`);
     if (sp.manaCost != null && (typeof sp.manaCost !== "number" || sp.manaCost < 0))
       errs.push(`spell ${id}: manaCost must be a non-negative number`);
+    if (sp.shardCost != null && (typeof sp.shardCost !== "number" || sp.shardCost < 0))
+      errs.push(`spell ${id}: shardCost must be a non-negative number`);
     const eff = sp.effect;
     if (!eff || typeof eff !== "object" || !eff.type) {
       errs.push(`spell ${id}: effect must be an object { type, ... }`);
@@ -263,6 +282,20 @@ function main() {
     } else if (eff.type === "emit-light") {
       if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`spell ${id}: effect.magnitude must be a number`);
       if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+    } else if (eff.type === "heal-over-time") {
+      if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`spell ${id}: effect.magnitude must be a number`);
+      if (eff.interval != null && (typeof eff.interval !== "number" || eff.interval <= 0)) errs.push(`spell ${id}: effect.interval must be a positive number (ticks)`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+      if (eff.scale != null) {
+        if (typeof eff.scale !== "object" || !eff.scale.attr) errs.push(`spell ${id}: effect.scale must be { attr, per }`);
+        else if (eff.scale.per != null && (typeof eff.scale.per !== "number" || eff.scale.per <= 0))
+          errs.push(`spell ${id}: effect.scale.per must be a positive number`);
+      }
+    } else if (eff.type === "protect") {
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+      if (eff.armour == null && eff.ward == null) errs.push(`spell ${id}: protect effect needs at least one of armour/ward`);
+      chkAmount(eff.armour, `spell ${id}: effect.armour`);
+      chkAmount(eff.ward, `spell ${id}: effect.ward`);
     }
   }
 

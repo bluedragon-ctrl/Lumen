@@ -7,5 +7,32 @@
     "hostile": true,
     "target": "creature",
     "effect": { "type": "damage", "damageType": "magical", "damage": "1d4", "scale": { "attr": "intellect", "per": 4 } }
+  },
+  "regeneration": {
+    "id": "regeneration",
+    "name": "Regeneration",
+    "description": "A slow weave of mending light, drawn from the glimmer and sunk beneath the skin, where it knits torn flesh a little at a time. It cannot be hurled at a foe — only laid on the willing, be it your own hand or an ally's. Cast it on yourself, a fellow delver, or any creature you can see; the deeper your Intellect, the more it knits with each pulse.",
+    "manaCost": 8,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "heal-over-time", "name": "Regeneration", "interval": 2, "duration": 10, "magnitude": 0, "scale": { "attr": "intellect", "per": 2 }, "good": true }
+  },
+  "glimmerskin": {
+    "id": "glimmerskin",
+    "name": "Glimmerskin",
+    "description": "A wardweave that draws a pinch of raw glimmer up out of the shards and crusts it over the skin in a thin, faintly luminous shell — part plate, part charm. It dulls a blade's bite and blunts hostile magic alike, but the glimmer burns away as it works, so the weave costs shards to cast. Lay it on yourself, an ally, or any creature you can see; the keener your Intellect, the thicker the crust. Re-casting renews the shell rather than doubling it.",
+    "manaCost": 6,
+    "shardCost": 5,
+    "hostile": false,
+    "target": "creature",
+    "effect": {
+      "type": "protect",
+      "name": "Glimmerskin",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 4 } },
+      "ward": { "base": 0, "scale": { "attr": "intellect", "per": 1 } },
+      "good": true
+    }
   }
 }

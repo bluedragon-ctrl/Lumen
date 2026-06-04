@@ -687,10 +687,20 @@ function spellList(state, player) {
     const s = w.spells[id];
     if (!s) continue;
     let tail = "";
-    if (s.effect && s.effect.type === "damage")
-      tail = ` — ${s.effect.damage} ${s.effect.damageType || "physical"} damage` +
-        (s.effect.scale ? ` (+${s.effect.scale.attr}/${s.effect.scale.per})` : "");
-    lines.push(`  ${s.name}: ${s.manaCost || 0} mana${tail}`);
+    const e = s.effect || {};
+    if (e.type === "damage")
+      tail = ` — ${e.damage} ${e.damageType || "physical"} damage` +
+        (e.scale ? ` (+${e.scale.attr}/${e.scale.per})` : "");
+    else if (e.type === "heal-over-time")
+      tail = ` — heals ${e.magnitude || 0}${e.scale ? `+${e.scale.attr}/${e.scale.per}` : ""} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${e.duration || 0}`;
+    else if (e.type === "protect") {
+      const parts = [];
+      if (e.armour) parts.push(`armour ${fmtAmount(e.armour)}`);
+      if (e.ward) parts.push(`ward ${fmtAmount(e.ward)}`);
+      tail = ` — ${parts.join(", ")} for ${fmtTicks(e.duration || 0)}`;
+    }
+    const cost = `${s.manaCost || 0} mana${s.shardCost ? ` + ${s.shardCost} shards` : ""}`;
+    lines.push(`  ${s.name}: ${cost}${tail}`);
   }
   lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
   return [{ type: "log", text: lines.join("\n") }];
@@ -723,9 +733,16 @@ function cast(state, player, arg, ctx) {
 
   if (Math.floor(player.mana || 0) < (spell.manaCost || 0))
     return [{ type: "error", text: `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).` }];
-  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
+  if (spell.shardCost && (player.shards || 0) < spell.shardCost)
+    return [{ type: "error", text: `${spell.name} burns ${spell.shardCost} shards as glimmer and you have ${player.shards || 0}.` }];
 
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
+
+  // Beneficial spells (no `hostile` flag) mend rather than harm — they have their
+  // own targeting (self by default, an ally delver, or any creature in the room).
+  if (!spell.hostile) return castSupport(state, player, spell, targetQ, ctx);
+
+  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const ql = targetQ.toLowerCase();
@@ -759,6 +776,84 @@ function cast(state, player, arg, ctx) {
   ctx.toRoom(player.location, { type: "log", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
+}
+
+// Format a tick count as m:ss for narration (one tick = one second). Mirrors
+// render.js's fmtDuration so spoken durations match the status panel countdown.
+function fmtTicks(ticks) {
+  const s = Math.max(0, ticks | 0);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+// Describe a `{ base?, scale? }` amount spec for the `spells` listing, e.g.
+// `1+intellect/4` or `intellect`. A bare number renders as itself.
+function fmtAmount(spec) {
+  if (spec == null) return "0";
+  if (typeof spec === "number") return String(spec);
+  const sc = spec.scale && spec.scale.attr ? `${spec.scale.attr}${spec.scale.per && spec.scale.per !== 1 ? `/${spec.scale.per}` : ""}` : "";
+  if (spec.base && sc) return `${spec.base}+${sc}`;
+  return sc || String(spec.base || 0);
+}
+
+// Cast a beneficial spell. Resolution (mana, magnitude scaling, applying the
+// effect) lives in state.castBeneficial; this resolves the target and narrates.
+// Target precedence: an explicit self word (or no target) → the caster; else an
+// ally delver in the room; else a creature. Per-pulse effects (Regeneration)
+// then surface their healing over the following ticks via `regen-tick` events.
+function castSupport(state, player, spell, targetQ, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const ql = (targetQ || "").trim().toLowerCase();
+  const selfWords = ["", "self", "me", "myself", player.name.toLowerCase()];
+
+  let target = null;
+  if (selfWords.includes(ql)) {
+    target = { kind: "player", actor: player, id: player.id, name: "yourself", isSelf: true };
+  } else {
+    const other = [...state.playersIn(player.location)].find(
+      (o) => o.id !== player.id && o.hp > 0 && o.name.toLowerCase().includes(ql)
+    );
+    if (other) {
+      if (!see) return [{ type: "error", text: "It is too dark to make out your target." }];
+      target = { kind: "player", actor: other, id: other.id, name: other.name };
+    } else {
+      const mob = rt.mobs.find((m) => {
+        const t = w.mobs[m.template];
+        return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+      });
+      if (mob) {
+        const mt = w.mobs[mob.template];
+        target = { kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId: player.location, emitsLight: !!mt.emitsLight };
+      }
+    }
+  }
+  if (!target) return [{ type: "error", text: `You see no "${targetQ}" here to mend.` }];
+
+  const res = state.castBeneficial(player, spell, target);
+  const verb = spell.name.toLowerCase();
+  const targetName = target.isSelf ? "themselves" : target.name; // for the room's view
+
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+
+  const onWhom = target.isSelf ? "yourself" : target.name;
+
+  if (res.effect === "restore") {
+    const parts = [];
+    if (res.restored.hp) parts.push(`${res.restored.hp} health`);
+    if (res.restored.mana) parts.push(`${res.restored.mana} mana`);
+    const tail = parts.length ? ` restoring ${parts.join(" and ")}` : "";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${target.name}${tail}.`);
+  }
+  if (res.effect === "protect") {
+    const parts = [];
+    if (res.armour) parts.push(`+${res.armour} armour`);
+    if (res.ward) parts.push(`+${res.ward} ward`);
+    const grant = parts.length ? parts.join(", ") : "a faint sheen";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a crust of hardened glimmer grants ${grant} for ${fmtTicks(res.duration)}.`);
+  }
+  return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
 }
 
 // Attributes a player can raise with banked level-up points.
@@ -831,8 +926,23 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       player.mana = Math.min(player.mana || 0, player.maxMana);
       return selfAndViews(state, player, `Your ${attr} is now ${n}.`);
     }
+    case "@spawn": {
+      // Drop a mob (by template id) into the admin's current room — a testing aid
+      // for mobs not yet placed in any room's spawn list.
+      const [mobId, rawN] = arg.split(/\s+/);
+      if (!mobId || !state.world.mobs[mobId])
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count]. Unknown mob "${mobId || ""}".` }];
+      const n = Math.max(1, Math.min(10, parseInt(rawN, 10) || 1));
+      for (let i = 0; i < n; i++) state._spawnMob(player.location, mobId);
+      state.rooms[player.location].light = state.computeRoomLight(player.location); // a luminous mob lights the room
+      const t = state.world.mobs[mobId];
+      const Name = t.name.charAt(0).toUpperCase() + t.name.slice(1);
+      ctx.toRoom(player.location, { type: "log", text: `${Name} flickers into being.` }, player.id);
+      ctx.refreshRoom(player.location, player.id);
+      return selfAndViews(state, player, `Spawned ${n}× ${t.name} here.`);
+    }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count]" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }

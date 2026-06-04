@@ -129,6 +129,11 @@ function playerDefence(world, player) {
   }
   const wits = effectiveAttributes(world, player).wits || 0;
   ward += wits * WARD_PER_WITS;
+  // Temporary defensive buffs (Glimmerskin): each active "protect" state adds its
+  // baked-in armour/ward for as long as it lasts.
+  for (const s of player.states || []) {
+    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; }
+  }
   return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
 
@@ -141,10 +146,27 @@ function spellScaleBonus(attrs, scale) {
   return Math.floor(v / (scale.per || 1));
 }
 
-// Ward resists hostile magic as an all-or-nothing fizzle: each point of the
-// target's Ward is this much chance to negate the spell entirely (works for
-// damage and effect spells alike). 0.01 = 1% per point.
+// Resolve a `{ base?, scale? }` amount spec (e.g. a Glimmerskin armour/ward
+// component) against effective attributes: flat base plus an attribute-scaled
+// bonus. A bare number or null is accepted too. Used for baked-at-cast buffs.
+function scaledAmount(attrs, spec) {
+  if (spec == null) return 0;
+  if (typeof spec === "number") return spec;
+  return (spec.base || 0) + spellScaleBonus(attrs, spec.scale);
+}
+
+// Ward resists hostile *spell casts* as an all-or-nothing negation: each point
+// of the target's Ward is this much chance to fizzle the spell entirely (works
+// for damage and effect spells alike). 0.01 = 1% per point, and it is NOT capped
+// — ward 100+ shrugs off magic outright (a deliberate design choice). Magical
+// *weapon* hits are handled separately, as a percent damage cut in strike().
 const WARD_RESIST_PER_POINT = 0.01;
+
+/** True if a defender's Ward negates an incoming hostile spell this cast.
+ *  Shared by both directions: player→mob (castSpell) and mob→player (_mobCast). */
+function wardNegates(ward) {
+  return (ward || 0) > 0 && Math.random() < ward * WARD_RESIST_PER_POINT;
+}
 
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
 function pickWeighted(options) {
@@ -173,12 +195,16 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   const chance = Math.max(MIN_HIT, Math.min(1, hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0)));
   const sighted = canSee(attacker.band, light);
   if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
-  // Physical damage is soaked by Armour; everything else (magical) by Ward.
-  const mitigation = damageType === "physical" ? defender.armour || 0 : defender.ward || 0;
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
   const crit = Math.random() < (attacker.crit || 0);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
-  const damage = Math.max(1, base - mitigation);
+  // Physical blows are soaked flat by Armour. Magical-type blows are cut by Ward
+  // as a PERCENT reduction (ward is a percentage: ward 50 → halved). A spell
+  // *cast* is instead negated wholesale by Ward (see wardNegates); a magical
+  // weapon always lands once it hits, but its bite is reduced here.
+  const damage = damageType === "physical"
+    ? Math.max(1, base - (defender.armour || 0))
+    : Math.max(1, Math.round(base * (1 - (defender.ward || 0) / 100)));
   return { hit: true, sighted, damage, crit };
 }
 
@@ -494,14 +520,23 @@ class GameState {
    *   { type: "emit-light", name: "Light", magnitude: 1, duration: 180 }
    * Effects stack as independent instances, each with its own countdown; the
    * engine reads them where relevant (emit-light is summed into room light).
+   * `spec.refresh` opts out of stacking: any existing instance of the same
+   * type+name is dropped first, so re-applying just resets the timer (the right
+   * behaviour for buffs like Glimmerskin; DoTs leave it unset to keep stacking).
    */
   applyEffect(actor, spec) {
     if (!actor.states) actor.states = [];
+    const name = spec.name || spec.type;
+    if (spec.refresh) actor.states = actor.states.filter((s) => !(s.type === spec.type && s.name === name));
     actor.states.push({
       type: spec.type,
-      name: spec.name || spec.type,
+      name,
       magnitude: spec.magnitude || 0,
+      armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
+      ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
+      pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
       source: spec.source || null, // "item" = sustained by worn/carried gear; survives death
       remaining: spec.duration != null ? spec.duration : null, // null = permanent
@@ -542,7 +577,13 @@ class GameState {
         if (s.type !== "damage-over-time" || !s.damage) continue;
         if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed" })) { dead = true; break; }
       }
-      if (!dead) this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
+      if (dead) continue;
+      for (const s of p.states) {
+        if (s.type !== "heal-over-time" || !this._pulseReady(s)) continue;
+        const healed = this._heal(p, s.magnitude);
+        if (healed) events.push({ type: "regen-tick", playerId: p.id, amount: healed, name: s.name });
+      }
+      this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
     }
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
@@ -555,10 +596,33 @@ class GameState {
         }
         if (!dead) {
           const t = this.world.mobs[m.template];
+          for (const s of m.states) {
+            if (s.type !== "heal-over-time" || !this._pulseReady(s)) continue;
+            const healed = this._heal(m, s.magnitude);
+            if (healed) events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: s.name, emitsLight: !!t.emitsLight, light: rt.light });
+          }
           this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, mobName: t.name, effectType: s.type, name: s.name, emitsLight: !!t.emitsLight, light: rt.light }));
         }
       }
     }
+  }
+
+  /** Advance a periodic state's pulse counter; true on the tick its `interval`
+   *  comes due (default every tick). Used by heal-over-time (and future pulses). */
+  _pulseReady(s) {
+    const every = s.interval || 1;
+    if (++s.pulse < every) return false;
+    s.pulse = 0;
+    return true;
+  }
+
+  /** Restore up to `amount` HP to an actor (player or mob), clamped to its
+   *  maximum. Returns the HP actually gained (0 if already full). */
+  _heal(actor, amount) {
+    if (!amount || actor.hp >= actor.maxHp) return 0;
+    const before = actor.hp;
+    actor.hp = Math.min(actor.maxHp, actor.hp + amount);
+    return actor.hp - before;
   }
 
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
@@ -1013,7 +1077,7 @@ class GameState {
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
 
     const ward = w.mobs[mob.template].ward || 0;
-    if (spell.hostile && ward > 0 && Math.random() < ward * WARD_RESIST_PER_POINT) {
+    if (spell.hostile && wardNegates(ward)) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
     }
@@ -1048,6 +1112,52 @@ class GameState {
     }
 
     return result;
+  }
+
+  /**
+   * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
+   * `target` is the normalized descriptor the command handler built:
+   *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
+   * Spends mana (and any `shardCost` material), then applies the effect
+   * primitive. `heal-over-time` bakes its per-pulse magnitude from the caster's
+   * scaling attribute at cast time (so the power follows the caster, while an
+   * innate mob regen authors `magnitude` directly); `protect` likewise bakes its
+   * armour/ward from the caster; an instant `restore` tops up hp/mana now.
+   * Returns a result the caller narrates: { effect, name, perPulse?, restored?,
+   * armour?, ward?, duration? }.
+   *
+   * NOTE (aggro groundwork): support magic draws no threat yet. When support-spell
+   * threat lands, this is the hook — credit threat on the buffed/healed ally's
+   * current attackers here, before/after applyEffect.
+   */
+  castBeneficial(player, spell, target, events = []) {
+    const w = this.world;
+    const eff = spell.effect || {};
+    const attrs = effectiveAttributes(w, player);
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+
+    if (eff.type === "restore") {
+      const got = this.applyRestore(target.actor, eff);
+      return { effect: "restore", name: spell.name, restored: got };
+    }
+
+    if (eff.type === "protect") {
+      // Bake the caster-scaled defence into the instance (base + attribute bonus).
+      const armour = scaledAmount(attrs, eff.armour);
+      const ward = scaledAmount(attrs, eff.ward);
+      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
+      this._narrateEffectApplied(events, target, eff.name || eff.type);
+      return { effect: "protect", name: spell.name, armour, ward, duration: eff.duration || 0 };
+    }
+
+    // Status effects (heal-over-time and future buffs). Bake any caster scaling
+    // into the magnitude so the instance carries a fixed strength.
+    const bonus = spellScaleBonus(attrs, eff.scale);
+    const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+    this.applyEffect(target.actor, { ...eff, magnitude });
+    this._narrateEffectApplied(events, target, eff.name || eff.type);
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
   }
 
   /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */
@@ -1109,6 +1219,7 @@ class GameState {
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return aggressive && t.attack && playersHere.length > 0;
+        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && playersHere.length > 0;
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
@@ -1121,6 +1232,7 @@ class GameState {
     const choice = pickWeighted(options);
     if (!choice || choice.type === "idle") return;
     if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, playersHere);
+    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, playersHere, choice.spell);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
@@ -1237,6 +1349,50 @@ class GameState {
     if (!target.pending && target.hp > 0) {
       target.pending = { type: "attack", targetId: m.id };
       events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+    }
+  }
+
+  /** A mob casts a hostile spell at a player (mirror of _mobAttack for the
+   *  `cast` action). The target's Ward gets a wholesale negation roll (see
+   *  wardNegates); a spell that lands deals magical damage scaled by the mob's
+   *  own attributes, or applies a hostile status effect. No mana bookkeeping for
+   *  mobs — cadence is gated by action energy. Pushes a `mob-cast` event the
+   *  server narrates, plus rouse/auto-retaliate like a melee blow. */
+  _mobCast(m, t, roomId, events, playersHere, spellId) {
+    const rt = this.rooms[roomId];
+    const spell = this.world.spells[spellId];
+    if (!spell || !spell.hostile) return; // only hostile spells reach a player this way
+    const eff = spell.effect || {};
+    const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
+    this._addThreat(m, target.id, 1); // casting sticks the mob to its quarry
+
+    const ward = playerDefence(this.world, target).ward || 0;
+    const resisted = wardNegates(ward);
+    let damage = 0, killed = false, death = null, effectName = null;
+    if (!resisted) {
+      if (eff.type === "damage") {
+        damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
+        target.hp -= damage;
+        if (target.hp <= 0) { death = this._respawn(target, roomId); killed = true; }
+      } else {
+        // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
+        this.applyEffect(target, { ...eff });
+        effectName = eff.name || eff.type;
+      }
+    }
+    events.push({
+      type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light,
+      targetId: target.id, targetName: target.name, spellName: spell.name,
+      resisted, damage, effectName, killed, targetHp: Math.max(0, target.hp), targetMaxHp: target.maxHp,
+    });
+    if (death) events.push(death);
+
+    if (!killed && target.hp > 0) {
+      if (this._rouse(target)) events.push({ type: "player-woke", playerId: target.id });
+      if (!target.pending) {
+        target.pending = { type: "attack", targetId: m.id };
+        events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+      }
     }
   }
 

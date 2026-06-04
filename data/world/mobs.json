@@ -45,6 +45,29 @@
     ],
     "loot": []
   },
+  "wisp": {
+    "id": "wisp",
+    "name": "a Wisp",
+    "description": "A drifting mote of cold, captive light, no bigger than a fist — a knot of glimmer that came loose from the seams and learned a sullen kind of life. It keeps its distance and spits its stolen light at anything warm, and the glow of it gives it away even in the deepest dark.",
+    "maxHp": 12,
+    "speed": 12,
+    "armour": 0,
+    "ward": 10,
+    "evasion": 0.8,
+    "emitsLight": 1,
+    "attributes": { "might": 1, "vitality": 4, "intellect": 1, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "xp": 12,
+    "shards": "1d4",
+    "actions": [
+      { "type": "cast", "weight": 7, "spell": "spark" },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["pulses an angry, flickering white", "drifts in a tight, wary circle", "sheds a cold spray of sparks"] }
+    ],
+    "loot": []
+  },
   "giant-rat": {
     "id": "giant-rat",
     "name": "a giant rat",
@@ -234,7 +257,7 @@
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-spark" }]
+      "sells": [{ "template": "scroll-spark" }, { "template": "scroll-regeneration" }, { "template": "scroll-glimmerskin" }]
     }
   },
   "cave-lurker": {

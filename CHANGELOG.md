@@ -5,7 +5,60 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Ward is now a percent defence, not flat mitigation.** Ward's core role is a
+  **percent chance to negate a hostile *spell* outright** (1 ward = 1%, **uncapped** —
+  ward 100+ shrugs magic off entirely), shared by both directions via a single
+  `wardNegates` helper: player→mob casts (existing) and the new mob→player casts.
+  Magical-type **weapon** hits — which land via the normal to-hit roll, not a
+  spell — are instead cut by a **percent damage reduction** (`damage × (1 −
+  ward/100)`) in `strike()`, replacing the old flat ward subtraction (a leftover
+  from an earlier stage). Physical damage is unchanged (flat Armour soak). Ward
+  still comes from Wits (×2), gear, and Glimmerskin.
+
 ### Added
+- **Mobs can cast hostile spells (`cast` action).** A mob action
+  `{ "type": "cast", "weight": N, "spell": "<id>" }` lets a creature throw a
+  hostile spell at its top-threat target, mirroring melee: the target's Ward gets
+  the negation roll, a landed damage spell scales off the **mob's own**
+  attributes, hostile status effects apply, and it triggers rouse/auto-retaliate.
+  No mana bookkeeping for mobs — cadence is gated by action energy. Narrated via a
+  new `mob-cast` event.
+- **A `Wisp` creature (not yet placed) + admin `@spawn`.** Added **a Wisp** — a
+  pure-magical creature that attacks only by casting Spark (Int 1, low damage),
+  with **80% evasion** (physical blows mostly miss; spells ignore evasion, so it's
+  killed with magic), `ward 10`, and a light-emitting glow. It is **not in any
+  room's spawn list** — placement is deferred. To exercise it (and the
+  defender-side player-Ward path), a new admin-only **`@spawn <mobId> [count]`**
+  drops a mob into the admin's current room.
+- **Glimmerskin spell + `protect` effect + spell material costs.** A new
+  `protect` effect primitive grants timed, flat **armour and/or ward**, summed
+  into `playerDefence` while active (so the player panel shows the boosted
+  numbers live and a countdown for the buff). The first spell to use it,
+  **Glimmerskin** (6 mana **+ 5 shards**), is beneficial — cast on yourself, an
+  ally, or any visible creature; its armour/ward scale with the caster's
+  **Intellect** (`armour = 1 + floor(Int/4)`, `ward = floor(Int)`), baked in at
+  cast time, lasting **3 minutes**. This also adds two reusable pieces:
+  **`spell.shardCost`** (a spell can now burn shards as a material component,
+  validated and deducted alongside mana) and **`effect.refresh`** — an opt-in
+  "renew, don't stack" flag on `applyEffect`, so re-casting a buff resets its
+  timer instead of stacking a second instance (DoTs leave it unset and keep
+  stacking as before). Learned from **a Scroll of Glimmerskin**, stocked by
+  **Vesper** (75 shards).
+- **Regeneration spell + heal-over-time effect.** A new `heal-over-time` effect
+  primitive pulses healing on its own `interval` for a `duration`, clamped to the
+  target's max HP. It works on **players and mobs alike** — so a mob can carry an
+  innate regen (a "regenerating troll" is just data: an authored
+  `heal-over-time` state with a fixed `magnitude`). The first spell to use it,
+  **Regeneration** (8 mana), is *beneficial*: it cannot be hurled at a foe, only
+  laid on the willing. `cast regeneration` (or `cast regeneration self`) mends the
+  caster; `cast regeneration <ally>` mends a fellow delver in the room; it can
+  also be cast on a creature you can see. The per-pulse heal scales with the
+  caster's **Intellect** (`floor(Int/2)` every 2 ticks for 10 ticks), baked in at
+  cast time. Beneficial casting has its own targeting path (`castBeneficial` in
+  `state.js`) with a documented hook for future support-spell threat/aggro —
+  healing draws **no threat yet**. Players learn it from **a Scroll of
+  Regeneration**, now stocked by **Vesper the glimmer-mage** (60 shards).
 - **Admin knows every recipe (testing aid)** — on login the auto-created `admin`
   is granted all recipes in the world (re-synced each login, so recipes added
   later are picked up automatically). Lets a maintainer exercise any `craft`
