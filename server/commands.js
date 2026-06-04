@@ -863,12 +863,12 @@ function castSupport(state, player, spell, targetQ, ctx) {
 // state.castSummon; this narrates. The summon is self-centred — it appears in the
 // caster's room and fights autonomously via the faction AI.
 function castSummon(state, player, spell, ctx) {
-  const events = [];
-  const res = state.castSummon(player, spell, events);
+  const res = state.castSummon(player, spell);
   const name = res.mob.name;
+  const bare = name.replace(/^an? /i, ""); // "a Wisp" -> "Wisp" for the possessive clause
   ctx.toRoom(player.location, { type: "log", text: `${player.name} traces a binding-glyph, and ${name} coalesces from the gloom.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  const replaced = res.replaced ? ` Your previous ${name} unravels into motes.` : "";
+  const replaced = res.replaced ? ` Your previous ${bare} unravels into motes.` : "";
   return selfAndViews(state, player, `You weave the glimmer into shape, and ${name} answers your call.${replaced}`);
 }
 
