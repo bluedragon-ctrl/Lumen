@@ -380,6 +380,24 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-assist") {
+    // A `helper` mob piled into a fight to defend a same-faction ally (see
+    // state._assistPass). One heads-up the moment it joins, light-gated.
+    const target = ev.targetKind === "player" ? state.players.get(ev.targetId) : null;
+    if (target) {
+      const seen = canSeeMob(target, ev.light, ev.emitsLight);
+      sendToPlayer(ev.targetId, { type: "log", text: seen
+        ? `${cap(ev.mobName)} rushes to join the attack on you!`
+        : "Something rushes at you out of the dark!" });
+    }
+    for (const o of state.playersIn(ev.roomId)) {
+      if (target && o.id === ev.targetId) continue;
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} rushes to join the attack on ${ev.targetName}.` });
+    }
+    return;
+  }
+
   if (ev.type === "combat-auto-start") {
     // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
     // player they've engaged, so the swings on following ticks aren't a mystery.

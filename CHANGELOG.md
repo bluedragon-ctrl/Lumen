@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Assisting mobs (`helper` flag).** A mob marked `helper` piles into any fight a
+  same-faction ally is already in — the moment an ally it can **see** is trading
+  blows with an enemy, the helper engages that enemy too (and announces it with a
+  "rushes to join the attack" line), instead of waiting to notice it on its own.
+  Perception-gated like all aggro (it won't join a fight in the dark it can't see),
+  and one-shot per enemy (no spam). **Giant rats** and **cave bats** become the
+  first helpers, so vermin and a bat-roost now swarm rather than queue up — and
+  **Gnaw's** summoned brood gangs up in kind.
 - **Ambush predators (`ambush` mobs).** A new mob flag for creatures that lie in
   wait and strike the helpless. An ambush mob *hunts* (tracks enemies it can
   perceive) but holds its proactive blow until a delver is **sleeping**, then
