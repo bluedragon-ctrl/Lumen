@@ -1353,6 +1353,7 @@ class GameState {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return aggressive && t.attack && enemies.length > 0;
         if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && enemies.length > 0;
+        if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && enemies.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
@@ -1366,6 +1367,7 @@ class GameState {
     if (!choice || choice.type === "idle") return;
     if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, enemies);
     if (choice.type === "cast") return this._mobCast(m, t, roomId, events, enemies, choice.spell);
+    if (choice.type === "summon") return this._mobSummon(m, t, roomId, events, choice);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
@@ -1572,6 +1574,21 @@ class GameState {
       p.pending = { type: "attack", targetId: m.id };
       events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
     }
+  }
+
+  /** A mob summons reinforcements (the `summon` action). Conjures up to its
+   *  `count`, never exceeding the living-brood `max`, on the mob's own faction
+   *  (allies that fight alongside it, not each other). Permanent, spoil-less. */
+  _mobSummon(m, t, roomId, events, action) {
+    const max = action.max != null ? action.max : Infinity;
+    const room = this._broodCount(m.id);
+    const count = Math.min(action.count || 1, max - room);
+    if (count <= 0) return;
+    this._summon({
+      roomId, mobId: action.mob, count, faction: m.faction || "wild",
+      ownerId: null, summonerId: m.id, group: null, lifetime: null,
+      by: "mob", byName: t.name, verb: action.verb || null,
+    }, events);
   }
 
   /** A mob casts a hostile spell at its highest-threat enemy — a player OR an

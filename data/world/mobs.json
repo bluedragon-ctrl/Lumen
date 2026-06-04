@@ -131,7 +131,8 @@
     "actions": [
       { "type": "attack", "weight": 8 },
       { "type": "idle", "weight": 3 },
-      { "type": "emote", "weight": 2, "messages": ["lets out a shrill, rattling screech", "bares a mouthful of yellowed incisors", "lashes her scaled tail across the bones", "drags a delver's femur closer with one clawed foot"] }
+      { "type": "emote", "weight": 2, "messages": ["lets out a shrill, rattling screech", "bares a mouthful of yellowed incisors", "lashes her scaled tail across the bones", "drags a delver's femur closer with one clawed foot"] },
+      { "type": "summon", "weight": 2, "mob": "giant-rat", "count": 2, "max": 4, "verb": "throws back her head and shrieks; vermin boil out of the dark" }
     ],
     "loot": [{ "template": "crystal", "chance": 1 }]
   },

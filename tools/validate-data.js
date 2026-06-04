@@ -193,13 +193,18 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "cast", "emote", "wander", "idle", "flee"].includes(a.type))
+      if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
       if (a.type === "cast") {
         if (!a.spell || !has(spells, a.spell)) errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
         else if (!spells[a.spell].hostile) errs.push(`mob ${id}: cast action spell ${a.spell} must be hostile`);
+      }
+      if (a.type === "summon") {
+        if (!a.mob || !has(mobs, a.mob)) errs.push(`mob ${id}: summon action references missing mob ${a.mob}`);
+        if (a.count != null && (typeof a.count !== "number" || a.count <= 0)) errs.push(`mob ${id}: summon count must be a positive number`);
+        if (a.max != null && (typeof a.max !== "number" || a.max <= 0)) errs.push(`mob ${id}: summon max must be a positive number`);
       }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
