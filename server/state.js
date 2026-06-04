@@ -1693,7 +1693,7 @@ class GameState {
     const xp = t.xp || 0;
     const participants = (killer && !mob.noSpoils) ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit; summons award nothing
     rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: killer ? xp : 0, cause, participants };
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: (killer && !mob.noSpoils) ? xp : 0, cause, participants };
     events.push(death);
     return death;
   }
