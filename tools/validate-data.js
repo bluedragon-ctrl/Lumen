@@ -241,8 +241,9 @@ function main() {
   }
 
   // Spells: data-driven casting (manaCost + an effect primitive). `damage` is
-  // instantaneous (dice + optional attribute scaling); `emit-light` is a status.
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light"];
+  // instantaneous (dice + optional attribute scaling); `emit-light` and
+  // `heal-over-time` are statuses (the latter pulses healing on an interval).
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time"];
   for (const [id, sp] of Object.entries(spells)) {
     if (sp.id !== id) errs.push(`spell ${id}: id field mismatch (${sp.id})`);
     if (sp.manaCost != null && (typeof sp.manaCost !== "number" || sp.manaCost < 0))
@@ -263,6 +264,15 @@ function main() {
     } else if (eff.type === "emit-light") {
       if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`spell ${id}: effect.magnitude must be a number`);
       if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+    } else if (eff.type === "heal-over-time") {
+      if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`spell ${id}: effect.magnitude must be a number`);
+      if (eff.interval != null && (typeof eff.interval !== "number" || eff.interval <= 0)) errs.push(`spell ${id}: effect.interval must be a positive number (ticks)`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+      if (eff.scale != null) {
+        if (typeof eff.scale !== "object" || !eff.scale.attr) errs.push(`spell ${id}: effect.scale must be { attr, per }`);
+        else if (eff.scale.per != null && (typeof eff.scale.per !== "number" || eff.scale.per <= 0))
+          errs.push(`spell ${id}: effect.scale.per must be a positive number`);
+      }
     }
   }
 

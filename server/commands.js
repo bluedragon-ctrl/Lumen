@@ -687,9 +687,12 @@ function spellList(state, player) {
     const s = w.spells[id];
     if (!s) continue;
     let tail = "";
-    if (s.effect && s.effect.type === "damage")
-      tail = ` — ${s.effect.damage} ${s.effect.damageType || "physical"} damage` +
-        (s.effect.scale ? ` (+${s.effect.scale.attr}/${s.effect.scale.per})` : "");
+    const e = s.effect || {};
+    if (e.type === "damage")
+      tail = ` — ${e.damage} ${e.damageType || "physical"} damage` +
+        (e.scale ? ` (+${e.scale.attr}/${e.scale.per})` : "");
+    else if (e.type === "heal-over-time")
+      tail = ` — heals ${e.magnitude || 0}${e.scale ? `+${e.scale.attr}/${e.scale.per}` : ""} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${e.duration || 0}`;
     lines.push(`  ${s.name}: ${s.manaCost || 0} mana${tail}`);
   }
   lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
@@ -723,9 +726,14 @@ function cast(state, player, arg, ctx) {
 
   if (Math.floor(player.mana || 0) < (spell.manaCost || 0))
     return [{ type: "error", text: `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).` }];
-  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
 
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
+
+  // Beneficial spells (no `hostile` flag) mend rather than harm — they have their
+  // own targeting (self by default, an ally delver, or any creature in the room).
+  if (!spell.hostile) return castSupport(state, player, spell, targetQ, ctx);
+
+  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const ql = targetQ.toLowerCase();
@@ -759,6 +767,59 @@ function cast(state, player, arg, ctx) {
   ctx.toRoom(player.location, { type: "log", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
+}
+
+// Cast a beneficial spell. Resolution (mana, magnitude scaling, applying the
+// effect) lives in state.castBeneficial; this resolves the target and narrates.
+// Target precedence: an explicit self word (or no target) → the caster; else an
+// ally delver in the room; else a creature. Per-pulse effects (Regeneration)
+// then surface their healing over the following ticks via `regen-tick` events.
+function castSupport(state, player, spell, targetQ, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const ql = (targetQ || "").trim().toLowerCase();
+  const selfWords = ["", "self", "me", "myself", player.name.toLowerCase()];
+
+  let target = null;
+  if (selfWords.includes(ql)) {
+    target = { kind: "player", actor: player, id: player.id, name: "yourself", isSelf: true };
+  } else {
+    const other = [...state.playersIn(player.location)].find(
+      (o) => o.id !== player.id && o.hp > 0 && o.name.toLowerCase().includes(ql)
+    );
+    if (other) {
+      if (!see) return [{ type: "error", text: "It is too dark to make out your target." }];
+      target = { kind: "player", actor: other, id: other.id, name: other.name };
+    } else {
+      const mob = rt.mobs.find((m) => {
+        const t = w.mobs[m.template];
+        return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+      });
+      if (mob) {
+        const mt = w.mobs[mob.template];
+        target = { kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId: player.location, emitsLight: !!mt.emitsLight };
+      }
+    }
+  }
+  if (!target) return [{ type: "error", text: `You see no "${targetQ}" here to mend.` }];
+
+  const res = state.castBeneficial(player, spell, target);
+  const verb = spell.name.toLowerCase();
+  const targetName = target.isSelf ? "themselves" : target.name; // for the room's view
+
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+
+  if (res.effect === "restore") {
+    const parts = [];
+    if (res.restored.hp) parts.push(`${res.restored.hp} health`);
+    if (res.restored.mana) parts.push(`${res.restored.mana} mana`);
+    const tail = parts.length ? ` restoring ${parts.join(" and ")}` : "";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${target.name}${tail}.`);
+  }
+  const onWhom = target.isSelf ? "yourself" : target.name;
+  return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
 }
 
 // Attributes a player can raise with banked level-up points.

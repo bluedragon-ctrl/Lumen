@@ -502,6 +502,8 @@ class GameState {
       name: spec.name || spec.type,
       magnitude: spec.magnitude || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
+      pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
       source: spec.source || null, // "item" = sustained by worn/carried gear; survives death
       remaining: spec.duration != null ? spec.duration : null, // null = permanent
@@ -542,7 +544,13 @@ class GameState {
         if (s.type !== "damage-over-time" || !s.damage) continue;
         if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed" })) { dead = true; break; }
       }
-      if (!dead) this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
+      if (dead) continue;
+      for (const s of p.states) {
+        if (s.type !== "heal-over-time" || !this._pulseReady(s)) continue;
+        const healed = this._heal(p, s.magnitude);
+        if (healed) events.push({ type: "regen-tick", playerId: p.id, amount: healed, name: s.name });
+      }
+      this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
     }
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
@@ -555,10 +563,33 @@ class GameState {
         }
         if (!dead) {
           const t = this.world.mobs[m.template];
+          for (const s of m.states) {
+            if (s.type !== "heal-over-time" || !this._pulseReady(s)) continue;
+            const healed = this._heal(m, s.magnitude);
+            if (healed) events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: s.name, emitsLight: !!t.emitsLight, light: rt.light });
+          }
           this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, mobName: t.name, effectType: s.type, name: s.name, emitsLight: !!t.emitsLight, light: rt.light }));
         }
       }
     }
+  }
+
+  /** Advance a periodic state's pulse counter; true on the tick its `interval`
+   *  comes due (default every tick). Used by heal-over-time (and future pulses). */
+  _pulseReady(s) {
+    const every = s.interval || 1;
+    if (++s.pulse < every) return false;
+    s.pulse = 0;
+    return true;
+  }
+
+  /** Restore up to `amount` HP to an actor (player or mob), clamped to its
+   *  maximum. Returns the HP actually gained (0 if already full). */
+  _heal(actor, amount) {
+    if (!amount || actor.hp >= actor.maxHp) return 0;
+    const before = actor.hp;
+    actor.hp = Math.min(actor.maxHp, actor.hp + amount);
+    return actor.hp - before;
   }
 
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
@@ -1048,6 +1079,39 @@ class GameState {
     }
 
     return result;
+  }
+
+  /**
+   * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
+   * `target` is the normalized descriptor the command handler built:
+   *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
+   * Spends mana, then applies the effect primitive. `heal-over-time` bakes its
+   * per-pulse magnitude from the caster's scaling attribute at cast time (so the
+   * power follows the caster, while an innate mob regen authors `magnitude`
+   * directly); an instant `restore` tops up hp/mana now. Returns a result the
+   * caller narrates: { effect, name, perPulse?, restored? }.
+   *
+   * NOTE (aggro groundwork): healing draws no threat yet. When support-spell
+   * threat lands, this is the hook — credit threat on the healed ally's current
+   * attackers here, before/after applyEffect.
+   */
+  castBeneficial(player, spell, target, events = []) {
+    const w = this.world;
+    const eff = spell.effect || {};
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+
+    if (eff.type === "restore") {
+      const got = this.applyRestore(target.actor, eff);
+      return { effect: "restore", name: spell.name, restored: got };
+    }
+
+    // Status effects (heal-over-time and future buffs). Bake any caster scaling
+    // into the magnitude so the instance carries a fixed strength.
+    const bonus = spellScaleBonus(effectiveAttributes(w, player), eff.scale);
+    const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+    this.applyEffect(target.actor, { ...eff, magnitude });
+    this._narrateEffectApplied(events, target, eff.name || eff.type);
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
   }
 
   /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */

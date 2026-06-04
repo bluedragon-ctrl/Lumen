@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Regeneration spell + heal-over-time effect.** A new `heal-over-time` effect
+  primitive pulses healing on its own `interval` for a `duration`, clamped to the
+  target's max HP. It works on **players and mobs alike** — so a mob can carry an
+  innate regen (a "regenerating troll" is just data: an authored
+  `heal-over-time` state with a fixed `magnitude`). The first spell to use it,
+  **Regeneration** (8 mana), is *beneficial*: it cannot be hurled at a foe, only
+  laid on the willing. `cast regeneration` (or `cast regeneration self`) mends the
+  caster; `cast regeneration <ally>` mends a fellow delver in the room; it can
+  also be cast on a creature you can see. The per-pulse heal scales with the
+  caster's **Intellect** (`floor(Int/2)` every 2 ticks for 10 ticks), baked in at
+  cast time. Beneficial casting has its own targeting path (`castBeneficial` in
+  `state.js`) with a documented hook for future support-spell threat/aggro —
+  healing draws **no threat yet**. Players learn it from **a Scroll of
+  Regeneration**, now stocked by **Vesper the glimmer-mage** (60 shards).
 - **Admin knows every recipe (testing aid)** — on login the auto-created `admin`
   is granted all recipes in the world (re-synced each login, so recipes added
   later are picked up automatically). Lets a maintainer exercise any `craft`

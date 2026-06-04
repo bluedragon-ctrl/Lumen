@@ -7,5 +7,14 @@
     "hostile": true,
     "target": "creature",
     "effect": { "type": "damage", "damageType": "magical", "damage": "1d4", "scale": { "attr": "intellect", "per": 4 } }
+  },
+  "regeneration": {
+    "id": "regeneration",
+    "name": "Regeneration",
+    "description": "A slow weave of mending light, drawn from the glimmer and sunk beneath the skin, where it knits torn flesh a little at a time. It cannot be hurled at a foe — only laid on the willing, be it your own hand or an ally's. Cast it on yourself, a fellow delver, or any creature you can see; the deeper your Intellect, the more it knits with each pulse.",
+    "manaCost": 8,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "heal-over-time", "name": "Regeneration", "interval": 2, "duration": 10, "magnitude": 0, "scale": { "attr": "intellect", "per": 2 }, "good": true }
   }
 }

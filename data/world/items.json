@@ -144,6 +144,16 @@
     "stackable": true,
     "scroll": { "spell": "spark" }
   },
+  "scroll-regeneration": {
+    "id": "scroll-regeneration",
+    "name": "a Scroll of Regeneration",
+    "description": "Vellum dense with looping, vinework glyphs that seem to breathe faintly green in the dark. Study it to learn the Regeneration weave — a mending light cast on yourself or an ally — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "scroll": { "spell": "regeneration" }
+  },
   "palecap-mushroom": {
     "id": "palecap-mushroom",
     "name": "a palecap mushroom",

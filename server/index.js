@@ -173,6 +173,26 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "regen-tick") {
+    // A heal-over-time pulse mended a player — climb the bar and note the gain.
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    sendToPlayer(ev.playerId, { type: "log", text: `${ev.name} knits your wounds. (+${ev.amount})` });
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
+  if (ev.type === "mob-regen") {
+    // A heal-over-time pulse mended a mob (e.g. a regenerating troll) — onlookers
+    // see its wounds close; refresh the room so its HP bar climbs.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)}'s wounds close over. (+${ev.amount})` });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
   if (ev.type === "effect-expired") {
     const player = state.players.get(ev.playerId);
     if (!player) return;
