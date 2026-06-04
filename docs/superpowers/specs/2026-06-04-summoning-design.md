@@ -34,8 +34,11 @@ through the same small mechanic.
 - **Gnaw:** weighted `summon` action with a **living-brood cap** (don't summon
   while `max` of her brood are alive). Reinforcements are permanent (no timer).
 - **Lifecycle (player summon):** ends on the **timer OR owner-loss** (owner death
-  *or* disconnect). It **winks out silently** — no corpse, loot, XP, or death
-  event. If an enemy kills it first, same: no spoils.
+  *or* disconnect). Those endings **wink out silently** — no corpse, loot, XP, or
+  death event. If an enemy *kills* it in combat first, it instead dies through the
+  normal combat death path (a regular "dies"/"you slay" line) but still drops **no
+  loot or XP** — the silent unravel is reserved for the timer/recast/owner-loss
+  endings. (Implementation note: confirmed as the intended framing during build.)
 - **Spoils:** summoned creatures (player Wisp *and* Gnaw's rats) yield **no loot
   and no XP** however they die — a `noSpoils` instance flag. Prevents summon-kill
   farming and matches the conjured-creature fantasy.
