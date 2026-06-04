@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Summoning.** A data-driven summon primitive: a player **Summon Wisp** spell
+  (learned from a scroll sold by Vesper the glimmer-mage) conjures an allied Wisp
+  for 3 minutes that fights autonomously and follows its summoner; **Gnaw, the
+  Brood-Mother** now calls capped giant-rat reinforcements mid-fight. Summoned
+  creatures drop no loot or XP and unravel on a timer, on their summoner's death,
+  or on disconnect.
 - **Combatant-agnostic threat + faction foundation (summoning groundwork).** The
   combat/threat model is generalized so non-player combatants can fight, without
   building summoning itself:
