@@ -204,7 +204,8 @@ A map of `mobId → template`.
 | `perception` | block   | `{ blindBelow, harmedAbove }`. |
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
-| `hostile`    | bool    | May attack players when able. |
+| `hostile`    | bool    | May attack players when able (proactively *hunts* — builds detection; see Aggro / threat). |
+| `ambush`     | bool?   | Predator that lies in wait. It still hunts (tracks perceivable enemies) but holds its **proactive** strike until a target is **sleeping**, then attacks; if `hidden`, that first strike **reveals** it to the victim (no `search` needed) and fires a `mob-ambush` appearance line. It emits no "spotted" tell, and once blows are traded it fights on normally (combat threat) regardless of posture. Requires `hostile: true`. |
 | `attack`     | block?  | Melee profile: `{ damage (dice), actionCost, type?, bonus?, crit?, hitBonus?, onHit? }`. `onHit` (see below) lands effects on a struck defender. |
 | `onDamage`   | block?  | General **when-struck** triggers (see below): a list of effect specs that fire when this mob is hit — reflect damage, retaliate with a DoT, or buff itself. Same shape on an item's `armour.onDamage`. |
 | `spikes`     | block?  | Terse sugar for the commonest `onDamage` entry — a flat melee **reflect** ("thorns"): `{ damage (dice), chance? }`. Anyone who lands a melee hit takes the damage back. Fires even if the mob has no `attack` of its own. Equivalent to `onDamage: [{ type: "damage", damage, target: "attacker" }]`. |

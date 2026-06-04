@@ -363,6 +363,23 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-ambush") {
+    // A hidden ambusher burst from concealment onto a (sleeping) delver — see
+    // state._mobAttack. Pushed just before the strike, so this appearance line
+    // reads first, then the attack/wake lines follow. Light-gated like other mobs.
+    const target = state.players.get(ev.targetId);
+    const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
+    sendToPlayer(ev.targetId, { type: "log", text: seen
+      ? `${cap(ev.mobName)} drops from its hiding place onto you!`
+      : "Something drops from the dark onto you!" });
+    for (const o of state.playersIn(ev.roomId)) {
+      if (o.id === ev.targetId) continue;
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} bursts from hiding onto ${ev.targetName}!` });
+    }
+    return;
+  }
+
   if (ev.type === "combat-auto-start") {
     // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
     // player they've engaged, so the swings on following ticks aren't a mystery.

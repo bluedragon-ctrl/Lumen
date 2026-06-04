@@ -1340,10 +1340,13 @@ class GameState {
     // Enemies = opposing-faction combatants present (players + opposing mobs).
     let enemies = this._enemiesOf(self, roomId);
 
-    // A hidden lurker is inert toward any DELVER who hasn't searched it out (reveal-
-    // on-find, no ambush): only players who have revealed it perceive — and provoke —
-    // it. Mobs sense each other regardless, so the filter touches only player enemies.
-    if (m.hidden) {
+    // A hidden mob is normally inert toward any DELVER who hasn't searched it out
+    // (reveal-on-find): only players who have revealed it perceive — and provoke —
+    // it. An *ambush* mob is the exception: it silently tracks the unaware and
+    // strikes when they're helpless, revealing itself with the blow (see
+    // _mobAttack), so it skips this filter. Mobs sense each other regardless, so
+    // the filter only ever touches player enemies.
+    if (m.hidden && !t.ambush) {
       enemies = enemies.filter((c) => c.kind !== "player" || mobVisibleTo(this, c.actor, m));
       if (enemies.length === 0) return;
     }
@@ -1358,7 +1361,7 @@ class GameState {
     // A sitting mob that engaged stood up in _engageTell; one still seated noticed
     // nobody worth rising for this action — stay at rest (no wander/emote).
     if (m.posture === "sitting") return;
-    const engagedTargets = enemies.filter((c) => this._isEngaged(m, c.id));
+    const engagedTargets = enemies.filter((c) => this._isEngaged(m, t, c));
     const inCombat = this._alerted(m); // alerted (combat threat or live detection) → won't wander
 
     // Wander destinations: "zone" scope confines a mob to its current zone (the
@@ -1484,10 +1487,16 @@ class GameState {
   }
 
   /** A combatant is *engaged* by a mob once it has either traded blows (a live
-   *  combat-threat entry, any amount → being hit provokes instantly) or been
-   *  noticed up to the detection threshold (`AGGRO_ENGAGE`). */
-  _isEngaged(mob, id) {
-    return (mob.aggro && mob.aggro[id] > 0) || (mob.detect && mob.detect[id] >= AGGRO_ENGAGE);
+   *  combat-threat entry, any amount → being hit provokes instantly, in any light
+   *  or posture) or been noticed up to the detection threshold (`AGGRO_ENGAGE`).
+   *  An `ambush` mob holds its proactive (detection-driven) strike until the target
+   *  is a *sleeping* delver — it preys only on the helpless — but still fights back
+   *  outright once blows are traded. */
+  _isEngaged(mob, t, c) {
+    if (mob.aggro && mob.aggro[c.id] > 0) return true;
+    if (!(mob.detect && mob.detect[c.id] >= AGGRO_ENGAGE)) return false;
+    if (t.ambush) return c.kind === "player" && c.actor.posture === "sleeping";
+    return true;
   }
 
   /** Alerted = holds any combat threat or any live detection. An alerted mob is
@@ -1520,7 +1529,9 @@ class GameState {
         if (before < AGGRO_ENGAGE) {
           const now = Math.min(AGGRO_ENGAGE, before + nc * AGGRO_RATE);
           mob.detect[id] = now;
-          if (now >= AGGRO_ENGAGE && c.kind === "player" && !(mob.aggro && mob.aggro[id] > 0)) {
+          // An ambush mob fires no "spotted" tell — its strike from hiding is the
+          // reveal (see _mobAttack); a normal mob announces the moment it commits.
+          if (now >= AGGRO_ENGAGE && c.kind === "player" && !t.ambush && !(mob.aggro && mob.aggro[id] > 0)) {
             this._engageTell(mob, t, c, roomId, events);
           }
         }
@@ -1649,6 +1660,16 @@ class GameState {
     if (!target) return;
     this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
     const isPlayer = target.kind === "player";
+    // Ambush: a hidden mob striking a delver who never found it bursts from
+    // concealment — reveal it to that player (ephemerally, like `search`) and
+    // announce the appearance just before the blow lands.
+    if (m.hidden && isPlayer && !mobVisibleTo(this, target.actor, m)) {
+      let set = this.revealedMobs.get(target.actor.id);
+      if (!set) { set = new Set(); this.revealedMobs.set(target.actor.id, set); }
+      set.add(m.id);
+      events.push({ type: "mob-ambush", roomId, mobId: m.id, mobName: t.name,
+        targetId: target.id, light: rt.light, emitsLight: !!t.emitsLight });
+    }
     const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const targetEmitsLight = isPlayer ? false : !!tmt.emitsLight;
