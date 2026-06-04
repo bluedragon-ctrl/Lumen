@@ -56,6 +56,25 @@ function hitChance(perception, light) {
   return 1.0;
 }
 
+/**
+ * Detection sensitivity by visibility tier — the per-action rate at which a mob
+ * *notices* an enemy and builds aggro toward it (see GameState._detectAndDecay).
+ * Mirrors `hitChance` but with a HARD zero below `blindBelow`: combat flailing
+ * still lands the occasional blind blow (0.05), but you are not *noticed* at all
+ * in the dark, so an unseen delver can slip past.
+ *   can't see (below blindBelow)                → 0   (undetected)
+ *   partial / dim, or glare (above harmedAbove)  → 0.5 (builds slowly)
+ *   clear (dimBelow .. harmedAbove)              → 1.0 (noticed fast)
+ */
+function noticeChance(perception, light) {
+  const blindBelow = perception ? perception.blindBelow : 1;
+  const dimBelow = perception && perception.dimBelow != null ? perception.dimBelow : blindBelow;
+  if (light < blindBelow) return 0;
+  if (isHarmedByLight(perception, light)) return 0.5;
+  if (light < dimBelow) return 0.5;
+  return 1.0;
+}
+
 module.exports = {
   LIGHT_MIN,
   LIGHT_MAX,
@@ -65,4 +84,5 @@ module.exports = {
   canSee,
   isHarmedByLight,
   hitChance,
+  noticeChance,
 };

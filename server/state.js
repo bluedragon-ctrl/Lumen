@@ -1,5 +1,5 @@
 "use strict";
-const { effectiveLight, canSee, hitChance } = require("./light");
+const { effectiveLight, canSee, hitChance, noticeChance } = require("./light");
 const { rollDice } = require("./dice");
 const { XP_BASE, XP_GROWTH, POINTS_PER_LEVEL } = require("./config");
 
@@ -94,6 +94,15 @@ const HP_PER_VITALITY = 5;
 const MANA_PER_INTELLECT = 4;
 const ATTR_BASELINE = 3; // starting value of every attribute
 const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimBelow by 1
+// Aggro detection (see GameState._detectAndDecay): a proactive hunter accrues a
+// decaying "notice" meter on each enemy it can perceive, at AGGRO_RATE × the
+// light-tier noticeChance per action, capped at AGGRO_ENGAGE; once a target's
+// detection reaches AGGRO_ENGAGE the mob engages (clear sight ≈ ENGAGE/RATE
+// actions, impaired ≈ 2×, dark never). A target it can no longer perceive for
+// AGGRO_GRACE actions decays by AGGRO_RATE/action until forgotten.
+const AGGRO_RATE = 1; // detection gained per action at clear sight
+const AGGRO_ENGAGE = 2; // detection threshold at which a mob commits to attack
+const AGGRO_GRACE = 3; // actions a target stays unperceived before detection decays
 
 /** A player's effective attributes: base attributes plus any flat modifiers
  *  from equipped gear (`armour.attrMod`, e.g. heavy iron that dulls Wits).
@@ -1313,7 +1322,9 @@ class GameState {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
         if (m.hp <= 0) continue; // slain earlier this tick (e.g. mob-vs-mob) but still in the snapshot
-        if (RESTING(m)) continue; // a sitting/sleeping mob is inert until struck (see _rouse)
+        if (m.posture === "sleeping") continue; // a sleeping mob perceives nothing — inert until struck (see _rouse)
+        // A *sitting* mob is alert-at-rest: it still runs _mobAct to detect enemies
+        // and stands as it engages (it just won't wander/emote — see _mobAct).
         const t = this.world.mobs[m.template];
         const cost = (t.attack && t.attack.actionCost) || 12;
         if (m.energy < cost) continue;
@@ -1337,11 +1348,18 @@ class GameState {
       if (enemies.length === 0) return;
     }
 
-    // Threat: hostile mobs engage any enemy present; drop threat toward those who
-    // have left/died. A mob with live threat is "in combat" and won't wander.
-    if (t.hostile) for (const c of enemies) this._addThreat(m, c.id, 0);
+    // Detection: forget combatants who have left, then a *proactive hunter* (a
+    // hostile wild mob, or a player-faction ally) builds a decaying notice meter
+    // on each enemy it can perceive. A mob it has actually traded blows with (a
+    // live combat-threat entry) is engaged outright — being hit bypasses the ramp.
     this._pruneAggro(m, enemies);
-    const inCombat = Object.keys(m.aggro || {}).length > 0;
+    const hunts = t.hostile || self.faction === "player";
+    this._detectAndDecay(m, t, enemies, rt.light, hunts, roomId, events);
+    // A sitting mob that engaged stood up in _engageTell; one still seated noticed
+    // nobody worth rising for this action — stay at rest (no wander/emote).
+    if (m.posture === "sitting") return;
+    const engagedTargets = enemies.filter((c) => this._isEngaged(m, c.id));
+    const inCombat = this._alerted(m); // alerted (combat threat or live detection) → won't wander
 
     // Wander destinations: "zone" scope confines a mob to its current zone (the
     // village stays in the village, the abyss below); "any" lets it cross zones.
@@ -1358,41 +1376,40 @@ class GameState {
       if (dirs.length) return this._mobMove(m, t, roomId, events, flee.verb || "flees into the dark", dirs);
     }
 
-    // A mob attacks if it's hostile, OR if it's been provoked (a neutral creature
-    // that someone struck has live threat → it fights back), OR if the room light
-    // has risen past its `lightAggro` tolerance (a calm creature roused by light —
-    // the inverse of `flee`). Shopkeepers et al. carry no `attack` block, so they
-    // stay passive even if hit. Note: above `flee`'s threshold, flight wins (it
-    // returned earlier); lightAggro bites in the band between calm and flight.
-    // A mob attacks if it's hostile, OR it's been provoked (a neutral creature that
-    // someone struck has live threat → it fights back), OR the room light has risen
-    // past its `lightAggro` tolerance (a calm creature roused by light — the inverse
-    // of `flee`), OR it is a player-faction ally with enemies present (a summon
-    // fights for its delver without needing `hostile`). Shopkeepers et al. carry no
-    // `attack` block, so they stay passive even if hit. For wild mobs the ally
-    // clause is always false, so their behaviour is unchanged.
+    // A mob attacks if it has *engaged* a present enemy — either a target whose
+    // detection meter reached `AGGRO_ENGAGE` (proactively noticed it; clear sight
+    // commits in ~AGGRO_ENGAGE actions, impaired ~2×, dark never), or one it has
+    // traded blows with (a live combat-threat entry → engaged outright, so being
+    // hit always provokes, in any light) — OR if the room light has risen past its
+    // `lightAggro` tolerance (a calm creature roused by light — the inverse of
+    // `flee`; it lashes at anyone present). Shopkeepers et al. carry no `attack`
+    // block, so they stay passive even if hit. Note: above `flee`'s threshold,
+    // flight wins (it returned earlier); lightAggro bites between calm and flight.
     const lightProvoked = t.lightAggro && rt.light > (t.lightAggro.above || 0);
-    const aggressive = t.hostile || inCombat || lightProvoked || (self.faction === "player" && enemies.length > 0);
+    const aggressive = engagedTargets.length > 0 || lightProvoked;
+    // Whom to swing at: a committed target if there is one, else (light-rage only)
+    // anyone present. _mobAttack/_mobCast weigh combined threat among these.
+    const candidates = engagedTargets.length ? engagedTargets : enemies;
 
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
-        if (a.type === "attack") return aggressive && t.attack && enemies.length > 0;
-        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && enemies.length > 0;
-        if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && enemies.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
+        if (a.type === "attack") return aggressive && t.attack && candidates.length > 0;
+        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && candidates.length > 0;
+        if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && candidates.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
     } else {
       // Default behaviour for mobs without an actions table: attack if able.
-      options = aggressive && t.attack && enemies.length ? [{ type: "attack" }] : [];
+      options = aggressive && t.attack && candidates.length ? [{ type: "attack" }] : [];
     }
 
     const choice = pickWeighted(options);
     if (!choice || choice.type === "idle") return;
-    if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, enemies);
-    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, enemies, choice.spell);
+    if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, candidates);
+    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, candidates, choice.spell);
     if (choice.type === "summon") return this._mobSummon(m, t, roomId, events, choice);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
@@ -1448,16 +1465,88 @@ class GameState {
     return owner && owner.hp > 0 ? owner : null;
   }
 
-  // --- Aggro / threat table (combatant-keyed; placeholder for a fuller system) ---
-  // A mob's `aggro` maps a combatant id (a player OR a mob) to threat. Today it
-  // tracks who a mob is engaged with so it stays to fight rather than wandering
-  // off, and picks its target by highest threat. Later: threat weighting per
-  // action, decay over time, and cross-room pursuit hook here.
+  // --- Aggro / threat tables (combatant-keyed) ---------------------------------
+  // A mob holds two per-enemy maps, both keyed by any combatant id (a player OR a
+  // mob): `aggro` is *combat* threat (from trading blows — drives kill-XP credit
+  // and outright engagement), `detect` is the decaying *detection* meter a hunter
+  // builds on enemies it can perceive (see _detectAndDecay). A mob is engaged once
+  // a target has combat threat or detection ≥ AGGRO_ENGAGE; it stays to fight (won't
+  // wander) while alerted, and targets the highest *combined* threat.
+  // Later: per-action threat weighting, cross-room pursuit hook here.
 
-  /** Add `amount` threat toward a combatant (0 just ensures an entry exists). */
+  /** Add `amount` combat threat toward a combatant (from trading blows — drives
+   *  XP credit and outright engagement). 0 just ensures an entry exists. Detection
+   *  (mere noticing) lives in the separate, decaying `mob.detect` map so that being
+   *  seen never counts as participation for kill XP. */
   _addThreat(mob, combatantId, amount) {
     if (!mob.aggro) mob.aggro = {};
     mob.aggro[combatantId] = (mob.aggro[combatantId] || 0) + amount;
+  }
+
+  /** A combatant is *engaged* by a mob once it has either traded blows (a live
+   *  combat-threat entry, any amount → being hit provokes instantly) or been
+   *  noticed up to the detection threshold (`AGGRO_ENGAGE`). */
+  _isEngaged(mob, id) {
+    return (mob.aggro && mob.aggro[id] > 0) || (mob.detect && mob.detect[id] >= AGGRO_ENGAGE);
+  }
+
+  /** Alerted = holds any combat threat or any live detection. An alerted mob is
+   *  "in combat" and won't wander; an un-alerted hostile roams normally. */
+  _alerted(mob) {
+    if (mob.aggro && Object.keys(mob.aggro).length) return true;
+    if (mob.detect) for (const v of Object.values(mob.detect)) if (v > 0) return true;
+    return false;
+  }
+
+  /** Per-action detection pass. A proactive `hunts`er accrues a notice meter on
+   *  each enemy it can perceive (mob posture + sight vs room light, via
+   *  `canPerceive`/`noticeChance`), capped at `AGGRO_ENGAGE`; the first time a
+   *  PLAYER target crosses that cap (and isn't already engaged via blows) the mob
+   *  emits its engage tell (and stands if seated). Any enemy it can no longer
+   *  perceive — too dark, or the mob itself blinded — decays after `AGGRO_GRACE`
+   *  unperceived actions until forgotten. Detection of mob targets (a summon's
+   *  wild quarry, or a wild mob noticing a summon) builds silently. */
+  _detectAndDecay(mob, t, enemies, light, hunts, roomId, events) {
+    if (!mob.detect) mob.detect = {};
+    if (!mob._unseen) mob._unseen = {};
+    // A mob's sight band lives on its template; a sleeping mob perceives nothing
+    // (resolveMobAI already skips it — this is belt-and-suspenders).
+    const nc = mob.posture === "sleeping" ? 0 : noticeChance(t.perception, light);
+    for (const c of enemies) {
+      const id = c.id;
+      if (hunts && nc > 0) {
+        mob._unseen[id] = 0;
+        const before = mob.detect[id] || 0;
+        if (before < AGGRO_ENGAGE) {
+          const now = Math.min(AGGRO_ENGAGE, before + nc * AGGRO_RATE);
+          mob.detect[id] = now;
+          if (now >= AGGRO_ENGAGE && c.kind === "player" && !(mob.aggro && mob.aggro[id] > 0)) {
+            this._engageTell(mob, t, c, roomId, events);
+          }
+        }
+      } else if (mob.detect[id] > 0) {
+        // Can't perceive this enemy (dark, or not a hunter): grace, then decay.
+        mob._unseen[id] = (mob._unseen[id] || 0) + 1;
+        if (mob._unseen[id] > AGGRO_GRACE) {
+          const v = mob.detect[id] - AGGRO_RATE;
+          if (v > 0) mob.detect[id] = v;
+          else { delete mob.detect[id]; delete mob._unseen[id]; }
+        }
+      }
+    }
+  }
+
+  /** The Diku-style "spotted you" tell, fired once as a player target crosses the
+   *  detection threshold. A seated mob stands as it commits (`rose`). Light-gated
+   *  by the renderer like other mob events. */
+  _engageTell(mob, t, target, roomId, events) {
+    let rose = false;
+    if (mob.posture === "sitting") { mob.posture = "standing"; rose = true; }
+    events.push({
+      type: "aggro-engage", roomId, mobId: mob.id, mobName: t.name,
+      targetId: target.id, targetName: target.actor.name, rose,
+      light: this.rooms[roomId].light, emitsLight: !!t.emitsLight,
+    });
   }
 
   /** Award `xp` to every PLAYER who earned a mob's death — the finisher (always,
@@ -1485,22 +1574,27 @@ class GameState {
     return out;
   }
 
-  /** Forget combatants no longer present/alive. `present` is the current candidate
-   *  list ({ id } descriptors). (Later: decay instead of hard drop.) */
+  /** Forget combatants no longer present/alive across every per-enemy table
+   *  (combat threat, detection meter, unseen counters). `present` is the current
+   *  candidate list ({ id } descriptors). In-room decay is handled separately by
+   *  `_detectAndDecay`; this is the hard drop for those who left. */
   _pruneAggro(mob, present) {
-    if (!mob.aggro) { mob.aggro = {}; return; }
     const ids = new Set(present.map((c) => c.id));
-    for (const cid of Object.keys(mob.aggro)) if (!ids.has(cid)) delete mob.aggro[cid];
+    for (const map of [mob.aggro, mob.detect, mob._unseen]) {
+      if (!map) continue;
+      for (const cid of Object.keys(map)) if (!ids.has(cid)) delete map[cid];
+    }
+    if (!mob.aggro) mob.aggro = {};
   }
 
   /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),
-   *  or null. `candidates` are the valid targets to weigh threat among. */
+   *  or null. Weighs combined combat threat + detection so a proactively-noticed
+   *  enemy is a valid quarry. `candidates` are the valid targets to weigh among. */
   _topThreat(mob, candidates) {
-    if (!mob.aggro) return null;
-    let best = null, bestT = -Infinity;
+    let best = null, bestT = 0;
     for (const c of candidates) {
-      const th = mob.aggro[c.id];
-      if (th != null && th > bestT) { bestT = th; best = c; }
+      const th = (mob.aggro && mob.aggro[c.id] || 0) + (mob.detect && mob.detect[c.id] || 0);
+      if (th > bestT) { bestT = th; best = c; }
     }
     return best;
   }
