@@ -344,6 +344,25 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "aggro-engage") {
+    // A mob proactively noticed a delver and committed to attack (see
+    // state._engageTell). One tell at the moment of engagement, light-gated like
+    // other mob lines; `rose` when a seated creature stood to do it.
+    const target = state.players.get(ev.targetId);
+    const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
+    const who = seen ? ev.mobName : "something";
+    const youLine = seen
+      ? `${cap(who)} ${ev.rose ? "stirs, its gaze locking" : "fixes its gaze"} onto you.`
+      : "Something stirs in the dark, fixing on you.";
+    sendToPlayer(ev.targetId, { type: "log", text: youLine });
+    for (const o of state.playersIn(ev.roomId)) {
+      if (o.id === ev.targetId) continue;
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.` });
+    }
+    return;
+  }
+
   if (ev.type === "combat-auto-start") {
     // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
     // player they've engaged, so the swings on following ticks aren't a mystery.

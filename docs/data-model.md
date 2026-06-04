@@ -211,7 +211,7 @@ A map of `mobId → template`.
 | `shop`       | block?  | Makes the mob a trader: `{ "sells": [{ template, price? }] }` — its stock, each sold at the item's `value` (or an optional `price` override). There is **no buy list**: the trader buys *any* valued item from a player at its `sellValue`. Players use `list`/`buy`/`sell` in the room. |
 | `shards`     | dice?   | Shards dropped on death, e.g. `"1d4"`. They land on the floor as a `shards` (type `currency`) pile that **anyone** present can `get` — gathering tallies to the picker's balance rather than into inventory. Piles in a room merge. |
 | `actions`    | Action[]?| Weighted behaviour table (see below). Without it, a hostile mob just attacks. |
-| `posture`    | enum?   | Starting posture: `standing` (default) \| `sitting` \| `sleeping`. A `sitting`/`sleeping` mob is **inert** — it won't wander, attack, or emote — until a blow (melee or hostile spell) **rouses** it to standing. Authors dozing guardians / resting NPCs and ambush openings. |
+| `posture`    | enum?   | Starting posture: `standing` (default) \| `sitting` \| `sleeping`. A **`sleeping`** mob perceives nothing — fully inert (no wander/attack/emote, builds no aggro) until a blow (melee or hostile spell) **rouses** it to standing. A **`sitting`** mob is alert-at-rest: it won't wander or emote, but it *does* detect enemies and **stands as it engages** (see Aggro / threat). Authors dozing guardians, resting NPCs, and creatures you can creep past while they sleep. |
 
 ### Mob actions (weighted)
 
@@ -312,15 +312,39 @@ or disconnect.
 
 ### Aggro / threat (runtime)
 
-Each mob instance carries an `aggro` table (`{ combatantId: threat }`) — minimal
-today, the foundation for a fuller threat system. The key is **any combatant id** —
-a player **or** a mob — so a creature can hold threat toward, and target, either.
-Trading blows with a mob earns threat; hostile mobs auto-engage any enemy in their
-room. A mob with any live threat entry is **in combat**: it won't `wander` off, and
-it attacks its **highest-threat** target. Healing or buffing an ally draws the
-caster threat on whatever is fighting that ally (mirrors the damage→threat
-convention). Threat toward a combatant is dropped when it leaves the room or dies
-(later: gradual decay, per-action threat weighting, cross-room pursuit).
+Each mob instance carries two per-enemy tables, both keyed by **any combatant id**
+(a player **or** a mob), so a creature can hold threat toward, and target, either:
+
+- **`aggro` — combat threat.** Earned by *trading blows* (being hit, or hitting),
+  and by healing/buffing an ally a mob is fighting (mirrors the damage→threat
+  convention). Any live `aggro` entry engages a mob **outright** — so being struck
+  provokes it in any light — and only `aggro` (real participation) earns **kill XP**.
+- **`detect` — the detection meter.** A decaying notice value a *proactive hunter*
+  (a `hostile` wild mob, or a `"player"`-faction ally) accrues on each enemy it can
+  **perceive**, gated by the mob's sight in the room's current light:
+
+  | Mob's sight (light vs its `perception` band) | gain per action |
+  |---|---|
+  | below `blindBelow` (blind / dark) | **0** — never noticed; can be passed |
+  | dim, or glare above `harmedAbove` (impaired) | **0.5** — builds ~2× slower |
+  | clear | **1.0** |
+
+  Detection is capped at the engage threshold (`AGGRO_ENGAGE`, currently 2 → clear
+  sight commits in ~2 actions). A target the mob can no longer perceive (light lost,
+  or the mob blinded) **decays** after a short grace (`AGGRO_GRACE`) until forgotten
+  — the hook for future hide/invisibility. A **sleeping** mob perceives nothing and
+  never proactively aggros (only rouses when struck); a **sitting** mob detects and
+  **stands as it engages**.
+
+A mob is **engaged** with an enemy when it has any `aggro` on it **or** `detect ≥
+AGGRO_ENGAGE`; engaging a *player* fires a one-shot `aggro-engage` "spotted" tell.
+A mob holding any combat threat or live detection is **alerted** — it won't `wander`
+off — and it attacks its **highest combined-threat** target. Both tables are dropped
+for a combatant when it leaves the room or dies. Tuning constants (`AGGRO_RATE`,
+`AGGRO_ENGAGE`, `AGGRO_GRACE`) live at the top of `server/state.js`. Because every
+current hostile has `blindBelow: 0` (full dark-vision), the gate is presently a brief
+telegraph rather than true stealth; dark-blind creatures (`blindBelow ≥ 1`) make it
+bite. (Later: per-action threat weighting, cross-room pursuit.)
 
 ---
 

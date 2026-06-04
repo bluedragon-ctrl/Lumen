@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Perception-gated aggro with a threat ramp.** A hostile mob no longer attacks
+  anyone in its room the instant they arrive. Instead a *proactive hunter* (a
+  hostile wild mob, or a player-faction ally) builds a **detection meter** on each
+  enemy it can perceive, and commits only once that meter reaches a threshold:
+  - **Visibility gates noticing.** A new `noticeChance` light curve mirrors combat
+    accuracy but with a **hard zero below the mob's `blindBelow`** — in the dark a
+    mob cannot notice an enemy at all (you can slip past), in dim/glare it builds
+    slowly (~2× longer), in clear light it commits fast. Cadence rides the mob's
+    action speed, so a sluggish creature notices more slowly.
+  - **Being struck bypasses the ramp.** Trading blows still engages a mob outright
+    in any light, so hitting a creature always provokes it.
+  - **Detection decays.** A target a mob can no longer perceive (lights gone, or the
+    mob itself blinded) is forgotten after a short grace — the hook future
+    hide/invisibility skills will use. (Leaving the room still drops threat entirely.)
+  - **Posture matters.** A **sleeping** mob perceives nothing and never proactively
+    aggros (only rouses when struck); a **sitting** mob is alert-at-rest — it builds
+    detection and **stands as it engages**.
+  - **The "spotted" tell.** When a mob first commits to a delver it emits a single
+    light-gated message ("…fixes its gaze onto you."), so engagement is readable.
+  - Detection lives in a separate decaying `detect` table from combat `aggro`, so
+    merely *being seen* never earns kill XP — only trading blows does, as before.
+  - Folds in a fix: an un-alerted hostile mob now **wanders normally** while a player
+    shares its room (it no longer freezes the instant anyone walks in).
+
+  Note: against current content (every hostile sees in full dark, `blindBelow:0`)
+  this reads as a brief telegraph before the first blow; the dark-blind creatures
+  that make stealth meaningful are authored later.
 - **Summoning.** A data-driven summon primitive: a player **Summon Wisp** spell
   (learned from a scroll sold by Vesper the glimmer-mage) conjures an allied Wisp
   for 3 minutes that fights autonomously and follows its summoner; **Gnaw, the
