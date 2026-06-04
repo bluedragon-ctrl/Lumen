@@ -447,6 +447,27 @@ class GameState {
     return events;
   }
 
+  /** Relocate a player's owned summons from `from` to `dest` (follow on move).
+   *  Returns [{ mobName, emitsLight }] for the caller to narrate. Recomputes light
+   *  in both rooms if anything moved. Wild (ownerless) summons never follow. */
+  _moveSummonsWith(player, from, dest) {
+    const rtFrom = this.rooms[from], rtDest = this.rooms[dest];
+    const moved = [];
+    for (const m of [...rtFrom.mobs]) {
+      if (m.ownerId !== player.id) continue;
+      const idx = rtFrom.mobs.indexOf(m);
+      if (idx >= 0) rtFrom.mobs.splice(idx, 1);
+      rtDest.mobs.push(m);
+      const t = this.world.mobs[m.template];
+      moved.push({ mobName: t.name, emitsLight: !!t.emitsLight });
+    }
+    if (moved.length) {
+      rtFrom.light = this.computeRoomLight(from);
+      rtDest.light = this.computeRoomLight(dest);
+    }
+    return moved;
+  }
+
   /** Count living summons sharing a `summonerId` (a mob's living brood). */
   _broodCount(summonerId) {
     let n = 0;
@@ -849,9 +870,14 @@ class GameState {
 
   removePlayer(playerId) {
     const player = this.players.get(playerId);
-    if (player) this._deindexPlayer(player);
+    const events = [];
+    if (player) {
+      this._dismissOwnedSummons(player.id, "owner-gone", events); // disconnect unravels summons
+      this._deindexPlayer(player);
+    }
     this.players.delete(playerId);
     this.revealedMobs.delete(playerId); // drop ephemeral hidden-mob reveals on disconnect
+    return events;
   }
 
   /** Forget a player's ephemeral hidden-mob reveals (e.g. on leaving a room). */
@@ -1511,7 +1537,7 @@ class GameState {
       sourceId: player.id, // a player's reflected DoT credits them
       deal: (dmg) => {
         player.hp -= dmg;
-        if (player.hp <= 0) { const d = this._respawn(player, roomId); events.push(d); return d; }
+        if (player.hp <= 0) { const d = this._respawn(player, roomId, events); events.push(d); return d; }
         return null;
       },
       hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
@@ -1620,7 +1646,7 @@ class GameState {
         if (target.actor.hp <= 0) {
           killed = true;
           death = isPlayer
-            ? this._respawn(target.actor, roomId)
+            ? this._respawn(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
       } else {
@@ -1747,7 +1773,7 @@ class GameState {
     player.hp -= amount;
     events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
     if (player.hp <= 0) {
-      const death = this._respawn(player, player.location);
+      const death = this._respawn(player, player.location, events);
       events.push(death);
       return death;
     }
@@ -1770,7 +1796,7 @@ class GameState {
   }
 
   /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */
-  _respawn(player, deathRoom) {
+  _respawn(player, deathRoom, events = []) {
     const start = this.world.playerTemplate.startLocation;
     player.hp = player.maxHp;
     // Death snuffs every carried light source — you wake at the rim in the dark.
@@ -1785,6 +1811,7 @@ class GameState {
     player.energy = 0;
     this.rooms[start].light = this.computeRoomLight(start);
     this.rooms[deathRoom].light = this.computeRoomLight(deathRoom);
+    this._dismissOwnedSummons(player.id, "owner-gone", events); // a falling delver's summons unravel
     return { type: "death", victimKind: "player", victimId: player.id, victimName: player.name, roomId: deathRoom, respawnRoom: start };
   }
 }

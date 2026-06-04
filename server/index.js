@@ -144,7 +144,7 @@ wss.on("connection", (ws) => {
         }
         console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
       }
-      state.removePlayer(ws.playerId);
+      for (const ev of state.removePlayer(ws.playerId)) dispatchEvent(ev);
       connections.delete(ws.playerId);
     }
   });

@@ -179,6 +179,14 @@ function move(state, player, dir, ctx) {
   state.setPlayerLocation(player, dest);
   state.rooms[dest].light = state.computeRoomLight(dest);
   state.rooms[from].light = state.computeRoomLight(from);
+  // Owned summons follow their delver between rooms (wild summons stay put).
+  const followed = state._moveSummonsWith(player, from, dest);
+  for (const f of followed) {
+    const Name = f.mobName.charAt(0).toUpperCase() + f.mobName.slice(1);
+    ctx.toRoom(from, { type: "log", text: `${Name} slips away after ${player.name}.` }, player.id);
+    ctx.toRoom(dest, { type: "log", text: `${Name} drifts in at ${player.name}'s heel.` }, player.id);
+  }
+  if (followed.length) { ctx.refreshRoom(from, player.id); ctx.refreshRoom(dest, player.id); }
   ctx.refreshRoom(from, player.id);
   ctx.toRoom(dest, { type: "log", text: `${player.name} arrives.` }, player.id);
   ctx.refreshRoom(dest, player.id);
@@ -194,7 +202,8 @@ function move(state, player, dir, ctx) {
       tail = ` You map new ground. (+${EXPLORE_XP} xp)`;
     }
   }
-  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}`);
+  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follows.` : "";
+  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}`);
   announceLevelUps(player, ups, ctx, msgs);
   return msgs;
 }
