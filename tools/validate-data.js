@@ -248,7 +248,7 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect"];
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect", "summon"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {
@@ -296,6 +296,11 @@ function main() {
       if (eff.armour == null && eff.ward == null) errs.push(`spell ${id}: protect effect needs at least one of armour/ward`);
       chkAmount(eff.armour, `spell ${id}: effect.armour`);
       chkAmount(eff.ward, `spell ${id}: effect.ward`);
+    } else if (eff.type === "summon") {
+      if (!eff.mob || !has(mobs, eff.mob)) errs.push(`spell ${id}: summon effect references missing mob ${eff.mob}`);
+      if (eff.count != null && (typeof eff.count !== "number" || eff.count <= 0)) errs.push(`spell ${id}: summon count must be a positive number`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: summon duration must be a positive number (ticks)`);
+      if (eff.group != null && typeof eff.group !== "string") errs.push(`spell ${id}: summon group must be a string`);
     }
   }
 

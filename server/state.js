@@ -1244,6 +1244,30 @@ class GameState {
     return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
   }
 
+  /**
+   * Resolve a player summon spell (effect.type "summon"). Spends mana/shards,
+   * dismisses this caster's existing summons of the same `group` (recast replaces,
+   * resetting the timer), then conjures the new one(s) via `_summon`. The per-owner
+   * cap of one-per-group is enforced purely by the dismiss step. Returns
+   * { mob, count, replaced } for the caller to narrate.
+   */
+  castSummon(player, spell, events = []) {
+    const eff = spell.effect || {};
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    const group = eff.group || spell.id;
+    const existing = [];
+    for (const rt of Object.values(this.rooms))
+      for (const m of rt.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
+    for (const m of existing) this._dismissSummon(m, "recast", events);
+    const made = this._summon({
+      roomId: player.location, mobId: eff.mob, count: eff.count || 1,
+      faction: "player", ownerId: player.id, summonerId: player.id, group,
+      lifetime: eff.duration != null ? eff.duration : null, by: "player", byName: player.name,
+    }, events);
+    return { mob: this.world.mobs[eff.mob], count: made.length, replaced: existing.length };
+  }
+
   /** Support-spell threat (the deferred aggro hook): healing/buffing an ally makes
    *  whatever is currently fighting that ally turn on the caster too. `amount`
    *  mirrors the damage→threat convention — the HP/mana mended, or a flat 1 for a

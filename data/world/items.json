@@ -387,5 +387,15 @@
     "weight": 0,
     "value": 9,
     "stackable": true
+  },
+  "scroll-summon-wisp": {
+    "id": "scroll-summon-wisp",
+    "name": "a Scroll of Summon Wisp",
+    "description": "Heavy vellum inked with a coiling binding-glyph that seems to tug faintly at the glimmer in the air. Study it to learn the Summon Wisp weave — a conjured mote of captive light that fights at your side — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "summon-wisp" }
   }
 }
