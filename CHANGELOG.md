@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Ambush predators (`ambush` mobs).** A new mob flag for creatures that lie in
+  wait and strike the helpless. An ambush mob *hunts* (tracks enemies it can
+  perceive) but holds its proactive blow until a delver is **sleeping**, then
+  pounces — and if it was `hidden`, the strike itself **reveals it** (no `search`
+  required) with an appearance line just before the blow. It fires no "spotted"
+  tell (the ambush is the surprise) and, once blows are traded, fights on normally
+  even after the victim wakes. The **cave lurker** becomes the first: it now
+  realizes its own description — clinging unseen until you bed down near it, then
+  dropping without a sound. (Resting in true darkness is still safe from a mob that
+  needs light to see; the lurker, a cave-dweller, sees in the dark.)
 - **Perception-gated aggro with a threat ramp.** A hostile mob no longer attacks
   anyone in its room the instant they arrive. Instead a *proactive hunter* (a
   hostile wild mob, or a player-faction ally) builds a **detection meter** on each
