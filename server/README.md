@@ -180,13 +180,25 @@ over a fresh instance) and `sell <item>` — the trader buys *any* valued item a
 (`shards`) has no value and can't be sold. Shards are an abstract integer balance on
 the character, shown in the player panel.
 
-Mobs keep a minimal **aggro table** (`{ playerId: threat }`): attacking a mob earns
-threat and hostile mobs engage any delver present. A mob with live threat is *in
-combat* — it won't `wander` away and strikes its highest-threat target. Threat is
-dropped when a player leaves or dies (a fuller threat/decay/pursuit system later).
-A **non-hostile** creature that is struck **retaliates** (it acts on the threat it
+Mobs keep a minimal **aggro table** (`{ combatantId: threat }`, keyed by any
+combatant — a player **or** a mob): trading blows earns threat and hostile mobs
+engage any **enemy** present. A mob with live threat is *in combat* — it won't
+`wander` away and strikes its highest-threat target. Threat is dropped when a
+combatant leaves or dies (a fuller threat/decay/pursuit system later). A
+**non-hostile** creature that is struck **retaliates** (it acts on the threat it
 gains), provided it has an `attack` block — so a neutral lurker fights back when
 provoked, while attack-less NPCs (shopkeepers) stay passive.
+
+**Factions & mob-vs-mob.** Allegiance is **instance-level**: every mob carries a
+`faction` (default `"wild"`; players are `"player"`) and an optional `ownerId`.
+Combatants of differing factions are enemies, so the same combat path resolves
+player↔mob *and* mob↔mob — an enemy (`"wild"`) creature targets and damages a
+player-allied (`"player"`) one and vice versa, reusing the shared `strike` /
+`applyHitOutcome` pipeline and the combatant-keyed threat table. A `"player"`-faction
+mob fights enemies on sight (no `hostile` flag needed) and credits its `ownerId` on a
+kill. This is the groundwork for a later **summon**; `@spawn <mobId> [count] player`
+marks an instance allied for live testing. Beneficial spells (heal/buff) draw the
+caster threat on whatever is fighting the mended ally, mirroring damage→threat.
 
 ### Posture — sit, sleep & rest recovery
 

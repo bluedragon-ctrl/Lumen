@@ -928,21 +928,31 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
     }
     case "@spawn": {
       // Drop a mob (by template id) into the admin's current room — a testing aid
-      // for mobs not yet placed in any room's spawn list.
-      const [mobId, rawN] = arg.split(/\s+/);
+      // for mobs not yet placed in any room's spawn list. An optional trailing
+      // faction (`wild` default, or `player`) marks the spawned instance as a
+      // player-allied creature (faction "player" + ownerId = admin) so mob-vs-mob
+      // combat can be exercised live; this is a dev affordance, not authored content.
+      const [mobId, rawN, rawFaction] = arg.split(/\s+/);
       if (!mobId || !state.world.mobs[mobId])
-        return [{ type: "error", text: `Usage: @spawn <mobId> [count]. Unknown mob "${mobId || ""}".` }];
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [wild|player]. Unknown mob "${mobId || ""}".` }];
+      const faction = (rawFaction || "wild").toLowerCase();
+      if (faction !== "wild" && faction !== "player")
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [wild|player]. Unknown faction "${rawFaction}".` }];
       const n = Math.max(1, Math.min(10, parseInt(rawN, 10) || 1));
-      for (let i = 0; i < n; i++) state._spawnMob(player.location, mobId);
+      for (let i = 0; i < n; i++) {
+        const m = state._spawnMob(player.location, mobId);
+        if (faction === "player") { m.faction = "player"; m.ownerId = player.id; }
+      }
       state.rooms[player.location].light = state.computeRoomLight(player.location); // a luminous mob lights the room
       const t = state.world.mobs[mobId];
       const Name = t.name.charAt(0).toUpperCase() + t.name.slice(1);
       ctx.toRoom(player.location, { type: "log", text: `${Name} flickers into being.` }, player.id);
       ctx.refreshRoom(player.location, player.id);
-      return selfAndViews(state, player, `Spawned ${n}× ${t.name} here.`);
+      const tag = faction === "player" ? " (player-allied)" : "";
+      return selfAndViews(state, player, `Spawned ${n}× ${t.name}${tag} here.`);
     }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count]" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count] [wild|player]" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }

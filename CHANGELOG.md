@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Combatant-agnostic threat + faction foundation (summoning groundwork).** The
+  combat/threat model is generalized so non-player combatants can fight, without
+  building summoning itself:
+  - **Instance-level faction.** Every mob instance carries a `faction` (default
+    `"wild"`; players are `"player"`) and an optional `ownerId`. Allegiance is per
+    *instance*, not per template — the same `wisp`/`gloom-crawler` can spawn as an
+    enemy or, later, an ally. Combatants of differing factions are enemies.
+  - **Threat is combatant-keyed.** A mob's `aggro` table is now keyed by *any*
+    combatant id (a player **or** a mob), so a creature can hold threat toward, and
+    target, either. Player↔mob behaviour is preserved exactly.
+  - **Mob-vs-mob combat.** An enemy mob can target and damage a player-allied mob
+    and vice versa, reusing the shared `strike` / `applyHitOutcome` pipeline (so
+    on-hit/on-damage/spikes triggers fire identically) for both melee and the
+    `cast` action. A `"player"`-faction mob fights enemies on sight and credits its
+    `ownerId` on a kill. Narrated to onlookers via the existing `attack`/`mob-cast`
+    events (now tagged with `targetKind`).
+  - **Support-spell threat.** Healing or buffing an ally now draws the caster
+    threat on whatever is currently fighting that ally, mirroring the damage→threat
+    convention (threat = HP/mana mended; a flat `1` for a pure buff).
+  - **`@spawn` faction flag.** The admin `@spawn <mobId> [count] [wild|player]`
+    gains an optional trailing faction; `player` marks the spawned instance allied
+    (`faction:"player"` + `ownerId`) for live mob-vs-mob testing.
+
 ### Changed
 - **Ward is now a percent defence, not flat mitigation.** Ward's core role is a
   **percent chance to negate a hostile *spell* outright** (1 ward = 1%, **uncapped** —

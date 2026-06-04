@@ -284,14 +284,33 @@ Reflect/retaliate is **melee-contact only** today (the `on` default). `onHit` an
 `onDamage` share the same dispatch, so a later `on: ["spell"]` wiring (and any
 future `onDeath` lifecycle trigger) slots in without reshaping the data.
 
+### Faction & ownership (runtime)
+
+Allegiance is **instance-level**, not a template property, so the same template can
+spawn as an enemy or as a player-allied creature. Every mob instance carries:
+
+| Field      | Default  | Meaning |
+|------------|----------|---------|
+| `faction`  | `"wild"` | The side this creature fights *for*. Players are always faction `"player"`. Two combatants are **enemies** iff their factions differ. |
+| `ownerId`  | `null`   | The player a `"player"`-faction creature belongs to (kill credit; future pet upkeep). |
+
+Faction defines *sides*; `hostile`/provocation still gate whether a creature
+actually engages. A `"wild"` mob's enemies are players + `"player"`-faction mobs; a
+`"player"` mob's enemies are `"wild"` mobs. This is the substrate a later **summon**
+sits on (an allied mob spawned `faction:"player"` + `ownerId`). The admin
+`@spawn <mobId> [count] [wild|player]` sets it for live testing.
+
 ### Aggro / threat (runtime)
 
-Each mob instance carries an `aggro` table (`{ playerId: threat }`) — minimal today,
-the foundation for a fuller threat system. A player swinging at a mob earns threat;
-hostile mobs auto-engage any delver in their room. A mob with any live threat entry
-is **in combat**: it won't `wander` off, and it attacks its **highest-threat** target.
-Threat toward a player is dropped when they leave the room or die (later: gradual
-decay, per-action threat weighting, cross-room pursuit).
+Each mob instance carries an `aggro` table (`{ combatantId: threat }`) — minimal
+today, the foundation for a fuller threat system. The key is **any combatant id** —
+a player **or** a mob — so a creature can hold threat toward, and target, either.
+Trading blows with a mob earns threat; hostile mobs auto-engage any enemy in their
+room. A mob with any live threat entry is **in combat**: it won't `wander` off, and
+it attacks its **highest-threat** target. Healing or buffing an ally draws the
+caster threat on whatever is fighting that ally (mirrors the damage→threat
+convention). Threat toward a combatant is dropped when it leaves the room or dies
+(later: gradual decay, per-action threat weighting, cross-room pursuit).
 
 ---
 
