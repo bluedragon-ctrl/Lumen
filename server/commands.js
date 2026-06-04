@@ -186,7 +186,6 @@ function move(state, player, dir, ctx) {
     ctx.toRoom(from, { type: "log", text: `${Name} slips away after ${player.name}.` }, player.id);
     ctx.toRoom(dest, { type: "log", text: `${Name} drifts in at ${player.name}'s heel.` }, player.id);
   }
-  if (followed.length) { ctx.refreshRoom(from, player.id); ctx.refreshRoom(dest, player.id); }
   ctx.refreshRoom(from, player.id);
   ctx.toRoom(dest, { type: "log", text: `${player.name} arrives.` }, player.id);
   ctx.refreshRoom(dest, player.id);
@@ -202,7 +201,7 @@ function move(state, player, dir, ctx) {
       tail = ` You map new ground. (+${EXPLORE_XP} xp)`;
     }
   }
-  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follows.` : "";
+  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
   const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}`);
   announceLevelUps(player, ups, ctx, msgs);
   return msgs;
