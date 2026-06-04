@@ -129,6 +129,11 @@ function playerDefence(world, player) {
   }
   const wits = effectiveAttributes(world, player).wits || 0;
   ward += wits * WARD_PER_WITS;
+  // Temporary defensive buffs (Glimmerskin): each active "protect" state adds its
+  // baked-in armour/ward for as long as it lasts.
+  for (const s of player.states || []) {
+    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; }
+  }
   return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
 
@@ -139,6 +144,15 @@ function spellScaleBonus(attrs, scale) {
   if (!scale || !scale.attr) return 0;
   const v = (attrs && attrs[scale.attr] != null) ? attrs[scale.attr] : 0;
   return Math.floor(v / (scale.per || 1));
+}
+
+// Resolve a `{ base?, scale? }` amount spec (e.g. a Glimmerskin armour/ward
+// component) against effective attributes: flat base plus an attribute-scaled
+// bonus. A bare number or null is accepted too. Used for baked-at-cast buffs.
+function scaledAmount(attrs, spec) {
+  if (spec == null) return 0;
+  if (typeof spec === "number") return spec;
+  return (spec.base || 0) + spellScaleBonus(attrs, spec.scale);
 }
 
 // Ward resists hostile magic as an all-or-nothing fizzle: each point of the
@@ -494,13 +508,20 @@ class GameState {
    *   { type: "emit-light", name: "Light", magnitude: 1, duration: 180 }
    * Effects stack as independent instances, each with its own countdown; the
    * engine reads them where relevant (emit-light is summed into room light).
+   * `spec.refresh` opts out of stacking: any existing instance of the same
+   * type+name is dropped first, so re-applying just resets the timer (the right
+   * behaviour for buffs like Glimmerskin; DoTs leave it unset to keep stacking).
    */
   applyEffect(actor, spec) {
     if (!actor.states) actor.states = [];
+    const name = spec.name || spec.type;
+    if (spec.refresh) actor.states = actor.states.filter((s) => !(s.type === spec.type && s.name === name));
     actor.states.push({
       type: spec.type,
-      name: spec.name || spec.type,
+      name,
       magnitude: spec.magnitude || 0,
+      armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
+      ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
       pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
@@ -1085,29 +1106,42 @@ class GameState {
    * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
    * `target` is the normalized descriptor the command handler built:
    *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
-   * Spends mana, then applies the effect primitive. `heal-over-time` bakes its
-   * per-pulse magnitude from the caster's scaling attribute at cast time (so the
-   * power follows the caster, while an innate mob regen authors `magnitude`
-   * directly); an instant `restore` tops up hp/mana now. Returns a result the
-   * caller narrates: { effect, name, perPulse?, restored? }.
+   * Spends mana (and any `shardCost` material), then applies the effect
+   * primitive. `heal-over-time` bakes its per-pulse magnitude from the caster's
+   * scaling attribute at cast time (so the power follows the caster, while an
+   * innate mob regen authors `magnitude` directly); `protect` likewise bakes its
+   * armour/ward from the caster; an instant `restore` tops up hp/mana now.
+   * Returns a result the caller narrates: { effect, name, perPulse?, restored?,
+   * armour?, ward?, duration? }.
    *
-   * NOTE (aggro groundwork): healing draws no threat yet. When support-spell
-   * threat lands, this is the hook — credit threat on the healed ally's current
-   * attackers here, before/after applyEffect.
+   * NOTE (aggro groundwork): support magic draws no threat yet. When support-spell
+   * threat lands, this is the hook — credit threat on the buffed/healed ally's
+   * current attackers here, before/after applyEffect.
    */
   castBeneficial(player, spell, target, events = []) {
     const w = this.world;
     const eff = spell.effect || {};
+    const attrs = effectiveAttributes(w, player);
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
 
     if (eff.type === "restore") {
       const got = this.applyRestore(target.actor, eff);
       return { effect: "restore", name: spell.name, restored: got };
     }
 
+    if (eff.type === "protect") {
+      // Bake the caster-scaled defence into the instance (base + attribute bonus).
+      const armour = scaledAmount(attrs, eff.armour);
+      const ward = scaledAmount(attrs, eff.ward);
+      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
+      this._narrateEffectApplied(events, target, eff.name || eff.type);
+      return { effect: "protect", name: spell.name, armour, ward, duration: eff.duration || 0 };
+    }
+
     // Status effects (heal-over-time and future buffs). Bake any caster scaling
     // into the magnitude so the instance carries a fixed strength.
-    const bonus = spellScaleBonus(effectiveAttributes(w, player), eff.scale);
+    const bonus = spellScaleBonus(attrs, eff.scale);
     const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
     this.applyEffect(target.actor, { ...eff, magnitude });
     this._narrateEffectApplied(events, target, eff.name || eff.type);

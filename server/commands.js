@@ -693,7 +693,14 @@ function spellList(state, player) {
         (e.scale ? ` (+${e.scale.attr}/${e.scale.per})` : "");
     else if (e.type === "heal-over-time")
       tail = ` — heals ${e.magnitude || 0}${e.scale ? `+${e.scale.attr}/${e.scale.per}` : ""} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${e.duration || 0}`;
-    lines.push(`  ${s.name}: ${s.manaCost || 0} mana${tail}`);
+    else if (e.type === "protect") {
+      const parts = [];
+      if (e.armour) parts.push(`armour ${fmtAmount(e.armour)}`);
+      if (e.ward) parts.push(`ward ${fmtAmount(e.ward)}`);
+      tail = ` — ${parts.join(", ")} for ${fmtTicks(e.duration || 0)}`;
+    }
+    const cost = `${s.manaCost || 0} mana${s.shardCost ? ` + ${s.shardCost} shards` : ""}`;
+    lines.push(`  ${s.name}: ${cost}${tail}`);
   }
   lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
   return [{ type: "log", text: lines.join("\n") }];
@@ -726,6 +733,8 @@ function cast(state, player, arg, ctx) {
 
   if (Math.floor(player.mana || 0) < (spell.manaCost || 0))
     return [{ type: "error", text: `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).` }];
+  if (spell.shardCost && (player.shards || 0) < spell.shardCost)
+    return [{ type: "error", text: `${spell.name} burns ${spell.shardCost} shards as glimmer and you have ${player.shards || 0}.` }];
 
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
 
@@ -767,6 +776,23 @@ function cast(state, player, arg, ctx) {
   ctx.toRoom(player.location, { type: "log", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
+}
+
+// Format a tick count as m:ss for narration (one tick = one second). Mirrors
+// render.js's fmtDuration so spoken durations match the status panel countdown.
+function fmtTicks(ticks) {
+  const s = Math.max(0, ticks | 0);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+// Describe a `{ base?, scale? }` amount spec for the `spells` listing, e.g.
+// `1+intellect/4` or `intellect`. A bare number renders as itself.
+function fmtAmount(spec) {
+  if (spec == null) return "0";
+  if (typeof spec === "number") return String(spec);
+  const sc = spec.scale && spec.scale.attr ? `${spec.scale.attr}${spec.scale.per && spec.scale.per !== 1 ? `/${spec.scale.per}` : ""}` : "";
+  if (spec.base && sc) return `${spec.base}+${sc}`;
+  return sc || String(spec.base || 0);
 }
 
 // Cast a beneficial spell. Resolution (mana, magnitude scaling, applying the
@@ -811,6 +837,8 @@ function castSupport(state, player, spell, targetQ, ctx) {
   ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
 
+  const onWhom = target.isSelf ? "yourself" : target.name;
+
   if (res.effect === "restore") {
     const parts = [];
     if (res.restored.hp) parts.push(`${res.restored.hp} health`);
@@ -818,7 +846,13 @@ function castSupport(state, player, spell, targetQ, ctx) {
     const tail = parts.length ? ` restoring ${parts.join(" and ")}` : "";
     return selfAndViews(state, player, `You cast ${spell.name} on ${target.name}${tail}.`);
   }
-  const onWhom = target.isSelf ? "yourself" : target.name;
+  if (res.effect === "protect") {
+    const parts = [];
+    if (res.armour) parts.push(`+${res.armour} armour`);
+    if (res.ward) parts.push(`+${res.ward} ward`);
+    const grant = parts.length ? parts.join(", ") : "a faint sheen";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a crust of hardened glimmer grants ${grant} for ${fmtTicks(res.duration)}.`);
+  }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
 }
 

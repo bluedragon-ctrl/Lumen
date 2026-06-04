@@ -154,6 +154,16 @@
     "stackable": true,
     "scroll": { "spell": "regeneration" }
   },
+  "scroll-glimmerskin": {
+    "id": "scroll-glimmerskin",
+    "name": "a Scroll of Glimmerskin",
+    "description": "Stiff vellum edged in flaking glimmer-leaf, the glyphs raised like a rime of frost you can feel under a thumb. Study it to learn the Glimmerskin weave — a glimmer shell that hardens the skin against blade and spell — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 75,
+    "stackable": true,
+    "scroll": { "spell": "glimmerskin" }
+  },
   "palecap-mushroom": {
     "id": "palecap-mushroom",
     "name": "a palecap mushroom",

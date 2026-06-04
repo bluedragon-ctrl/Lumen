@@ -234,7 +234,7 @@
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-spark" }, { "template": "scroll-regeneration" }]
+      "sells": [{ "template": "scroll-spark" }, { "template": "scroll-regeneration" }, { "template": "scroll-glimmerskin" }]
     }
   },
   "cave-lurker": {

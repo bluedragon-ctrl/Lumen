@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glimmerskin spell + `protect` effect + spell material costs.** A new
+  `protect` effect primitive grants timed, flat **armour and/or ward**, summed
+  into `playerDefence` while active (so the player panel shows the boosted
+  numbers live and a countdown for the buff). The first spell to use it,
+  **Glimmerskin** (6 mana **+ 5 shards**), is beneficial — cast on yourself, an
+  ally, or any visible creature; its armour/ward scale with the caster's
+  **Intellect** (`armour = 1 + floor(Int/4)`, `ward = floor(Int)`), baked in at
+  cast time, lasting **3 minutes**. This also adds two reusable pieces:
+  **`spell.shardCost`** (a spell can now burn shards as a material component,
+  validated and deducted alongside mana) and **`effect.refresh`** — an opt-in
+  "renew, don't stack" flag on `applyEffect`, so re-casting a buff resets its
+  timer instead of stacking a second instance (DoTs leave it unset and keep
+  stacking as before). Learned from **a Scroll of Glimmerskin**, stocked by
+  **Vesper** (75 shards).
 - **Regeneration spell + heal-over-time effect.** A new `heal-over-time` effect
   primitive pulses healing on its own `interval` for a `duration`, clamped to the
   target's max HP. It works on **players and mobs alike** — so a mob can carry an
