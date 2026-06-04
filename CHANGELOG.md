@@ -5,7 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Ward is now a percent defence, not flat mitigation.** Ward's core role is a
+  **percent chance to negate a hostile *spell* outright** (1 ward = 1%, **uncapped** —
+  ward 100+ shrugs magic off entirely), shared by both directions via a single
+  `wardNegates` helper: player→mob casts (existing) and the new mob→player casts.
+  Magical-type **weapon** hits — which land via the normal to-hit roll, not a
+  spell — are instead cut by a **percent damage reduction** (`damage × (1 −
+  ward/100)`) in `strike()`, replacing the old flat ward subtraction (a leftover
+  from an earlier stage). Physical damage is unchanged (flat Armour soak). Ward
+  still comes from Wits (×2), gear, and Glimmerskin.
+
 ### Added
+- **Mobs can cast hostile spells (`cast` action).** A mob action
+  `{ "type": "cast", "weight": N, "spell": "<id>" }` lets a creature throw a
+  hostile spell at its top-threat target, mirroring melee: the target's Ward gets
+  the negation roll, a landed damage spell scales off the **mob's own**
+  attributes, hostile status effects apply, and it triggers rouse/auto-retaliate.
+  No mana bookkeeping for mobs — cadence is gated by action energy. Narrated via a
+  new `mob-cast` event.
+- **A `Wisp` creature (not yet placed) + admin `@spawn`.** Added **a Wisp** — a
+  pure-magical creature that attacks only by casting Spark (Int 1, low damage),
+  with **80% evasion** (physical blows mostly miss; spells ignore evasion, so it's
+  killed with magic), `ward 10`, and a light-emitting glow. It is **not in any
+  room's spawn list** — placement is deferred. To exercise it (and the
+  defender-side player-Ward path), a new admin-only **`@spawn <mobId> [count]`**
+  drops a mob into the admin's current room.
 - **Glimmerskin spell + `protect` effect + spell material costs.** A new
   `protect` effect primitive grants timed, flat **armour and/or ward**, summed
   into `playerDefence` while active (so the player panel shows the boosted

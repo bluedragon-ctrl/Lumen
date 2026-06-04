@@ -293,6 +293,26 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-cast") {
+    // A mob threw a hostile spell at a player (see state._mobCast). The damage/
+    // death is already applied; this just narrates and refreshes views.
+    const target = state.players.get(ev.targetId);
+    const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
+    const who = seen ? ev.mobName : "something";
+    let youLine;
+    if (ev.resisted) youLine = `${cap(who)} hurls ${ev.spellName} at you, but your ward turns it aside.`;
+    else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
+    else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
+    sendToPlayer(ev.targetId, { type: "log", text: youLine });
+    if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
+    for (const o of state.playersIn(ev.roomId)) {
+      if (o.id === ev.targetId) continue;
+      const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.` });
+    }
+    return;
+  }
+
   if (ev.type === "combat-stop") {
     sendToPlayer(ev.playerId, { type: "log", text: ev.reason });
     return;

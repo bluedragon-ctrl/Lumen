@@ -926,8 +926,23 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       player.mana = Math.min(player.mana || 0, player.maxMana);
       return selfAndViews(state, player, `Your ${attr} is now ${n}.`);
     }
+    case "@spawn": {
+      // Drop a mob (by template id) into the admin's current room — a testing aid
+      // for mobs not yet placed in any room's spawn list.
+      const [mobId, rawN] = arg.split(/\s+/);
+      if (!mobId || !state.world.mobs[mobId])
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count]. Unknown mob "${mobId || ""}".` }];
+      const n = Math.max(1, Math.min(10, parseInt(rawN, 10) || 1));
+      for (let i = 0; i < n; i++) state._spawnMob(player.location, mobId);
+      state.rooms[player.location].light = state.computeRoomLight(player.location); // a luminous mob lights the room
+      const t = state.world.mobs[mobId];
+      const Name = t.name.charAt(0).toUpperCase() + t.name.slice(1);
+      ctx.toRoom(player.location, { type: "log", text: `${Name} flickers into being.` }, player.id);
+      ctx.refreshRoom(player.location, player.id);
+      return selfAndViews(state, player, `Spawned ${n}× ${t.name} here.`);
+    }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count]" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }

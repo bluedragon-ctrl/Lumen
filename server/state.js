@@ -155,10 +155,18 @@ function scaledAmount(attrs, spec) {
   return (spec.base || 0) + spellScaleBonus(attrs, spec.scale);
 }
 
-// Ward resists hostile magic as an all-or-nothing fizzle: each point of the
-// target's Ward is this much chance to negate the spell entirely (works for
-// damage and effect spells alike). 0.01 = 1% per point.
+// Ward resists hostile *spell casts* as an all-or-nothing negation: each point
+// of the target's Ward is this much chance to fizzle the spell entirely (works
+// for damage and effect spells alike). 0.01 = 1% per point, and it is NOT capped
+// — ward 100+ shrugs off magic outright (a deliberate design choice). Magical
+// *weapon* hits are handled separately, as a percent damage cut in strike().
 const WARD_RESIST_PER_POINT = 0.01;
+
+/** True if a defender's Ward negates an incoming hostile spell this cast.
+ *  Shared by both directions: player→mob (castSpell) and mob→player (_mobCast). */
+function wardNegates(ward) {
+  return (ward || 0) > 0 && Math.random() < ward * WARD_RESIST_PER_POINT;
+}
 
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
 function pickWeighted(options) {
@@ -187,12 +195,16 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   const chance = Math.max(MIN_HIT, Math.min(1, hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0)));
   const sighted = canSee(attacker.band, light);
   if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
-  // Physical damage is soaked by Armour; everything else (magical) by Ward.
-  const mitigation = damageType === "physical" ? defender.armour || 0 : defender.ward || 0;
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
   const crit = Math.random() < (attacker.crit || 0);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
-  const damage = Math.max(1, base - mitigation);
+  // Physical blows are soaked flat by Armour. Magical-type blows are cut by Ward
+  // as a PERCENT reduction (ward is a percentage: ward 50 → halved). A spell
+  // *cast* is instead negated wholesale by Ward (see wardNegates); a magical
+  // weapon always lands once it hits, but its bite is reduced here.
+  const damage = damageType === "physical"
+    ? Math.max(1, base - (defender.armour || 0))
+    : Math.max(1, Math.round(base * (1 - (defender.ward || 0) / 100)));
   return { hit: true, sighted, damage, crit };
 }
 
@@ -1065,7 +1077,7 @@ class GameState {
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
 
     const ward = w.mobs[mob.template].ward || 0;
-    if (spell.hostile && ward > 0 && Math.random() < ward * WARD_RESIST_PER_POINT) {
+    if (spell.hostile && wardNegates(ward)) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
     }
@@ -1207,6 +1219,7 @@ class GameState {
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return aggressive && t.attack && playersHere.length > 0;
+        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && playersHere.length > 0;
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
@@ -1219,6 +1232,7 @@ class GameState {
     const choice = pickWeighted(options);
     if (!choice || choice.type === "idle") return;
     if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, playersHere);
+    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, playersHere, choice.spell);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
@@ -1335,6 +1349,50 @@ class GameState {
     if (!target.pending && target.hp > 0) {
       target.pending = { type: "attack", targetId: m.id };
       events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+    }
+  }
+
+  /** A mob casts a hostile spell at a player (mirror of _mobAttack for the
+   *  `cast` action). The target's Ward gets a wholesale negation roll (see
+   *  wardNegates); a spell that lands deals magical damage scaled by the mob's
+   *  own attributes, or applies a hostile status effect. No mana bookkeeping for
+   *  mobs — cadence is gated by action energy. Pushes a `mob-cast` event the
+   *  server narrates, plus rouse/auto-retaliate like a melee blow. */
+  _mobCast(m, t, roomId, events, playersHere, spellId) {
+    const rt = this.rooms[roomId];
+    const spell = this.world.spells[spellId];
+    if (!spell || !spell.hostile) return; // only hostile spells reach a player this way
+    const eff = spell.effect || {};
+    const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
+    this._addThreat(m, target.id, 1); // casting sticks the mob to its quarry
+
+    const ward = playerDefence(this.world, target).ward || 0;
+    const resisted = wardNegates(ward);
+    let damage = 0, killed = false, death = null, effectName = null;
+    if (!resisted) {
+      if (eff.type === "damage") {
+        damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
+        target.hp -= damage;
+        if (target.hp <= 0) { death = this._respawn(target, roomId); killed = true; }
+      } else {
+        // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
+        this.applyEffect(target, { ...eff });
+        effectName = eff.name || eff.type;
+      }
+    }
+    events.push({
+      type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light,
+      targetId: target.id, targetName: target.name, spellName: spell.name,
+      resisted, damage, effectName, killed, targetHp: Math.max(0, target.hp), targetMaxHp: target.maxHp,
+    });
+    if (death) events.push(death);
+
+    if (!killed && target.hp > 0) {
+      if (this._rouse(target)) events.push({ type: "player-woke", playerId: target.id });
+      if (!target.pending) {
+        target.pending = { type: "attack", targetId: m.id };
+        events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+      }
     }
   }
 

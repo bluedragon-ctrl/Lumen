@@ -193,10 +193,14 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "emote", "wander", "idle", "flee"].includes(a.type))
+      if (!["attack", "cast", "emote", "wander", "idle", "flee"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
+      if (a.type === "cast") {
+        if (!a.spell || !has(spells, a.spell)) errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
+        else if (!spells[a.spell].hostile) errs.push(`mob ${id}: cast action spell ${a.spell} must be hostile`);
+      }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
       if (a.type === "flee" && a.lightAbove != null && typeof a.lightAbove !== "number")
