@@ -273,9 +273,22 @@ function makeMobInstance(mobId, world) {
     hp: tmpl.maxHp,
     maxHp: tmpl.maxHp,
     energy: 0, // accumulated action points
-    aggro: {}, // playerId -> threat; minimal threat table, see _addThreat()
+    aggro: {}, // combatantId -> threat; key is any combatant (player OR mob) id, see _addThreat()
+    // Instance-level faction (the side this creature fights FOR). Default "wild";
+    // a summon/ally spawns as "player". Faction defines sides — `_areEnemies` makes
+    // differing factions hostile — while `hostile`/provocation still gate active
+    // aggression. `ownerId` names the player a "player"-faction mob belongs to
+    // (kill credit, future pet upkeep); null for wild creatures.
+    faction: "wild",
+    ownerId: null,
     posture: tmpl.posture || "standing", // authored dozing/resting NPCs; inert until roused
   };
+}
+
+/** The faction a combatant fights for. Players are always "player"; a mob carries
+ *  its instance `faction` (default "wild"). Differing factions are enemies. */
+function combatantFaction(actor, kind) {
+  return kind === "player" ? "player" : (actor.faction || "wild");
 }
 
 /** Total light an actor radiates from active `emit-light` status effects. */
@@ -1043,18 +1056,7 @@ class GameState {
             sourceId: p.id, // a player-applied DoT credits them on the kill
             hurt: (dmg, cause) => this._hurtPlayer(p, dmg, events, { cause }), // reflect lands here
           },
-          defender: {
-            actor: mob, kind: "mob", id: mob.id, name: mobName, emitsLight: mobEmits,
-            roomId: p.location, onDamage: mobOnDamage(mt),
-            sourceId: null, // a mob defender's retaliatory DoT credits no one
-            deal: (dmg) => {
-              this._addThreat(mob, p.id, Math.max(1, dmg)); // attacking it earns its ire
-              mob.hp -= dmg;
-              if (mob.hp <= 0) { const d = this._killMob(mob, p); events.push(d); p.pending = null; return d; }
-              return null;
-            },
-            hurt: (dmg, cause) => this._hurtMob(mob, p.location, dmg, events, { cause }), // self-damage onDamage (rare)
-          },
+          defender: this._mobDefender(mob, mt, p.location, { id: p.id, kind: "player", actor: p }, events),
         });
         if (attackerDeath) break; // a reflect killed the player — they've respawned away
       }
@@ -1126,9 +1128,10 @@ class GameState {
    * Returns a result the caller narrates: { effect, name, perPulse?, restored?,
    * armour?, ward?, duration? }.
    *
-   * NOTE (aggro groundwork): support magic draws no threat yet. When support-spell
-   * threat lands, this is the hook — credit threat on the buffed/healed ally's
-   * current attackers here, before/after applyEffect.
+   * Support-spell threat: mending or buffing an ally makes whatever is fighting
+   * that ally turn on the caster too (see `_drawSupportThreat`), mirroring the
+   * damage→threat convention — the amount is the HP/mana mended (a flat 1 for a
+   * pure buff). This is the aggro hook this method long reserved.
    */
   castBeneficial(player, spell, target, events = []) {
     const w = this.world;
@@ -1139,6 +1142,7 @@ class GameState {
 
     if (eff.type === "restore") {
       const got = this.applyRestore(target.actor, eff);
+      this._drawSupportThreat(player, target.id, (got.hp || 0) + (got.mana || 0));
       return { effect: "restore", name: spell.name, restored: got };
     }
 
@@ -1148,6 +1152,7 @@ class GameState {
       const ward = scaledAmount(attrs, eff.ward);
       this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
       this._narrateEffectApplied(events, target, eff.name || eff.type);
+      this._drawSupportThreat(player, target.id, 1); // a pure buff: a flat sliver of threat
       return { effect: "protect", name: spell.name, armour, ward, duration: eff.duration || 0 };
     }
 
@@ -1157,13 +1162,29 @@ class GameState {
     const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
     this.applyEffect(target.actor, { ...eff, magnitude });
     this._narrateEffectApplied(events, target, eff.name || eff.type);
+    this._drawSupportThreat(player, target.id, magnitude); // mend-over-time: per-pulse magnitude as threat
     return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
+  }
+
+  /** Support-spell threat (the deferred aggro hook): healing/buffing an ally makes
+   *  whatever is currently fighting that ally turn on the caster too. `amount`
+   *  mirrors the damage→threat convention — the HP/mana mended, or a flat 1 for a
+   *  pure buff. For every live mob in the caster's room whose threat table already
+   *  names the ally (so it is fighting them), the caster gains `amount` threat. A
+   *  self-cast simply stokes the caster's own attackers — the intended healer-aggro
+   *  feel. Co-located by construction: a beneficial cast resolves in the caster's room. */
+  _drawSupportThreat(caster, allyId, amount) {
+    if (!(amount > 0)) return;
+    for (const m of this.rooms[caster.location].mobs) {
+      if (m.hp > 0 && m.aggro && m.aggro[allyId] != null) this._addThreat(m, caster.id, amount);
+    }
   }
 
   /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */
   resolveMobAI(events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
+        if (m.hp <= 0) continue; // slain earlier this tick (e.g. mob-vs-mob) but still in the snapshot
         if (RESTING(m)) continue; // a sitting/sleeping mob is inert until struck (see _rouse)
         const t = this.world.mobs[m.template];
         const cost = (t.attack && t.attack.actionCost) || 12;
@@ -1176,19 +1197,22 @@ class GameState {
 
   _mobAct(m, t, roomId, events) {
     const rt = this.rooms[roomId];
-    let playersHere = this.playersIn(roomId).filter((p) => p.hp > 0);
+    const self = { id: m.id, actor: m, kind: "mob", faction: combatantFaction(m, "mob") };
+    // Enemies = opposing-faction combatants present (players + opposing mobs).
+    let enemies = this._enemiesOf(self, roomId);
 
-    // A hidden lurker is inert toward anyone who hasn't searched it out (reveal-on-
-    // find, no ambush): only delvers who have revealed it perceive — and provoke — it.
+    // A hidden lurker is inert toward any DELVER who hasn't searched it out (reveal-
+    // on-find, no ambush): only players who have revealed it perceive — and provoke —
+    // it. Mobs sense each other regardless, so the filter touches only player enemies.
     if (m.hidden) {
-      playersHere = playersHere.filter((p) => mobVisibleTo(this, p, m));
-      if (playersHere.length === 0) return;
+      enemies = enemies.filter((c) => c.kind !== "player" || mobVisibleTo(this, c.actor, m));
+      if (enemies.length === 0) return;
     }
 
-    // Threat: hostile mobs engage any delver present; drop threat toward those
-    // who have left/died. A mob with live threat is "in combat" and won't wander.
-    if (t.hostile) for (const p of playersHere) this._addThreat(m, p.id, 0);
-    this._pruneAggro(m, playersHere);
+    // Threat: hostile mobs engage any enemy present; drop threat toward those who
+    // have left/died. A mob with live threat is "in combat" and won't wander.
+    if (t.hostile) for (const c of enemies) this._addThreat(m, c.id, 0);
+    this._pruneAggro(m, enemies);
     const inCombat = Object.keys(m.aggro || {}).length > 0;
 
     // Wander destinations: "zone" scope confines a mob to its current zone (the
@@ -1212,27 +1236,34 @@ class GameState {
     // the inverse of `flee`). Shopkeepers et al. carry no `attack` block, so they
     // stay passive even if hit. Note: above `flee`'s threshold, flight wins (it
     // returned earlier); lightAggro bites in the band between calm and flight.
+    // A mob attacks if it's hostile, OR it's been provoked (a neutral creature that
+    // someone struck has live threat → it fights back), OR the room light has risen
+    // past its `lightAggro` tolerance (a calm creature roused by light — the inverse
+    // of `flee`), OR it is a player-faction ally with enemies present (a summon
+    // fights for its delver without needing `hostile`). Shopkeepers et al. carry no
+    // `attack` block, so they stay passive even if hit. For wild mobs the ally
+    // clause is always false, so their behaviour is unchanged.
     const lightProvoked = t.lightAggro && rt.light > (t.lightAggro.above || 0);
-    const aggressive = t.hostile || inCombat || lightProvoked;
+    const aggressive = t.hostile || inCombat || lightProvoked || (self.faction === "player" && enemies.length > 0);
 
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
-        if (a.type === "attack") return aggressive && t.attack && playersHere.length > 0;
-        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && playersHere.length > 0;
+        if (a.type === "attack") return aggressive && t.attack && enemies.length > 0;
+        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && enemies.length > 0;
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
     } else {
       // Default behaviour for mobs without an actions table: attack if able.
-      options = aggressive && t.attack && playersHere.length ? [{ type: "attack" }] : [];
+      options = aggressive && t.attack && enemies.length ? [{ type: "attack" }] : [];
     }
 
     const choice = pickWeighted(options);
     if (!choice || choice.type === "idle") return;
-    if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, playersHere);
-    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, playersHere, choice.spell);
+    if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, enemies);
+    if (choice.type === "cast") return this._mobCast(m, t, roomId, events, enemies, choice.spell);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
@@ -1250,22 +1281,62 @@ class GameState {
       .map(([dir]) => dir);
   }
 
-  // --- Aggro / threat table (minimal; placeholder for a fuller threat system) ---
-  // Today: tracks which players a mob is engaged with so it stays to fight rather
-  // than wandering off, and picks its target by highest threat. Later: threat
-  // weighting per action, decay over time, and cross-room pursuit hook here.
+  // --- Combatants & factions ------------------------------------------------
+  // A combatant is any living actor that can fight — a player or a mob. Each is
+  // described uniformly as { id, actor, kind, faction } so the threat table and
+  // the combat loop can treat players and mobs the same. Faction defines sides
+  // (differing factions are enemies); `hostile`/provocation still gate whether a
+  // creature actually engages (see _mobAct).
 
-  /** Add `amount` threat toward a player (0 just ensures an entry exists). */
-  _addThreat(mob, playerId, amount) {
-    if (!mob.aggro) mob.aggro = {};
-    mob.aggro[playerId] = (mob.aggro[playerId] || 0) + amount;
+  /** Living combatants in a room: every up player plus every up mob, as uniform
+   *  { id, actor, kind, faction } descriptors. */
+  _combatantsIn(roomId) {
+    const out = [];
+    for (const p of this.playersIn(roomId)) if (p.hp > 0) out.push({ id: p.id, actor: p, kind: "player", faction: "player" });
+    for (const m of this.rooms[roomId].mobs) if (m.hp > 0) out.push({ id: m.id, actor: m, kind: "mob", faction: combatantFaction(m, "mob") });
+    return out;
   }
 
-  /** Award `xp` to everyone who earned a mob's death — the finisher (always, even
-   *  if a remote DoT landed the blow) plus anyone with a threat entry who is still
-   *  present and alive. Model A: each participant gets the FULL value (co-op, no
-   *  division — grouping is rewarded, not taxed). Returns [{ playerId, levelUps }]
-   *  so the caller can narrate the credit and broadcast any level-ups. */
+  /** Two combatants are enemies iff their factions differ. */
+  _areEnemies(a, b) {
+    return a.faction !== b.faction;
+  }
+
+  /** Living opposing-faction combatants of `self` in `roomId`. For a wild mob this
+   *  is players + player-faction (allied) mobs; for a player-faction mob, wild mobs. */
+  _enemiesOf(self, roomId) {
+    return this._combatantsIn(roomId).filter((c) => c.id !== self.id && this._areEnemies(self, c));
+  }
+
+  /** Resolve a combatant to the player who should receive kill credit for its
+   *  actions: a player credits itself; a player-faction mob credits its owner (if
+   *  that owner is a live player); anything else credits no one. */
+  _killerPlayerFor(combatant) {
+    if (!combatant) return null;
+    if (combatant.kind === "player") return combatant.actor;
+    const owner = combatant.actor && combatant.actor.ownerId ? this.players.get(combatant.actor.ownerId) : null;
+    return owner && owner.hp > 0 ? owner : null;
+  }
+
+  // --- Aggro / threat table (combatant-keyed; placeholder for a fuller system) ---
+  // A mob's `aggro` maps a combatant id (a player OR a mob) to threat. Today it
+  // tracks who a mob is engaged with so it stays to fight rather than wandering
+  // off, and picks its target by highest threat. Later: threat weighting per
+  // action, decay over time, and cross-room pursuit hook here.
+
+  /** Add `amount` threat toward a combatant (0 just ensures an entry exists). */
+  _addThreat(mob, combatantId, amount) {
+    if (!mob.aggro) mob.aggro = {};
+    mob.aggro[combatantId] = (mob.aggro[combatantId] || 0) + amount;
+  }
+
+  /** Award `xp` to every PLAYER who earned a mob's death — the finisher (always,
+   *  even if a remote DoT landed the blow; for an allied-mob kill this is its
+   *  owner, resolved by the caller) plus any player with a live threat entry who is
+   *  still present and alive. Threat keys that are mob ids (an allied mob that
+   *  helped) credit no XP in Phase 1 — `players.get(mobId)` is undefined, so they
+   *  fall through; owner-share is a Phase 2 concern. Model A: each participant gets
+   *  the FULL value (co-op, no division). Returns [{ playerId, levelUps }]. */
   _awardKillXp(mob, primaryKiller, xp, roomId) {
     const out = [];
     const credited = new Set();
@@ -1276,7 +1347,7 @@ class GameState {
     for (const id of Object.keys(mob.aggro || {})) {
       if (credited.has(id)) continue;
       if (!(mob.aggro[id] > 0)) continue; // a hostile mob seeds 0-threat entries for everyone present (AI targeting); mere presence isn't participation — you must have traded blows
-      const pl = this.players.get(id);
+      const pl = this.players.get(id); // a mob-id key (allied helper) resolves to undefined → skipped
       if (!pl || pl.hp <= 0 || pl.location !== roomId) continue; // present and alive
       out.push({ playerId: id, levelUps: this.awardXp(pl, xp) });
       credited.add(id);
@@ -1284,115 +1355,175 @@ class GameState {
     return out;
   }
 
-  /** Forget players no longer present/alive. (Later: decay instead of hard drop.) */
-  _pruneAggro(mob, playersHere) {
+  /** Forget combatants no longer present/alive. `present` is the current candidate
+   *  list ({ id } descriptors). (Later: decay instead of hard drop.) */
+  _pruneAggro(mob, present) {
     if (!mob.aggro) { mob.aggro = {}; return; }
-    const present = new Set(playersHere.map((p) => p.id));
-    for (const pid of Object.keys(mob.aggro)) if (!present.has(pid)) delete mob.aggro[pid];
+    const ids = new Set(present.map((c) => c.id));
+    for (const cid of Object.keys(mob.aggro)) if (!ids.has(cid)) delete mob.aggro[cid];
   }
 
-  /** The present player a mob is most angry at, or null. */
-  _topThreat(mob, playersHere) {
+  /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),
+   *  or null. `candidates` are the valid targets to weigh threat among. */
+  _topThreat(mob, candidates) {
     if (!mob.aggro) return null;
     let best = null, bestT = -Infinity;
-    for (const p of playersHere) {
-      const th = mob.aggro[p.id];
-      if (th != null && th > bestT) { bestT = th; best = p; }
+    for (const c of candidates) {
+      const th = mob.aggro[c.id];
+      if (th != null && th > bestT) { bestT = th; best = c; }
     }
     return best;
   }
 
-  _mobAttack(m, t, roomId, events, playersHere) {
+  /** Defender descriptor for a MOB being struck, for `applyHitOutcome`. `attacker`
+   *  is the striking combatant ({ id, kind, actor }); landing the kill credits its
+   *  resolved player (a player attacker, or an allied mob's owner — see
+   *  `_killerPlayerFor`). Shared by the player-attack path and mob-vs-mob combat. */
+  _mobDefender(mob, mt, roomId, attacker, events) {
+    return {
+      actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: !!mt.emitsLight, roomId,
+      onDamage: mobOnDamage(mt),
+      sourceId: null, // a mob defender's retaliatory DoT credits no one
+      deal: (dmg) => {
+        this._addThreat(mob, attacker.id, Math.max(1, dmg)); // being hit earns the striker its ire
+        mob.hp -= dmg;
+        if (mob.hp <= 0) {
+          const d = this._killMobAt(mob, roomId, this._killerPlayerFor(attacker));
+          events.push(d);
+          if (attacker.kind === "player") attacker.actor.pending = null; // quarry slain — stop swinging
+          return d;
+        }
+        return null;
+      },
+      hurt: (dmg, cause) => this._hurtMob(mob, roomId, dmg, events, { cause }), // self-damage onDamage (rare)
+    };
+  }
+
+  /** Defender descriptor for a PLAYER being struck, for `applyHitOutcome`. */
+  _playerDefender(player, roomId, events) {
+    return {
+      actor: player, kind: "player", id: player.id, name: player.name, emitsLight: false, roomId,
+      onDamage: playerOnDamage(this.world, player), // player armour triggers (none seeded yet)
+      sourceId: player.id, // a player's reflected DoT credits them
+      deal: (dmg) => {
+        player.hp -= dmg;
+        if (player.hp <= 0) { const d = this._respawn(player, roomId); events.push(d); return d; }
+        return null;
+      },
+      hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
+    };
+  }
+
+  /** A mob makes one melee attack against its highest-threat enemy — a player OR
+   *  an opposing-faction mob (an allied summon, etc.). `enemies` is the candidate
+   *  set from `_mobAct`. Reuses `strike`/`applyHitOutcome` via the shared defender
+   *  builders, so contact triggers (onHit/onDamage/spikes) fire identically in both
+   *  directions. Player targets also rouse from rest and auto-retaliate. */
+  _mobAttack(m, t, roomId, events, enemies) {
     const rt = this.rooms[roomId];
-    const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
+    const target = this._topThreat(m, enemies) || enemies[Math.floor(Math.random() * enemies.length)];
+    if (!target) return;
     this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
+    const isPlayer = target.kind === "player";
+    const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
+    const targetName = isPlayer ? target.actor.name : tmt.name;
+    const targetEmitsLight = isPlayer ? false : !!tmt.emitsLight;
+    const defence = isPlayer
+      ? playerDefence(this.world, target.actor)
+      : { armour: tmt.armour || 0, ward: tmt.ward || 0, evasion: tmt.evasion || 0 };
     const attacker = {
       band: t.perception,
       hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
       dmgBonus: (t.attack.bonus) || 0,
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
     };
-    const r = strike(attacker, playerDefence(this.world, target), rt.light, t.attack.damage, t.attack.type || "physical");
+    const r = strike(attacker, defence, rt.light, t.attack.damage, t.attack.type || "physical");
     const attackEvent = {
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
-      targetId: target.id, targetName: target.name, hit: r.hit, sighted: r.sighted,
-      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.hp - r.damage), targetMaxHp: target.maxHp,
-      light: rt.light, attackerEmitsLight: !!t.emitsLight,
+      targetId: target.id, targetName, targetKind: target.kind, hit: r.hit, sighted: r.sighted,
+      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.actor.hp - r.damage), targetMaxHp: target.actor.maxHp,
+      light: rt.light, attackerEmitsLight: !!t.emitsLight, targetEmitsLight,
     };
+    const defender = isPlayer
+      ? this._playerDefender(target.actor, roomId, events)
+      : this._mobDefender(target.actor, tmt, roomId, { id: m.id, kind: "mob", actor: m }, events);
     this.applyHitOutcome({
       r, events, attackEvent,
       attacker: {
         actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: !!t.emitsLight, roomId,
         onHit: t.attack.onHit,
         sourceId: null, // a mob's venom credits no one
-        // Reflect/retaliate lands on the mob; the struck player (if up) gets the credit.
-        hurt: (dmg, cause) => this._hurtMob(m, roomId, dmg, events, { cause, killer: target.hp > 0 ? target : null }),
+        // Reflect/retaliate lands on the mob; the struck defender's owner (a player,
+        // if it's a delver or an allied mob still up) gets the credit.
+        hurt: (dmg, cause) => this._hurtMob(m, roomId, dmg, events, { cause, killer: target.actor.hp > 0 ? this._killerPlayerFor(target) : null }),
       },
-      defender: {
-        actor: target, kind: "player", id: target.id, name: target.name, emitsLight: false, roomId,
-        onDamage: playerOnDamage(this.world, target), // player armour triggers (none seeded yet)
-        sourceId: target.id, // a player's reflected DoT credits them
-        deal: (dmg) => {
-          target.hp -= dmg;
-          if (target.hp <= 0) { const d = this._respawn(target, roomId); events.push(d); return d; }
-          return null;
-        },
-        hurt: (dmg, cause) => this._hurtPlayer(target, dmg, events, { cause }), // self-damage onDamage (rare)
-      },
+      defender,
     });
 
+    if (!isPlayer) return; // mob-vs-mob: no rouse-from-rest or player auto-retaliate
+    const p = target.actor;
     // A blow rouses a resting target — you can't sleep through being hit. (A
     // sleeping delver is blind, so the first they know of a threat is this strike.)
-    if (target.hp > 0 && this._rouse(target)) events.push({ type: "player-woke", playerId: target.id });
-
+    if (p.hp > 0 && this._rouse(p)) events.push({ type: "player-woke", playerId: p.id });
     // Auto-retaliate: if the player isn't already attacking something, target this mob
-    if (!target.pending && target.hp > 0) {
-      target.pending = { type: "attack", targetId: m.id };
-      events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
+    if (!p.pending && p.hp > 0) {
+      p.pending = { type: "attack", targetId: m.id };
+      events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
     }
   }
 
-  /** A mob casts a hostile spell at a player (mirror of _mobAttack for the
-   *  `cast` action). The target's Ward gets a wholesale negation roll (see
-   *  wardNegates); a spell that lands deals magical damage scaled by the mob's
-   *  own attributes, or applies a hostile status effect. No mana bookkeeping for
-   *  mobs — cadence is gated by action energy. Pushes a `mob-cast` event the
-   *  server narrates, plus rouse/auto-retaliate like a melee blow. */
-  _mobCast(m, t, roomId, events, playersHere, spellId) {
+  /** A mob casts a hostile spell at its highest-threat enemy — a player OR an
+   *  opposing-faction mob (mirror of _mobAttack for the `cast` action). The target's
+   *  Ward gets a wholesale negation roll (see wardNegates); a spell that lands deals
+   *  magical damage scaled by the mob's own attributes, or applies a hostile status
+   *  effect. No mana bookkeeping for mobs — cadence is gated by action energy. Pushes
+   *  a `mob-cast` event the server narrates; a player target also rouses/retaliates. */
+  _mobCast(m, t, roomId, events, enemies, spellId) {
     const rt = this.rooms[roomId];
     const spell = this.world.spells[spellId];
-    if (!spell || !spell.hostile) return; // only hostile spells reach a player this way
+    if (!spell || !spell.hostile) return; // only hostile spells engage an enemy this way
     const eff = spell.effect || {};
-    const target = this._topThreat(m, playersHere) || playersHere[Math.floor(Math.random() * playersHere.length)];
+    const target = this._topThreat(m, enemies) || enemies[Math.floor(Math.random() * enemies.length)];
+    if (!target) return;
     this._addThreat(m, target.id, 1); // casting sticks the mob to its quarry
+    const isPlayer = target.kind === "player";
+    const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
+    const targetName = isPlayer ? target.actor.name : tmt.name;
 
-    const ward = playerDefence(this.world, target).ward || 0;
+    const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (tmt.ward || 0);
     const resisted = wardNegates(ward);
     let damage = 0, killed = false, death = null, effectName = null;
     if (!resisted) {
       if (eff.type === "damage") {
         damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
-        target.hp -= damage;
-        if (target.hp <= 0) { death = this._respawn(target, roomId); killed = true; }
+        this._addThreat(m, target.id, damage); // mirror melee: damage stokes threat
+        target.actor.hp -= damage;
+        if (target.actor.hp <= 0) {
+          killed = true;
+          death = isPlayer
+            ? this._respawn(target.actor, roomId)
+            : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
+        }
       } else {
         // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
-        this.applyEffect(target, { ...eff });
+        this.applyEffect(target.actor, { ...eff });
         effectName = eff.name || eff.type;
       }
     }
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light,
-      targetId: target.id, targetName: target.name, spellName: spell.name,
-      resisted, damage, effectName, killed, targetHp: Math.max(0, target.hp), targetMaxHp: target.maxHp,
+      targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : !!tmt.emitsLight,
+      spellName: spell.name, resisted, damage, effectName, killed,
+      targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
     });
     if (death) events.push(death);
 
-    if (!killed && target.hp > 0) {
-      if (this._rouse(target)) events.push({ type: "player-woke", playerId: target.id });
-      if (!target.pending) {
-        target.pending = { type: "attack", targetId: m.id };
-        events.push({ type: "combat-auto-start", playerId: target.id, targetId: m.id, targetName: t.name });
-      }
+    if (!isPlayer || killed || target.actor.hp <= 0) return;
+    const p = target.actor;
+    if (this._rouse(p)) events.push({ type: "player-woke", playerId: p.id });
+    if (!p.pending) {
+      p.pending = { type: "attack", targetId: m.id };
+      events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
     }
   }
 
@@ -1440,15 +1571,25 @@ class GameState {
   /** A direct kill by a player (melee/spell): removes the mob, drops spoils, and
    *  awards xp to the killer. Non-combat deaths go through `_hurtMob` instead. */
   _killMob(mob, killer) {
+    return this._killMobAt(mob, killer.location, killer);
+  }
+
+  /** Remove a mob killed by a direct hit in `roomId`, drop its spoils, and award
+   *  XP. `killerPlayer` is the player to credit as finisher (a player attacker, or
+   *  the OWNER of an allied mob that landed the blow — resolved by the caller) or
+   *  null when no player struck the killing blow (e.g. an ownerless ally's kill);
+   *  other players who held threat are still credited via `_awardKillXp`. Returns
+   *  the `death` event. Shared by the player-attack path and mob-vs-mob combat. */
+  _killMobAt(mob, roomId, killerPlayer, cause = "hit") {
     const t = this.world.mobs[mob.template];
-    const roomId = killer.location;
     const idx = this.rooms[roomId].mobs.indexOf(mob);
     if (idx >= 0) this.rooms[roomId].mobs.splice(idx, 1);
     this._adjustOwned(mob, -1);
     const loot = this._dropSpoils(mob, roomId);
     const xp = t.xp || 0;
-    const participants = this._awardKillXp(mob, killer, xp, roomId); // shared credit (Model A)
-    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer.id, loot, xp, cause: "hit", participants };
+    const participants = this._awardKillXp(mob, killerPlayer, xp, roomId); // shared credit (Model A)
+    this.rooms[roomId].light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killerPlayer ? killerPlayer.id : null, loot, xp: participants.length ? xp : 0, cause, participants };
   }
 
   /**

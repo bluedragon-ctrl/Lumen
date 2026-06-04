@@ -273,6 +273,19 @@ function dispatchEvent(ev) {
         const view = buildExamineView(state, attacker, ev.targetId);
         if (view) sendToPlayer(ev.attackerId, view);
       }
+    } else if (ev.targetKind === "mob") {
+      // Mob-vs-mob (an enemy and an allied creature trading blows). No player is
+      // the attacker or target, so there is no private view to push — just narrate
+      // to onlookers, light-gating both creatures' names. HP shows on `examine`;
+      // the eventual death event refreshes the room.
+      for (const o of state.playersIn(ev.roomId)) {
+        const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
+        const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
+        const line = ev.hit
+          ? `${cap(an)} strikes ${tn} for ${ev.damage}.${ev.crit ? " A critical hit!" : ""}`
+          : `${cap(an)} ${ev.sighted ? `swings at ${tn} and misses` : `lunges at ${tn} in the dark and misses`}.`;
+        sendToPlayer(o.id, { type: "log", text: line });
+      }
     } else {
       const target = state.players.get(ev.targetId);
       const seen = target && canSeeMob(target, ev.light, ev.attackerEmitsLight);
@@ -296,6 +309,19 @@ function dispatchEvent(ev) {
   if (ev.type === "mob-cast") {
     // A mob threw a hostile spell at a player (see state._mobCast). The damage/
     // death is already applied; this just narrates and refreshes views.
+    if (ev.targetKind === "mob") {
+      // Mob-vs-mob spell: narrate to onlookers only, light-gating both names.
+      for (const o of state.playersIn(ev.roomId)) {
+        const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+        const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
+        let line;
+        if (ev.resisted) line = `${cap(an)} hurls ${ev.spellName} at ${tn}, but its ward turns it aside.`;
+        else if (ev.effectName) line = `${cap(an)} casts ${ev.spellName} on ${tn} — the ${ev.effectName} takes hold.`;
+        else line = `${cap(an)} blasts ${tn} with ${ev.spellName} for ${ev.damage}.`;
+        sendToPlayer(o.id, { type: "log", text: line });
+      }
+      return;
+    }
     const target = state.players.get(ev.targetId);
     const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
     const who = seen ? ev.mobName : "something";
