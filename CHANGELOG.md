@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Content quick-reference (`docs/templates-quickref.md`).** One annotated
+  "golden record" per world-data type (item, mob, spell, recipe, fixture, room,
+  player), with every field's rule inline and derived from the validator. The
+  fast path for drafting content — far cheaper to read than the full data-model.
+- **Lumen-specific authoring subagents** (`.claude/agents/`): `lore-checker`
+  (vets proposed content against canon, returns only conflicts), `content-drafter`
+  (drafts valid JSON from the quickref; drafts only — never auto-approves names or
+  writes world data), and `data-validator` (runs `npm run validate` and reports
+  just the fixes). Each isolates heavy reading from the main session.
 - **Assisting mobs (`helper` flag).** A mob marked `helper` piles into any fight a
   same-faction ally is already in — the moment an ally it can **see** is trading
   blows with an enemy, the helper engages that enemy too (and announces it with a
