@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The third abyss floor (depth 3) — the Underriver, reached down the Deep Stair.**
+  Seven new rooms running along a black underground river. A mostly-gentle spine
+  (`The River Stair` → `The Pale Shallows` → `The Still Pools` →
+  `The Sunless Falls`) ends at a waterfall the Umbrals name the **paqcha**, beside
+  which an unfinished ledge marks the descent to a future fourth floor. Two of the
+  river rooms are **fishing water**; a **hidden cave-lurker** (perception 3) lies in
+  ambush in the Pale Shallows, so the easy fishing is not quite as safe as it looks.
+  North of the falls, a flooded **Plunge Cave** holds a richer fishing pool **owned
+  by hostile pale crayfish** — risk-and-reward water for braver delvers. Off the
+  pools, a worked side-path leads to the
+  **first Umbral presence** in the game: **Mallki the qhatuq** — a quiet,
+  bioluminescent Umbral trader — in his dim, lamp-lit hollow (`Mallki's Hollow`)
+  with a tended fungus garden behind it (`The Sunless Garden`), where farmed grubs
+  supply bait on the floor itself. New wander-zones `third` and `third-umbral`.
+  (Umbral names draw on Quechua roots; Mallki's trade stock is staged for a
+  later pass.)
+- **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
+  work a baited line in a `fish` resource fixture. Each cast spends a **grub** as
+  bait (lost to the water, catch or no) plus energy, and rolls the fixture's
+  `catchChance` to land **a blind cave-fish** (a new raw, sellable food). Like ore
+  veins, a pool holds a stock of catches that depletes and refills on a timer.
+  New `fish` fixture block (`{ template, yield, charges, respawn, energy, bait,
+  catchChance }`), validated and documented; `state._mineTick` now recovers
+  fishing pools as well as ore veins.
 - **The second abyss floor (depth 2), reached down from the Ore Drift.** Thirteen
   new rooms in three parts. A safe, prospector-trafficked **main road** runs
   east→west (`The Winch-Head` → `The Prospectors' Road` → `The Crossing` →

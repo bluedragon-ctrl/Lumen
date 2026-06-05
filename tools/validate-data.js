@@ -253,6 +253,18 @@ function main() {
       if (f.mine.energy != null && (typeof f.mine.energy !== "number" || f.mine.energy < 0))
         errs.push(`fixture ${id}: mine.energy must be a non-negative number`);
     }
+    if (f.fish) {
+      if (!has(items, f.fish.template)) errs.push(`fixture ${id}: fish.template missing item ${f.fish.template}`);
+      if (f.fish.bait != null && !has(items, f.fish.bait)) errs.push(`fixture ${id}: fish.bait missing item ${f.fish.bait}`);
+      for (const k of ["charges", "respawn"])
+        if (typeof f.fish[k] !== "number" || f.fish[k] <= 0) errs.push(`fixture ${id}: fish.${k} must be a positive number`);
+      if (f.fish.yield != null && (typeof f.fish.yield !== "number" || f.fish.yield <= 0))
+        errs.push(`fixture ${id}: fish.yield must be a positive number`);
+      if (f.fish.energy != null && (typeof f.fish.energy !== "number" || f.fish.energy < 0))
+        errs.push(`fixture ${id}: fish.energy must be a non-negative number`);
+      if (f.fish.catchChance != null && (typeof f.fish.catchChance !== "number" || f.fish.catchChance <= 0 || f.fish.catchChance > 1))
+        errs.push(`fixture ${id}: fish.catchChance must be a number in (0, 1]`);
+    }
   }
 
   const stations = new Set(Object.values(fixtures).map((f) => f.station).filter(Boolean));

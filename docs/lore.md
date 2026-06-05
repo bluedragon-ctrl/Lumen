@@ -79,7 +79,16 @@ A subterranean humanoid race native to the Abyss — there long before the Rush.
 - **Culture:** they craft with glimmer and are quiet masters of **stonemasonry**,
   carving reliefs into the cave walls. This explains the worked passages, old
   stonework, and carvings delvers find below.
-- **Settlements:** Umbral **villages** lie deeper in the Abyss.
+- **Settlements:** Umbral **villages** lie deeper in the Abyss. The first Umbral a
+  delver meets on the descent is **Mallki the qhatuq** (trader), who keeps a
+  lamp-lit hollow and a tended fungus garden beside the underground river of the
+  third floor.
+- **Language:** the Umbral tongue draws on **Quechua** roots for its flavour —
+  soft, rounded, sparse. A few words surface in their speech and place-names
+  (*qhatuq* — trader; *paqcha* — waterfall; *yaku-runa* — "water-folk", their name
+  for the delvers who follow the river down). Keep it to a word or two; Umbrals
+  speak little to outsiders, and content should never render a whole translated
+  sentence.
 - **The quiet tension:** glimmer matters to the Umbrals too. The Rush is, unspoken,
   an intrusion on their resource — the deeper humans mine, the more they take what
   was the Umbrals'. A slow-burn source of future conflict; not open hostility yet.

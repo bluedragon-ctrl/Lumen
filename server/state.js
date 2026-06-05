@@ -379,7 +379,7 @@ class GameState {
         const ft = this.world.fixtures[tmplId];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
         if (ft && ft.door) inst.open = !!ft.door.open; // door fixtures carry open/shut state
-        if (ft && ft.mine) { inst.charges = ft.mine.charges; inst.regrow = ft.mine.respawn; } // resource veins deplete as mined
+        if (ft && (ft.mine || ft.fish)) { const res = ft.mine || ft.fish; inst.charges = res.charges; inst.regrow = res.respawn; } // resource veins/pools deplete as worked
         if (typeof f === "object" && f.hidden) { inst.hidden = f.hidden; inst.discoveryKey = discoveryKey(id, "fix", tmplId); }
         this.rooms[id].fixtures.push(inst);
       }
@@ -565,12 +565,13 @@ class GameState {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const f of rt.fixtures) {
         const ft = this.world.fixtures[f.template];
-        if (!ft || !ft.mine) continue;
-        if (f.charges >= ft.mine.charges) { f.regrow = ft.mine.respawn; continue; }
+        const res = ft && (ft.mine || ft.fish);
+        if (!res) continue;
+        if (f.charges >= res.charges) { f.regrow = res.respawn; continue; }
         if (--f.regrow > 0) continue;
-        f.charges = ft.mine.charges;
-        f.regrow = ft.mine.respawn;
-        events.push({ type: "vein-recover", roomId, fixtureName: ft.name });
+        f.charges = res.charges;
+        f.regrow = res.respawn;
+        events.push({ type: "vein-recover", roomId, fixtureName: ft.name, kind: ft.fish ? "fish" : "ore" });
       }
     }
   }

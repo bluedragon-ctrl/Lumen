@@ -405,6 +405,19 @@
       "effect": { "type": "restore", "hp": 1 }
     }
   },
+  "cave-fish": {
+    "id": "cave-fish",
+    "name": "a blind cave-fish",
+    "description": "A pale, eyeless fish hauled dripping from the black water, no longer than a hand. The flesh is cold and faintly translucent. Edible raw at a pinch, and far better over a fire — a staple catch for any camp that learns the trick of the line.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 5,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the raw cave-fish in cold, soft mouthfuls. It is bland and faintly bitter, but it fills the hollow under your ribs.",
+      "effect": { "type": "restore", "hp": 2 }
+    }
+  },
   "roasted-grubs": {
     "id": "roasted-grubs",
     "name": "a handful of roasted grubs",

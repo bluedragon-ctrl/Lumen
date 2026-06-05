@@ -492,9 +492,12 @@ function dispatchEvent(ev) {
   }
 
   if (ev.type === "vein-recover") {
+    const text = ev.kind === "fish"
+      ? `The water stirs — the fish are biting at ${ev.fixtureName} again.`
+      : `${cap(ev.fixtureName)} has fresh ore to work again.`;
     for (const o of state.playersIn(ev.roomId)) {
       if (canSee(o.perception, state.rooms[ev.roomId].light)) {
-        sendToPlayer(o.id, { type: "log", text: `${cap(ev.fixtureName)} has fresh ore to work again.` });
+        sendToPlayer(o.id, { type: "log", text });
       }
     }
     return;

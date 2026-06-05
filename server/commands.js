@@ -36,7 +36,7 @@ const VERBS = [
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
-  "mine", "dig", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  "mine", "dig", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
 ];
@@ -66,6 +66,7 @@ const HELP = [
   "  recipes               — list recipes you know",
   "  craft | make <recipe> — craft at the matching station here",
   "  mine | dig [vein]     — work ore loose from a vein in the room",
+  "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
   "  drink | quaff | eat <item> — consume a potion or food",
   "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
   "  say <text>            — speak to others in the room",
@@ -687,6 +688,54 @@ function mine(state, player, arg, ctx) {
   return selfAndViews(state, player, `You work ${oreName} loose.${thin}`);
 }
 
+// `fish` (alias `angle`): work a baited line in fishing water. Mirrors `mine` —
+// the water holds a stock of catches that depletes and refills on a timer (see
+// state._mineTick, which recovers `fish` fixtures too) — but a cast also spends a
+// grub as bait, lost to the water whether or not anything takes it.
+function fish(state, player, arg, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  if (!canSee(player.perception, rt.light))
+    return [{ type: "error", text: "It is too dark to find the water, let alone fish it." }];
+  const pools = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].fish);
+  if (!pools.length) return [{ type: "error", text: "There is no water to fish here." }];
+  let f;
+  if (arg) {
+    const ql = arg.toLowerCase();
+    f = pools.find((v) => v.template.toLowerCase().includes(ql) || w.fixtures[v.template].name.toLowerCase().includes(ql));
+    if (!f) return [{ type: "error", text: `There is no "${arg}" to fish here.` }];
+  } else if (pools.length === 1) {
+    f = pools[0];
+  } else {
+    return [{ type: "error", text: `Fish where? ${pools.map((v) => w.fixtures[v.template].name).join(", ")}.` }];
+  }
+  const ft = w.fixtures[f.template];
+  const spec = ft.fish;
+  if (f.charges <= 0)
+    return [{ type: "error", text: "The water is fished out for now — nothing is biting until it recovers." }];
+  const bait = spec.bait || "grub";
+  if (countItem(player, bait) < 1)
+    return [{ type: "error", text: `You have no bait — you need ${w.items[bait].name} to work the line.` }];
+  const cost = spec.energy || player.speed; // ~one tick's worth of effort per cast
+  if (player.energy < cost)
+    return [{ type: "error", text: "You are too spent to work the line just yet." }];
+  player.energy -= cost;
+  removeItem(player, bait, 1); // bait is lost to the water, catch or no
+  const chance = spec.catchChance != null ? spec.catchChance : 1;
+  if (Math.random() >= chance) {
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, "Something worries the bait off your line and is gone before you can pull. The line comes up bare.");
+  }
+  f.charges -= 1;
+  const qty = spec.yield || 1;
+  addToInventory(player, makeItemInstance({ template: spec.template, qty }, w), w);
+  const catchName = w.items[spec.template].name;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} hauls ${catchName} from ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const fishedOut = f.charges <= 0 ? " The water goes still; nothing more is biting for now." : "";
+  return selfAndViews(state, player, `You hook ${catchName} and swing it ashore.${fishedOut}`);
+}
+
 function say(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Say what?" }];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} says: ${text}` }, player.id);
@@ -1218,6 +1267,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "mine":
     case "dig":
       return mine(state, player, arg, ctx);
+    case "fish":
+    case "angle":
+      return fish(state, player, arg, ctx);
     case "recipes":
       return recipes(state, player);
     case "say":

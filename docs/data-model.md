@@ -404,6 +404,8 @@ Room-anchored objects, primarily crafting stations.
 | `type`   | enum   | `crafting` \| `switch` \| `door` \| `scenery` \| `resource` \| … |
 | `station`| string?| Crafting station tag recipes reference (e.g. `alchemy`, `forge`). |
 | `switch` | block? | Makes the fixture switchable: `{ emitsLight, on }`. `on` is the default state; each instance carries live on/off state. Toggled with `use <fixture>`. When on, `emitsLight` adds to room light (like a torch). |
+| `mine`   | block? | Makes the fixture a mineable **resource vein**: `{ template, yield?, charges, respawn, energy? }`. `mine`/`dig` spends `energy` (defaults to the player's speed) to take `yield` (default 1) of `template`, drawing down `charges`; a worked-out vein refills to full after `respawn` ticks (see `state._mineTick`). Requires light to work. |
+| `fish`   | block? | Makes the fixture **fishing water**, a sibling of `mine`: `{ template, yield?, charges, respawn, energy?, bait?, catchChance? }`. `fish`/`angle` spends `energy` (default speed) **and one `bait` item** (default `grub`, consumed every cast whether or not anything bites), then rolls `catchChance` (0–1, default 1) to land `yield` of `template` and draw down a charge. Misses cost the bait but no charge. Refills like a vein after `respawn` ticks. Requires light. |
 | `door`   | block? | Makes the fixture a gated exit: `{ dir, to, open }`. While **open**, the room gains an exit `dir → to`; **shut**, that way reads as no exit at all. `open` is the default state; each instance carries live open/shut state, toggled with `use <fixture>` (or `open`/`close <fixture>`). The validator counts a room's door fixture as a graph edge, so a room reachable only through a door still validates. |
 
 ---
