@@ -111,5 +111,33 @@
     "name": "an Umbral pillar",
     "description": "A squat, square-cut column of polished stone set into the floor of the cut — not natural, and not the prospectors' work either. Its four faces are scored with the same lightless-eye glyphs found on the old reliefs, cut with the same patient hand and the same indifference to whoever might one day read them. What it marked, or held, or meant, the rock keeps to itself.",
     "type": "scenery"
+  },
+  "river-shallows": {
+    "id": "river-shallows",
+    "name": "the river shallows",
+    "description": "The black water spreads thin and slow over a shelf of pale stone, barely shin-deep. Things move in it — the blind, drifting cave-fish that nose the current for whatever the dark lets fall. A patient hand and a baited line could take a few; the grubs the fungus-beds breed are the surest bait.",
+    "type": "resource",
+    "fish": { "template": "cave-fish", "yield": 1, "charges": 4, "respawn": 150, "energy": 20, "bait": "grub", "catchChance": 0.7 }
+  },
+  "still-pool": {
+    "id": "still-pool",
+    "name": "a still pool",
+    "description": "Off the main race the river deepens into a broad, black pool, its surface unbroken but for the slow rings where something rises to feed below. The fish run larger and thicker down in the cold dark — good water for a baited line.",
+    "type": "resource",
+    "fish": { "template": "cave-fish", "yield": 1, "charges": 6, "respawn": 120, "energy": 20, "bait": "grub", "catchChance": 0.8 }
+  },
+  "umbral-garden-beds": {
+    "id": "umbral-garden-beds",
+    "name": "the garden beds",
+    "description": "Terraced beds of dark, damp earth climb the cavern wall, each one carefully furred with luminous fungus — not the wild witchglow of the deep tunnels but a tended, even crop, coaxed into neat rows that breathe a soft blue-green light. Someone has worked this ground a very long time, and works it still.",
+    "type": "scenery",
+    "emitsLight": 2
+  },
+  "umbral-coldlamp": {
+    "id": "umbral-coldlamp",
+    "name": "a cold glimmer-lamp",
+    "description": "A fist-sized knot of raw glimmer rests in a carved stone cradle, breathing a low, blue-white light that throws no heat and no glare — enough for deep-adapted eyes, and gentle enough not to pain them. The Umbrals light their halls this way, where surface folk would strike a torch and wince at their own flame.",
+    "type": "scenery",
+    "emitsLight": 1
   }
 }

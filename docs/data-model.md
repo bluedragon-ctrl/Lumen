@@ -172,14 +172,14 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `id`,`name`,`description` | string | `name` is the noun phrase used in text. |
 | `keywords`   | string[]? | Words a player can target this by (`get <kw>`, `kill <kw>`, …). **Optional** — when omitted, the significant words of `name` are used automatically (articles/prepositions like *a/the/of* dropped), so a sliver of glimmerstone already answers to `sliver` and `glimmerstone`. Set it only to add synonyms the name doesn't contain (e.g. `["ore","rock"]`). See [Targeting](#targeting-keywords--abbreviation). |
 | `type`       | enum    | `light` \| `weapon` \| `armour` \| `consumable` \| `material` \| `currency` \| `misc`. `currency` (e.g. `shards`) is gathered into the player's balance by `get`, not stowed in inventory. |
-| `slot`       | enum?   | Equip slot: `hand` \| `body` \| `head` \| `light` … (omit if not equippable). |
+| `slot`       | enum?   | Equip slot: `hand` \| `body` \| `head` \| `neck` \| `finger` \| `light` … (omit if not equippable). Slots are **dynamic** — a slot exists once any item declares it; seed empty ones in `startEquipment` so `unequip <slot>` works fresh. |
 | `weight`     | number  | For future carry-capacity. |
 | `value`      | integer | Buy price in shards (what a trader charges). **Required** for every item except `currency`. |
 | `sellValue`  | integer?| What a trader pays to buy it from a player. Defaults to `round(value × 0.2)` (20%); set it to override. |
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
 | `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. Add `fuelItem` + `refuelPerUnit` to make it **refuellable** (`refuel <item>` consumes one `fuelItem` and adds `refuelPerUnit` fuel); omit them for a disposable light (e.g. a torch). |
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
-| `armour`     | block?  | `{ armour, ward, speedPenalty, maxHp?, attrMod?, spikes?, onDamage? }`. `maxHp` is bonus max HP the piece grants while worn (heavy gear → raw durability on top of Vitality); folded into derived stats and refreshed on equip/unequip. |
+| `armour`     | block?  | `{ armour, ward, speedPenalty, maxHp?, maxMana?, attrMod?, spikes?, onDamage? }`. `maxHp`/`maxMana` are bonus max HP/Mana the piece grants while worn (heavy gear → durability on top of Vitality; caster gear → a deeper mana well on top of Intellect); both are folded into derived stats and refreshed on equip/unequip, with the new capacity granted on equip and clamped on unequip. `attrMod` is a map of attribute → flat modifier applied to the wearer's **effective** attributes (read live at combat/cast time), e.g. `{ "intellect": 2 }` to lift spell power or `{ "wits": -1 }` for clumsy heavy gear. |
 | `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
 | `scroll`     | block?  | `{ spell }` — `learn`/`study` teaches the one spell, then consumes the item. |
 | `recipe`     | string? | A recipe id — `learn`/`study` teaches the one recipe, then consumes the item. |
@@ -404,6 +404,8 @@ Room-anchored objects, primarily crafting stations.
 | `type`   | enum   | `crafting` \| `switch` \| `door` \| `scenery` \| `resource` \| … |
 | `station`| string?| Crafting station tag recipes reference (e.g. `alchemy`, `forge`). |
 | `switch` | block? | Makes the fixture switchable: `{ emitsLight, on }`. `on` is the default state; each instance carries live on/off state. Toggled with `use <fixture>`. When on, `emitsLight` adds to room light (like a torch). |
+| `mine`   | block? | Makes the fixture a mineable **resource vein**: `{ template, yield?, charges, respawn, energy? }`. `mine`/`dig` spends `energy` (defaults to the player's speed) to take `yield` (default 1) of `template`, drawing down `charges`; a worked-out vein refills to full after `respawn` ticks (see `state._mineTick`). Requires light to work. |
+| `fish`   | block? | Makes the fixture **fishing water**, a sibling of `mine`: `{ template, yield?, charges, respawn, energy?, bait?, catchChance? }`. `fish`/`angle` spends `energy` (default speed) **and one `bait` item** (default `grub`, consumed every cast whether or not anything bites), then rolls `catchChance` (0–1, default 1) to land `yield` of `template` and draw down a charge. Misses cost the bait but no charge. Refills like a vein after `respawn` ticks. Requires light. |
 | `door`   | block? | Makes the fixture a gated exit: `{ dir, to, open }`. While **open**, the room gains an exit `dir → to`; **shut**, that way reads as no exit at all. `open` is the default state; each instance carries live open/shut state, toggled with `use <fixture>` (or `open`/`close <fixture>`). The validator counts a room's door fixture as a graph edge, so a room reachable only through a door still validates. |
 
 ---

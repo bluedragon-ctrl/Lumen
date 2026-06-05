@@ -6,6 +6,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The third abyss floor (depth 3) — the Underriver, reached down the Deep Stair.**
+  Seven new rooms running along a black underground river. A mostly-gentle spine
+  (`The River Stair` → `The Pale Shallows` → `The Still Pools` →
+  `The Sunless Falls`) ends at a waterfall the Umbrals name the **paqcha**, beside
+  which an unfinished ledge marks the descent to a future fourth floor. Two of the
+  river rooms are **fishing water**; a **hidden cave-lurker** (perception 3) lies in
+  ambush in the Pale Shallows, so the easy fishing is not quite as safe as it looks.
+  North of the falls, a flooded **Plunge Cave** holds a richer fishing pool **owned
+  by hostile pale crayfish** — risk-and-reward water for braver delvers. Off the
+  pools, a worked side-path leads to the
+  **first Umbral presence** in the game: **Mallki the qhatuq** — a quiet,
+  bioluminescent Umbral trader — in his dim, lamp-lit hollow (`Mallki's Hollow`)
+  with a tended fungus garden behind it (`The Sunless Garden`), where farmed grubs
+  supply bait on the floor itself. New wander-zones `third` and `third-umbral`.
+  (Umbral names draw on Quechua roots.)
+- **Glimmer-craft moves to the deep.** The two glimmer-craft scrolls
+  (**Glimmer Spike**, **Glimmerskin** — the shard-burning Umbral art) leave
+  Vesper's shelf at the Rim and are now sold only by **Mallki** on the third
+  floor, gating the heaviest spells behind reaching the first Umbral. He also
+  takes over the **Book of Chitin Craft** (was Tobin the smith's), a fitting
+  trade for a deep-dweller. Vesper still sells the human-tradition scrolls.
+- **Two new Umbral accessories, sold by Mallki.** An **Umbral mind-charm**
+  (`neck` slot, `+2 Intellect` → sharper spell power) and an **Umbral
+  glimmer-ring** (`finger` slot, `+5 max Mana` → a deeper caster's well). Adds
+  two new **equipment slots** (`neck`, `finger`), seeded empty on fresh
+  characters, and a new `armour.maxMana` bonus (mirroring `armour.maxHp`):
+  equipping grants the new capacity, unequipping clamps it. Validator now
+  checks `armour.maxMana` and `armour.attrMod`.
+- **Two silver attribute rings, crafted at the smithy.** A **Ring of Sight**
+  (`+1 Perception` — sharper aim, crit, and now searching) and a **Ring of Wits**
+  (`+1 Wits` — more Ward and evasion), each forged from **one silver bar**. Recipes
+  are gated behind schematics sold by Vesper. `search` now reads **effective**
+  Perception (so perception gear helps you spot hidden things, not just base
+  attribute). Both use the `finger` slot — only one ring worn at a time for now.
+- **Starsilver, a top-tier alloy.** Smelt **1 silver-bar + 1 glimmer-dust** into a
+  **starsilver bar** (`alloy-starsilver`, smithing) — finer than glimmersteel and
+  the first use for silver-bar. The recipe is gated behind a **starsilver
+  schematic** sold by Vesper. (Flavour nods at the "frozen starlight" legend
+  without asserting it — glimmer's nature stays a mystery.) Stock material for
+  future gear; no starsilver gear yet.
+- **Two glimmersteel craftables.** A **Glimmersteel Sword** (`+1 Might`,
+  `1d8 + Might/2` — a per-weapon `scale` block) forged at the smithy, and a
+  **Glimmersteel Staff** (`+1 Intellect`, `+5 max Mana` — a caster focus,
+  `1d6 + Might/3`). Both are forged at the smithy and each costs **two
+  glimmersteel bars**. The recipes are taught by schematics: the sword schematic
+  is sold by **Tobin** at the Rim, the staff schematic by **Vesper**. First gear to carry both a
+  `weapon` and an `armour` (bonus) block on one item.
+- **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
+  work a baited line in a `fish` resource fixture. Each cast spends a **grub** as
+  bait (lost to the water, catch or no) plus energy, and rolls the fixture's
+  `catchChance` to land **a blind cave-fish** (a new raw, sellable food). Like ore
+  veins, a pool holds a stock of catches that depletes and refills on a timer.
+  New `fish` fixture block (`{ template, yield, charges, respawn, energy, bait,
+  catchChance }`), validated and documented; `state._mineTick` now recovers
+  fishing pools as well as ore veins.
 - **The second abyss floor (depth 2), reached down from the Ore Drift.** Thirteen
   new rooms in three parts. A safe, prospector-trafficked **main road** runs
   east→west (`The Winch-Head` → `The Prospectors' Road` → `The Crossing` →

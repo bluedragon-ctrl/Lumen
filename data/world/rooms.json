@@ -340,8 +340,8 @@
     "name": "The Deep Stair",
     "depth": 2,
     "ambientLight": 0,
-    "description": "The passage ends at a cleft in the rock where cut stone steps drop away into a black throat — a stair driven deeper than any prospector on this floor has yet worked. A length of rope is knotted to an iron spike and runs over the lip, but it is slack, and no one has pulled it taut for some time. The prospectors' chalk on the wall here says only: NOT YET. The crossing is east.",
-    "exits": { "east": "second.crossing" },
+    "description": "The passage ends at a cleft in the rock where cut stone steps drop away into a black throat — a stair driven deeper than any prospector on this floor has yet worked. A length of rope is knotted to an iron spike and runs over the lip, taut now, where a steadier hand than the last has made it fast. Far below, faint and constant, comes the sound of running water. The prospectors' chalk on the wall here said NOT YET, and someone has scratched it through. The crossing is east; the stair drops away down.",
+    "exits": { "east": "second.crossing", "down": "third.landing" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 12, "hidden": { "perception": 3 } },
@@ -496,6 +496,103 @@
     ],
     "spawns": [
       { "mob": "pale-salamander", "max": 2, "respawn": 90 }
+    ]
+  },
+  "third.landing": {
+    "id": "third.landing",
+    "zone": "third",
+    "name": "The River Stair",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "The deep stair bottoms out on a broad shelf of water-smoothed rock, and the sound that carried down the shaft resolves into a river — a wide, black current sliding out of the dark on one side and away into it on the other, older than any working above. The air is cool and wet and clean, and after the close mine-dust of the upper floors it feels almost kind. No vermin nest here; the water keeps the dark things off. The stair climbs back up; the bank runs west along the current.",
+    "exits": { "up": "second.stair", "west": "third.shallows" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "third.shallows": {
+    "id": "third.shallows",
+    "zone": "third",
+    "name": "The Pale Shallows",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "The river widens and slows, spreading thin over a pale stone shelf where it runs barely shin-deep. Blind cave-fish drift the slack water in lazy, unhurried circles, nosing the current. It looks a still, easy stretch of bank — the sort of place a delver might unsling a baited line and breathe a while, though the water is darker where it deepens at the far edge, and not every shadow under it is stone. The stair-landing is back east; the bank runs on west toward a deeper sound of water.",
+    "exits": { "east": "third.landing", "west": "third.pools" },
+    "fixtures": ["river-shallows"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
+      { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
+    ]
+  },
+  "third.pools": {
+    "id": "third.pools",
+    "zone": "third",
+    "name": "The Still Pools",
+    "depth": 3,
+    "ambientLight": 1,
+    "description": "Here the current loses itself in a chain of broad, deep pools, their black surfaces lit faintly from below by a phosphor-glow caught in the deep water. The fish run larger down in the cold dark, and rise in slow rings to feed. A worked path branches south, away from the water — cut stone, dressed smooth, with the soft glow of something tended bleeding up from below. The bank runs west toward the falls and east back to the shallows.",
+    "exits": { "east": "third.shallows", "west": "third.falls", "south": "third.dwelling" },
+    "fixtures": ["still-pool"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 }
+    ]
+  },
+  "third.falls": {
+    "id": "third.falls",
+    "zone": "third",
+    "name": "The Sunless Falls",
+    "depth": 3,
+    "ambientLight": 1,
+    "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. A narrow ledge runs down beside the cataract, worn but unfinished, the rope-stakes set only partway — the descent to whatever lies below is begun, but no one has yet made it fast enough to trust. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
+    "exits": { "east": "third.pools", "north": "third.cave" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "third.cave": {
+    "id": "third.cave",
+    "zone": "third",
+    "name": "The Plunge Cave",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "The falls have gnawed a deep pocket back into the rock here, and the river's overspill gathers in a broad, cold plunge-pool that fills most of the floor. The roar of the cataract comes muffled through the stone, and the dark is total but for what light a delver brings. This is no quiet fishing-hole: pale crayfish own the water, eyeless and armoured, claws raised at anything that nears their pool — they swarm the fish the falls wash down, and will turn those same claws on a careless hand. The way out is back south, through the spray.",
+    "exits": { "south": "third.falls" },
+    "fixtures": ["still-pool"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-crayfish", "max": 2, "respawn": 90 }
+    ]
+  },
+  "third.dwelling": {
+    "id": "third.dwelling",
+    "zone": "third-umbral",
+    "name": "Mallki's Hollow",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "The worked path opens into a low, dry hollow carved square from the living rock — a dwelling, plainly, and a very old one. A cold glimmer-lamp throws a soft, heatless blue over shelves of river-shells, coils of woven gut-line, and neat stacks of dried fungus. There are no torches and no flame; the light here is kept low and kind, easy on eyes that were never meant for the sun. Mallki keeps this place. The pools lie back north; the light of a tended garden glows up from a passage south.",
+    "exits": { "north": "third.pools", "south": "third.garden" },
+    "fixtures": ["umbral-coldlamp"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-trader", "max": 1, "respawn": 90 }
+    ]
+  },
+  "third.garden": {
+    "id": "third.garden",
+    "zone": "third-umbral",
+    "name": "The Sunless Garden",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "A cavern given over wholly to cultivation: terraced beds of dark earth climb the walls, each furred with a tended, even crop of luminous fungus that breathes a soft blue-green light over the whole chamber. The air is rich and damp and faintly sweet. Pale grubs work the richest beds, fattening on the crop — Mallki lets them be, and picks them off for the line when they grow bold. This is where the Umbral feeds himself, and has, by the look of it, for longer than the Rim has stood. The only way out is back up to the hollow, north.",
+    "exits": { "north": "third.dwelling" },
+    "fixtures": ["umbral-garden-beds"],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
+    ],
+    "spawns": [
+      { "mob": "grub", "max": 2, "respawn": 120 }
     ]
   }
 }

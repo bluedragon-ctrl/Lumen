@@ -323,8 +323,8 @@ const isDiscovered = (player, key) => Array.isArray(player.discovered) && player
 /** Effective Perception for searching: the attribute scaled by how well the player
  *  sees the room — the same light tiers combat uses (darkness ×0.05, dim/glare
  *  ×0.5, clear ×1.0). So light is required to find what's hidden. */
-function effectivePerception(player, light) {
-  const per = (player.attributes && player.attributes.perception) || 0;
+function effectivePerception(world, player, light) {
+  const per = effectiveAttributes(world, player).perception || 0; // includes gear (e.g. a ring of sight)
   return per * hitChance(player.perception, light);
 }
 
@@ -379,7 +379,7 @@ class GameState {
         const ft = this.world.fixtures[tmplId];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
         if (ft && ft.door) inst.open = !!ft.door.open; // door fixtures carry open/shut state
-        if (ft && ft.mine) { inst.charges = ft.mine.charges; inst.regrow = ft.mine.respawn; } // resource veins deplete as mined
+        if (ft && (ft.mine || ft.fish)) { const res = ft.mine || ft.fish; inst.charges = res.charges; inst.regrow = res.respawn; } // resource veins/pools deplete as worked
         if (typeof f === "object" && f.hidden) { inst.hidden = f.hidden; inst.discoveryKey = discoveryKey(id, "fix", tmplId); }
         this.rooms[id].fixtures.push(inst);
       }
@@ -565,12 +565,13 @@ class GameState {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const f of rt.fixtures) {
         const ft = this.world.fixtures[f.template];
-        if (!ft || !ft.mine) continue;
-        if (f.charges >= ft.mine.charges) { f.regrow = ft.mine.respawn; continue; }
+        const res = ft && (ft.mine || ft.fish);
+        if (!res) continue;
+        if (f.charges >= res.charges) { f.regrow = res.respawn; continue; }
         if (--f.regrow > 0) continue;
-        f.charges = ft.mine.charges;
-        f.regrow = ft.mine.respawn;
-        events.push({ type: "vein-recover", roomId, fixtureName: ft.name });
+        f.charges = res.charges;
+        f.regrow = res.respawn;
+        events.push({ type: "vein-recover", roomId, fixtureName: ft.name, kind: ft.fish ? "fish" : "ore" });
       }
     }
   }
@@ -773,6 +774,19 @@ class GameState {
     return bonus;
   }
 
+  /** Bonus max Mana from equipped gear (`armour.maxMana`) — e.g. an Umbral
+   *  glimmer-ring that deepens a caster's well. Summed across every equipped
+   *  slot and folded into `deriveStats`, refreshed whenever gear changes. */
+  _equipManaBonus(player) {
+    let bonus = 0;
+    for (const inst of Object.values(player.equipment || {})) {
+      if (!inst) continue;
+      const t = this.world.items[inst.template];
+      if (t && t.armour && t.armour.maxMana) bonus += t.armour.maxMana;
+    }
+    return bonus;
+  }
+
   /**
    * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
    * max HP (Vitality), max Mana (Intellect), and the low-light sight band
@@ -785,7 +799,7 @@ class GameState {
   deriveStats(player) {
     const a = player.attributes || {};
     player.maxHp = (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
-    player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT;
+    player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT + this._equipManaBonus(player);
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
     const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);
     const dimBelow = Math.max(band.blindBelow, band.dimBelow - sight);
@@ -918,7 +932,7 @@ class GameState {
     const roomId = player.location;
     const room = this.world.rooms[roomId];
     const rt = this.rooms[roomId];
-    const eff = effectivePerception(player, rt.light);
+    const eff = effectivePerception(this.world, player, rt.light);
     if (!Array.isArray(player.discovered)) player.discovered = [];
     const found = [];
 

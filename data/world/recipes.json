@@ -210,5 +210,55 @@
     ],
     "shards": 3,
     "output": { "template": "silver-bar", "qty": 1 }
+  },
+  "forge-glimmersteel-sword": {
+    "id": "forge-glimmersteel-sword",
+    "name": "Glimmersteel Sword",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 10,
+    "output": { "template": "glimmersteel-sword", "qty": 1 }
+  },
+  "craft-glimmersteel-staff": {
+    "id": "craft-glimmersteel-staff",
+    "name": "Glimmersteel Staff",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 10,
+    "output": { "template": "glimmersteel-staff", "qty": 1 }
+  },
+  "alloy-starsilver": {
+    "id": "alloy-starsilver",
+    "name": "Starsilver Bar",
+    "station": "smelting",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "output": { "template": "starsilver-bar", "qty": 1 }
+  },
+  "forge-ring-of-sight": {
+    "id": "forge-ring-of-sight",
+    "name": "Ring of Sight",
+    "station": "smithing",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "ring-of-sight", "qty": 1 }
+  },
+  "forge-ring-of-wits": {
+    "id": "forge-ring-of-wits",
+    "name": "Ring of Wits",
+    "station": "smithing",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "ring-of-wits", "qty": 1 }
   }
 }

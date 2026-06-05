@@ -89,6 +89,50 @@
     "value": 26,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
   },
+  "umbral-mind-charm": {
+    "id": "umbral-mind-charm",
+    "name": "an Umbral mind-charm",
+    "keywords": ["charm", "amulet", "mind", "umbral"],
+    "description": "A flat disc of dark, river-smoothed stone hung on a cord of woven gut, its face inlaid with a single thread of glimmer worked into the lightless-eye glyph. It rests cool against the breastbone, and the longer it is worn the clearer the wearer's thoughts seem to run — as though the cold light lent the mind an edge. Umbral work, and patient: they carve these for their own glimmer-singers and part with them rarely.",
+    "type": "armour",
+    "slot": "neck",
+    "weight": 0,
+    "value": 110,
+    "armour": { "attrMod": { "intellect": 2 } }
+  },
+  "umbral-glimmer-ring": {
+    "id": "umbral-glimmer-ring",
+    "name": "an Umbral glimmer-ring",
+    "keywords": ["ring", "band", "glimmer", "umbral"],
+    "description": "A plain band of cold grey metal, its inner face grooved with a hair-fine channel of glimmer that never quite stops glowing. Worn against the skin it deepens the well a caster draws from — a small, steady reservoir of borrowed light to spend on the weave. Old Umbral craft, the channel-work finer than any surface smith could cut.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 85,
+    "armour": { "maxMana": 5 }
+  },
+  "ring-of-sight": {
+    "id": "ring-of-sight",
+    "name": "a ring of sight",
+    "keywords": ["ring", "sight"],
+    "description": "A slim silver band graven with a fine, open eye. The pattern is an old silversmith's conceit, but worked to Vesper's method it does more than flatter — it sharpens the wearer's notice, the flick of movement at the dark's edge and the seam a careless delver walks straight past.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 90,
+    "armour": { "attrMod": { "perception": 1 } }
+  },
+  "ring-of-wits": {
+    "id": "ring-of-wits",
+    "name": "a ring of wits",
+    "keywords": ["ring", "wits"],
+    "description": "A slim silver band chased with a knot of interlacing lines that draws the eye in and never quite lets it settle. Worked to Vesper's method, it keeps the wearer's thoughts quick and their guard quicker — the small, steady edge that turns a blow aside or shrugs off a hostile weave.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 90,
+    "armour": { "attrMod": { "wits": 1 } }
+  },
   "shards": {
     "id": "shards",
     "name": "shards",
@@ -308,6 +352,37 @@
     "value": 90,
     "stackable": true
   },
+  "glimmersteel-sword": {
+    "id": "glimmersteel-sword",
+    "name": "a glimmersteel sword",
+    "description": "A long blade forged from glimmer-alloyed steel, its edge holding a faint, cold inner light that never quite fades. Lighter and meaner than honest iron, and balanced so finely it seems to lend strength to the arm that swings it. A small fortune in bars, and rarer still in the skill to work them.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d8" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 12 },
+    "armour": { "attrMod": { "might": 1 } }
+  },
+  "glimmersteel-staff": {
+    "id": "glimmersteel-staff",
+    "name": "a glimmersteel staff",
+    "description": "A slender rod of glimmer-alloyed steel, cool to the grip, a vein of captive light running its length and pooling bright at the head. It is no great weapon — but a focus: held while casting it steadies the will and deepens the well a caster draws from. Arcane work, half-forged and half-attuned.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12 },
+    "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
+  },
+  "starsilver-bar": {
+    "id": "starsilver-bar",
+    "name": "a starsilver bar",
+    "description": "Silver smelted through with glimmer dust until the metal holds a cold, captive shimmer all its own — frozen starlight, the old tales would have it, though no smith alive can say what glimmer truly is. Dearer than glimmersteel and finer still; stock for the rarest gear the deep allows.",
+    "type": "material",
+    "weight": 2,
+    "value": 140,
+    "stackable": true
+  },
   "searing-flare": {
     "id": "searing-flare",
     "name": "a searing flare",
@@ -327,6 +402,56 @@
     "value": 5,
     "stackable": true,
     "recipe": "searing-flare"
+  },
+  "schematic-glimmersteel-sword": {
+    "id": "schematic-glimmersteel-sword",
+    "name": "a glimmersteel sword schematic",
+    "description": "A careful smith's diagram on oiled vellum — the folding and quenching of glimmer-alloyed steel into a blade that keeps its cold edge. Tobin charges dearly for it; the method is hard-won and the stock dearer. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 80,
+    "stackable": true,
+    "recipe": "forge-glimmersteel-sword"
+  },
+  "schematic-glimmersteel-staff": {
+    "id": "schematic-glimmersteel-staff",
+    "name": "a glimmersteel staff schematic",
+    "description": "A page of Vesper's precise hand — the working and arcane attuning of glimmersteel into a caster's focus, the channel-lines that let it hold and lend back the will. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 80,
+    "stackable": true,
+    "recipe": "craft-glimmersteel-staff"
+  },
+  "schematic-starsilver": {
+    "id": "schematic-starsilver",
+    "name": "a starsilver schematic",
+    "description": "A page of Vesper's careful hand — the trick of folding glimmer dust into molten silver so the light takes and holds rather than burning off in the heat. She'll tell you the 'frozen starlight' is only a story; the method, she'll grant, is real enough. Study it to fix the alloy in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 120,
+    "stackable": true,
+    "recipe": "alloy-starsilver"
+  },
+  "schematic-ring-of-sight": {
+    "id": "schematic-ring-of-sight",
+    "name": "a sight-ring schematic",
+    "description": "A page of Vesper's careful hand — the graving and quiet working of a silver band that sharpens its wearer's notice. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "recipe": "forge-ring-of-sight"
+  },
+  "schematic-ring-of-wits": {
+    "id": "schematic-ring-of-wits",
+    "name": "a wits-ring schematic",
+    "description": "A page of Vesper's careful hand — the chasing and quiet working of a silver band that keeps its wearer's thoughts and guard quick. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "recipe": "forge-ring-of-wits"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",
@@ -403,6 +528,19 @@
     "consumable": {
       "flavour": "You swallow the raw grub down whole, trying not to taste it. Cold and soft, it is barely a mouthful — but it is something.",
       "effect": { "type": "restore", "hp": 1 }
+    }
+  },
+  "cave-fish": {
+    "id": "cave-fish",
+    "name": "a blind cave-fish",
+    "description": "A pale, eyeless fish hauled dripping from the black water, no longer than a hand. The flesh is cold and faintly translucent. Edible raw at a pinch, and far better over a fire — a staple catch for any camp that learns the trick of the line.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 5,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the raw cave-fish in cold, soft mouthfuls. It is bland and faintly bitter, but it fills the hollow under your ribs.",
+      "effect": { "type": "restore", "hp": 2 }
     }
   },
   "roasted-grubs": {
