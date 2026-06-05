@@ -261,12 +261,12 @@ function dispatchEvent(ev) {
         : ev.sighted
           ? `swing at ${ev.targetName} and miss`
           : `flail at ${ev.targetName} in the dark and miss`;
-      sendToPlayer(ev.attackerId, { type: "log", text: `You ${verb}.${ev.crit ? " A critical hit!" : ""}` });
+      sendToPlayer(ev.attackerId, { type: "combat", text: `You ${verb}.${ev.crit ? " A critical hit!" : ""}` });
       // Bystanders only learn the mob's name if they can see it.
       for (const o of state.playersIn(ev.roomId)) {
         if (o.id === ev.attackerId) continue;
         const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
-        sendToPlayer(o.id, { type: "log", text: `${ev.attackerName} ${ev.hit ? "strikes" : "lunges at"} ${tn}.` });
+        sendToPlayer(o.id, { type: "combat", text: `${ev.attackerName} ${ev.hit ? "strikes" : "lunges at"} ${tn}.` });
       }
       const attacker = state.players.get(ev.attackerId);
       if (attacker && ev.targetHp > 0) {
@@ -284,7 +284,7 @@ function dispatchEvent(ev) {
         const line = ev.hit
           ? `${cap(an)} strikes ${tn} for ${ev.damage}.${ev.crit ? " A critical hit!" : ""}`
           : `${cap(an)} ${ev.sighted ? `swings at ${tn} and misses` : `lunges at ${tn} in the dark and misses`}.`;
-        sendToPlayer(o.id, { type: "log", text: line });
+        sendToPlayer(o.id, { type: "combat", text: line });
       }
     } else {
       const target = state.players.get(ev.targetId);
@@ -295,12 +295,12 @@ function dispatchEvent(ev) {
         : seen
           ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
           : "Something lunges out of the dark and misses.";
-      sendToPlayer(ev.targetId, { type: "log", text: youLine });
+      sendToPlayer(ev.targetId, { type: "combat", text: youLine });
       if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
       for (const o of state.playersIn(ev.roomId)) {
         if (o.id === ev.targetId) continue;
         const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
-        sendToPlayer(o.id, { type: "log", text: `${cap(an)} attacks ${ev.targetName}.` });
+        sendToPlayer(o.id, { type: "combat", text: `${cap(an)} attacks ${ev.targetName}.` });
       }
     }
     return;
@@ -318,7 +318,7 @@ function dispatchEvent(ev) {
         if (ev.resisted) line = `${cap(an)} hurls ${ev.spellName} at ${tn}, but its ward turns it aside.`;
         else if (ev.effectName) line = `${cap(an)} casts ${ev.spellName} on ${tn} — the ${ev.effectName} takes hold.`;
         else line = `${cap(an)} blasts ${tn} with ${ev.spellName} for ${ev.damage}.`;
-        sendToPlayer(o.id, { type: "log", text: line });
+        sendToPlayer(o.id, { type: "combat", text: line });
       }
       return;
     }
@@ -329,12 +329,12 @@ function dispatchEvent(ev) {
     if (ev.resisted) youLine = `${cap(who)} hurls ${ev.spellName} at you, but your ward turns it aside.`;
     else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
     else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
-    sendToPlayer(ev.targetId, { type: "log", text: youLine });
+    sendToPlayer(ev.targetId, { type: "combat", text: youLine });
     if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.` });
+      sendToPlayer(o.id, { type: "combat", text: `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.` });
     }
     return;
   }
@@ -354,11 +354,11 @@ function dispatchEvent(ev) {
     const youLine = seen
       ? `${cap(who)} ${ev.rose ? "stirs, its gaze locking" : "fixes its gaze"} onto you.`
       : "Something stirs in the dark, fixing on you.";
-    sendToPlayer(ev.targetId, { type: "log", text: youLine });
+    sendToPlayer(ev.targetId, { type: "combat", text: youLine });
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.` });
+      sendToPlayer(o.id, { type: "combat", text: `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.` });
     }
     return;
   }
@@ -369,13 +369,13 @@ function dispatchEvent(ev) {
     // reads first, then the attack/wake lines follow. Light-gated like other mobs.
     const target = state.players.get(ev.targetId);
     const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
-    sendToPlayer(ev.targetId, { type: "log", text: seen
+    sendToPlayer(ev.targetId, { type: "combat", text: seen
       ? `${cap(ev.mobName)} drops from its hiding place onto you!`
       : "Something drops from the dark onto you!" });
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} bursts from hiding onto ${ev.targetName}!` });
+      sendToPlayer(o.id, { type: "combat", text: `${cap(n)} bursts from hiding onto ${ev.targetName}!` });
     }
     return;
   }
@@ -386,14 +386,14 @@ function dispatchEvent(ev) {
     const target = ev.targetKind === "player" ? state.players.get(ev.targetId) : null;
     if (target) {
       const seen = canSeeMob(target, ev.light, ev.emitsLight);
-      sendToPlayer(ev.targetId, { type: "log", text: seen
+      sendToPlayer(ev.targetId, { type: "combat", text: seen
         ? `${cap(ev.mobName)} rushes to join the attack on you!`
         : "Something rushes at you out of the dark!" });
     }
     for (const o of state.playersIn(ev.roomId)) {
       if (target && o.id === ev.targetId) continue;
       const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} rushes to join the attack on ${ev.targetName}.` });
+      sendToPlayer(o.id, { type: "combat", text: `${cap(n)} rushes to join the attack on ${ev.targetName}.` });
     }
     return;
   }
@@ -401,7 +401,7 @@ function dispatchEvent(ev) {
   if (ev.type === "combat-auto-start") {
     // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
     // player they've engaged, so the swings on following ticks aren't a mystery.
-    sendToPlayer(ev.playerId, { type: "log", text: `You turn on ${ev.targetName} and fight back!` });
+    sendToPlayer(ev.playerId, { type: "combat", text: `You turn on ${ev.targetName} and fight back!` });
     return;
   }
 
@@ -527,11 +527,11 @@ function dispatchEvent(ev) {
   if (ev.type === "death" && ev.victimKind === "mob") {
     const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
     const deathVerb = { light: "shrivels and dies in the light", bleed: "bleeds out and dies", venom: "succumbs to the venom and dies", spikes: "is impaled on its own spines and dies" }[ev.cause] || "dies";
-    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
+    roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
     const killer = state.players.get(ev.killerId);
     if (killer) {
       const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off", venom: "Your venom finishes off", spikes: "Your thorns finish off" }[ev.cause] || "You slay";
-      sendToPlayer(ev.killerId, { type: "log", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
+      sendToPlayer(ev.killerId, { type: "combat", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
       sendToPlayer(ev.killerId, buildRoomView(state, killer));
     }
     // Shared kill XP (Model A): every participant gets the full value. The finisher
@@ -540,7 +540,7 @@ function dispatchEvent(ev) {
     for (const a of ev.participants || []) {
       const pl = state.players.get(a.playerId);
       if (!pl) continue;
-      if (a.playerId !== ev.killerId && ev.xp) sendToPlayer(a.playerId, { type: "log", text: `You help bring down ${ev.victimName}. (+${ev.xp} xp)` });
+      if (a.playerId !== ev.killerId && ev.xp) sendToPlayer(a.playerId, { type: "combat", text: `You help bring down ${ev.victimName}. (+${ev.xp} xp)` });
       for (const up of a.levelUps || []) {
         sendToPlayer(a.playerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
         roomCtx.toRoom(ev.roomId, { type: "gold", text: `${pl.name} reaches level ${up.level}!` }, a.playerId);
@@ -558,7 +558,7 @@ function dispatchEvent(ev) {
       sendToPlayer(ev.victimId, buildRoomView(state, victim));
       sendToPlayer(ev.victimId, buildPlayerView(state, victim));
     }
-    roomCtx.toRoom(ev.roomId, { type: "log", text: `${ev.victimName} falls.` }, ev.victimId);
+    roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} falls.` }, ev.victimId);
     roomCtx.refreshRoom(ev.roomId, ev.victimId);
     roomCtx.refreshRoom(ev.respawnRoom, ev.victimId);
   }

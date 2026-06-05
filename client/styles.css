@@ -5,6 +5,8 @@
   --edge: #232a31;
   --text: #cdd3da;
   --muted: #6b7682;
+  --system: #8b95a1;
+  --combat: #c98a8a;
   --accent: #7fb0d0;
   --hp: #c45b5b;
   --energy: #c9a14a;
@@ -42,10 +44,14 @@ body {
 #console { grid-area: console; padding: 8px 10px; }
 #log { white-space: pre-wrap; word-break: break-word; }
 #log > div { padding: 1px 0; }
-.line-system { color: var(--accent); }
-.line-error { color: var(--hostile); }
+/* A calm, semantic palette: warm tones are earned by real game outcomes
+   (combat = soft rose, leveling = gold); the gray family carries meta/plumbing
+   (your own commands, system notices, errors); world narration stays white. */
+.line-system { color: var(--system); }
+.line-error { color: var(--system); font-style: italic; }
 .line-echo { color: var(--muted); }
 .line-log { color: var(--text); }
+.line-combat { color: var(--combat); }
 .line-gold { color: var(--gold); font-weight: 600; text-shadow: 0 0 6px rgba(242, 193, 78, .35); }
 
 /* Inspect (room view, tinted by light) --------------------------------- */

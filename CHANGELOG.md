@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`pickup` as a synonym for `get`.**
 
 ### Changed
+- **Standardised console message colours into a calm, semantic palette.** Warm
+  tones are now earned by real game outcomes — **combat is soft rose**, **levelling
+  stays gold**; the **gray family carries meta/plumbing** (your own commands, system
+  notices, and errors); world narration stays white. Errors moved off red (they read
+  as gray italics now, so a failed action still stands apart from your echoed command
+  without shouting), and system notices moved off blue to gray. Combat is a new
+  first-class message type: core combat lines (attacks, hits/misses, mob spells,
+  deaths, ambush/aggro engagement) are tagged `combat` on the server rather than
+  riding the generic white `log` channel.
 - **Lighting is now equip-driven (DikuMUD-style).** Equipping a fuelled light
   source into the `light` slot **kindles it automatically** — no separate "light it"
   step. `use <source>` toggles a carried/equipped source between lit and doused (to

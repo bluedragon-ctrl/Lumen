@@ -77,8 +77,8 @@ const HELP = [
   "Target things by any word in their name (kill innkeeper, get glimmerstone).",
 ].join("\n");
 
-const selfAndViews = (state, player, line) => [
-  { type: "log", text: line },
+const selfAndViews = (state, player, line, kind = "log") => [
+  { type: kind, text: line },
   buildRoomView(state, player),
   buildPlayerView(state, player),
 ];
@@ -719,7 +719,7 @@ function attack(state, player, arg) {
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
-  const ready = { type: "log", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
+  const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
   return woke ? [{ type: "log", text: "You scramble to your feet." }, ready] : [ready];
 }
 
@@ -895,25 +895,26 @@ function cast(state, player, arg, ctx) {
   const res = state.castSpell(player, spell, mob);
 
   if (res.resisted) {
-    ctx.toRoom(player.location, { type: "log", text: `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.` }, player.id);
+    ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`);
+    return selfAndViews(state, player, `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`, "combat");
   }
 
   if (res.killed) {
     const d = res.death;
     const lootTxt = d.loot && d.loot.length ? ` It leaves behind ${d.loot.join(", ")}.` : "";
-    ctx.toRoom(player.location, { type: "log", text: `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}` }, player.id);
+    ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     return selfAndViews(
       state, player,
-      `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`
+      `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`,
+      "combat"
     );
   }
 
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
+  ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`);
+  return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`, "combat");
 }
 
 // Format a tick count as m:ss for narration (one tick = one second). Mirrors
