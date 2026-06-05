@@ -278,6 +278,16 @@
     "stackable": true,
     "recipe": "searing-flare"
   },
+  "book-of-cooking": {
+    "id": "book-of-cooking",
+    "name": "a book of cooking",
+    "description": "A grease-spotted, hard-used kitchen book bound in cracked leather, its pages thick with Maeve's looping hand and the steam-warped recipes of the Lantern's Rest. Study it to learn the camp cook's staples all at once — the binding falls to crumbs as you take in the last page.",
+    "type": "book",
+    "weight": 1,
+    "value": 40,
+    "stackable": true,
+    "teaches": { "recipes": ["mushroom-soup", "cooked-skewer", "roasted-grubs"] }
+  },
   "chitin-plate": {
     "id": "chitin-plate",
     "name": "a chitin plate",

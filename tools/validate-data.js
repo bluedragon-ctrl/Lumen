@@ -143,6 +143,16 @@ function main() {
       errs.push(`item ${id}: recipe item needs a recipe`);
     if (it.recipe && !has(recipes, it.recipe))
       errs.push(`item ${id}: recipe references missing recipe ${it.recipe}`);
+    if (it.teaches) {
+      const tr = it.teaches.recipes || [];
+      const ts = it.teaches.spells || [];
+      if (!tr.length && !ts.length)
+        errs.push(`item ${id}: teaches needs at least one recipe or spell`);
+      for (const rid of tr)
+        if (!has(recipes, rid)) errs.push(`item ${id}: teaches.recipes references missing recipe ${rid}`);
+      for (const sid of ts)
+        if (!has(spells, sid)) errs.push(`item ${id}: teaches.spells references missing spell ${sid}`);
+    }
     const eff = it.consumable && it.consumable.effect;
     if (eff != null) {
       if (typeof eff !== "object")
