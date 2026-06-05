@@ -200,5 +200,15 @@
     ],
     "shards": 8,
     "output": { "template": "spiked-chitin-armor", "qty": 1 }
+  },
+  "smelt-silver": {
+    "id": "smelt-silver",
+    "name": "Silver Bar",
+    "station": "smelting",
+    "inputs": [
+      { "template": "silver-ore", "qty": 2 }
+    ],
+    "shards": 3,
+    "output": { "template": "silver-bar", "qty": 1 }
   }
 }

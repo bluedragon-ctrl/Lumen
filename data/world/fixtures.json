@@ -98,5 +98,18 @@
     "description": "Pale mushrooms crowd a damp seam of the wall, each cap breathing a weak, steady light. It is enough to draw the grazers in out of the black to feed — and enough, just, to see them by.",
     "type": "scenery",
     "emitsLight": 1
+  },
+  "silver-vein": {
+    "id": "silver-vein",
+    "name": "a silver vein",
+    "description": "A pale seam threads the dark rock, its colour distinct from the rust-red iron all around it — cooler, finer, harder-won. The ore runs thin and wants more effort than iron to loose, but what comes free is worth the swing.",
+    "type": "resource",
+    "mine": { "template": "silver-ore", "yield": 1, "charges": 4, "respawn": 120, "energy": 35 }
+  },
+  "umbral-pillar": {
+    "id": "umbral-pillar",
+    "name": "an Umbral pillar",
+    "description": "A squat, square-cut column of polished stone set into the floor of the cut — not natural, and not the prospectors' work either. Its four faces are scored with the same lightless-eye glyphs found on the old reliefs, cut with the same patient hand and the same indifference to whoever might one day read them. What it marked, or held, or meant, the rock keeps to itself.",
+    "type": "scenery"
   }
 }

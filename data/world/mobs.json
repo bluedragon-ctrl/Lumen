@@ -500,5 +500,58 @@
       { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] }
     ],
     "loot": []
+  },
+  "old-grinder": {
+    "id": "old-grinder",
+    "name": "the Old Grinder",
+    "description": "A boulder-sized stonebug so ancient it has worn a smooth hollow in the stone where it feeds, the rock polished mirror-flat by years of slow circuits. Its plates are layered with old growth — lichen, mineral stain, the calcified scars of a hundred encounters — and decades of grinding ore-rich rock to graze have lodged a knot of swallowed glimmer deep in its gut, turned slow to crystal. It does not hurry. It does not flee. It simply persists, and anything foolish enough to strike it discovers very quickly that persistence has teeth.",
+    "maxHp": 60,
+    "speed": 7,
+    "armour": 5,
+    "ward": 0,
+    "attributes": { "might": 9, "vitality": 14, "intellect": 0, "wits": 3, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "xp": 30,
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 6 },
+      { "type": "emote", "weight": 2, "messages": ["grazes along the worn hollow, mandibles working in a slow, ancient rhythm", "trundles a deliberate half-circle, plates grinding over smooth stone", "pauses, tucks its legs, and sits completely still — indistinguishable from a boulder"] },
+      { "type": "wander", "weight": 1, "verb": "grinds slowly forward", "scope": "zone" }
+    ],
+    "loot": [
+      { "template": "chitin-plate", "chance": 1 },
+      { "template": "bug-meat", "chance": 1 },
+      { "template": "dense-chitin-plate", "chance": 1 },
+      { "template": "crystal", "chance": 1 }
+    ]
+  },
+  "pallid-hunter": {
+    "id": "pallid-hunter",
+    "name": "a pallid hunter",
+    "description": "A lean, eyeless predator built for the total dark — long-limbed and nearly silent, navigating by scent and the faint vibration of footsteps through stone. Its bleached, bone-white hide is broken along the spine and flanks by dull nodes of glimmer grown into the flesh, lightless and cold until they are cut from it — crystal pushing up through old snow. Its kind belong deeper than this; the deep has been working on this one a long time, and that it climbed so high is its own quiet warning. Any light at all stops it in its tracks, and a bright source drives it into a frenzy of flinching and retreat. In the dark it is another matter entirely.",
+    "maxHp": 30,
+    "speed": 11,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 8, "intellect": 1, "wits": 6, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d6", "actionCost": 13 },
+    "lightBane": { "above": 2, "damage": "1d3" },
+    "xp": 18,
+    "shards": "2d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "wander", "weight": 3, "verb": "pads off into the dark", "scope": "zone" },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["lifts its head, nostrils working at the air", "tilts its skull toward you, listening with its whole body", "flinches from the edge of the light, then stills"] }
+    ],
+    "loot": [
+      { "template": "crystal", "chance": 0.6 }
+    ]
   }
 }

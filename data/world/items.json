@@ -347,6 +347,15 @@
     "value": 9,
     "stackable": true
   },
+  "dense-chitin-plate": {
+    "id": "dense-chitin-plate",
+    "name": "a slab of dense chitin",
+    "description": "A scute prised from one of the deep's oldest armoured things — not grey like ordinary stonebug plate, but dark-banded and near-black where mineral has worked into the shell over decades. It is heavier than it looks, notched a little by whatever took it off the beast, and rings like ceramic when you knock it.",
+    "type": "material",
+    "weight": 2,
+    "value": 28,
+    "stackable": true
+  },
   "chitin-spike": {
     "id": "chitin-spike",
     "name": "a chitin spike",
@@ -354,6 +363,24 @@
     "type": "material",
     "weight": 0,
     "value": 6,
+    "stackable": true
+  },
+  "silver-ore": {
+    "id": "silver-ore",
+    "name": "a chunk of silver ore",
+    "description": "A heavy, pale grey lump flecked with the faint lustre of raw silver. Rarer than iron down here, and finer — the seams run thin and deep, and the rock gives it up grudgingly.",
+    "type": "material",
+    "weight": 2,
+    "value": 20,
+    "stackable": true
+  },
+  "silver-bar": {
+    "id": "silver-bar",
+    "name": "a silver bar",
+    "description": "A pale ingot cast from smelted ore, cool and solid in the hand, bearing the faint marks of the mould. The smith's stock for fine work — harder-won than iron, and worth the getting.",
+    "type": "material",
+    "weight": 2,
+    "value": 60,
     "stackable": true
   },
   "slug-slime": {
