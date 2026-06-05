@@ -34,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   characters, and a new `armour.maxMana` bonus (mirroring `armour.maxHp`):
   equipping grants the new capacity, unequipping clamps it. Validator now
   checks `armour.maxMana` and `armour.attrMod`.
+- **Two silver attribute rings, crafted at the smithy.** A **Ring of Sight**
+  (`+1 Perception` — sharper aim, crit, and now searching) and a **Ring of Wits**
+  (`+1 Wits` — more Ward and evasion), each forged from **one silver bar**. Recipes
+  are gated behind schematics sold by Vesper. `search` now reads **effective**
+  Perception (so perception gear helps you spot hidden things, not just base
+  attribute). Both use the `finger` slot — only one ring worn at a time for now.
 - **Starsilver, a top-tier alloy.** Smelt **1 silver-bar + 1 glimmer-dust** into a
   **starsilver bar** (`alloy-starsilver`, smithing) — finer than glimmersteel and
   the first use for silver-bar. The recipe is gated behind a **starsilver

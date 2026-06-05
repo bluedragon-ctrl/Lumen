@@ -240,5 +240,25 @@
       { "template": "glimmer-dust", "qty": 1 }
     ],
     "output": { "template": "starsilver-bar", "qty": 1 }
+  },
+  "forge-ring-of-sight": {
+    "id": "forge-ring-of-sight",
+    "name": "Ring of Sight",
+    "station": "smithing",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "ring-of-sight", "qty": 1 }
+  },
+  "forge-ring-of-wits": {
+    "id": "forge-ring-of-wits",
+    "name": "Ring of Wits",
+    "station": "smithing",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "ring-of-wits", "qty": 1 }
   }
 }

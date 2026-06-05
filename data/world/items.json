@@ -111,6 +111,28 @@
     "value": 85,
     "armour": { "maxMana": 5 }
   },
+  "ring-of-sight": {
+    "id": "ring-of-sight",
+    "name": "a ring of sight",
+    "keywords": ["ring", "sight"],
+    "description": "A slim silver band graven with a fine, open eye. The pattern is an old silversmith's conceit, but worked to Vesper's method it does more than flatter — it sharpens the wearer's notice, the flick of movement at the dark's edge and the seam a careless delver walks straight past.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 90,
+    "armour": { "attrMod": { "perception": 1 } }
+  },
+  "ring-of-wits": {
+    "id": "ring-of-wits",
+    "name": "a ring of wits",
+    "keywords": ["ring", "wits"],
+    "description": "A slim silver band chased with a knot of interlacing lines that draws the eye in and never quite lets it settle. Worked to Vesper's method, it keeps the wearer's thoughts quick and their guard quicker — the small, steady edge that turns a blow aside or shrugs off a hostile weave.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 90,
+    "armour": { "attrMod": { "wits": 1 } }
+  },
   "shards": {
     "id": "shards",
     "name": "shards",
@@ -410,6 +432,26 @@
     "value": 120,
     "stackable": true,
     "recipe": "alloy-starsilver"
+  },
+  "schematic-ring-of-sight": {
+    "id": "schematic-ring-of-sight",
+    "name": "a sight-ring schematic",
+    "description": "A page of Vesper's careful hand — the graving and quiet working of a silver band that sharpens its wearer's notice. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "recipe": "forge-ring-of-sight"
+  },
+  "schematic-ring-of-wits": {
+    "id": "schematic-ring-of-wits",
+    "name": "a wits-ring schematic",
+    "description": "A page of Vesper's careful hand — the chasing and quiet working of a silver band that keeps its wearer's thoughts and guard quick. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "recipe": "forge-ring-of-wits"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",

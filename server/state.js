@@ -323,8 +323,8 @@ const isDiscovered = (player, key) => Array.isArray(player.discovered) && player
 /** Effective Perception for searching: the attribute scaled by how well the player
  *  sees the room — the same light tiers combat uses (darkness ×0.05, dim/glare
  *  ×0.5, clear ×1.0). So light is required to find what's hidden. */
-function effectivePerception(player, light) {
-  const per = (player.attributes && player.attributes.perception) || 0;
+function effectivePerception(world, player, light) {
+  const per = effectiveAttributes(world, player).perception || 0; // includes gear (e.g. a ring of sight)
   return per * hitChance(player.perception, light);
 }
 
@@ -932,7 +932,7 @@ class GameState {
     const roomId = player.location;
     const room = this.world.rooms[roomId];
     const rt = this.rooms[roomId];
-    const eff = effectivePerception(player, rt.light);
+    const eff = effectivePerception(this.world, player, rt.light);
     if (!Array.isArray(player.discovered)) player.discovered = [];
     const found = [];
 
