@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   matches. The priority list lives in `VERBS` in `server/commands.js`, ordered so
   `h` → `help` and `re` → `refuel`/`remove`/`recipes` (not `rest`, which is `res`).
 - **`pickup` as a synonym for `get`.**
+- **Console scrollback freeze + "new messages" pill.** Scrolling up to read
+  history no longer yanks you back down when new lines arrive (MUD-style split
+  scrollback). While you're reading backlog a floating `↓ N new messages` pill
+  shows how many lines have arrived; click it (or scroll back to the bottom) to
+  snap to the newest. Client-only (`client/app.js`, `client/styles.css`).
+- **Room-change dividers in the console.** Moving to a new room inserts a muted
+  hairline rule with the room name and depth (`Ossuary Stair · depth 3`), so the
+  console reads as per-room chapters. Keyed on room-id change, so `look` and
+  light flickers never spam dividers.
 
 ### Changed
 - **Lighting is now equip-driven (DikuMUD-style).** Equipping a fuelled light

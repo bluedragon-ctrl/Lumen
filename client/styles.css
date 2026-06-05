@@ -39,14 +39,38 @@ body {
 .pane { background: var(--panel); border: 1px solid var(--edge); border-radius: 6px; overflow: auto; }
 
 /* Console -------------------------------------------------------------- */
-#console { grid-area: console; padding: 8px 10px; }
-#log { white-space: pre-wrap; word-break: break-word; }
+#console { grid-area: console; padding: 8px 10px; display: flex; flex-direction: column; }
+#log { flex: 1 0 auto; white-space: pre-wrap; word-break: break-word; }
 #log > div { padding: 1px 0; }
 .line-system { color: var(--accent); }
 .line-error { color: var(--hostile); }
 .line-echo { color: var(--muted); }
 .line-log { color: var(--text); }
 .line-gold { color: var(--gold); font-weight: 600; text-shadow: 0 0 6px rgba(242, 193, 78, .35); }
+
+/* Room-change divider: a hairline rule with the room name + depth centred in it,
+   so scrollback reads as per-room chapters. */
+.room-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 8px 0 6px; color: var(--muted); font-size: 12px;
+}
+.room-divider::before, .room-divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--edge);
+}
+.room-divider span { white-space: nowrap; letter-spacing: .04em; }
+
+/* "↓ N new messages" pill — sticks to the bottom of the console while the player
+   reads backlog, jumps to newest on click. */
+#jump-pill {
+  position: sticky; bottom: 4px; align-self: center; z-index: 2;
+  margin-top: 6px;
+  padding: 3px 12px; border-radius: 999px;
+  border: 1px solid var(--accent); background: var(--panel);
+  color: var(--accent); font: inherit; font-size: 12px; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+}
+#jump-pill:hover { background: var(--accent); color: var(--bg); }
+#jump-pill[hidden] { display: none; }
 
 /* Inspect (room view, tinted by light) --------------------------------- */
 #inspect { grid-area: inspect; padding: 10px 12px; position: relative; transition: background .4s, color .4s, filter .4s; }

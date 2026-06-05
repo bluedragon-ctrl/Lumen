@@ -51,7 +51,13 @@ function handle(msg) {
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
     case "gold": addLine(msg.text, "gold"); break;
-    case "room": lastRoom = msg.room; renderRoom(msg.room); break;
+    case "room":
+      // A new room id means an actual move (not a look / light flicker) — mark
+      // it in the console so the scrollback reads in per-room chapters.
+      if (lastRoom && msg.room.id !== lastRoom.id) addRoomDivider(msg.room);
+      lastRoom = msg.room;
+      renderRoom(msg.room);
+      break;
     case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
     default: addLine(JSON.stringify(msg), "log");
@@ -59,13 +65,72 @@ function handle(msg) {
 }
 
 // --- Console ---------------------------------------------------------------
+// The console is the scrollback (#log) inside its scroll container (#console).
+// If the player has scrolled up to read history, new lines must NOT yank the
+// view back down (MUD "split scrollback"). Instead we freeze the view and
+// surface a "↓ N new messages" pill that jumps to the newest on click.
+const consoleEl = logEl.parentElement;
+let unreadCount = 0;
+
+// "Pinned" = the player is at (or within a hair of) the bottom, i.e. following
+// the live feed. 40px of slack absorbs sub-pixel rounding and line height.
+function atBottom() {
+  return consoleEl.scrollHeight - consoleEl.scrollTop - consoleEl.clientHeight < 40;
+}
+
+function jumpToBottom() {
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+  unreadCount = 0;
+  updateJumpPill();
+}
+
+function updateJumpPill() {
+  const pill = $("jump-pill");
+  if (!pill) return;
+  if (unreadCount > 0) {
+    pill.textContent = `↓ ${unreadCount} new message${unreadCount === 1 ? "" : "s"}`;
+    pill.hidden = false;
+  } else {
+    pill.hidden = true;
+  }
+}
+
+function appendToLog(el) {
+  const pinned = atBottom();
+  logEl.appendChild(el);
+  if (pinned) {
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  } else {
+    unreadCount++;
+    updateJumpPill();
+  }
+}
+
 function addLine(text, kind) {
   const div = document.createElement("div");
   div.className = "line-" + (kind || "log");
   div.textContent = text;
-  logEl.appendChild(div);
-  logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+  appendToLog(div);
 }
+
+// A muted "chapter break" in the console marking arrival in a new room. Inserted
+// only on an actual move (room id change), never on look / light flicker.
+function addRoomDivider(room) {
+  const div = document.createElement("div");
+  div.className = "room-divider";
+  const span = document.createElement("span");
+  span.textContent = room.depth != null ? `${room.name} · depth ${room.depth}` : room.name;
+  div.appendChild(span);
+  appendToLog(div);
+}
+
+// Re-pin (and clear the unread badge) once the player scrolls back to the bottom.
+consoleEl.addEventListener("scroll", () => {
+  if (atBottom() && unreadCount > 0) {
+    unreadCount = 0;
+    updateJumpPill();
+  }
+});
 
 // --- Inspect (room) --------------------------------------------------------
 function renderRoom(room) {
@@ -166,6 +231,13 @@ function renderExamine(e) {
 
 // Back to the live room view.
 document.getElementById("ex-back").addEventListener("click", () => sendCommand("look"));
+
+// Jump-to-newest pill: snap to the bottom and clear the unread badge, then return
+// focus to the command line so the player can keep typing.
+$("jump-pill").addEventListener("click", () => {
+  jumpToBottom();
+  cmdEl.focus();
+});
 
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {
