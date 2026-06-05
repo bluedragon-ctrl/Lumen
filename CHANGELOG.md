@@ -50,6 +50,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **a book of cooking** — Maeve sells it at the Lantern's Rest for 8 shards, and
   it teaches the three cooking recipes (mushroom soup, bug-meat skewer, roasted
   grubs) that fresh delvers no longer start with.
+- **Door fixtures (gated exits).** A new fixture `door` block (`{ dir, to, open }`)
+  turns a fixture into an openable passage: while open the room gains an exit in the
+  door's direction, while shut that way is closed. `use <door>` toggles it, and
+  `open`/`close <door>` set it explicitly. The data validator counts a door as a
+  graph edge, so rooms reachable only through one still validate. First use: a
+  **trapdoor** in the Mage's Shed opening down into Vesper's practice cellar.
+- **The Warded Cellar (`rim.training`).** A room beneath the Mage's Shed, reached by
+  opening the trapdoor — Vesper's spell-drill room, where a hostile **wisp** is
+  pinned inside a warding ring as a live casting target.
+- **The Ore Drift (`abyss.drift`).** A new first-floor abyss room south off the
+  Collapsed Gallery: a second **iron vein**, a glow-cap cluster that draws grazing
+  **stonebugs** and a **thornbug** (the thornbug's first spawn home — its chitin
+  spikes are now obtainable), and a lurking **cave-lurker** in ambush.
+- **Bonus durability on armour (`armour.maxHp`).** Armour pieces can now grant bonus
+  max HP while worn, folded into derived stats and refreshed on equip/unequip — heavy
+  gear that adds raw toughness on top of Vitality.
+- **Smithing gear & recipes.** Ten new forge items: iron **sword**, **mace**, and
+  now-craftable **cuirass**/**helm** (standard kit); a tanky **chitin** line (helm,
+  cuirass, heavy plate, maul) traded out of stonebug shell for armour on par with iron
+  plus extra hit points; and two thornbug-spike pieces — a **barbed flail** that bleeds
+  what it hits and **spiked chitin armour** that thorns back at melee.
+- **Two smithing books, sold by Tobin** at the Craftsmen's Row. **A book of basic
+  smithing** (12 shards) teaches the four iron recipes; **a book of chitin craft**
+  (80 shards) teaches the four chitin recipes plus the two thornbug-spike ones. The
+  smithing recipes are no longer start-known — these books are the path to them.
 - **Content quick-reference (`docs/templates-quickref.md`).** One annotated
   "golden record" per world-data type (item, mob, spell, recipe, fixture, room,
   player), with every field's rule inline and derived from the validator. The

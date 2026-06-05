@@ -378,6 +378,7 @@ class GameState {
         const inst = { id: entityId("fixture"), template: tmplId };
         const ft = this.world.fixtures[tmplId];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
+        if (ft && ft.door) inst.open = !!ft.door.open; // door fixtures carry open/shut state
         if (ft && ft.mine) { inst.charges = ft.mine.charges; inst.regrow = ft.mine.respawn; } // resource veins deplete as mined
         if (typeof f === "object" && f.hidden) { inst.hidden = f.hidden; inst.discoveryKey = discoveryKey(id, "fix", tmplId); }
         this.rooms[id].fixtures.push(inst);
@@ -759,6 +760,19 @@ class GameState {
     for (const s of expired) events.push(mkEvent(s));
   }
 
+  /** Bonus max HP from equipped gear (`armour.maxHp`) — lets heavy armour add
+   *  raw durability on top of Vitality. Summed across every equipped slot, so it
+   *  is folded into `deriveStats` and refreshed whenever gear changes. */
+  _equipHpBonus(player) {
+    let bonus = 0;
+    for (const inst of Object.values(player.equipment || {})) {
+      if (!inst) continue;
+      const t = this.world.items[inst.template];
+      if (t && t.armour && t.armour.maxHp) bonus += t.armour.maxHp;
+    }
+    return bonus;
+  }
+
   /**
    * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
    * max HP (Vitality), max Mana (Intellect), and the low-light sight band
@@ -770,7 +784,7 @@ class GameState {
    */
   deriveStats(player) {
     const a = player.attributes || {};
-    player.maxHp = (a.vitality || 0) * HP_PER_VITALITY;
+    player.maxHp = (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
     player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT;
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
     const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);

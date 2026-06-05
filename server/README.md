@@ -105,7 +105,8 @@ lightbug) still appear. Commands handled today: `look [target]`, movement
 `attack`/`kill`/`stop`, `search` (find hidden features), `equip`/`wield`/`wear`,
 `unequip`/`remove`, `light [item]`/`douse`, `list`/`buy`/`sell`, `recipes`/`craft`,
 `drink`/`quaff`,
-`use`/`switch` (operate a fixture here, else drink), `refuel`/`fill`, `help`, and admin
+`use`/`switch` (operate a fixture here, else drink), `open`/`close` (a door fixture),
+`refuel`/`fill`, `help`, and admin
 `@`-commands. (`light` auto-swaps a spent source for a fuelled one.) Effects
 visible to other players in the room (speech, arrivals/departures, picking
 things up, combat) are broadcast to them.
@@ -260,3 +261,13 @@ A fixture template may carry a `switch` block (`{ emitsLight, on }`); each insta
 holds live on/off state. `use`/`switch <fixture>` toggles it and recomputes room
 light — e.g. the iron lamp at the shaft mouth adds 3 light when on. `use` operates a
 matching fixture in the room, otherwise falls back to drinking.
+
+### Doors (gated exits)
+
+A fixture template may instead carry a `door` block (`{ dir, to, open }`); each
+instance holds live open/shut state. While **open**, the room gains an exit `dir → to`
+(movement and the room view both honour it); **shut**, that way reads as no exit at
+all. `use <fixture>` toggles it, and `open`/`close <fixture>` set it explicitly — e.g.
+the trapdoor in the Mage's Shed opens the way `down` to Vesper's warded cellar. The
+data validator treats a room's door fixture as a graph edge, so a room reachable only
+through a door still passes the reachability check.

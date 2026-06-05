@@ -129,7 +129,11 @@ function main() {
           errs.push(`item ${id}: weapon.damage.${kind} "${val}" is not valid dice notation`);
     }
     if (it.weapon) checkOnHit(it.weapon.onHit, `item ${id} weapon`); // player on-hit effects (forward-ready)
-    if (it.armour) { checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); } // player thorns / when-struck triggers (forward-ready)
+    if (it.armour) {
+      checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); // player thorns / when-struck triggers (forward-ready)
+      if (it.armour.maxHp != null && (typeof it.armour.maxHp !== "number" || it.armour.maxHp < 0))
+        errs.push(`item ${id}: armour.maxHp must be a non-negative number`); // bonus durability from heavy gear
+    }
     if (it.light && it.light.fuelItem) {
       if (!has(items, it.light.fuelItem)) errs.push(`item ${id}: light.fuelItem references missing template ${it.light.fuelItem}`);
       if (it.light.refuelPerUnit != null && (typeof it.light.refuelPerUnit !== "number" || it.light.refuelPerUnit <= 0))
@@ -233,6 +237,12 @@ function main() {
         errs.push(`fixture ${id}: switch.emitsLight must be a non-negative number`);
       if (f.switch.on != null && typeof f.switch.on !== "boolean")
         errs.push(`fixture ${id}: switch.on must be a boolean`);
+    }
+    // A door fixture gates an exit: open it (`use`/`open`) to walk its `dir` to `to`.
+    if (f.door) {
+      if (typeof f.door.dir !== "string" || !f.door.dir) errs.push(`fixture ${id}: door.dir must be a non-empty direction string`);
+      if (!f.door.to || !has(rooms, f.door.to)) errs.push(`fixture ${id}: door.to references missing room ${f.door.to}`);
+      if (f.door.open != null && typeof f.door.open !== "boolean") errs.push(`fixture ${id}: door.open must be a boolean`);
     }
     if (f.mine) {
       if (!has(items, f.mine.template)) errs.push(`fixture ${id}: mine.template missing item ${f.mine.template}`);
@@ -340,6 +350,11 @@ function main() {
     for (const dest of Object.values(rooms[c].exits || {})) stack.push(dest);
     // A hidden exit still connects rooms — a room reachable only via one is reachable.
     for (const h of Object.values(rooms[c].hiddenExits || {})) if (h && h.to) stack.push(h.to);
+    // A door fixture in the room is an edge too (you `use` it to open the way through).
+    for (const f of rooms[c].fixtures || []) {
+      const ft = fixtures[typeof f === "string" ? f : f.template];
+      if (ft && ft.door && ft.door.to) stack.push(ft.door.to);
+    }
   }
   for (const id of Object.keys(rooms))
     if (!seen.has(id)) errs.push(`room ${id}: NOT reachable from start (${player.startLocation})`);

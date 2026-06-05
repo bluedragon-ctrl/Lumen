@@ -220,7 +220,7 @@
       { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] }
     ],
     "shop": {
-      "sells": [{ "template": "schematic-searing-flare", "price": 5 }]
+      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "book-of-chitin-craft", "price": 80 }]
     }
   },
   "rim-hatcher": {

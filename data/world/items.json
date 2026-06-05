@@ -407,5 +407,109 @@
     "value": 90,
     "stackable": true,
     "scroll": { "spell": "summon-wisp" }
+  },
+  "iron-sword": {
+    "id": "iron-sword",
+    "name": "an iron sword",
+    "description": "A straight, single-edged blade of abyssal iron, plain at the hilt and honest in the hand. No finer than a smith's first hundred, but it bites as well as bought steel and a delver can forge their own.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 28,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
+  },
+  "iron-mace": {
+    "id": "iron-mace",
+    "name": "an iron mace",
+    "description": "A blunt iron head on a short haft — no edge to dull, just weight, swung hard. It rewards a strong arm, cracking through shell and bone that turn a blade aside.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 3,
+    "value": 30,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 3 } }
+  },
+  "chitin-helm": {
+    "id": "chitin-helm",
+    "name": "a chitin helm",
+    "description": "A cap of curved stonebug scutes lashed over a leather lining, light for the cover it gives. It turns a blow as well as beaten iron and rides easier — but the shell closes close around the ears, and a delver hears the dark a little less keenly for it.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 2,
+    "value": 24,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 3, "attrMod": { "wits": -1 } }
+  },
+  "chitin-cuirass": {
+    "id": "chitin-cuirass",
+    "name": "a chitin cuirass",
+    "description": "Overlapping plates of grey stonebug shell, boiled hard and stitched onto a hide backing so they ride the body like a second carapace. It soaks up punishment a leather jerkin never could, lending a delver the grazer's own stubborn endurance — at the cost of some of their ear for the dark.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 6,
+    "value": 40,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 6, "attrMod": { "wits": -1 } }
+  },
+  "heavy-chitin-plate": {
+    "id": "heavy-chitin-plate",
+    "name": "a suit of heavy chitin plate",
+    "description": "A full harness of the thickest stonebug scutes, layered double and banded with iron until it stands near as stiff as the creature it came from. Almost nothing gets through it, and it carries the weight of a small wall — a delver inside it shrugs off blows that would fell them, but lumbers half-deaf and half-blind to the dark closing in.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 9,
+    "value": 60,
+    "armour": { "armour": 3, "ward": 0, "speedPenalty": 0, "maxHp": 5, "attrMod": { "wits": -3 } }
+  },
+  "chitin-maul": {
+    "id": "chitin-maul",
+    "name": "a chitin maul",
+    "description": "A great two-fisted head of fused stonebug plate, banded to a stout haft. It is heavier than it looks and slow off the mark, but a delver who puts their back into it brings the whole weight of the deep's own armour down on a single point.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 4,
+    "value": 34,
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 14, "scale": { "attr": "might", "per": 3 } }
+  },
+  "barbed-flail": {
+    "id": "barbed-flail",
+    "name": "a barbed flail",
+    "description": "A knot of thornbug spikes bound to a swinging head on a short chain — it does not so much strike as tear, leaving ragged, weeping wounds that will not close. Quick and light, it asks little strength; what it asks for is time, and a foe with nowhere to bleed out.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 32,
+    "weapon": {
+      "damage": { "physical": "1d4" },
+      "actionCost": 11,
+      "onHit": [{ "type": "damage-over-time", "name": "bleed", "damage": "1d2", "duration": 4, "chance": 1 }]
+    }
+  },
+  "spiked-chitin-armor": {
+    "id": "spiked-chitin-armor",
+    "name": "spiked chitin armour",
+    "description": "A stonebug-shell cuirass studded all over with thornbug spikes, points turned outward like a cornered pillbug's. It guards a delver no worse than plain chitin — and makes the dark pay for laying hands on them, every blow drawing its own blood back on the barbs.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 6,
+    "value": 42,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 4, "attrMod": { "wits": -1 }, "spikes": { "damage": "1d3", "chance": 1 } }
+  },
+  "book-of-basic-smithing": {
+    "id": "book-of-basic-smithing",
+    "name": "a book of basic smithing",
+    "description": "A thin, soot-thumbed primer in Tobin's cramped hand — the honest fundamentals of the forge, ore to edge, with diagrams of a plain sword, a mace, a cuirass and a helm any delver could beat out with iron and patience. Study it to fix the lot in memory at once; the binding gives up its pages as you take in the last.",
+    "type": "book",
+    "weight": 1,
+    "value": 60,
+    "stackable": true,
+    "teaches": { "recipes": ["forge-iron-sword", "forge-iron-mace", "forge-iron-cuirass", "forge-iron-helm"] }
+  },
+  "book-of-chitin-craft": {
+    "id": "book-of-chitin-craft",
+    "name": "a book of chitin craft",
+    "description": "A heavier, hard-won treatise — half Tobin's notes, half borrowed from older hands — on working the deep's own armour: how to boil and band stonebug plate into gear that turns a blade, and how to set a thornbug's barbs so they bite back. Rare knowledge, and priced like it. Study it to learn the whole tanky line at once.",
+    "type": "book",
+    "weight": 1,
+    "value": 400,
+    "stackable": true,
+    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
   }
 }
