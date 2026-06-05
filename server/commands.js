@@ -22,6 +22,25 @@ const DIRS = ["north", "south", "east", "west", "up", "down"];
 const DIR_ALIAS = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
 const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
 
+// Every command word the dispatcher understands, in PRIORITY order. A typed verb
+// that isn't an exact match resolves to the FIRST entry it is a prefix of
+// (DikuMUD-style abbreviation) — so common verbs precede rarer ones that share a
+// prefix (e.g. `look` before `list`, `light` before `list`, `get` before `go`,
+// `drop` before `drink`). Exact matches (incl. single-letter aliases like l/i/k/c
+// and directions, handled earlier) always win over prefixes. KEEP IN SYNC with the
+// switch in execute(): every word here must have a matching case there, and vice
+// versa, or an abbreviation will resolve to an "Unknown command".
+const VERBS = [
+  "look", "examine", "exam", "search", "go", "move", "get", "take", "drop",
+  "inventory", "inv", "attack", "kill", "stop", "sit", "rest", "sleep", "stand",
+  "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
+  "light", "ignite", "douse", "extinguish", "list", "shop", "wares", "buy", "sell",
+  "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
+  "mine", "dig", "recipes", "say", "emote", "me", "equip", "wield", "wear", "hold",
+  "unequip", "remove", "help",
+];
+const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-letter aliases
+
 const HELP = [
   "Commands:",
   "  look | examine | x [target] — view the room, or examine something",
@@ -54,6 +73,9 @@ const HELP = [
   "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
   "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
   "  help | ?              — this list",
+  "",
+  "Commands can be shortened to any unambiguous prefix (exa→examine, cr→craft).",
+  "Target things by any word in their name (kill innkeeper, get glimmerstone).",
 ].join("\n");
 
 const selfAndViews = (state, player, line) => [
@@ -73,10 +95,34 @@ function announceLevelUps(player, ups, ctx, out) {
   }
 }
 
-// Find an item instance by id (exact) or name (substring) within a list.
+// Words too generic to single out a target — dropped when deriving keywords
+// from a display name (so "a sliver of glimmerstone" yields sliver/glimmerstone).
+const STOP_WORDS = new Set(["a", "an", "the", "of", "some", "and", "with", "to"]);
+
+// Significant lowercase tokens from a display name, used as fallback keywords.
+function nameTokens(name) {
+  return (name || "").toLowerCase().split(/[^a-z0-9]+/).filter((t) => t && !STOP_WORDS.has(t));
+}
+
+// Does query `q` name a thing called `name` (with optional authored `keywords`
+// and instance/template `id`)? Resolution order:
+//   1. exact id match
+//   2. every query word is (a prefix of) some keyword — authored `keywords` if
+//      present, else words derived from the display name. Multi-word queries use
+//      AND semantics, so "glimmer crystal" needs both keywords present.
+//   3. legacy fallback: `q` is a substring of the full display name.
+function matchesQuery(q, name, keywords, id) {
+  const ql = (q || "").trim().toLowerCase();
+  if (!ql) return false;
+  if (id && String(id).toLowerCase() === ql) return true;
+  const kws = keywords && keywords.length ? keywords.map((k) => k.toLowerCase()) : nameTokens(name);
+  if (ql.split(/\s+/).every((qw) => kws.some((kw) => kw === qw || kw.startsWith(qw)))) return true;
+  return (name || "").toLowerCase().includes(ql);
+}
+
+// Find an item instance matching `q` (by id, keyword, or name) within a list.
 function findItem(list, world, q) {
-  const ql = q.toLowerCase();
-  return list.findIndex((i) => i.id.toLowerCase() === ql || world.items[i.template].name.toLowerCase().includes(ql));
+  return list.findIndex((i) => matchesQuery(q, world.items[i.template].name, world.items[i.template].keywords, i.id));
 }
 
 function addToInventory(player, inst, world) {
@@ -495,9 +541,8 @@ function drink(state, player, arg, ctx, verb = "use") {
 function craft(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return [{ type: "error", text: "Craft what? Try `recipes`." }];
-  const ql = arg.toLowerCase();
   const entry = Object.entries(w.recipes).find(
-    ([id, r]) => id.toLowerCase() === ql || (r.name && r.name.toLowerCase().includes(ql))
+    ([id, r]) => matchesQuery(arg, r.name || id, r.keywords, id)
   );
   if (!entry) return [{ type: "error", text: `You know no recipe for "${arg}".` }];
   const [rid, r] = entry;
@@ -616,10 +661,9 @@ function attack(state, player, arg) {
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
-  const ql = arg.toLowerCase();
   const mob = rt.mobs.find((m) => {
     const t = state.world.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
@@ -730,7 +774,7 @@ function cast(state, player, arg, ctx) {
     const phrase = tokens.slice(0, n).join(" ").toLowerCase();
     const hit = known.find((id) => {
       const s = w.spells[id];
-      return s && (id.toLowerCase() === phrase || s.name.toLowerCase() === phrase);
+      return s && matchesQuery(phrase, s.name, s.keywords, id);
     });
     if (hit) { spellId = hit; rest = tokens.slice(n); }
   }
@@ -756,10 +800,9 @@ function cast(state, player, arg, ctx) {
   if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
-  const ql = targetQ.toLowerCase();
   const mob = rt.mobs.find((m) => {
     const t = w.mobs[m.template];
-    return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+    return (see || t.emitsLight) && matchesQuery(targetQ, t.name, t.keywords, m.id);
   });
   if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
 
@@ -823,7 +866,7 @@ function castSupport(state, player, spell, targetQ, ctx) {
     target = { kind: "player", actor: player, id: player.id, name: "yourself", isSelf: true };
   } else {
     const other = [...state.playersIn(player.location)].find(
-      (o) => o.id !== player.id && o.hp > 0 && o.name.toLowerCase().includes(ql)
+      (o) => o.id !== player.id && o.hp > 0 && matchesQuery(ql, o.name, null, o.id)
     );
     if (other) {
       if (!see) return [{ type: "error", text: "It is too dark to make out your target." }];
@@ -831,7 +874,7 @@ function castSupport(state, player, spell, targetQ, ctx) {
     } else {
       const mob = rt.mobs.find((m) => {
         const t = w.mobs[m.template];
-        return (see || t.emitsLight) && (m.id.toLowerCase() === ql || t.name.toLowerCase().includes(ql));
+        return (see || t.emitsLight) && matchesQuery(ql, t.name, t.keywords, m.id);
       });
       if (mob) {
         const mt = w.mobs[mob.template];
@@ -989,6 +1032,12 @@ function execute(state, player, input, ctx = NOOP_CTX) {
   if (verb.startsWith("@")) return handleAdmin(state, player, verb, arg, ctx);
   if (DIR_ALIAS[verb]) verb = DIR_ALIAS[verb];
   if (DIRS.includes(verb)) return move(state, player, verb, ctx);
+  // DikuMUD-style abbreviation: resolve a partial verb to the first command it
+  // prefixes (priority order in VERBS). Exact verbs/aliases are left untouched.
+  if (verb && !VERB_SET.has(verb)) {
+    const hit = VERBS.find((v) => v.startsWith(verb));
+    if (hit) verb = hit;
+  }
 
   switch (verb) {
     case "":

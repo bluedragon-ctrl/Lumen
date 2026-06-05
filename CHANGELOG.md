@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Command abbreviation (DikuMUD-style).** Any command can be shortened to an
+  unambiguous prefix — `exa` → `examine`, `rec` → `recipes`, `cr` → `craft`,
+  `lig` → `light`. Ambiguous prefixes resolve by a deliberate priority order (so
+  `dr` → `drop`, `se` → `search`, `li` → `light`); the existing single-letter
+  aliases (`l`, `i`, `k`, `c`, `x`) and direction shortcuts still win as exact
+  matches. The priority list lives in `VERBS` in `server/commands.js`.
+- **Keyword targeting for items, mobs, spells & recipes.** Targets now match on
+  any significant word in their name, not just a leading substring — so
+  `kill innkeeper` hits *Maeve the innkeeper*, and `get glimmerstone` picks up
+  *a sliver of glimmerstone*. Each query word may also be a prefix (`get torc`),
+  and multi-word queries require all words present. An optional `keywords` array
+  on any item/mob/spell/recipe template overrides the auto-derived words for
+  synonyms (e.g. listing `"ore"` on a vein chunk); when absent, keywords are
+  derived from the display name (articles like *a/the/of* dropped). Substring
+  matching remains as a final fallback, so nothing that worked before breaks.
 - **Assisting mobs (`helper` flag).** A mob marked `helper` piles into any fight a
   same-faction ally is already in — the moment an ally it can **see** is trading
   blows with an enemy, the helper engages that enemy too (and announces it with a
