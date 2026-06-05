@@ -20,8 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bioluminescent Umbral trader — in his dim, lamp-lit hollow (`Mallki's Hollow`)
   with a tended fungus garden behind it (`The Sunless Garden`), where farmed grubs
   supply bait on the floor itself. New wander-zones `third` and `third-umbral`.
-  (Umbral names draw on Quechua roots; Mallki's trade stock is staged for a
-  later pass.)
+  (Umbral names draw on Quechua roots.)
+- **Glimmer-craft moves to the deep.** The two glimmer-craft scrolls
+  (**Glimmer Spike**, **Glimmerskin** — the shard-burning Umbral art) leave
+  Vesper's shelf at the Rim and are now sold only by **Mallki** on the third
+  floor, gating the heaviest spells behind reaching the first Umbral. He also
+  takes over the **Book of Chitin Craft** (was Tobin the smith's), a fitting
+  trade for a deep-dweller. Vesper still sells the human-tradition scrolls.
 - **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
   work a baited line in a `fish` resource fixture. Each cast spends a **grub** as
   bait (lost to the water, catch or no) plus energy, and rolls the fixture's
