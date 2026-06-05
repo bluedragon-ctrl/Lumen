@@ -111,6 +111,30 @@ A map of `roomId → room`.
 
 ---
 
+## Targeting (keywords & abbreviation)
+
+How typed input resolves to a thing or a command — shared by every command that
+takes a target (`get`, `drop`, `equip`, `kill`, `cast`, `buy`, `craft`, …).
+
+**Targets (items, mobs, spells, recipes).** A query matches a target when, in order:
+
+1. it equals the target's `id` exactly; else
+2. every word of the query is (a prefix of) one of the target's **keywords** —
+   the optional `keywords` array if present, otherwise the significant words
+   derived from `name` (articles/prepositions like *a/an/the/of/with* dropped).
+   Multi-word queries use **AND** semantics, so `glimmer crystal` needs both; else
+3. the query is a substring of the full `name` (legacy fallback).
+
+So *Maeve the innkeeper* answers to `innkeeper`, *a sliver of glimmerstone* to
+`glimmerstone` or `sliver` or `glimm`. Add a `keywords` array only for synonyms the
+name lacks. (Ordinals like `2.rock` are **not** supported — the first match wins.)
+
+**Commands.** A verb that isn't an exact match (or alias, or direction) resolves to
+the first command it is a **prefix** of, in the priority order of `VERBS` in
+`server/commands.js` — DikuMUD-style abbreviation (`exa`→`examine`, `cr`→`craft`).
+
+---
+
 ## Item template (static) — `data/world/items.json`
 
 A map of `itemId → template`. Common fields plus type-specific blocks.
@@ -146,6 +170,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | Field        | Type    | Notes |
 |--------------|---------|-------|
 | `id`,`name`,`description` | string | `name` is the noun phrase used in text. |
+| `keywords`   | string[]? | Words a player can target this by (`get <kw>`, `kill <kw>`, …). **Optional** — when omitted, the significant words of `name` are used automatically (articles/prepositions like *a/the/of* dropped), so a sliver of glimmerstone already answers to `sliver` and `glimmerstone`. Set it only to add synonyms the name doesn't contain (e.g. `["ore","rock"]`). See [Targeting](#targeting-keywords--abbreviation). |
 | `type`       | enum    | `light` \| `weapon` \| `armour` \| `consumable` \| `material` \| `currency` \| `misc`. `currency` (e.g. `shards`) is gathered into the player's balance by `get`, not stowed in inventory. |
 | `slot`       | enum?   | Equip slot: `hand` \| `body` \| `head` \| `light` … (omit if not equippable). |
 | `weight`     | number  | For future carry-capacity. |

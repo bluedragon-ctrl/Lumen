@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Command abbreviation (DikuMUD-style).** Any command can be shortened to an
+  unambiguous prefix — `exa` → `examine`, `rec` → `recipes`, `cr` → `craft`,
+  `lig` → `light`. Ambiguous prefixes resolve by a deliberate priority order (so
+  `dr` → `drop`, `se` → `search`, `li` → `light`); the existing single-letter
+  aliases (`l`, `i`, `k`, `c`, `x`) and direction shortcuts still win as exact
+  matches. The priority list lives in `VERBS` in `server/commands.js`, ordered so
+  `h` → `help` and `re` → `refuel`/`remove`/`recipes` (not `rest`, which is `res`).
+- **`pickup` as a synonym for `get`.**
+
+### Changed
+- **Lighting is now equip-driven (DikuMUD-style).** Equipping a fuelled light
+  source into the `light` slot **kindles it automatically** — no separate "light it"
+  step. `use <source>` toggles a carried/equipped source between lit and doused (to
+  conserve fuel), equipping it first if it's still in your pack. Works in the dark,
+  since lighting a torch is how you escape it.
+- **New characters start unequipped.** The starting short-sword now begins in the
+  pack rather than wielded; all equipment slots (`hand`/`body`/`head`/`light`) are
+  seeded empty so `unequip <slot>` works and gear can be equipped from a fresh
+  character. (You spawn at the lit rim, so you can `equip`/light up before descending.)
+- **Dropped the `hold` alias for `equip`.** Lumen's `equip` already routes an item
+  to whatever slot it declares (incl. the `light` slot), so `hold` was pure
+  duplication; `equip`/`wield`/`wear` remain.
+
+### Removed
+- **`light` / `ignite` / `douse` / `extinguish` commands** — folded into
+  `equip` (kindles) and `use <source>` (toggles); see above.
+- **`go` / `move` commands** — movement is direction words and `n/s/e/w/u/d`
+  (DikuMUD has no `go`). Bonus: `g` now abbreviates to `get`, `m` to `make`.
+- **Keyword targeting for items, mobs, spells & recipes.** Targets now match on
+  any significant word in their name, not just a leading substring — so
+  `kill innkeeper` hits *Maeve the innkeeper*, and `get glimmerstone` picks up
+  *a sliver of glimmerstone*. Each query word may also be a prefix (`get torc`),
+  and multi-word queries require all words present. An optional `keywords` array
+  on any item/mob/spell/recipe template overrides the auto-derived words for
+  synonyms (e.g. listing `"ore"` on a vein chunk); when absent, keywords are
+  derived from the display name (articles like *a/the/of* dropped). Substring
+  matching remains as a final fallback, so nothing that worked before breaks.
 - **Teaching books (`teaches` item block).** An item with
   `teaches: { recipes?: [...], spells?: [...] }` is a book: `learn`/`study`
   teaches every listed recipe and spell the player doesn't already know, then
