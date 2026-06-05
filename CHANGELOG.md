@@ -34,12 +34,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   characters, and a new `armour.maxMana` bonus (mirroring `armour.maxHp`):
   equipping grants the new capacity, unequipping clamps it. Validator now
   checks `armour.maxMana` and `armour.attrMod`.
+- **Starsilver, a top-tier alloy.** Smelt **1 silver-bar + 1 glimmer-dust** into a
+  **starsilver bar** (`alloy-starsilver`, smithing) — finer than glimmersteel and
+  the first use for silver-bar. The recipe is gated behind a **starsilver
+  schematic** sold by Vesper. (Flavour nods at the "frozen starlight" legend
+  without asserting it — glimmer's nature stays a mystery.) Stock material for
+  future gear; no starsilver gear yet.
 - **Two glimmersteel craftables.** A **Glimmersteel Sword** (`+1 Might`,
   `1d8 + Might/2` — a per-weapon `scale` block) forged at the smithy, and a
-  **Glimmersteel Staff** (`+1 Intellect`, `+5 max Mana` — a caster focus, light
-  `1d4`) attuned at the alchemist's bench. Each costs **two glimmersteel bars**.
-  The recipes are taught by schematics: the sword schematic is sold by **Tobin**
-  at the Rim, the staff schematic by **Vesper**. First gear to carry both a
+  **Glimmersteel Staff** (`+1 Intellect`, `+5 max Mana` — a caster focus,
+  `1d6 + Might/3`). Both are forged at the smithy and each costs **two
+  glimmersteel bars**. The recipes are taught by schematics: the sword schematic
+  is sold by **Tobin** at the Rim, the staff schematic by **Vesper**. First gear to carry both a
   `weapon` and an `armour` (bonus) block on one item.
 - **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
   work a baited line in a `fish` resource fixture. Each cast spends a **grub** as

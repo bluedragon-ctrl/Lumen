@@ -349,8 +349,17 @@
     "slot": "hand",
     "weight": 2,
     "value": 180,
-    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 },
+    "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12 },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
+  },
+  "starsilver-bar": {
+    "id": "starsilver-bar",
+    "name": "a starsilver bar",
+    "description": "Silver smelted through with glimmer dust until the metal holds a cold, captive shimmer all its own — frozen starlight, the old tales would have it, though no smith alive can say what glimmer truly is. Dearer than glimmersteel and finer still; stock for the rarest gear the deep allows.",
+    "type": "material",
+    "weight": 2,
+    "value": 140,
+    "stackable": true
   },
   "searing-flare": {
     "id": "searing-flare",
@@ -391,6 +400,16 @@
     "value": 80,
     "stackable": true,
     "recipe": "craft-glimmersteel-staff"
+  },
+  "schematic-starsilver": {
+    "id": "schematic-starsilver",
+    "name": "a starsilver schematic",
+    "description": "A page of Vesper's careful hand — the trick of folding glimmer dust into molten silver so the light takes and holds rather than burning off in the heat. She'll tell you the 'frozen starlight' is only a story; the method, she'll grant, is real enough. Study it to fix the alloy in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 120,
+    "stackable": true,
+    "recipe": "alloy-starsilver"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",

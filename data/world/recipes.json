@@ -224,11 +224,21 @@
   "craft-glimmersteel-staff": {
     "id": "craft-glimmersteel-staff",
     "name": "Glimmersteel Staff",
-    "station": "alchemy",
+    "station": "smithing",
     "inputs": [
       { "template": "glimmersteel-bar", "qty": 2 }
     ],
     "shards": 10,
     "output": { "template": "glimmersteel-staff", "qty": 1 }
+  },
+  "alloy-starsilver": {
+    "id": "alloy-starsilver",
+    "name": "Starsilver Bar",
+    "station": "smelting",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "output": { "template": "starsilver-bar", "qty": 1 }
   }
 }
