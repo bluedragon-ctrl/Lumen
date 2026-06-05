@@ -330,6 +330,28 @@
     "value": 90,
     "stackable": true
   },
+  "glimmersteel-sword": {
+    "id": "glimmersteel-sword",
+    "name": "a glimmersteel sword",
+    "description": "A long blade forged from glimmer-alloyed steel, its edge holding a faint, cold inner light that never quite fades. Lighter and meaner than honest iron, and balanced so finely it seems to lend strength to the arm that swings it. A small fortune in bars, and rarer still in the skill to work them.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d8" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 12 },
+    "armour": { "attrMod": { "might": 1 } }
+  },
+  "glimmersteel-staff": {
+    "id": "glimmersteel-staff",
+    "name": "a glimmersteel staff",
+    "description": "A slender rod of glimmer-alloyed steel, cool to the grip, a vein of captive light running its length and pooling bright at the head. It is no great weapon — but a focus: held while casting it steadies the will and deepens the well a caster draws from. Arcane work, half-forged and half-attuned.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 },
+    "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
+  },
   "searing-flare": {
     "id": "searing-flare",
     "name": "a searing flare",
@@ -349,6 +371,26 @@
     "value": 5,
     "stackable": true,
     "recipe": "searing-flare"
+  },
+  "schematic-glimmersteel-sword": {
+    "id": "schematic-glimmersteel-sword",
+    "name": "a glimmersteel sword schematic",
+    "description": "A careful smith's diagram on oiled vellum — the folding and quenching of glimmer-alloyed steel into a blade that keeps its cold edge. Tobin charges dearly for it; the method is hard-won and the stock dearer. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 80,
+    "stackable": true,
+    "recipe": "forge-glimmersteel-sword"
+  },
+  "schematic-glimmersteel-staff": {
+    "id": "schematic-glimmersteel-staff",
+    "name": "a glimmersteel staff schematic",
+    "description": "A page of Vesper's precise hand — the working and arcane attuning of glimmersteel into a caster's focus, the channel-lines that let it hold and lend back the will. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 80,
+    "stackable": true,
+    "recipe": "craft-glimmersteel-staff"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",

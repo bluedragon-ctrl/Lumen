@@ -210,5 +210,25 @@
     ],
     "shards": 3,
     "output": { "template": "silver-bar", "qty": 1 }
+  },
+  "forge-glimmersteel-sword": {
+    "id": "forge-glimmersteel-sword",
+    "name": "Glimmersteel Sword",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 10,
+    "output": { "template": "glimmersteel-sword", "qty": 1 }
+  },
+  "craft-glimmersteel-staff": {
+    "id": "craft-glimmersteel-staff",
+    "name": "Glimmersteel Staff",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 10,
+    "output": { "template": "glimmersteel-staff", "qty": 1 }
   }
 }

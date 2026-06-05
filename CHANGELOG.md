@@ -34,6 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   characters, and a new `armour.maxMana` bonus (mirroring `armour.maxHp`):
   equipping grants the new capacity, unequipping clamps it. Validator now
   checks `armour.maxMana` and `armour.attrMod`.
+- **Two glimmersteel craftables.** A **Glimmersteel Sword** (`+1 Might`,
+  `1d8 + Might/2` — a per-weapon `scale` block) forged at the smithy, and a
+  **Glimmersteel Staff** (`+1 Intellect`, `+5 max Mana` — a caster focus, light
+  `1d4`) attuned at the alchemist's bench. Each costs **two glimmersteel bars**.
+  The recipes are taught by schematics: the sword schematic is sold by **Tobin**
+  at the Rim, the staff schematic by **Vesper**. First gear to carry both a
+  `weapon` and an `armour` (bonus) block on one item.
 - **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
   work a baited line in a `fish` resource fixture. Each cast spends a **grub** as
   bait (lost to the water, catch or no) plus energy, and rolls the fixture's
