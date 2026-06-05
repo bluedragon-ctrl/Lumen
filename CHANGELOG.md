@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step. `use <source>` toggles a carried/equipped source between lit and doused (to
   conserve fuel), equipping it first if it's still in your pack. Works in the dark,
   since lighting a torch is how you escape it.
+- **New characters start unequipped.** The starting short-sword now begins in the
+  pack rather than wielded; all equipment slots (`hand`/`body`/`head`/`light`) are
+  seeded empty so `unequip <slot>` works and gear can be equipped from a fresh
+  character. (You spawn at the lit rim, so you can `equip`/light up before descending.)
 - **Dropped the `hold` alias for `equip`.** Lumen's `equip` already routes an item
   to whatever slot it declares (incl. the `light` slot), so `hold` was pure
   duplication; `equip`/`wield`/`wear` remain.
