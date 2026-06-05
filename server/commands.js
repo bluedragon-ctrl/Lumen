@@ -835,6 +835,10 @@ function spellList(state, player) {
       if (e.ward) parts.push(`ward ${fmtAmount(e.ward)}`);
       tail = ` — ${parts.join(", ")} for ${fmtTicks(e.duration || 0)}`;
     }
+    else if (e.type === "emit-light")
+      tail = ` — sheds ${e.magnitude || 1} light for ${fmtTicks(e.duration || 0)}`;
+    else if (e.type === "sleep")
+      tail = ` — lulls a foe to sleep (resisted by Ward, broken by any blow)`;
     const cost = `${s.manaCost || 0} mana${s.shardCost ? ` + ${s.shardCost} shards` : ""}`;
     lines.push(`  ${s.name}: ${cost}${tail}`);
   }
@@ -898,6 +902,14 @@ function cast(state, player, arg, ctx) {
     ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     return selfAndViews(state, player, `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`, "combat");
+  }
+
+  if (res.slept) {
+    // Don't let the caster's own queued swing instantly rouse the sleeper.
+    if (player.pending && player.pending.targetId === mob.id) player.pending = null;
+    ctx.toRoom(player.location, { type: "combat", text: `${player.name} weaves a drowsy hush over ${mt.name}, and it sinks into slumber.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You weave ${spell.name} over ${mt.name}; its limbs go slack and it sinks into a deep slumber.`, "combat");
   }
 
   if (res.killed) {
@@ -991,6 +1003,9 @@ function castSupport(state, player, spell, targetQ, ctx) {
     if (res.ward) parts.push(`+${res.ward} ward`);
     const grant = parts.length ? parts.join(", ") : "a faint sheen";
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a crust of hardened glimmer grants ${grant} for ${fmtTicks(res.duration)}.`);
+  }
+  if (res.effect === "emit-light") {
+    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a mote of light kindles overhead, shedding ${res.perPulse} light for ${fmtTicks(res.duration)}.`);
   }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
 }

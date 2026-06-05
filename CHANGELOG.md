@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Five new spells.** **Candlelight** — a 3-mana cantrip that sheds 1 light for a
+  minute (an `emit-light` weave; cast on self/ally/creature). **Mage Armour** —
+  a shard-free wardweave granting `1 + Intellect/10` armour for 3 minutes
+  (`protect`, renews on recast). **Sleep** — a non-damaging hex that drops a foe
+  into slumber (sets posture `sleeping`, inert until any blow rouses it; resisted
+  wholesale by Ward, draws no threat on success). **Bolt** — a 7-mana magical
+  attack, `1d8 + Intellect/3`, stronger than Spark. **Glimmer Spike** — the
+  heaviest single strike, `2d6 + Intellect/3` for 8 mana **and 3 shards** (glimmer
+  burned in the cast). Each has a learnable scroll sold by Vesper the glimmer-mage.
+  Adds a `sleep` spell-effect primitive and wires `shardCost` into hostile casts.
 - **Command abbreviation (DikuMUD-style).** Any command can be shortened to an
   unambiguous prefix — `exa` → `examine`, `rec` → `recipes`, `cr` → `craft`,
   `lig` → `light`. Ambiguous prefixes resolve by a deliberate priority order (so
@@ -25,6 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   light flickers never spam dividers.
 
 ### Changed
+- **Magic now has two named traditions in the lore** (`docs/lore.md`): **human**
+  magic is standard fantasy paid for in mana alone, while **Umbral** glimmer-craft
+  always **burns shards** alongside mana. Rule of thumb for authors: a spell with a
+  `shardCost` is glimmer-craft; mana-only spells are human and keep glimmer out of
+  their flavour. Reworded **Regeneration** and **Summon Wisp** (both mana-only) so
+  their flavour no longer leans on glimmer-as-medium.
 - **Standardised console message colours into a calm, semantic palette.** Warm
   tones are now earned by real game outcomes — **combat is soft rose**, **levelling
   stays gold**; the **gray family carries meta/plumbing** (your own commands, system

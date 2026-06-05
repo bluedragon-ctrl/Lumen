@@ -139,7 +139,7 @@ see at all (0 = darkvision); `dimBelow` = light for clear sight (partial between
 }
 ```
 
-Effect shapes (`effect.type` ∈ `damage | emit-light | heal-over-time | protect | summon`):
+Effect shapes (`effect.type` ∈ `damage | emit-light | heal-over-time | protect | sleep | summon`):
 
 ```jsonc
 // damage — instantaneous; optional attribute scaling
@@ -156,6 +156,9 @@ Effect shapes (`effect.type` ∈ `damage | emit-light | heal-over-time | protect
   "ward":   { "base": 0, "scale": { "attr": "intellect", "per": 1 } }, "good": true }
 // summon — conjure a mob (must exist) for a time
 { "type": "summon", "mob": "wisp", "count": 1, "duration": 180, "group": "summon-wisp" }
+// sleep — hostile, non-damaging; sets the target's posture to sleeping (inert
+//   until any blow rouses it). Resisted wholesale by Ward; draws no threat on success.
+{ "type": "sleep", "name": "Sleep" }
 ```
 
 `{ base, scale }` amount: `scale` must be `{ attr, per }` with `per > 0`. Durations

@@ -11,7 +11,7 @@
   "regeneration": {
     "id": "regeneration",
     "name": "Regeneration",
-    "description": "A slow weave of mending light, drawn from the glimmer and sunk beneath the skin, where it knits torn flesh a little at a time. It cannot be hurled at a foe — only laid on the willing, be it your own hand or an ally's. Cast it on yourself, a fellow delver, or any creature you can see; the deeper your Intellect, the more it knits with each pulse.",
+    "description": "A slow weave of mending light, drawn up by the caster's own will and sunk beneath the skin, where it knits torn flesh a little at a time. It cannot be hurled at a foe — only laid on the willing, be it your own hand or an ally's. Cast it on yourself, a fellow delver, or any creature you can see; the deeper your Intellect, the more it knits with each pulse.",
     "manaCost": 8,
     "hostile": false,
     "target": "creature",
@@ -38,8 +38,62 @@
   "summon-wisp": {
     "id": "summon-wisp",
     "name": "Summon Wisp",
-    "description": "A weave that coaxes a knot of loose glimmer into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its cold light at your foes, but the binding frays — in a few minutes the glimmer slips free and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
+    "description": "A weave that conjures a knot of cold light into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its light at your foes, but the binding frays — in a few minutes it slips loose and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
     "manaCost": 10,
     "effect": { "type": "summon", "mob": "wisp", "count": 1, "duration": 180, "group": "summon-wisp" }
+  },
+  "candlelight": {
+    "id": "candlelight",
+    "name": "Candlelight",
+    "description": "The humblest of human light-cantrips, taught to hedge-mages and night-travellers the world over: a delver kindles a mote of cold flame above the brow, just bright enough to push the dark back a single step. It sheds the barest light and gutters out within the minute, but in a black drift it is the difference between blind and not. Cast it on yourself, an ally, or any creature you can see.",
+    "manaCost": 3,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "emit-light", "name": "Candlelight", "magnitude": 1, "duration": 60 }
+  },
+  "mage-armour": {
+    "id": "mage-armour",
+    "name": "Mage Armour",
+    "description": "A wardweave of pure will rather than glimmer — the caster draws a lattice of hardened light close about a body, an invisible barding that turns a blade a fraction before it bites. It costs no shards, only concentration, and holds for a few minutes before it thins to nothing. The keener your Intellect, the tighter the weave. Lay it on yourself, an ally, or any creature you can see; re-casting renews the lattice rather than stacking it.",
+    "manaCost": 6,
+    "hostile": false,
+    "target": "creature",
+    "effect": {
+      "type": "protect",
+      "name": "Mage Armour",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 10 } },
+      "ward": 0,
+      "good": true
+    }
+  },
+  "sleep": {
+    "id": "sleep",
+    "name": "Sleep",
+    "description": "A hush of drowsy light poured into a foe's eyes, weighting its limbs until it folds where it stands and sinks into slumber. It deals no harm — its mercy is the opening it buys: a chance to slip away, or to set a killing blow before the sleeper stirs. Any blow rouses it at once, and a creature's Ward may shrug the weave off entirely. Cast it at a creature you can see.",
+    "manaCost": 7,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "sleep", "name": "Sleep" }
+  },
+  "bolt": {
+    "id": "bolt",
+    "name": "Bolt",
+    "description": "Where Spark merely stings, Bolt is a hurled lance of compressed light — slower to shape and hungrier for mana, but it lands with real weight and punches deep. The first true war-spell a delver learns, scaling hard with Intellect; only a creature's Ward turns it aside. Cast it at any foe you can see.",
+    "manaCost": 7,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage", "damageType": "magical", "damage": "1d8", "scale": { "attr": "intellect", "per": 3 } }
+  },
+  "glimmer-spike": {
+    "id": "glimmer-spike",
+    "name": "Glimmer Spike",
+    "description": "The mage's heaviest single strike: a spike of raw glimmer dragged up out of the shards themselves and driven through a foe like a spear of frozen light. It burns mana and shards together, for the glimmer is spent in the casting and cannot be reclaimed — but nothing else a delver can throw bites as deep. It scales with Intellect, and Ward alone can blunt it. Cast it at any foe you can see.",
+    "manaCost": 8,
+    "shardCost": 3,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
   }
 }
