@@ -19,9 +19,21 @@
     "depth": 0,
     "ambientLight": 5,
     "exits": { "south": "rim.plaza" },
-    "fixtures": ["hearth"],
+    "fixtures": ["hearth", "cellar-hatch"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 60 }]
+  },
+  "rim.cellar": {
+    "id": "rim.cellar",
+    "zone": "rim",
+    "name": "The Inn Cellar",
+    "description": "A cramped, earthen-floored cellar that smells less of stores than of straw and warm vermin. Casks and broth-crocks are shoved to one wall to clear the rest: a long pen of stacked crates and chicken-wire where dog-sized rats churn over a trough of kitchen scraps and gnawed bones, fat and unhurried and entirely unafraid of people. A cleaver and a coil of twine hang by the ladder, and the straw in the corner is dark with old stains. Whatever Maeve tells the delvers upstairs, the broth-pot's meat is bred down here. The ladder climbs back up to the common room.",
+    "depth": 0,
+    "ambientLight": 2,
+    "exits": { "up": "rim.inn" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
   },
   "rim.market": {
     "id": "rim.market",

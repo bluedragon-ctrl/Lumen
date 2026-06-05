@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A cellar beneath the Rim inn (`rim.cellar`, "The Inn Cellar").** A low cellar
+  hatch behind the bar of the Lantern's Rest (a `door` fixture, barred shut by
+  default) drops to a cramped pen where **two giant rats** are kept fat on kitchen
+  scraps. The room flavour hints that Maeve breeds them down here for the
+  broth-pot's meat — whatever she tells the delvers upstairs.
 - **The third abyss floor (depth 3) — the Underriver, reached down the Deep Stair.**
   Seven new rooms running along a black underground river. A mostly-gentle spine
   (`The River Stair` → `The Pale Shallows` → `The Still Pools` →
