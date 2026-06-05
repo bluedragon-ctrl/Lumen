@@ -226,6 +226,14 @@ function move(state, player, dir, ctx) {
   let dest = room.exits && room.exits[dir];
   if (!dest && room.hiddenExits && room.hiddenExits[dir] && isDiscovered(player, discoveryKey(player.location, "exit", dir)))
     dest = room.hiddenExits[dir].to;
+  // An *open* door fixture (a trapdoor, gate) provides an exit in its direction;
+  // shut, that way reads as no exit at all.
+  if (!dest) {
+    for (const f of state.rooms[player.location].fixtures || []) {
+      const ft = state.world.fixtures[f.template];
+      if (ft && ft.door && ft.door.dir === dir && f.open) { dest = ft.door.to; break; }
+    }
+  }
   if (!dest) return [{ type: "error", text: `You can't go ${dir} from here.` }];
   player.pending = null; // moving breaks off any attack
   state.clearRevealedMobs(player.id); // leaving the room re-hides any lurkers you'd spotted
@@ -293,7 +301,11 @@ function equip(state, player, arg, ctx) {
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const t = w.items[player.inventory[idx].template];
   if (!t.slot) return [{ type: "error", text: `You can't equip ${t.name}.` }];
+  const prevHp = player.maxHp;
   const prev = equipItem(player, player.inventory.splice(idx, 1)[0], w);
+  state.deriveStats(player); // gear may carry an armour.maxHp bonus
+  if (player.maxHp > prevHp) player.hp += player.maxHp - prevHp; // grant the new capacity (like training)
+  player.hp = Math.min(player.hp, player.maxHp);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
   const stowed = prev ? `, stowing ${w.items[prev.template].name}` : "";
@@ -319,6 +331,8 @@ function unequip(state, player, arg, ctx) {
   if (inst.lit) inst.lit = false;
   player.equipment[slot] = null;
   player.inventory.push(inst);
+  state.deriveStats(player); // shedding gear may drop an armour.maxHp bonus
+  player.hp = Math.min(player.hp, player.maxHp);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You remove ${w.items[inst.template].name}.`);
@@ -460,7 +474,20 @@ function toggleFixture(state, player, f, ctx) {
   return selfAndViews(state, player, `You switch ${f.on ? "on" : "off"} ${ft.name}.${tail}`);
 }
 
-// `use <target>`: operate a switchable fixture here if it matches, else drink it.
+// Open or shut a door fixture (a trapdoor, gate, …). Open, it provides an exit
+// in its `dir`; shut, that way is closed. `want` forces a state (open/close
+// verbs); omit it to toggle (`use`).
+function toggleDoor(state, player, f, ctx, want) {
+  const ft = state.world.fixtures[f.template];
+  const next = want === undefined ? !f.open : want;
+  if (next === f.open) return [{ type: "error", text: `It's already ${f.open ? "open" : "shut"}.` }];
+  f.open = next;
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${f.open ? "opens" : "shuts"} ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  return selfAndViews(state, player, `You ${f.open ? "open" : "shut"} ${ft.name}.`);
+}
+
+// `use <target>`: operate a switchable or door fixture here if it matches, else drink it.
 function use(state, player, arg, ctx) {
   const w = state.world;
   const rt = state.rooms[player.location];
@@ -468,9 +495,9 @@ function use(state, player, arg, ctx) {
     const ql = arg.toLowerCase();
     const f = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
-      return ft && ft.switch && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+      return ft && (ft.switch || ft.door) && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
-    if (f) return toggleFixture(state, player, f, ctx);
+    if (f) return w.fixtures[f.template].door ? toggleDoor(state, player, f, ctx) : toggleFixture(state, player, f, ctx);
   }
   // A carried/equipped light source toggles lit/doused (works in the dark — that's
   // the point of lighting one). Checked before the drink/eat fallback.
@@ -481,6 +508,21 @@ function use(state, player, arg, ctx) {
     if (src) return toggleLightSource(state, player, src, ctx);
   }
   return drink(state, player, arg, ctx);
+}
+
+// `open`/`close <door>`: explicitly set a door fixture's state (sugar over `use`).
+function operateDoor(state, player, arg, ctx, want) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  if (!arg) return [{ type: "error", text: `${want ? "Open" : "Close"} what?` }];
+  if (!canSee(player.perception, rt.light)) return [{ type: "error", text: "It's too dark to make that out." }];
+  const ql = arg.toLowerCase();
+  const f = rt.fixtures.find((f) => {
+    const ft = w.fixtures[f.template];
+    return ft && ft.door && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+  });
+  if (!f) return [{ type: "error", text: `There's nothing like that to ${want ? "open" : "close"} here.` }];
+  return toggleDoor(state, player, f, ctx, want);
 }
 
 // `refuel <item>`: top up a carried/equipped fuelled light from its fuel item
@@ -1149,6 +1191,11 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "toggle":
     case "flip":
       return use(state, player, arg, ctx);
+    case "open":
+      return operateDoor(state, player, arg, ctx, true);
+    case "close":
+    case "shut":
+      return operateDoor(state, player, arg, ctx, false);
     case "craft":
     case "make":
       return craft(state, player, arg, ctx);

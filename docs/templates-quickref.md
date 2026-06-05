@@ -52,6 +52,7 @@ Type-specific blocks (include exactly the one matching `type`):
            "fuelItem": "lamp-oil", "refuelPerUnit": 300 }  // fuelItem must exist; refuelPerUnit >0
 // armour:
 "armour": { "armour": 1, "ward": 0, "speedPenalty": 0,
+            "maxHp": 5,                                    // optional bonus max HP while worn (≥0)
             "attrMod": { "wits": -1 },                     // optional stat trade-off
             "spikes": { "damage": "1d3", "chance": 1 } }   // optional melee reflect (chance in (0,1])
 // consumable: effect.type ∈ emit-light|restore|damage-over-time
@@ -189,7 +190,7 @@ validation. To be craftable from a fresh character, add the id to
   "id": "forge",
   "name": "a smith's forge",
   "description": "A banked coal forge with anvil and tongs...",
-  "type": "crafting",                  // crafting|switch|scenery|resource (flavour/behaviour)
+  "type": "crafting",                  // crafting|switch|door|scenery|resource (flavour/behaviour)
   "station": "smithing"                // crafting station id recipes reference
 }
 ```
@@ -199,6 +200,9 @@ Other variants:
 ```jsonc
 // switch — a toggleable light source
 "switch": { "emitsLight": 3, "on": false }     // emitsLight ≥0, on is boolean
+// door — a gated exit; open it (use/open <fixture>) to walk `dir` to `to`
+"door": { "dir": "down", "to": "rim.training", "open": false }  // to must exist; open is boolean
+//   counts as a graph edge for reachability — a room reachable only via a door still validates
 // scenery with passive light
 "emitsLight": 1                                 // ≥0
 // resource — a mineable node

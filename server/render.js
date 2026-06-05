@@ -122,6 +122,8 @@ function buildRoomView(state, p) {
       exits: [
         ...Object.keys(room.exits || {}),
         ...Object.keys(room.hiddenExits || {}).filter((dir) => isDiscovered(p, discoveryKey(room.id, "exit", dir))),
+        // An open, visible door fixture (a trapdoor, gate) opens a way in its direction.
+        ...rt.fixtures.filter((f) => { const ft = w.fixtures[f.template]; return ft && ft.door && f.open && fixtureVisibleTo(p, f); }).map((f) => w.fixtures[f.template].door.dir),
       ],
       contents: { players, mobs, items, fixtures },
     },
@@ -244,6 +246,11 @@ function buildExamineView(state, p, q) {
           if (t.switch.emitsLight) lines.push(`light when on: ${t.switch.emitsLight}`);
           const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "an iron lamp" → "iron lamp"
           hints.push(`Switch it with \`use ${callName}\`.`);
+        }
+        if (t.door) {
+          lines.push(`it is ${f.open ? "open" : "shut"}`);
+          const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "a heavy trapdoor" → "heavy trapdoor"
+          hints.push(`${f.open ? "Close" : "Open"} it with \`${f.open ? "close" : "open"} ${callName}\`.`);
         }
         if (t.mine) {
           const left = f.charges != null ? f.charges : t.mine.charges;

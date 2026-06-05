@@ -93,5 +93,112 @@
       { "template": "grub", "qty": 3 }
     ],
     "output": { "template": "roasted-grubs", "qty": 1 }
+  },
+  "forge-iron-sword": {
+    "id": "forge-iron-sword",
+    "name": "Iron Sword",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 6,
+    "output": { "template": "iron-sword", "qty": 1 }
+  },
+  "forge-iron-mace": {
+    "id": "forge-iron-mace",
+    "name": "Iron Mace",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 6,
+    "output": { "template": "iron-mace", "qty": 1 }
+  },
+  "forge-iron-cuirass": {
+    "id": "forge-iron-cuirass",
+    "name": "Iron Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 3 }
+    ],
+    "shards": 8,
+    "output": { "template": "iron-cuirass", "qty": 1 }
+  },
+  "forge-iron-helm": {
+    "id": "forge-iron-helm",
+    "name": "Iron Helm",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 5,
+    "output": { "template": "iron-helm", "qty": 1 }
+  },
+  "forge-chitin-helm": {
+    "id": "forge-chitin-helm",
+    "name": "Chitin Helm",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 3 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 5,
+    "output": { "template": "chitin-helm", "qty": 1 }
+  },
+  "forge-chitin-cuirass": {
+    "id": "forge-chitin-cuirass",
+    "name": "Chitin Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 5 },
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 8,
+    "output": { "template": "chitin-cuirass", "qty": 1 }
+  },
+  "forge-heavy-chitin-plate": {
+    "id": "forge-heavy-chitin-plate",
+    "name": "Heavy Chitin Plate",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 6 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "heavy-chitin-plate", "qty": 1 }
+  },
+  "forge-chitin-maul": {
+    "id": "forge-chitin-maul",
+    "name": "Chitin Maul",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 4 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "chitin-maul", "qty": 1 }
+  },
+  "forge-barbed-flail": {
+    "id": "forge-barbed-flail",
+    "name": "Barbed Flail",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-spike", "qty": 3 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 5,
+    "output": { "template": "barbed-flail", "qty": 1 }
+  },
+  "forge-spiked-chitin-armor": {
+    "id": "forge-spiked-chitin-armor",
+    "name": "Spiked Chitin Armour",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 4 },
+      { "template": "chitin-spike", "qty": 3 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "spiked-chitin-armor", "qty": 1 }
   }
 }

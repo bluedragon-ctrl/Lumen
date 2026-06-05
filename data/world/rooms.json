@@ -84,13 +84,25 @@
     "id": "rim.mageshed",
     "zone": "rim",
     "name": "The Mage's Shed",
-    "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. The market lane lies back west.",
+    "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The market lane lies back west.",
     "depth": 0,
     "ambientLight": 4,
     "exits": { "west": "rim.market" },
-    "fixtures": ["alchemist-bench"],
+    "fixtures": ["alchemist-bench", "trapdoor"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 60 }]
+  },
+  "rim.training": {
+    "id": "rim.training",
+    "zone": "rim",
+    "name": "The Warded Cellar",
+    "description": "A low stone cellar dug beneath the shed, the rough walls chalked from floor to ceiling with sigils and crossings-out — Vesper's working notes, written large. This is where she lets a delver learn the feel of a spell with something fighting back: a wisp coaxed loose from the glimmer and pinned inside a warding ring scored into the floor, snapping its cold light at anything that comes near. The only way up is the ladder back through the trapdoor.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "up": "rim.mageshed" },
+    "fixtures": ["ward-ring"],
+    "groundItems": [],
+    "spawns": [{ "mob": "wisp", "max": 1, "respawn": 60 }]
   },
   "rim.workshop": {
     "id": "rim.workshop",
@@ -146,10 +158,10 @@
     "id": "abyss.gallery",
     "zone": "abyss",
     "name": "The Collapsed Gallery",
-    "description": "A passage cut smooth and square by no human hand, long since half-choked by fallen rock — old Umbral work, its walls still bearing the worn ghost of a carved relief. A crack in the ceiling lets down a grey thread of daylight, enough to see by. A seam of rust-red ore runs through the broken face. Rats nest in the rubble, fat and unafraid. The First Dark lies back to the west; the way deepens north and east.",
+    "description": "A passage cut smooth and square by no human hand, long since half-choked by fallen rock — old Umbral work, its walls still bearing the worn ghost of a carved relief. A crack in the ceiling lets down a grey thread of daylight, enough to see by. A seam of rust-red ore runs through the broken face and dives away south, where the old miners chased it into the dark. Rats nest in the rubble, fat and unafraid. The First Dark lies back to the west; the way deepens north, east, and down the ore-drift to the south.",
     "depth": 1,
     "ambientLight": 1,
-    "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren" },
+    "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren", "south": "abyss.drift" },
     "fixtures": ["iron-vein", "umbral-relief"],
     "groundItems": [{ "template": "shards", "qty": 15, "hidden": { "perception": 3 } }],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
@@ -165,6 +177,22 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 35 }]
+  },
+  "abyss.drift": {
+    "id": "abyss.drift",
+    "zone": "abyss",
+    "name": "The Ore Drift",
+    "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of glow-caps has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "abyss.gallery" },
+    "fixtures": ["iron-vein", "glow-caps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 2, "respawn": 60 },
+      { "mob": "thornbug", "max": 1, "respawn": 60 },
+      { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
+    ]
   },
   "abyss.fissure": {
     "id": "abyss.fissure",

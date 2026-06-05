@@ -179,7 +179,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
 | `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. Add `fuelItem` + `refuelPerUnit` to make it **refuellable** (`refuel <item>` consumes one `fuelItem` and adds `refuelPerUnit` fuel); omit them for a disposable light (e.g. a torch). |
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
-| `armour`     | block?  | `{ armour, ward, speedPenalty }`. |
+| `armour`     | block?  | `{ armour, ward, speedPenalty, maxHp?, attrMod?, spikes?, onDamage? }`. `maxHp` is bonus max HP the piece grants while worn (heavy gear → raw durability on top of Vitality); folded into derived stats and refreshed on equip/unequip. |
 | `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
 | `scroll`     | block?  | `{ spell }` — `learn`/`study` teaches the one spell, then consumes the item. |
 | `recipe`     | string? | A recipe id — `learn`/`study` teaches the one recipe, then consumes the item. |
@@ -401,9 +401,10 @@ Room-anchored objects, primarily crafting stations.
 
 | Field    | Type   | Notes |
 |----------|--------|-------|
-| `type`   | enum   | `crafting` \| `switch` \| `decoration` \| … |
+| `type`   | enum   | `crafting` \| `switch` \| `door` \| `scenery` \| `resource` \| … |
 | `station`| string?| Crafting station tag recipes reference (e.g. `alchemy`, `forge`). |
 | `switch` | block? | Makes the fixture switchable: `{ emitsLight, on }`. `on` is the default state; each instance carries live on/off state. Toggled with `use <fixture>`. When on, `emitsLight` adds to room light (like a torch). |
+| `door`   | block? | Makes the fixture a gated exit: `{ dir, to, open }`. While **open**, the room gains an exit `dir → to`; **shut**, that way reads as no exit at all. `open` is the default state; each instance carries live open/shut state, toggled with `use <fixture>` (or `open`/`close <fixture>`). The validator counts a room's door fixture as a graph edge, so a room reachable only through a door still validates. |
 
 ---
 
