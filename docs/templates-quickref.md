@@ -33,7 +33,7 @@ Map of `itemId → template`. Common fields, then ONE type-specific block.
   "id": "iron-dagger",
   "name": "an iron dagger",            // includes the article; lowercase
   "description": "A short, plain blade forged from abyssal iron.",
-  "type": "weapon",                    // light|weapon|armour|currency|treasure|material|consumable|scroll|recipe
+  "type": "weapon",                    // light|weapon|armour|currency|treasure|material|consumable|scroll|recipe|book
   "slot": "hand",                      // ONLY if equippable: hand|body|head|light (slots are dynamic)
   "weight": 1,
   "value": 24,                         // buy price. REQUIRED & ≥0 unless type==="currency"
@@ -61,6 +61,8 @@ Type-specific blocks (include exactly the one matching `type`):
 "scroll": { "spell": "spark" }
 // recipe item: names a recipe id that must exist
 "recipe": "searing-flare"
+// book: teaches every listed recipe/spell at once (ids must exist; ≥1 total). Consumed on study.
+"teaches": { "recipes": ["mushroom-soup", "cooked-skewer"], "spells": ["spark"] }
 ```
 
 `currency` (shards) skips `value`/`slot`. `treasure`/`material` are usually just

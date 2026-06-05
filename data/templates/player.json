@@ -12,6 +12,6 @@
     { "template": "scroll-spark" }
   ],
   "startEquipment": { "hand": "short-sword", "body": null, "head": null, "light": null },
-  "knownRecipes": ["minor-light-potion", "smelt-iron", "forge-iron-dagger", "glimmer-dust", "pressed-glimmer-dust", "glimmersteel", "mushroom-soup", "cooked-skewer", "roasted-grubs"],
+  "knownRecipes": ["minor-light-potion", "smelt-iron", "forge-iron-dagger", "glimmer-dust", "pressed-glimmer-dust", "glimmersteel"],
   "knownSpells": []
 }

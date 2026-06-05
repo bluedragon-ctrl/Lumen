@@ -156,6 +156,9 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost }`. Damage values are **dice notation** (see below). |
 | `armour`     | block?  | `{ armour, ward, speedPenalty }`. |
 | `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
+| `scroll`     | block?  | `{ spell }` — `learn`/`study` teaches the one spell, then consumes the item. |
+| `recipe`     | string? | A recipe id — `learn`/`study` teaches the one recipe, then consumes the item. |
+| `teaches`    | block?  | `{ recipes?: [...], spells?: [...] }` — a **book**: `learn`/`study` teaches every listed recipe/spell the player doesn't already know, then consumes the item. (If the player already knew all of them, it isn't consumed.) |
 
 ### Dice notation
 
