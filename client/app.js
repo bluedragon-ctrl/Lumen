@@ -50,6 +50,7 @@ function handle(msg) {
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
+    case "combat": addLine(msg.text, "combat"); break;
     case "gold": addLine(msg.text, "gold"); break;
     case "room":
       // A new room id means an actual move (not a look / light flicker) — mark
