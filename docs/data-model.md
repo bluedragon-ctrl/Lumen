@@ -346,6 +346,8 @@ Each mob instance carries two per-enemy tables, both keyed by **any combatant id
   and by healing/buffing an ally a mob is fighting (mirrors the damage→threat
   convention). Any live `aggro` entry engages a mob **outright** — so being struck
   provokes it in any light — and only `aggro` (real participation) earns **kill XP**.
+  A mob-id `aggro` key (an allied **summon** that helped) credits that summon's
+  **owner** in the kill's XP share (present + alive); a wild mob's key credits no one.
 - **`detect` — the detection meter.** A decaying notice value a *proactive hunter*
   (a `hostile` wild mob, or a `"player"`-faction ally) accrues on each enemy it can
   **perceive**, gated by the mob's sight in the room's current light:

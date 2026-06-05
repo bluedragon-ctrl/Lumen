@@ -43,6 +43,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   synonyms (e.g. listing `"ore"` on a vein chunk); when absent, keywords are
   derived from the display name (articles like *a/the/of* dropped). Substring
   matching remains as a final fallback, so nothing that worked before breaks.
+- **Content quick-reference (`docs/templates-quickref.md`).** One annotated
+  "golden record" per world-data type (item, mob, spell, recipe, fixture, room,
+  player), with every field's rule inline and derived from the validator. The
+  fast path for drafting content — far cheaper to read than the full data-model.
+- **Lumen-specific authoring subagents** (`.claude/agents/`): `lore-checker`
+  (vets proposed content against canon, returns only conflicts), `content-drafter`
+  (drafts valid JSON from the quickref; drafts only — never auto-approves names or
+  writes world data), and `data-validator` (runs `npm run validate` and reports
+  just the fixes). Each isolates heavy reading from the main session.
 - **Assisting mobs (`helper` flag).** A mob marked `helper` piles into any fight a
   same-faction ally is already in — the moment an ally it can **see** is trading
   blows with an enemy, the helper engages that enemy too (and announces it with a
@@ -118,6 +127,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     (`faction:"player"` + `ownerId`) for live mob-vs-mob testing.
 
 ### Changed
+- **Summon kills now share XP with the owner.** When an allied summon helps wear
+  down a mob, its contribution credits its **owner** in the kill's participation
+  share — so a delver whose pet did the work no longer misses out when something
+  else lands the final blow. (The finisher case was already credited.) Owner is
+  credited once, only if present and alive, like any participant; a wild mob's
+  threat key still credits no one.
 - **Ward is now a percent defence, not flat mitigation.** Ward's core role is a
   **percent chance to negate a hostile *spell* outright** (1 ward = 1%, **uncapped** —
   ward 100+ shrugs magic off entirely), shared by both directions via a single

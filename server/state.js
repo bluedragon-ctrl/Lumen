@@ -1591,11 +1591,12 @@ class GameState {
 
   /** Award `xp` to every PLAYER who earned a mob's death — the finisher (always,
    *  even if a remote DoT landed the blow; for an allied-mob kill this is its
-   *  owner, resolved by the caller) plus any player with a live threat entry who is
-   *  still present and alive. Threat keys that are mob ids (an allied mob that
-   *  helped) credit no XP in Phase 1 — `players.get(mobId)` is undefined, so they
-   *  fall through; owner-share is a Phase 2 concern. Model A: each participant gets
-   *  the FULL value (co-op, no division). Returns [{ playerId, levelUps }]. */
+   *  owner, resolved by the caller) plus any player who traded blows (a live combat
+   *  threat entry) and is still present and alive. A threat key that is a *mob* id
+   *  is an allied **summon** that helped: it credits its owner (owner-share), so a
+   *  delver whose pet did the work shares the kill even when something else lands
+   *  the final blow. Model A: each participant gets the FULL value (co-op, no
+   *  division). Returns [{ playerId, levelUps }]. */
   _awardKillXp(mob, primaryKiller, xp, roomId) {
     const out = [];
     const credited = new Set();
@@ -1604,12 +1605,16 @@ class GameState {
       credited.add(primaryKiller.id);
     }
     for (const id of Object.keys(mob.aggro || {})) {
-      if (credited.has(id)) continue;
-      if (!(mob.aggro[id] > 0)) continue; // a hostile mob seeds 0-threat entries for everyone present (AI targeting); mere presence isn't participation — you must have traded blows
-      const pl = this.players.get(id); // a mob-id key (allied helper) resolves to undefined → skipped
-      if (!pl || pl.hp <= 0 || pl.location !== roomId) continue; // present and alive
-      out.push({ playerId: id, levelUps: this.awardXp(pl, xp) });
-      credited.add(id);
+      if (!(mob.aggro[id] > 0)) continue; // participation requires traded blows, not mere detection
+      let pl = this.players.get(id);
+      if (!pl) {
+        // A mob-id key — an allied summon that helped. Credit its owner instead.
+        const helper = this.rooms[roomId].mobs.find((x) => x.id === id);
+        if (helper && helper.faction === "player" && helper.ownerId) pl = this.players.get(helper.ownerId);
+      }
+      if (!pl || credited.has(pl.id) || pl.hp <= 0 || pl.location !== roomId) continue; // present, alive, once
+      out.push({ playerId: pl.id, levelUps: this.awardXp(pl, xp) });
+      credited.add(pl.id);
     }
     return out;
   }
