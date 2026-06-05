@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Vesper's field journal** — a `scenery` fixture in the Warded Cellar (`rim.training`).
+  Fragmentary research notes on the Umbrals: the eye-glyph reliefs, the word *ukhu-pacha*
+  (the depth beneath depth), Mallki's cryptic remark about the deep-dwellers (*suti mana kan*
+  — "the name is not"), and Vesper's uneasy observation of Umbrals watching the shaft-work.
+  Examine it to read; the last entry trails off mid-sentence.
+- **A cellar beneath the Rim inn (`rim.cellar`, "The Inn Cellar").** A low cellar
+  hatch behind the bar of the Lantern's Rest (a `door` fixture, barred shut by
+  default) drops to a cramped pen where **two giant rats** are kept fat on kitchen
+  scraps. The room flavour hints that Maeve breeds them down here for the
+  broth-pot's meat — whatever she tells the delvers upstairs.
 - **The third abyss floor (depth 3) — the Underriver, reached down the Deep Stair.**
   Seven new rooms running along a black underground river. A mostly-gentle spine
   (`The River Stair` → `The Pale Shallows` → `The Still Pools` →

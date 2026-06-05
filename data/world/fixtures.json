@@ -139,5 +139,18 @@
     "description": "A fist-sized knot of raw glimmer rests in a carved stone cradle, breathing a low, blue-white light that throws no heat and no glare — enough for deep-adapted eyes, and gentle enough not to pain them. The Umbrals light their halls this way, where surface folk would strike a torch and wince at their own flame.",
     "type": "scenery",
     "emitsLight": 1
+  },
+  "vesper-field-journal": {
+    "id": "vesper-field-journal",
+    "name": "Vesper's field journal",
+    "description": "A worn leather notebook left open on a camp table shoved against the cellar wall, its pages puckered with mineral dust and damp. Most of the book is dense alchemical notation; somewhere past the middle the columns break off and the hand loosens into field observation.\n\n— *The Umbral who tends the hollow near the paqcha — the waterfall — showed me the far relief today. I have counted seventeen distinct eye-glyph variants. Not decoration. A system.*\n\n— *A word I have now heard from three separate individuals: ukhu-pacha. Spoken without particular weight, the way one says 'the cellar' or 'the floor below'. I suspect it names not a place but a condition — the interior world, the depth beneath depth. They do not seem to consider it remarkable.*\n\n— *I asked Mallki about the grey ones — the wasted things in the lowest passages. He was quiet for longer than usual. Eventually: suti mana kan. I have written it as I heard it; my Umbral is still poor. I believe it means something like: the name is not. Or: they no longer have a name. He did not elaborate and I did not ask again.*\n\n— *They watch the shaft-work. Every day, one or two of them standing at the gallery mouth. Not obstructing. Not speaking. Only watching. I do not know what to make of it.*\n\n*The last entry trails off mid-sentence. The facing page is blank.*",
+    "type": "scenery"
+  },
+  "cellar-hatch": {
+    "id": "cellar-hatch",
+    "name": "a low cellar hatch",
+    "description": "A plank hatch set into the floorboards behind the bar, worn smooth where Maeve lifts it day in, day out. A faint, animal reek drifts up through the seams — and now and then a scrabble of claws on stone. She is quick to wave a delver off it: nothing down there, dear, only stores. Heave it open and a short ladder drops into the cellar.",
+    "type": "door",
+    "door": { "dir": "down", "to": "rim.cellar", "open": false }
   }
 }
