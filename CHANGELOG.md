@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Weeping Chasm-Moss** — lore-canon bioluminescent predatory moss that grows over
+  abyssal rivers and hot vents (`docs/lore.md` updated). Yields `weeping-chasm-moss`
+  (harvestable material, value 8), processed at an alchemist's bench via
+  `process-gloom-silk` (3 moss → 1 `gloom-silk`, value 40), the base thread for
+  future deep-made fabric gear.
+- **`weeping-moss-curtain`** fixture placed in two third-floor river rooms:
+  `third.shallows` (ceiling above slow water) and `third.falls` (the paqcha).
+  The falls room description now names the moss as the source of the room's
+  faint ambient glow. `mine`/`dig` to harvest; 4 charges, respawn 150 ticks.
 - **Vesper's field journal** — a `scenery` fixture in the Warded Cellar (`rim.training`).
   Fragmentary research notes on the Umbrals: the eye-glyph reliefs, the word *ukhu-pacha*
   (the depth beneath depth), Mallki's cryptic remark about the deep-dwellers (*suti mana kan*

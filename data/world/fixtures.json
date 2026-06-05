@@ -140,6 +140,13 @@
     "type": "scenery",
     "emitsLight": 1
   },
+  "weeping-moss-curtain": {
+    "id": "weeping-moss-curtain",
+    "name": "a curtain of weeping chasm-moss",
+    "description": "A mass of bioluminescent moss clings to the ceiling and upper rock above the river, trailing long, hair-fine tendrils into the damp air. Each one beads with cold moisture and catches drifting organic matter — a slow, patient filter in the dark. The glow it gives is faint and blue-white, barely enough to see by, but unmistakable. Pull a clump free and it comes away without resistance, tendrils and all.",
+    "type": "resource",
+    "mine": { "template": "weeping-chasm-moss", "yield": 1, "charges": 4, "respawn": 150, "energy": 10 }
+  },
   "vesper-field-journal": {
     "id": "vesper-field-journal",
     "name": "Vesper's field journal",

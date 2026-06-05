@@ -530,7 +530,7 @@
     "ambientLight": 0,
     "description": "The river widens and slows, spreading thin over a pale stone shelf where it runs barely shin-deep. Blind cave-fish drift the slack water in lazy, unhurried circles, nosing the current. It looks a still, easy stretch of bank — the sort of place a delver might unsling a baited line and breathe a while, though the water is darker where it deepens at the far edge, and not every shadow under it is stone. The stair-landing is back east; the bank runs on west toward a deeper sound of water.",
     "exits": { "east": "third.landing", "west": "third.pools" },
-    "fixtures": ["river-shallows"],
+    "fixtures": ["river-shallows", "weeping-moss-curtain"],
     "groundItems": [],
     "spawns": [
       { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
@@ -557,9 +557,9 @@
     "name": "The Sunless Falls",
     "depth": 3,
     "ambientLight": 1,
-    "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. A narrow ledge runs down beside the cataract, worn but unfinished, the rope-stakes set only partway — the descent to whatever lies below is begun, but no one has yet made it fast enough to trust. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
+    "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. The glow comes from the moss: a dense curtain of weeping chasm-moss clinging to the ceiling and the high rock, its blue-white bioluminescence caught and scattered by the spray into something that barely passes for light. A narrow ledge runs down beside the cataract, worn but unfinished, the rope-stakes set only partway — the descent to whatever lies below is begun, but no one has yet made it fast enough to trust. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
     "exits": { "east": "third.pools", "north": "third.cave" },
-    "fixtures": [],
+    "fixtures": ["weeping-moss-curtain"],
     "groundItems": [],
     "spawns": []
   },

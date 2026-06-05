@@ -726,5 +726,33 @@
     "value": 400,
     "stackable": true,
     "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
+  },
+  "schematic-gloom-silk": {
+    "id": "schematic-gloom-silk",
+    "name": "a gloom-silk method",
+    "description": "A narrow strip of cured gut-skin, marked with Mallki's careful hand — small diagrams of the moss-curtain, the drying rack, the drawing of the fibres. No words, only the sequence of steps. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 35,
+    "stackable": true,
+    "recipe": "process-gloom-silk"
+  },
+  "weeping-chasm-moss": {
+    "id": "weeping-chasm-moss",
+    "name": "a clump of weeping chasm-moss",
+    "description": "A soft mass of bioluminescent moss, its long micro-fibrous tendrils still damp from the river air. It glows faintly and coldly — blue-white, like something that never learned there was a sun. Left to dry, the fibres can be drawn out and spun into something finer.",
+    "type": "material",
+    "weight": 0,
+    "value": 8,
+    "stackable": true
+  },
+  "gloom-silk": {
+    "id": "gloom-silk",
+    "name": "a spool of gloom-silk",
+    "description": "Fine thread drawn from dried weeping chasm-moss fibres and processed at the alchemist's bench. Faintly luminous, cool to the touch, and stronger than it has any right to look. The stuff of deep-made cloth.",
+    "type": "material",
+    "weight": 0,
+    "value": 40,
+    "stackable": true
   }
 }
