@@ -31,13 +31,14 @@ const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
 // switch in execute(): every word here must have a matching case there, and vice
 // versa, or an abbreviation will resolve to an "Unknown command".
 const VERBS = [
-  "look", "examine", "exam", "search", "go", "move", "get", "take", "drop",
-  "inventory", "inv", "attack", "kill", "stop", "sit", "rest", "sleep", "stand",
+  "look", "examine", "exam", "search", "go", "move", "get", "take", "pickup", "drop",
+  "inventory", "inv", "attack", "kill", "stop", "sit", "sleep", "stand",
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
   "light", "ignite", "douse", "extinguish", "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
-  "mine", "dig", "recipes", "say", "emote", "me", "equip", "wield", "wear", "hold",
-  "unequip", "remove", "help",
+  "mine", "dig", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
+  "unequip", "remove", "rest", "help",
 ];
 const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-letter aliases
 
@@ -47,7 +48,7 @@ const HELP = [
   "  search                — comb the room for hidden things (needs light + Perception)",
   "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
   "  go <dir> | move <dir> — move",
-  "  get | take <target>   — pick up an item",
+  "  get | take | pickup <target> — pick up an item",
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
   "  attack | kill <target> — attack a creature (stop to break off)",
@@ -1059,6 +1060,7 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     }
     case "get":
     case "take":
+    case "pickup":
       return get(state, player, arg, ctx);
     case "drop":
       return drop(state, player, arg, ctx);
@@ -1129,7 +1131,6 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "equip":
     case "wield":
     case "wear":
-    case "hold":
       return equip(state, player, arg, ctx);
     case "unequip":
     case "remove":

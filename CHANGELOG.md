@@ -11,7 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lig` → `light`. Ambiguous prefixes resolve by a deliberate priority order (so
   `dr` → `drop`, `se` → `search`, `li` → `light`); the existing single-letter
   aliases (`l`, `i`, `k`, `c`, `x`) and direction shortcuts still win as exact
-  matches. The priority list lives in `VERBS` in `server/commands.js`.
+  matches. The priority list lives in `VERBS` in `server/commands.js`, ordered so
+  `h` → `help` and `re` → `refuel`/`remove`/`recipes` (not `rest`, which is `res`).
+- **`pickup` as a synonym for `get`.**
+
+### Changed
+- **Dropped the `hold` alias for `equip`.** Lumen's `equip` already routes an item
+  to whatever slot it declares (incl. the `light` slot), so `hold` was pure
+  duplication; `equip`/`wield`/`wear` remain.
 - **Keyword targeting for items, mobs, spells & recipes.** Targets now match on
   any significant word in their name, not just a leading substring — so
   `kill innkeeper` hits *Maeve the innkeeper*, and `get glimmerstone` picks up
