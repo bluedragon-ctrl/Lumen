@@ -112,7 +112,7 @@
     "depth": 0,
     "ambientLight": 3,
     "exits": { "up": "rim.mageshed" },
-    "fixtures": ["ward-ring"],
+    "fixtures": ["ward-ring", "vesper-field-journal"],
     "groundItems": [],
     "spawns": [{ "mob": "wisp", "max": 1, "respawn": 60 }]
   },
