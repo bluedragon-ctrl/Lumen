@@ -573,7 +573,7 @@
       { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }]
+      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }]
     }
   }
 }

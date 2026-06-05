@@ -727,6 +727,16 @@
     "stackable": true,
     "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
   },
+  "schematic-gloom-silk": {
+    "id": "schematic-gloom-silk",
+    "name": "a gloom-silk method",
+    "description": "A narrow strip of cured gut-skin, marked with Mallki's careful hand — small diagrams of the moss-curtain, the drying rack, the drawing of the fibres. No words, only the sequence of steps. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 35,
+    "stackable": true,
+    "recipe": "process-gloom-silk"
+  },
   "weeping-chasm-moss": {
     "id": "weeping-chasm-moss",
     "name": "a clump of weeping chasm-moss",
