@@ -180,7 +180,7 @@
       { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
     ],
     "shop": {
-      "sells": [{ "template": "mushroom-soup" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "beer" }]
+      "sells": [{ "template": "mushroom-soup" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "beer" }, { "template": "book-of-cooking", "price": 8 }]
     }
   },
   "rim-shopkeeper": {

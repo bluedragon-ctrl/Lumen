@@ -43,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   synonyms (e.g. listing `"ore"` on a vein chunk); when absent, keywords are
   derived from the display name (articles like *a/the/of* dropped). Substring
   matching remains as a final fallback, so nothing that worked before breaks.
+- **Teaching books (`teaches` item block).** An item with
+  `teaches: { recipes?: [...], spells?: [...] }` is a book: `learn`/`study`
+  teaches every listed recipe and spell the player doesn't already know, then
+  consumes it (skipped if they already knew everything). The first one is
+  **a book of cooking** — Maeve sells it at the Lantern's Rest for 8 shards, and
+  it teaches the three cooking recipes (mushroom soup, bug-meat skewer, roasted
+  grubs) that fresh delvers no longer start with.
 - **Content quick-reference (`docs/templates-quickref.md`).** One annotated
   "golden record" per world-data type (item, mob, spell, recipe, fixture, room,
   player), with every field's rule inline and derived from the validator. The

@@ -55,7 +55,7 @@ const HELP = [
   "  sleep                 — sleep to recover faster (1 per 2 ticks), but blind",
   "  stand | wake          — get up; moving or attacking also stands you",
   "  cast | c <spell> <target> — cast a spell you know at a creature",
-  "  learn | study <scroll|schematic> — learn a spell or recipe (consumes it)",
+  "  learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
   "  spells                — list the spells you know",
   "  train [attribute]     — spend a level-up point on an attribute (no arg: show progress)",
   "  equip | wield | wear <item> — equip from inventory (a light source kindles as you equip it)",
@@ -150,6 +150,13 @@ function removeItem(player, template, n) {
     if (have > n) inst.qty = have - n, (n = 0);
     else (n -= have), player.inventory.splice(i, 1);
   }
+}
+
+// Join names into prose: "a", "a and b", "a, b, and c" (Oxford comma).
+function joinList(names) {
+  if (names.length <= 1) return names[0] || "";
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
 // Display name of the fixture that provides a crafting station (for hints).
@@ -692,7 +699,8 @@ function search(state, player, ctx) {
 // `learn <scroll|schematic>` (alias `study`): commit a scroll's spell or a
 // schematic's recipe to memory, consuming the item — one item, one permanent
 // thing learned. Scrolls teach spells (`scroll.spell`); recipe items teach
-// recipes (`recipe`). Both follow the same flow.
+// recipes (`recipe`); a book (`teaches`) can teach several of each at once.
+// All follow the same consume-on-study flow.
 function learn(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return [{ type: "error", text: "Learn what? Study a scroll or schematic you're carrying." }];
@@ -709,6 +717,37 @@ function learn(state, player, arg, ctx) {
     ctx.refreshRoom(player.location, player.id);
     return selfAndViews(state, player, line);
   };
+
+  // A book teaches a list of recipes and/or spells. We learn every entry we
+  // don't already know, skipping the rest; if the book holds nothing new, it
+  // isn't consumed. A short summary names what was learned (and what was old).
+  if (t.teaches) {
+    const recipeIds = t.teaches.recipes || [];
+    const spellIds = t.teaches.spells || [];
+    if (!player.knownRecipes) player.knownRecipes = [];
+    if (!player.knownSpells) player.knownSpells = [];
+    const learned = [];
+    const knew = [];
+    for (const rid of recipeIds) {
+      const r = w.recipes[rid];
+      if (!r) return [{ type: "error", text: `${t.name} describes a method you can't make sense of.` }];
+      if (player.knownRecipes.includes(rid)) { knew.push(r.name || rid); continue; }
+      player.knownRecipes.push(rid);
+      learned.push(r.name || rid);
+    }
+    for (const sid of spellIds) {
+      const spell = w.spells[sid];
+      if (!spell) return [{ type: "error", text: `${t.name} is inscribed with a spell you can't decipher.` }];
+      if (player.knownSpells.includes(sid)) { knew.push(spell.name); continue; }
+      player.knownSpells.push(sid);
+      learned.push(spell.name);
+    }
+    if (!learned.length)
+      return [{ type: "error", text: `You already know everything ${t.name} has to teach.` }];
+    let line = `You study ${t.name} and learn ${joinList(learned)}.`;
+    if (knew.length) line += ` (You already knew ${joinList(knew)}.)`;
+    return consume(line);
+  }
 
   if (t.scroll && t.scroll.spell) {
     const spell = w.spells[t.scroll.spell];
