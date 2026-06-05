@@ -16,9 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`pickup` as a synonym for `get`.**
 
 ### Changed
+- **Lighting is now equip-driven (DikuMUD-style).** Equipping a fuelled light
+  source into the `light` slot **kindles it automatically** — no separate "light it"
+  step. `use <source>` toggles a carried/equipped source between lit and doused (to
+  conserve fuel), equipping it first if it's still in your pack. Works in the dark,
+  since lighting a torch is how you escape it.
 - **Dropped the `hold` alias for `equip`.** Lumen's `equip` already routes an item
   to whatever slot it declares (incl. the `light` slot), so `hold` was pure
   duplication; `equip`/`wield`/`wear` remain.
+
+### Removed
+- **`light` / `ignite` / `douse` / `extinguish` commands** — folded into
+  `equip` (kindles) and `use <source>` (toggles); see above.
+- **`go` / `move` commands** — movement is direction words and `n/s/e/w/u/d`
+  (DikuMUD has no `go`). Bonus: `g` now abbreviates to `get`, `m` to `make`.
 - **Keyword targeting for items, mobs, spells & recipes.** Targets now match on
   any significant word in their name, not just a leading substring — so
   `kill innkeeper` hits *Maeve the innkeeper*, and `get glimmerstone` picks up

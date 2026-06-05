@@ -25,16 +25,16 @@ const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
 // Every command word the dispatcher understands, in PRIORITY order. A typed verb
 // that isn't an exact match resolves to the FIRST entry it is a prefix of
 // (DikuMUD-style abbreviation) — so common verbs precede rarer ones that share a
-// prefix (e.g. `look` before `list`, `light` before `list`, `get` before `go`,
-// `drop` before `drink`). Exact matches (incl. single-letter aliases like l/i/k/c
+// prefix (e.g. `look` before `list`, `drop` before `drink`, `get`/`g` since there
+// is no `go`). Exact matches (incl. single-letter aliases like l/i/k/c
 // and directions, handled earlier) always win over prefixes. KEEP IN SYNC with the
 // switch in execute(): every word here must have a matching case there, and vice
 // versa, or an abbreviation will resolve to an "Unknown command".
 const VERBS = [
-  "look", "examine", "exam", "search", "go", "move", "get", "take", "pickup", "drop",
+  "look", "examine", "exam", "search", "get", "take", "pickup", "drop",
   "inventory", "inv", "attack", "kill", "stop", "sit", "sleep", "stand",
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
-  "light", "ignite", "douse", "extinguish", "list", "shop", "wares", "buy", "sell",
+  "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
   "mine", "dig", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
@@ -47,7 +47,6 @@ const HELP = [
   "  look | examine | x [target] — view the room, or examine something",
   "  search                — comb the room for hidden things (needs light + Perception)",
   "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
-  "  go <dir> | move <dir> — move",
   "  get | take | pickup <target> — pick up an item",
   "  drop <target>         — drop an item",
   "  inventory | inv | i   — list what you are carrying",
@@ -59,7 +58,7 @@ const HELP = [
   "  learn | study <scroll|schematic> — learn a spell or recipe (consumes it)",
   "  spells                — list the spells you know",
   "  train [attribute]     — spend a level-up point on an attribute (no arg: show progress)",
-  "  equip | wield | wear <item> — equip from inventory (swaps current)",
+  "  equip | wield | wear <item> — equip from inventory (a light source kindles as you equip it)",
   "  unequip | remove <item|slot> — return equipped gear to inventory",
   "  list | shop           — see what a trader here buys and sells",
   "  buy <item>            — buy from a trader here",
@@ -68,10 +67,9 @@ const HELP = [
   "  craft | make <recipe> — craft at the matching station here",
   "  mine | dig [vein]     — work ore loose from a vein in the room",
   "  drink | quaff | eat <item> — consume a potion or food",
-  "  use | switch <target> — operate a fixture (e.g. a lamp), or use a carried item (potion, flare)",
+  "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
-  "  light [item] | douse  — light (swaps in a fresh source if spent) or douse",
   "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
   "  help | ?              — this list",
   "",
@@ -161,12 +159,15 @@ function stationLabel(world, station) {
 }
 
 // Equip an instance into its template's slot, stowing whatever was there back to
-// inventory (and dousing it if it was a lit light). Returns the displaced item.
+// inventory (and dousing it if it was a lit light). A fuelled light source kindles
+// as it goes into the light slot (DikuMUD-style: holding a torch lights it; douse
+// to conserve fuel with `use`). Returns the displaced item.
 function equipItem(player, inst, world) {
-  const slot = world.items[inst.template].slot;
-  const prev = player.equipment[slot] || null;
+  const t = world.items[inst.template];
+  const prev = player.equipment[t.slot] || null;
   if (prev && prev.lit) prev.lit = false;
-  player.equipment[slot] = inst;
+  if (t.light && inst.fuel > 0) inst.lit = true;
+  player.equipment[t.slot] = inst;
   if (prev) player.inventory.push(prev);
   return prev;
 }
@@ -254,36 +255,28 @@ function move(state, player, dir, ctx) {
   return msgs;
 }
 
-const fueledLightIdx = (player, w) =>
-  player.inventory.findIndex((i) => w.items[i.template].light && i.fuel > 0);
-
-function toggleLight(state, player, on, ctx, arg) {
+// Toggle a carried/equipped light source via `use <source>`. Equipping a source
+// already kindles it (see equipItem); this is how you douse one to save fuel and
+// relight it later. A source still in the pack is equipped (and thus lit) first.
+// Not gated by light — you must be able to light a torch in the dark.
+function toggleLightSource(state, player, inst, ctx) {
   const w = state.world;
-  // `light <item>`: equip that specific source first (swapping the current one).
-  if (on && arg) {
-    const idx = findItem(player.inventory, w, arg);
-    if (idx >= 0 && w.items[player.inventory[idx].template].light) {
-      equipItem(player, player.inventory.splice(idx, 1)[0], w);
-    }
-  }
-  let inst = player.equipment.light;
-  // Auto-equip a light if none held, or swap out a spent one for a fuelled one.
-  if (on && (!inst || inst.fuel <= 0)) {
-    let idx = fueledLightIdx(player, w);
-    if (idx < 0 && !inst) idx = player.inventory.findIndex((i) => w.items[i.template].light);
-    if (idx >= 0) {
-      equipItem(player, player.inventory.splice(idx, 1)[0], w);
-      inst = player.equipment.light;
-    }
-  }
-  if (!inst) return [{ type: "error", text: "You have no light source." }];
   const name = w.items[inst.template].name;
-  if (on && inst.fuel <= 0) return [{ type: "error", text: `${name} is spent and you have no fresh light.` }];
-  inst.lit = on;
+  const equipped = player.equipment.light === inst;
+  if (equipped && inst.lit) {
+    inst.lit = false;
+    state.rooms[player.location].light = state.computeRoomLight(player.location);
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} douses ${name}.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You douse ${name}.`);
+  }
+  if (inst.fuel <= 0) return [{ type: "error", text: `${name} is spent — you need a fresh light.` }];
+  if (equipped) inst.lit = true; // relight an equipped-but-doused source
+  else equipItem(player, player.inventory.splice(player.inventory.indexOf(inst), 1)[0], w); // equipping kindles it
   state.rooms[player.location].light = state.computeRoomLight(player.location);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${on ? "lights" : "douses"} ${name}.` }, player.id);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} lights ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, on ? `You light ${name}. The dark recedes.` : `You douse ${name}.`);
+  return selfAndViews(state, player, `You light ${name}. The dark recedes.`);
 }
 
 function equip(state, player, arg, ctx) {
@@ -296,8 +289,9 @@ function equip(state, player, arg, ctx) {
   const prev = equipItem(player, player.inventory.splice(idx, 1)[0], w);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
-  const extra = prev ? `, stowing ${w.items[prev.template].name}` : "";
-  return selfAndViews(state, player, `You equip ${t.name}${extra}.`);
+  const stowed = prev ? `, stowing ${w.items[prev.template].name}` : "";
+  const kindled = t.slot === "light" && player.equipment.light && player.equipment.light.lit ? " It kindles, and the dark recedes." : "";
+  return selfAndViews(state, player, `You equip ${t.name}${stowed}.${kindled}`);
 }
 
 function unequip(state, player, arg, ctx) {
@@ -470,6 +464,14 @@ function use(state, player, arg, ctx) {
       return ft && ft.switch && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
     if (f) return toggleFixture(state, player, f, ctx);
+  }
+  // A carried/equipped light source toggles lit/doused (works in the dark — that's
+  // the point of lighting one). Checked before the drink/eat fallback.
+  if (arg) {
+    const src = [player.equipment.light, ...player.inventory].filter(Boolean).find(
+      (i) => w.items[i.template].light && matchesQuery(arg, w.items[i.template].name, w.items[i.template].keywords, i.id)
+    );
+    if (src) return toggleLightSource(state, player, src, ctx);
   }
   return drink(state, player, arg, ctx);
 }
@@ -1051,13 +1053,6 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return arg ? lookAt(state, player, arg) : [buildRoomView(state, player)];
     case "search":
       return search(state, player, ctx);
-    case "go":
-    case "move": {
-      let d = arg.toLowerCase();
-      d = DIR_ALIAS[d] || d;
-      if (!DIRS.includes(d)) return [{ type: "error", text: `Go where? (${DIRS.join(", ")})` }];
-      return move(state, player, d, ctx);
-    }
     case "get":
     case "take":
     case "pickup":
@@ -1135,12 +1130,6 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "unequip":
     case "remove":
       return unequip(state, player, arg, ctx);
-    case "light":
-    case "ignite":
-      return toggleLight(state, player, true, ctx, arg);
-    case "douse":
-    case "extinguish":
-      return toggleLight(state, player, false, ctx);
     case "help":
     case "?":
       return [{ type: "log", text: HELP }];
