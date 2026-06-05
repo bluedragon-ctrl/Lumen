@@ -142,6 +142,18 @@ Most fauna yield **materials** — chitin plate, spikes, venom glands, slug slim
 salamander tails, luminescent glands — the biological half of the crafting economy,
 beside the mineral half (iron, glimmer).
 
+### River flora
+
+**Weeping Chasm-Moss** is a predatory, bioluminescent moss found at depth, wherever
+water runs or hot vents breathe moisture into the air. It clings to ceilings and rock
+faces above abyssal rivers and drops long, hair-fine tendrils into the current to catch
+drifting organic matter — a passive filter-feeder that glows faintly blue-white.
+It does **not** require external light; it is self-luminous, and is one of the rare plants
+that thrives in total darkness. Harvested and dried, its fibres can be processed at an
+alchemist's bench into **gloom-silk**, a fine, faintly luminous thread — the raw material
+for deep-made cloth and woven gear. Exception to the light-dependent flora rule:
+it carries its own light with it.
+
 ## The threat ladder (escalation by depth)
 
 A legible progression for hanging future content on:

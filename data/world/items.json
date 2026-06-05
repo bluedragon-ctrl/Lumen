@@ -726,5 +726,23 @@
     "value": 400,
     "stackable": true,
     "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
+  },
+  "weeping-chasm-moss": {
+    "id": "weeping-chasm-moss",
+    "name": "a clump of weeping chasm-moss",
+    "description": "A soft mass of bioluminescent moss, its long micro-fibrous tendrils still damp from the river air. It glows faintly and coldly — blue-white, like something that never learned there was a sun. Left to dry, the fibres can be drawn out and spun into something finer.",
+    "type": "material",
+    "weight": 0,
+    "value": 8,
+    "stackable": true
+  },
+  "gloom-silk": {
+    "id": "gloom-silk",
+    "name": "a spool of gloom-silk",
+    "description": "Fine thread drawn from dried weeping chasm-moss fibres and processed at the alchemist's bench. Faintly luminous, cool to the touch, and stronger than it has any right to look. The stuff of deep-made cloth.",
+    "type": "material",
+    "weight": 0,
+    "value": 40,
+    "stackable": true
   }
 }
