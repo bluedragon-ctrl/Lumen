@@ -34,6 +34,24 @@ glimmer is the most coveted substance in the world.
 - **Glimmer shards** are the loose, spendable form and serve as frontier currency.
   Larger **glimmer crystals** are the richer prize broken down from veins.
 
+## Magic — two traditions
+
+Spellcraft in Lumen splits along its source, and the split is the cost:
+
+- **Human magic** is the **standard fantasy tradition** carried down the Abyss from
+  the wider world — drawn from the caster's own will and learning, paid for in
+  effort (mana) alone. Light cantrips, conjured wards, sleep-hexes, bolts of force:
+  the common stock of any hedge-mage or war-wizard. It does **not** consume glimmer.
+- **Umbral magic** is **glimmer-craft** — the deep art of the Umbrals, which works
+  by spending raw glimmer rather than will. It is hungrier and heavier-hitting, but
+  every casting **burns shards** alongside mana; the glimmer is consumed in the weave
+  and cannot be reclaimed. Surface mages who learn it pay the same toll. Spell names
+  in this tradition tend to wear the word (*Glimmer Spike*, *Glimmerskin*).
+
+Rule of thumb for authored spells: a spell that **consumes shards** (`shardCost`) is
+glimmer-craft; one that costs **mana only** is the human tradition — keep its flavour
+text clear of glimmer-as-medium.
+
 ## The Glimmer Rush
 
 A gold-rush, in everything but the metal. Word of glimmer has drawn

@@ -164,6 +164,56 @@
     "stackable": true,
     "scroll": { "spell": "glimmerskin" }
   },
+  "scroll-candlelight": {
+    "id": "scroll-candlelight",
+    "name": "a Scroll of Candlelight",
+    "description": "A scrap of cheap vellum, the glyphs scrawled in a hurried hand and smelling of tallow. Study it to learn the Candlelight cantrip — a mote of light to push the dark back a step — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "scroll": { "spell": "candlelight" }
+  },
+  "scroll-mage-armour": {
+    "id": "scroll-mage-armour",
+    "name": "a Scroll of Mage Armour",
+    "description": "Vellum ruled with a tight, geometric lattice of glyphs that catch the light like fine mail. Study it to learn the Mage Armour weave — a barding of hardened light that turns a blade — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 55,
+    "stackable": true,
+    "scroll": { "spell": "mage-armour" }
+  },
+  "scroll-sleep": {
+    "id": "scroll-sleep",
+    "name": "a Scroll of Sleep",
+    "description": "Soft grey vellum, the glyphs looping and unhurried, heavy to look at as though the page itself were drowsy. Study it to learn the Sleep weave — a hush that folds a foe into slumber — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "scroll": { "spell": "sleep" }
+  },
+  "scroll-bolt": {
+    "id": "scroll-bolt",
+    "name": "a Scroll of Bolt",
+    "description": "Heavy vellum, the glyphs gouged deep and edged in scorch, as though the spell strained the page that held it. Study it to learn the Bolt war-spell — a hurled lance of compressed light — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 70,
+    "stackable": true,
+    "scroll": { "spell": "bolt" }
+  },
+  "scroll-glimmer-spike": {
+    "id": "scroll-glimmer-spike",
+    "name": "a Scroll of Glimmer Spike",
+    "description": "Stiff vellum flecked with ground glimmer that glints along the strokes of each savage glyph. Study it to learn the Glimmer Spike weave — a spike of raw glimmer that burns shards as it strikes — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "glimmer-spike" }
+  },
   "palecap-mushroom": {
     "id": "palecap-mushroom",
     "name": "a palecap mushroom",
@@ -401,7 +451,7 @@
   "scroll-summon-wisp": {
     "id": "scroll-summon-wisp",
     "name": "a Scroll of Summon Wisp",
-    "description": "Heavy vellum inked with a coiling binding-glyph that seems to tug faintly at the glimmer in the air. Study it to learn the Summon Wisp weave — a conjured mote of captive light that fights at your side — and the scroll crumbles to ash in the learning.",
+    "description": "Heavy vellum inked with a coiling binding-glyph that seems to tug faintly at the air around it. Study it to learn the Summon Wisp weave — a conjured mote of captive light that fights at your side — and the scroll crumbles to ash in the learning.",
     "type": "scroll",
     "weight": 0,
     "value": 90,

@@ -273,7 +273,7 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect", "summon"];
+  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect", "sleep", "summon"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {

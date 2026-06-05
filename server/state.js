@@ -1204,11 +1204,22 @@ class GameState {
     const w = this.world;
     const eff = spell.effect || {};
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost); // glimmer burned in the cast (e.g. Glimmer Spike)
 
     const ward = w.mobs[mob.template].ward || 0;
     if (spell.hostile && wardNegates(ward)) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
+    }
+
+    // Sleep: a non-damaging hex that drops a perceiving foe into slumber, making
+    // it inert (see resolveMobAI) until any blow rouses it. Ward had its wholesale
+    // chance to negate above; on success it draws no threat and does NOT rouse or
+    // auto-engage — the point is to slip away or line up an ambush.
+    if (eff.type === "sleep") {
+      mob.posture = "sleeping";
+      this.rooms[player.location].light = this.computeRoomLight(player.location);
+      return { resisted: false, slept: true };
     }
 
     const result = { resisted: false };
@@ -1288,9 +1299,11 @@ class GameState {
     const bonus = spellScaleBonus(attrs, eff.scale);
     const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
     this.applyEffect(target.actor, { ...eff, magnitude });
+    // A light-shedding weave (Candlelight) brightens the room at once, like a potion.
+    if (eff.type === "emit-light") this.rooms[player.location].light = this.computeRoomLight(player.location);
     this._narrateEffectApplied(events, target, eff.name || eff.type);
     this._drawSupportThreat(player, target.id, magnitude); // mend-over-time: per-pulse magnitude as threat
-    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1 };
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: eff.duration || 0 };
   }
 
   /**
