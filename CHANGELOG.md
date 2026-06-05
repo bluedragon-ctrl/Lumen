@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   floor, gating the heaviest spells behind reaching the first Umbral. He also
   takes over the **Book of Chitin Craft** (was Tobin the smith's), a fitting
   trade for a deep-dweller. Vesper still sells the human-tradition scrolls.
+- **Two new Umbral accessories, sold by Mallki.** An **Umbral mind-charm**
+  (`neck` slot, `+2 Intellect` → sharper spell power) and an **Umbral
+  glimmer-ring** (`finger` slot, `+5 max Mana` → a deeper caster's well). Adds
+  two new **equipment slots** (`neck`, `finger`), seeded empty on fresh
+  characters, and a new `armour.maxMana` bonus (mirroring `armour.maxHp`):
+  equipping grants the new capacity, unequipping clamps it. Validator now
+  checks `armour.maxMana` and `armour.attrMod`.
 - **Fishing.** A new `fish` (alias `angle`) gathering verb, a sibling of `mine`:
   work a baited line in a `fish` resource fixture. Each cast spends a **grub** as
   bait (lost to the water, catch or no) plus energy, and rolls the fixture's

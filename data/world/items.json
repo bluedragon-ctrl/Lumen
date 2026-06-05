@@ -89,6 +89,28 @@
     "value": 26,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
   },
+  "umbral-mind-charm": {
+    "id": "umbral-mind-charm",
+    "name": "an Umbral mind-charm",
+    "keywords": ["charm", "amulet", "mind", "umbral"],
+    "description": "A flat disc of dark, river-smoothed stone hung on a cord of woven gut, its face inlaid with a single thread of glimmer worked into the lightless-eye glyph. It rests cool against the breastbone, and the longer it is worn the clearer the wearer's thoughts seem to run — as though the cold light lent the mind an edge. Umbral work, and patient: they carve these for their own glimmer-singers and part with them rarely.",
+    "type": "armour",
+    "slot": "neck",
+    "weight": 0,
+    "value": 110,
+    "armour": { "attrMod": { "intellect": 2 } }
+  },
+  "umbral-glimmer-ring": {
+    "id": "umbral-glimmer-ring",
+    "name": "an Umbral glimmer-ring",
+    "keywords": ["ring", "band", "glimmer", "umbral"],
+    "description": "A plain band of cold grey metal, its inner face grooved with a hair-fine channel of glimmer that never quite stops glowing. Worn against the skin it deepens the well a caster draws from — a small, steady reservoir of borrowed light to spend on the weave. Old Umbral craft, the channel-work finer than any surface smith could cut.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 85,
+    "armour": { "maxMana": 5 }
+  },
   "shards": {
     "id": "shards",
     "name": "shards",

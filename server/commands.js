@@ -303,10 +303,13 @@ function equip(state, player, arg, ctx) {
   const t = w.items[player.inventory[idx].template];
   if (!t.slot) return [{ type: "error", text: `You can't equip ${t.name}.` }];
   const prevHp = player.maxHp;
+  const prevMana = player.maxMana;
   const prev = equipItem(player, player.inventory.splice(idx, 1)[0], w);
-  state.deriveStats(player); // gear may carry an armour.maxHp bonus
+  state.deriveStats(player); // gear may carry an armour.maxHp / armour.maxMana bonus
   if (player.maxHp > prevHp) player.hp += player.maxHp - prevHp; // grant the new capacity (like training)
+  if (player.maxMana > prevMana) player.mana += player.maxMana - prevMana;
   player.hp = Math.min(player.hp, player.maxHp);
+  player.mana = Math.min(player.mana, player.maxMana);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
   const stowed = prev ? `, stowing ${w.items[prev.template].name}` : "";
@@ -332,8 +335,9 @@ function unequip(state, player, arg, ctx) {
   if (inst.lit) inst.lit = false;
   player.equipment[slot] = null;
   player.inventory.push(inst);
-  state.deriveStats(player); // shedding gear may drop an armour.maxHp bonus
+  state.deriveStats(player); // shedding gear may drop an armour.maxHp / armour.maxMana bonus
   player.hp = Math.min(player.hp, player.maxHp);
+  player.mana = Math.min(player.mana, player.maxMana);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You remove ${w.items[inst.template].name}.`);

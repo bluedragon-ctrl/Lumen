@@ -68,6 +68,7 @@ function main() {
   }
 
   const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
+  const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
 
   // Combat triggers (see GameState.applyHitOutcome): `onHit` is a list of effect
   // specs an attacker lands on a hit (mob `attack.onHit` / item `weapon.onHit`);
@@ -133,6 +134,15 @@ function main() {
       checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); // player thorns / when-struck triggers (forward-ready)
       if (it.armour.maxHp != null && (typeof it.armour.maxHp !== "number" || it.armour.maxHp < 0))
         errs.push(`item ${id}: armour.maxHp must be a non-negative number`); // bonus durability from heavy gear
+      if (it.armour.maxMana != null && (typeof it.armour.maxMana !== "number" || it.armour.maxMana < 0))
+        errs.push(`item ${id}: armour.maxMana must be a non-negative number`); // bonus mana from caster gear
+      if (it.armour.attrMod != null) {
+        if (typeof it.armour.attrMod !== "object") errs.push(`item ${id}: armour.attrMod must be an object of attribute → number`);
+        else for (const [k, v] of Object.entries(it.armour.attrMod)) {
+          if (!ATTRS.includes(k)) errs.push(`item ${id}: armour.attrMod unknown attribute "${k}" (known: ${ATTRS.join(", ")})`);
+          if (typeof v !== "number") errs.push(`item ${id}: armour.attrMod.${k} must be a number`);
+        }
+      }
     }
     if (it.light && it.light.fuelItem) {
       if (!has(items, it.light.fuelItem)) errs.push(`item ${id}: light.fuelItem references missing template ${it.light.fuelItem}`);

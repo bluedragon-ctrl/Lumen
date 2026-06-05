@@ -774,6 +774,19 @@ class GameState {
     return bonus;
   }
 
+  /** Bonus max Mana from equipped gear (`armour.maxMana`) — e.g. an Umbral
+   *  glimmer-ring that deepens a caster's well. Summed across every equipped
+   *  slot and folded into `deriveStats`, refreshed whenever gear changes. */
+  _equipManaBonus(player) {
+    let bonus = 0;
+    for (const inst of Object.values(player.equipment || {})) {
+      if (!inst) continue;
+      const t = this.world.items[inst.template];
+      if (t && t.armour && t.armour.maxMana) bonus += t.armour.maxMana;
+    }
+    return bonus;
+  }
+
   /**
    * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
    * max HP (Vitality), max Mana (Intellect), and the low-light sight band
@@ -786,7 +799,7 @@ class GameState {
   deriveStats(player) {
     const a = player.attributes || {};
     player.maxHp = (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
-    player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT;
+    player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT + this._equipManaBonus(player);
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
     const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);
     const dimBelow = Math.max(band.blindBelow, band.dimBelow - sight);

@@ -12,7 +12,7 @@
     { "template": "torch", "fuel": 200 },
     { "template": "scroll-spark" }
   ],
-  "startEquipment": { "hand": "short-sword", "body": null, "head": null, "light": null },
+  "startEquipment": { "hand": "short-sword", "body": null, "head": null, "neck": null, "finger": null, "light": null },
   "knownRecipes": ["minor-light-potion", "smelt-iron", "smelt-silver", "forge-iron-dagger", "glimmer-dust", "pressed-glimmer-dust", "glimmersteel"],
   "knownSpells": []
 }
