@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The second abyss floor (depth 2), reached down from the Ore Drift.** Thirteen
+  new rooms in three parts. A safe, prospector-trafficked **main road** runs
+  east→west (`The Winch-Head` → `The Prospectors' Road` → `The Crossing` →
+  `The Deep Stair`, the last a roped-off descent toward a future third floor).
+  **South** lies a glow-cap-lit grazing range of stonebugs and thornbugs
+  (`The Grazing Galleries`, `The Spine-Thicket`, `The Grinder's Hollow`,
+  `The Skitter-Crack`), home to **the Old Grinder** — a huge, ancient stonebug
+  miniboss (HP 60, armour 5; neutral until provoked) — and a venomous cave
+  centipede. The Old Grinder drops chitin plate and bug-meat, a **slab of dense
+  chitin** (a new deep-tier crafting material, also to be dropped by tougher
+  beasts further down), and a glimmer crystal ground slow in its gut over decades
+  of grazing ore-rich rock. **North** is a fully dark, five-room **mine** (`The Adit`,
+  `The Black Drift`, `The Silver Cut`, `The Umbral Stope`, `The Sump`) with two
+  iron veins, a new **silver vein**, an **Umbral pillar** marking older work, and
+  the existing dark fauna joined by **a pallid hunter** — a big, light-pained
+  blind predator that roams the workings, an early glimmer-mutated outlier
+  carrying dormant crystal in its hide. New wander-zones (`second`,
+  `second-graze`, `second-mine`) keep the grazers and hunter off the safe road.
+  A **hidden flooded chamber** (`The Drowned Hollow`) lies below the Sump, found
+  only by `search` (perception 4) and reached down a submerged tunnel: an
+  untouched **glimmer crystal** set in a seam there, guarded by two pale
+  salamanders. The pallid hunter, being glimmer-mutated, drops a glimmer crystal
+  fairly often (60%).
+  Three more `search`-gated secrets reward the perceptive: a lost climber's stash
+  at the Deep Stair (shards + lamp-oil, perception 3), a venomous cave centipede
+  lying in ambush in the Spine-Thicket (perception 3), and a concealed second
+  silver vein behind a hairline crack in the Black Drift (perception 4).
+- **Silver.** A new mundane metal deeper than iron: mine **silver ore** from the
+  silver vein, smelt it to a **silver bar** (`smelt-silver`, known from the start)
+  at the furnace. A high-value material/coin sink; no gear yet.
 - **Five new spells.** **Candlelight** — a 3-mana cantrip that sheds 1 light for a
   minute (an `emit-light` weave; cast on self/ally/creature). **Mage Armour** —
   a shard-free wardweave granting `1 + Intellect/10` armour for 3 minutes

@@ -185,7 +185,7 @@
     "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of glow-caps has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.gallery" },
+    "exits": { "north": "abyss.gallery", "down": "second.descent" },
     "fixtures": ["iron-vein", "glow-caps"],
     "groundItems": [],
     "spawns": [
@@ -295,5 +295,207 @@
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 120 }]
+  },
+  "second.descent": {
+    "id": "second.descent",
+    "zone": "second",
+    "name": "The Winch-Head",
+    "depth": 2,
+    "ambientLight": 1,
+    "description": "A rough waystation hacked from the rock at the base of the lower shaft — a hauling winch bolted to a timber frame, its rope frayed to silk at the wear-points, a capstan bar worn smooth by many hands. The rock face is chalked with tally marks: haul dates, weights, and a running count that stops abruptly mid-column. Someone's arithmetic, abandoned. A lantern hangs on a spike above the winch and has not yet guttered out. The ore drift is back up; the prospectors' road runs west.",
+    "exits": { "up": "abyss.drift", "west": "second.road" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 2, "respawn": 25 }
+    ]
+  },
+  "second.road": {
+    "id": "second.road",
+    "zone": "second",
+    "name": "The Prospectors' Road",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A passage worn smooth by boots and boot-nails, wider than the wild tunnels around it — this one has been walked. Cairns of stacked stones mark the safe line through the dark, and chalk arrows on the wall point the way back up. Whoever laid the markers knew what they were doing. The winch-head is east; the passage runs on west to the crossing, and a side-way drops south into the grazing galleries.",
+    "exits": { "east": "second.descent", "west": "second.crossing", "south": "second.graze1" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "second.crossing": {
+    "id": "second.crossing",
+    "zone": "second",
+    "name": "The Crossing",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The road meets a junction where the passage widens and a hewn adit opens north — a mine-mouth driven square into the rock, the pick-scars fresh enough that the dust has not fully settled. The prospectors' chalk marks stop here; beyond the adit mouth the dark is unmarked and complete. The road runs east toward the winch-head and west toward the deep stair.",
+    "exits": { "east": "second.road", "west": "second.stair", "north": "second.mine1" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "second.stair": {
+    "id": "second.stair",
+    "zone": "second",
+    "name": "The Deep Stair",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The passage ends at a cleft in the rock where cut stone steps drop away into a black throat — a stair driven deeper than any prospector on this floor has yet worked. A length of rope is knotted to an iron spike and runs over the lip, but it is slack, and no one has pulled it taut for some time. The prospectors' chalk on the wall here says only: NOT YET. The crossing is east.",
+    "exits": { "east": "second.crossing" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "shards", "qty": 12, "hidden": { "perception": 3 } },
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 3 } }
+    ],
+    "spawns": []
+  },
+  "second.graze1": {
+    "id": "second.graze1",
+    "zone": "second-graze",
+    "name": "The Grazing Galleries",
+    "depth": 2,
+    "ambientLight": 1,
+    "description": "A broad, low gallery lit by the soft pulse of glow-caps spread across the damp walls — enough light to graze by, which is exactly what the stonebugs do. Armoured backs catch the glow as the bugs work their slow circuits, and the floor is smooth where they have turned it under them for years. The prospectors' road is north; the galleries open south and east.",
+    "exits": { "north": "second.road", "south": "second.graze2", "east": "second.graze4" },
+    "fixtures": ["glow-caps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 2, "respawn": 60 },
+      { "mob": "thornbug", "max": 1, "respawn": 60 }
+    ]
+  },
+  "second.graze2": {
+    "id": "second.graze2",
+    "zone": "second-graze",
+    "name": "The Spine-Thicket",
+    "depth": 2,
+    "ambientLight": 1,
+    "description": "A close, low gallery where the glow-caps cluster thick and the thornbugs have followed the food. They crowd the walls in bristling rows — squat, spiked shapes rasping at the caps, indifferent to company until company gets too close. The galleries open back north; the way deepens south.",
+    "exits": { "north": "second.graze1", "south": "second.graze3" },
+    "fixtures": ["glow-caps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "thornbug", "max": 2, "respawn": 60 },
+      { "mob": "stonebug", "max": 1, "respawn": 60 },
+      { "mob": "cave-centipede", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
+    ]
+  },
+  "second.graze3": {
+    "id": "second.graze3",
+    "zone": "second-graze",
+    "name": "The Grinder's Hollow",
+    "depth": 2,
+    "ambientLight": 1,
+    "description": "The rock here is smooth as dressed stone — not cut, but worn flat by years of slow circling. The glow-caps crowd the walls, and in the centre of it all, older than anything else in the galleries, the great stonebug makes its endless round. The hollow fits it exactly; it made the hollow. The spine-thicket is back north.",
+    "exits": { "north": "second.graze2" },
+    "fixtures": ["glow-caps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "old-grinder", "max": 1, "respawn": 300 }
+    ]
+  },
+  "second.graze4": {
+    "id": "second.graze4",
+    "zone": "second-graze",
+    "name": "The Skitter-Crack",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A low, dark crack running off from the galleries — the glow-caps don't reach here, and whatever nests in the crack prefers it that way. The stone underfoot is scored with thin, close marks, the kind many fast legs leave. Something hunts the strays that drift out of the lit galleries. The galleries are back west.",
+    "exits": { "west": "second.graze1" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-centipede", "max": 1, "respawn": 60 },
+      { "mob": "thornbug", "max": 1, "respawn": 60 }
+    ]
+  },
+  "second.mine1": {
+    "id": "second.mine1",
+    "zone": "second-mine",
+    "name": "The Adit",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The hewn mouth of the mine, square-cut and fresh-worked — the pick-scars still sharp on the walls. A seam of rust-red iron runs along the right face and dips deeper into the dark. The crossing is back south; the working runs north and west.",
+    "exits": { "south": "second.crossing", "north": "second.mine2", "west": "second.mine3" },
+    "fixtures": ["iron-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "tremor-mole", "max": 1, "respawn": 50 },
+      { "mob": "scour-slug", "max": 1, "respawn": 60 }
+    ]
+  },
+  "second.mine2": {
+    "id": "second.mine2",
+    "zone": "second-mine",
+    "name": "The Black Drift",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A long working driven north along a second iron seam, the walls pressing close. The floor is tracked and churned — this drift has seen steady traffic, and not all of it human-footed. The adit is back south; a side-cut runs west.",
+    "exits": { "south": "second.mine1", "west": "second.mine4" },
+    "fixtures": ["iron-vein", { "template": "silver-vein", "hidden": { "perception": 4 } }],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "giant-rat", "max": 2, "respawn": 40 }
+    ]
+  },
+  "second.mine3": {
+    "id": "second.mine3",
+    "zone": "second-mine",
+    "name": "The Silver Cut",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A short cut driven west off the main adit where the pick broke into something unexpected — a pale seam, neither rust-red nor common grey, threading the rock at a steep angle. The ore the Rim calls the mine's prize; it runs thin, and the cut is not large. The ceiling is low and close. The adit is east; the cut opens north into older stone.",
+    "exits": { "east": "second.mine1", "north": "second.mine4" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
+    ]
+  },
+  "second.mine4": {
+    "id": "second.mine4",
+    "zone": "second-mine",
+    "name": "The Umbral Stope",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The prospectors' rough scars give way abruptly to square-cut Umbral stone — the picks broke through a worked wall and into something older. A wide, low chamber opens out, the walls dressed smooth and set with a squat pillar scored with lightless-eye glyphs. The air here is different: stiller, older, pressing back. The silver cut is south; the black drift is east; the stope descends north to the deepest working.",
+    "exits": { "south": "second.mine3", "east": "second.mine2", "north": "second.mine5" },
+    "fixtures": ["umbral-pillar"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
+    ]
+  },
+  "second.mine5": {
+    "id": "second.mine5",
+    "zone": "second-mine",
+    "name": "The Sump",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The mine's lowest point, where the workings run into water. A black pool has gathered in the deepest cut, fed from a dozen hair-thin seeps in the Umbral stone, and the floor slopes into it from all sides. Things live in the water and in the dark above it. The stope is back south — and something in the dark came from further off, following the sound of boots.",
+    "exits": { "south": "second.mine4" },
+    "hiddenExits": { "down": { "to": "second.grotto", "perception": 4, "name": "a flooded tunnel" } },
+    "fixtures": ["dripping-pool"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-bat", "max": 2, "respawn": 35 },
+      { "mob": "pallid-hunter", "max": 1, "respawn": 200 }
+    ]
+  },
+  "second.grotto": {
+    "id": "second.grotto",
+    "zone": "second-mine",
+    "name": "The Drowned Hollow",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The flooded tunnel spits you out into a pocket the workings never found. Half the floor is water — black, perfectly still, cold enough to ache in the joints — and the stone above it is slick and low. Above the waterline a narrow ledge runs the far wall, and a glimmer crystal still juts from the seam that birthed it there — whole, untouched, its captive light pressing faint blue-white against the dark in a slow, almost breathing pulse, waiting for a steady hand to work it free. Pale salamanders lie along the wet stone near the ledge, skin the colour of old candle-wax, eyes sealed over and useless. They do not react to your presence. The air is close and cold and tastes of deep water. The only way back is through the flooded tunnel, up.",
+    "exits": { "up": "second.mine5" },
+    "fixtures": ["dripping-pool"],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 900 }
+    ],
+    "spawns": [
+      { "mob": "pale-salamander", "max": 2, "respawn": 90 }
+    ]
   }
 }
