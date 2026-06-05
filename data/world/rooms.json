@@ -32,7 +32,7 @@
     "ambientLight": 2,
     "exits": { "up": "rim.inn" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [{ "template": "shards", "qty": 12, "hidden": { "perception": 3 } }],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
   },
   "rim.market": {
