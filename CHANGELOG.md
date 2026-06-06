@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Exit destinations on the room panel.** Each exit chip now reads `north → Rim Inn`
+  when the room is lit enough to see — you can tell where a passage leads at a glance.
+  In the dark the chips fall back to bare directions (you feel the openings but can't
+  read where they go). Covers normal, discovered-hidden, and open-door-fixture exits.
+
 - **Weeping Chasm-Moss** — lore-canon bioluminescent predatory moss that grows over
   abyssal rivers and hot vents (`docs/lore.md` updated). Yields `weeping-chasm-moss`
   (harvestable material, value 8), processed at an alchemist's bench via
