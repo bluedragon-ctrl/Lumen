@@ -43,6 +43,13 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   known recipes). Data model: [docs/data-model.md](docs/data-model.md).
 - `client/` — vanilla 4-pane browser client.
 - `tools/validate-data.js` — pre-commit data validator.
+- `tools/mob-editor/` — browser-based NPC stat editor (`npm run edit-mobs` or
+  double-click `tools/mob-editor/start.bat`, port 3939). Edits
+  `data/world/mobs.json`; validates and can open a PR via `gh`.
+- `tools/spawn-editor/` — browser-based room spawn-rule editor (`npm run
+  edit-spawns` or `tools/spawn-editor/start.bat`, port 3940). Edits the
+  per-room `spawns` (mob / max / respawn) in `data/world/rooms.json`; validates
+  and can open a PR via `gh`.
 - `DESIGN.md` — pillars and design intent. `docs/lore.md` — **canon world & lore**;
   the reference for authored/AI-generated content (consistency rules included).
   `CHANGELOG.md` — keep-a-changelog.
