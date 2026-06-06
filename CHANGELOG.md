@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **The Inspect window now switches to your target the instant you `attack`**,
+  instead of waiting for the first swing to land on a later tick. Combat keeps
+  this view pinned and refreshes the target's HP each swing (unchanged), so the
+  readout no longer pops in unpredictably mid-fight. In the dark, where there is
+  nothing to make out, nothing is pinned.
+
 ### Added
 - **Weeping Chasm-Moss** — lore-canon bioluminescent predatory moss that grows over
   abyssal rivers and hot vents (`docs/lore.md` updated). Yields `weeping-chasm-moss`
