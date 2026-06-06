@@ -163,7 +163,7 @@
     "inputs": [
       { "template": "kingshell-plate", "qty": 1 },
       { "template": "crystal", "qty": 1 },
-      { "template": "iron-bar", "qty": 2 }
+      { "template": "silver-bar", "qty": 2 }
     ],
     "shards": 12,
     "output": { "template": "kingshell-cuirass", "qty": 1 }

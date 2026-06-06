@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Kingshell cuirass — the first warded body armour.** **Mallki** now sells **a
   kingshell method** (`schematic-kingshell-cuirass`), which teaches a smithing
   recipe forged from the Pale King's own two drops — a **kingshell plate** + a
-  **glimmer crystal**, plus 2 iron bars and 12 shards. Where the chitin/iron line
+  **glimmer crystal**, plus 2 silver bars and 12 shards. Where the chitin/iron line
   is heavier physical plate paid for in Wits, the **kingshell cuirass** is a light,
   glimmer-enhanced shell: `armour 2`, **`ward 2`** (the first body armour to carry
   any), **`+4 max mana`**, **no Wits penalty**, and it draws **`+2 mana`** back into
