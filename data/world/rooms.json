@@ -698,9 +698,9 @@
     "name": "The Dry Fissure",
     "depth": 4,
     "ambientLight": 0,
-    "description": "The passage climbs away from the lake into dry rock, and the moss-glow dies behind you — here the dark is total but for what light a delver carries. A few steps in, the rough cave changes character: the walls go suddenly straight and true, dressed smooth, the floor levelled and swept. This is worked stone, old Umbral work, and far older than the half-built ledges of the delvers above — someone shaped this passage long ago and meant it to last. The air is dry and dead-still and carries a faint, sour wrongness, like a clean room gone unaired for years. The lake glows faintly back to the north; the worked passage runs deeper south.",
+    "description": "The passage climbs away from the lake into dry rock, and the moss-glow dies behind you — here the dark is total but for what light a delver carries. A few steps in, the rough cave changes character: the walls go suddenly straight and true, dressed smooth, the floor levelled and swept. This is worked stone, old Umbral work, and far older than the half-built ledges of the delvers above — someone shaped this passage long ago and meant it to last. The air is dry and dead-still and carries a faint, sour wrongness, like a clean room gone unaired for years. Where the old chisels bit deepest into the side wall, the cut has laid bare a seam of pale metal threading the stone — raw silver, unworked, the kind of find that starts rushes. The lake glows faintly back to the north; the worked passage runs deeper south.",
     "exits": { "north": "lake.shallows", "south": "lake.gallery" },
-    "fixtures": [],
+    "fixtures": ["silver-vein"],
     "groundItems": [],
     "spawns": []
   },

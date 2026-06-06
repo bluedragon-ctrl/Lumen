@@ -42,6 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so they bank action-energy — and thus act and swing — more slowly. The dense
   cuirass carries `speedPenalty 2` (speed 12 → 10); the player panel shows the
   reduced speed. No existing gear changes (everything else is `speedPenalty 0`).
+- **A silver seam in the Sunless Lake.** `lake.fissure` (the worked-stone side
+  passage) now holds a **silver vein** — a local source of silver ore at depth 4,
+  so the kingshell cuirass's silver requirement can be supplied near where it's
+  found rather than only from the depth-2 mine.
 
 ### Changed
 - **The Inspect window now switches to your target the instant you `attack`**,
