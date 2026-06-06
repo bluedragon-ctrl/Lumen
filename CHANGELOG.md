@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **The Inspect window now switches to your target the instant you `attack`**,
+  instead of waiting for the first swing to land on a later tick. Combat keeps
+  this view pinned and refreshes the target's HP each swing (unchanged), so the
+  readout no longer pops in unpredictably mid-fight. In the dark, where there is
+  nothing to make out, nothing is pinned.
+
 ### Added
 - **Exit destinations on the room panel.** Each exit chip now reads `north → Rim Inn`
   when the room is lit enough to see — you can tell where a passage leads at a glance.

@@ -773,7 +773,14 @@ function attack(state, player, arg) {
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
   const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
-  return woke ? [{ type: "log", text: "You scramble to your feet." }, ready] : [ready];
+  // Switch the Inspect window to the target the instant you engage, rather than
+  // waiting for the first swing to resolve on a later tick — combat then keeps
+  // this view refreshed each swing (see the attack event in index.js). Returns
+  // null in the dark, where there is nothing to pin.
+  const view = buildExamineView(state, player, mob.id);
+  const out = woke ? [{ type: "log", text: "You scramble to your feet." }, ready] : [ready];
+  if (view) out.push(view);
+  return out;
 }
 
 // `search`: comb the current room for hidden features (exits, stashes, fixtures,
