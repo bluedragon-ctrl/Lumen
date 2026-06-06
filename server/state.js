@@ -146,6 +146,24 @@ function playerDefence(world, player) {
   return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
 
+// Total action-speed penalty from equipped gear: heavy armour (`armour.speedPenalty`)
+// slows the rate a player banks action-energy, and thus how often they act.
+function equipSpeedPenalty(world, player) {
+  let pen = 0;
+  for (const inst of Object.values(player.equipment || {})) {
+    if (!inst) continue;
+    const t = world.items[inst.template];
+    if (t && t.armour && t.armour.speedPenalty) pen += t.armour.speedPenalty;
+  }
+  return pen;
+}
+
+// A player's effective action speed after gear penalties — never below 1, so even
+// the heaviest load still lets them act. Drives energy gain and the bank cap.
+function effectiveSpeed(world, player) {
+  return Math.max(1, (player.speed || 0) - equipSpeedPenalty(world, player));
+}
+
 // A mob's live defence: its template armour/ward/evasion plus any active
 // "protect" buff states (e.g. a self-cast Glimmerskin). Mirrors how
 // playerDefence folds protect states in for players, so a buffed mob is tougher
@@ -1030,7 +1048,8 @@ class GameState {
     const events = [];
 
     for (const p of this.players.values()) {
-      p.energy = Math.min(p.energy + p.speed, p.speed * 3);
+      const sp = effectiveSpeed(this.world, p); // heavy gear (speedPenalty) slows action-energy gain
+      p.energy = Math.min(p.energy + sp, sp * 3);
       this._recoverTick(p, events);
     }
     for (const rt of Object.values(this.rooms)) {
@@ -2061,4 +2080,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };

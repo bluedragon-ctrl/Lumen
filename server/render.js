@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel } = require("./state");
 
 // How a posture reads to OTHERS in the room (the social tag). Standing is the
 // default and shows nothing.
@@ -29,6 +29,7 @@ function buildPlayerView(state, p) {
   const equipment = {};
   for (const [slot, inst] of Object.entries(p.equipment)) equipment[slot] = itemView(inst, w);
   const defence = playerDefence(w, p); // Armour (vs physical) + Ward (vs magical) from gear
+  const sp = effectiveSpeed(w, p); // base speed minus heavy-gear speedPenalty
   return {
     type: "player",
     player: {
@@ -43,8 +44,8 @@ function buildPlayerView(state, p) {
       mana: Math.floor(p.mana || 0),
       maxMana: p.maxMana,
       energy: p.energy,
-      energyMax: p.speed * 3, // action-point bank cap (matches state.advance)
-      speed: p.speed,
+      energyMax: sp * 3, // action-point bank cap (matches state.advance, after gear penalty)
+      speed: sp, // effective action speed (base minus heavy-gear speedPenalty)
       posture: p.posture || "standing", // sit/sleep for rest recovery
 
       armour: defence.armour,

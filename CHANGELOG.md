@@ -31,6 +31,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the wearer off every melee blow that lands (`armour.onDamage`). A caster's/battle-
   mage's bodywear, pairing with the glimmer-singer circlet — all pure data, no new
   code.
+- **Dense chitin cuirass — the heaviest tank, and `speedPenalty` made real.**
+  **Mallki** also sells **a dense chitin method** (`schematic-dense-chitin-cuirass`),
+  a smithing recipe forged from **dense chitin plate ×3** (the Old Grinder's drop,
+  finally given a use) + 2 iron bars + 12 shards. The **dense chitin cuirass** is the
+  game's heaviest armour — `armour 4` (top), `+8 max HP`, `Wits −2` — and the
+  counterpart to the light kingshell shell. To make "heavy" mean heavy, the
+  long-documented-but-unwired **`speedPenalty`** field is now live: equipped
+  `armour.speedPenalty` lowers a player's effective action speed (`effectiveSpeed`),
+  so they bank action-energy — and thus act and swing — more slowly. The dense
+  cuirass carries `speedPenalty 2` (speed 12 → 10); the player panel shows the
+  reduced speed. No existing gear changes (everything else is `speedPenalty 0`).
 
 ### Changed
 - **The Inspect window now switches to your target the instant you `attack`**,

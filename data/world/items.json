@@ -693,6 +693,28 @@
     "value": 60,
     "armour": { "armour": 3, "ward": 0, "speedPenalty": 0, "maxHp": 5, "attrMod": { "wits": -3 } }
   },
+  "dense-chitin-cuirass": {
+    "id": "dense-chitin-cuirass",
+    "name": "a dense chitin cuirass",
+    "keywords": ["cuirass", "dense", "chitin", "carapace"],
+    "description": "A cuirass beaten from slabs of dense, mineral-banded chitin — the near-black, ceramic-hard plate of the deep's oldest armoured things — fitted to Mallki's pattern and bound to an iron frame. It is the heaviest thing a delver can wear and turns aside very nearly everything, but it sits like a second skeleton of stone: a body inside it lumbers, slow to move and slower to strike, and the dark has long to close before a swing comes round.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 12,
+    "value": 80,
+    "armour": { "armour": 4, "ward": 0, "speedPenalty": 2, "maxHp": 8, "attrMod": { "wits": -2 } }
+  },
+  "schematic-dense-chitin-cuirass": {
+    "id": "schematic-dense-chitin-cuirass",
+    "name": "a dense chitin method",
+    "keywords": ["method", "schematic", "dense", "chitin", "cuirass"],
+    "description": "A strip of cured gut-skin marked in Mallki's careful hand — the layering of the dense black plate, the working of the iron frame, the fitting of a harness heavy enough to stop a deep-thing's charge. No words, only the sequence of steps. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 45,
+    "stackable": true,
+    "recipe": "forge-dense-chitin-cuirass"
+  },
   "chitin-maul": {
     "id": "chitin-maul",
     "name": "a chitin maul",
