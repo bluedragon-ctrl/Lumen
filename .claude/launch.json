@@ -7,6 +7,18 @@
       "runtimeArgs": ["start"],
       "port": 3737,
       "autoPort": true
+    },
+    {
+      "name": "mob-editor",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/mob-editor/mob-editor.js"],
+      "port": 3939
+    },
+    {
+      "name": "spawn-editor",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/spawn-editor/spawn-editor.js"],
+      "port": 3940
     }
   ]
 }

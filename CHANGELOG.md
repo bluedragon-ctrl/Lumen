@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **NPC stat editor (`tools/mob-editor/`).** A local, browser-based form for
+  editing `data/world/mobs.json` — run `npm run edit-mobs` (or double-click
+  `tools/mob-editor/start.bat`) and open `http://localhost:3939`. Edit each mob's common stats (HP, speed, armour, ward,
+  attributes, perception band, flags) via form fields, with a raw-JSON escape
+  hatch for advanced blocks (attack, loot, actions, shop). **Validate & preview**
+  writes the file, runs `npm run validate`, shows the exact `git diff`, then
+  restores the file; **Create pull request** branches, commits (Conventional
+  Commit), pushes, and opens a PR via `gh`. Diff hygiene: unedited mobs keep their
+  exact source text byte-for-byte, so a PR touches only the NPCs you changed.
+- **Room spawn-rule editor (`tools/spawn-editor/`).** A sibling tool for editing
+  the per-room `spawns` rules (mob / max / respawn) in `data/world/rooms.json` —
+  run `npm run edit-spawns` (or double-click `tools/spawn-editor/start.bat`) and
+  open `http://localhost:3940`. Pick a room, add/remove/edit its spawn rows, then
+  validate + preview the diff or open a PR via `gh`. Field-level splice: only the
+  `spawns` value of an edited room is rewritten, every other byte is preserved.
 - **Weeping Chasm-Moss** — lore-canon bioluminescent predatory moss that grows over
   abyssal rivers and hot vents (`docs/lore.md` updated). Yields `weeping-chasm-moss`
   (harvestable material, value 8), processed at an alchemist's bench via

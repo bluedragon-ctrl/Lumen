@@ -6,7 +6,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "validate": "node tools/validate-data.js"
+    "validate": "node tools/validate-data.js",
+    "edit-mobs": "node tools/mob-editor/mob-editor.js",
+    "edit-spawns": "node tools/spawn-editor/spawn-editor.js"
   },
   "engines": {
     "node": ">=18"
