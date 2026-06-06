@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Spawn rules** — Spawn speed updates (rim.cellar, rim.hatchery).
 - **The Inspect window now switches to your target the instant you `attack`**,
   instead of waiting for the first swing to land on a later tick. Combat keeps
   this view pinned and refreshes the target's HP each swing (unchanged), so the
