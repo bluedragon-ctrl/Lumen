@@ -46,6 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   passage) now holds a **silver vein** — a local source of silver ore at depth 4,
   so the kingshell cuirass's silver requirement can be supplied near where it's
   found rather than only from the depth-2 mine.
+- **Secret: the Drowned Claimant.** `lake.islet` (the King's Reach) now hides a
+  dead prospector's silt-logged cache among the bone-heap — `search` it (Perception
+  3) to turn up glimmer shards, lamp-oil, and a leather jerkin. The reward for
+  beating the Pale King and looking closer.
 - **Palecaps on the lake shore.** `lake.strand` now grows a small patch of
   **palecap mushrooms** in the weeping-moss glow — the lake's first foraged food
   besides the fishing shallows, and consistent with fungus growing where there's

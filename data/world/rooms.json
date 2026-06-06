@@ -686,10 +686,14 @@
     "name": "The King's Reach",
     "depth": 4,
     "ambientLight": 1,
-    "description": "The spit climbs onto a low island of heaped, water-worn rock, ringed on every side by the deep black lake — the richest hunting on the water, where everything the falls wash down eventually drifts. The stone is littered with the leavings of a long reign: cracked shells and the picked-clean bones of fish and crayfish and things less easy to name, heaped and trodden into the rock over years. This is the Pale King's ground, and he suffers nothing to share it. There is no way on from here; the gravel spit runs back south to the shore.",
+    "description": "The spit climbs onto a low island of heaped, water-worn rock, ringed on every side by the deep black lake — the richest hunting on the water, where everything the falls wash down eventually drifts. The stone is littered with the leavings of a long reign: cracked shells and the picked-clean bones of fish and crayfish and things less easy to name, heaped and trodden into the rock over years. Here and there among the heap a harder edge catches the light — things that are neither shell nor bone, sunk in the silt of the King's table. This is the Pale King's ground, and he suffers nothing to share it. There is no way on from here; the gravel spit runs back south to the shore.",
     "exits": { "south": "lake.causeway" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "shards", "qty": 15, "hidden": { "perception": 3 } },
+      { "template": "lamp-oil", "qty": 2, "hidden": { "perception": 3 } },
+      { "template": "leather-jerkin", "hidden": { "perception": 3 } }
+    ],
     "spawns": [
       { "mob": "pale-king", "max": 1, "respawn": 1200 }
     ]
