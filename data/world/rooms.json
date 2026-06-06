@@ -33,7 +33,7 @@
     "exits": { "up": "rim.inn" },
     "fixtures": [],
     "groundItems": [{ "template": "shards", "qty": 12, "hidden": { "perception": 3 } }],
-    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
   },
   "rim.market": {
     "id": "rim.market",
@@ -58,8 +58,8 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "rim-hatcher", "max": 1, "respawn": 60 },
-      { "mob": "lightbug", "max": 3, "respawn": 20 }
+      { "mob": "rim-hatcher", "max": 1, "respawn": 120 },
+      { "mob": "lightbug", "max": 3, "respawn": 120 }
     ]
   },
   "rim.corral": {
