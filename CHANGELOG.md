@@ -46,6 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   passage) now holds a **silver vein** — a local source of silver ore at depth 4,
   so the kingshell cuirass's silver requirement can be supplied near where it's
   found rather than only from the depth-2 mine.
+- **Palecaps on the lake shore.** `lake.strand` now grows a small patch of
+  **palecap mushrooms** in the weeping-moss glow — the lake's first foraged food
+  besides the fishing shallows, and consistent with fungus growing where there's
+  light.
 
 ### Changed
 - **The Inspect window now switches to your target the instant you `attack`**,

@@ -613,10 +613,12 @@
     "name": "The Drowned Strand",
     "depth": 4,
     "ambientLight": 1,
-    "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. The air is all cold mist and the smell of deep water. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
+    "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. Where that cold light falls steadiest, a scatter of pale mushrooms has taken to the damp sand — the first growing things to feed on a glow since the river far above. The air is all cold mist and the smell of deep water. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
     "exits": { "up": "third.falls", "east": "lake.shallows" },
     "fixtures": ["weeping-moss-curtain"],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
+    ],
     "spawns": [
       { "mob": "pale-salamander", "max": 1, "respawn": 120 }
     ]
