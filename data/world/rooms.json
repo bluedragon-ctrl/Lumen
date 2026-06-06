@@ -557,8 +557,8 @@
     "name": "The Sunless Falls",
     "depth": 3,
     "ambientLight": 1,
-    "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. The glow comes from the moss: a dense curtain of weeping chasm-moss clinging to the ceiling and the high rock, its blue-white bioluminescence caught and scattered by the spray into something that barely passes for light. A narrow ledge runs down beside the cataract, worn but unfinished, the rope-stakes set only partway — the descent to whatever lies below is begun, but no one has yet made it fast enough to trust. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
-    "exits": { "east": "third.pools", "north": "third.cave" },
+    "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. The glow comes from the moss: a dense curtain of weeping chasm-moss clinging to the ceiling and the high rock, its blue-white bioluminescence caught and scattered by the spray into something that barely passes for light. A narrow ledge runs down beside the cataract — the rope-stakes are driven home and the line strung taut at last, the descent made fast, and it switchbacks away into the cold roar below toward a wider water glimmering far down. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
+    "exits": { "east": "third.pools", "north": "third.cave", "down": "lake.strand" },
     "fixtures": ["weeping-moss-curtain"],
     "groundItems": [],
     "spawns": []
@@ -605,6 +605,129 @@
     ],
     "spawns": [
       { "mob": "grub", "max": 2, "respawn": 120 }
+    ]
+  },
+  "lake.strand": {
+    "id": "lake.strand",
+    "zone": "fourth-lake",
+    "name": "The Drowned Strand",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. The air is all cold mist and the smell of deep water. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
+    "exits": { "up": "third.falls", "east": "lake.shallows" },
+    "fixtures": ["weeping-moss-curtain"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-salamander", "max": 1, "respawn": 120 }
+    ]
+  },
+  "lake.shallows": {
+    "id": "lake.shallows",
+    "zone": "fourth-lake",
+    "name": "The Black Shallows",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "Here the lake comes ashore in a long, shallow margin, the black water spreading thin and glass-still over a shelf of pale stone before it drops away into the deep. Blind cave-fish hang in the slack, larger than those of the river above and many more of them — the falls feed this lake, and what the falls wash down gathers here. It is a still, easy stretch, the moss-glow soft on the water, the kind of place a delver might unsling a baited line and breathe a while; only the pale crayfish that own the silt give it any edge. The shore runs west toward the roar of the falls and east toward a narrowing of the bank. A dry passage opens south, away from the water, where the rough cave gives way to old cut stone.",
+    "exits": { "west": "lake.strand", "east": "lake.narrows", "south": "lake.fissure" },
+    "fixtures": ["still-pool"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
+      { "mob": "pale-crayfish", "max": 1, "respawn": 120 }
+    ]
+  },
+  "lake.narrows": {
+    "id": "lake.narrows",
+    "zone": "fourth-lake",
+    "name": "The Shorewalk Narrows",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The cavern wall closes in on the lake here, pinching the shore down to a slick ledge barely a body wide, deep black water on one hand and cold stone on the other. The moss thins where the spray no longer reaches, and the glow with it, so the footing must be read more than seen. It is the one tight place on the walk around the water, and the crayfish know it — they gather where the bank forces everything past within reach of their claws. The ledge widens again to the east, where the lake begins to drain away. To the west the shore opens back toward the shallows. North, a low gravel spit runs out into the lake itself, pale against the black.",
+    "exits": { "west": "lake.shallows", "east": "lake.farshore", "north": "lake.causeway" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-crayfish", "max": 2, "respawn": 90 }
+    ]
+  },
+  "lake.farshore": {
+    "id": "lake.farshore",
+    "zone": "fourth-lake",
+    "name": "The Far Bank",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The shore-walk ends on a broad bank of water-smoothed rock at the lake's far reach, where the still water finds its outflow at last — drawn down a black throat in the floor with a low, endless suck of current, away into a deeper dark than this. A little weeping-moss has taken on the wet rock at the lip of it, throwing just enough light to see the water turn and go down. The descent continues here, plainly: a delver has begun working a way down beside the outflow — a few stakes driven, a coil of gut-line, a chalked mark on the stone — but the work is half-done and the line goes nowhere yet. No one has made this way fast. The only sure path is back west, the way you came around the lake.",
+    "exits": { "west": "lake.narrows" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-salamander", "max": 1, "respawn": 120 }
+    ]
+  },
+  "lake.causeway": {
+    "id": "lake.causeway",
+    "zone": "fourth-lake",
+    "name": "The Gravel Spit",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "A natural causeway of pale gravel and tumbled stone runs out from the bank into the lake, low and bare, black water lapping at both edges of it. Walking it feels like walking out onto the water itself, the shore-glow falling away behind and the cold rising off the lake on every side. Ahead, where the spit lifts clear of the water, a hump of rock breaks the surface — a small island, and something on it catches what little light there is and throws it back in a cold, mineral shimmer. The spit runs north toward the island and back south to the safety of the shore.",
+    "exits": { "south": "lake.narrows", "north": "lake.islet" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-crayfish", "max": 1, "respawn": 120 }
+    ]
+  },
+  "lake.islet": {
+    "id": "lake.islet",
+    "zone": "fourth-lake",
+    "name": "The King's Reach",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The spit climbs onto a low island of heaped, water-worn rock, ringed on every side by the deep black lake — the richest hunting on the water, where everything the falls wash down eventually drifts. The stone is littered with the leavings of a long reign: cracked shells and the picked-clean bones of fish and crayfish and things less easy to name, heaped and trodden into the rock over years. This is the Pale King's ground, and he suffers nothing to share it. There is no way on from here; the gravel spit runs back south to the shore.",
+    "exits": { "south": "lake.causeway" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-king", "max": 1, "respawn": 1200 }
+    ]
+  },
+  "lake.fissure": {
+    "id": "lake.fissure",
+    "zone": "fourth-umbral",
+    "name": "The Dry Fissure",
+    "depth": 4,
+    "ambientLight": 0,
+    "description": "The passage climbs away from the lake into dry rock, and the moss-glow dies behind you — here the dark is total but for what light a delver carries. A few steps in, the rough cave changes character: the walls go suddenly straight and true, dressed smooth, the floor levelled and swept. This is worked stone, old Umbral work, and far older than the half-built ledges of the delvers above — someone shaped this passage long ago and meant it to last. The air is dry and dead-still and carries a faint, sour wrongness, like a clean room gone unaired for years. The lake glows faintly back to the north; the worked passage runs deeper south.",
+    "exits": { "north": "lake.shallows", "south": "lake.gallery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "lake.gallery": {
+    "id": "lake.gallery",
+    "zone": "fourth-umbral",
+    "name": "The Failing Reliefs",
+    "depth": 4,
+    "ambientLight": 0,
+    "description": "The passage opens into a long gallery, and both walls are carved end to end with Umbral relief — the same patient stonework that ornaments the worked tunnels above, figures of the deep-folk at their crafts and their rites, worn soft but unmistakable. Follow them along the wall, though, and something goes wrong with them. The figures grow taller and thinner as they go, their fine faces lengthening into something gaunt and starved, hands curling, eyes opening too wide; the careful lines turn ragged, then gouged, then to raw hacking at the stone, as if the same hand that began them kept working long after it had forgotten what it was carving. The last reliefs are barely figures at all. A cold draught breathes up from the dark ahead, southward; the worked passage runs back north toward the lake.",
+    "exits": { "north": "lake.fissure", "south": "lake.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "lake.warren": {
+    "id": "lake.warren",
+    "zone": "fourth-umbral",
+    "name": "Yana's Hollow",
+    "depth": 4,
+    "ambientLight": 0,
+    "description": "The passage ends in a low, square hollow — a dwelling, once, and unmistakably a brother to Mallki's clean lamp-lit room far above: the same carved shelves, the same cold-lamp niche, the same care in the cut of the walls. But the lamp is long dead, the shelves are swept to the floor and the floor is fouled, and the careful order has been clawed apart from within and rebuilt into something a beast would make. Whatever light there is comes from the thing that keeps this place now — a faint blue-green glow moving under grey skin, the very same glow Mallki carries, but stretched thin over a frame gone tall and wrong, flinching from even the memory of light. This was an Umbral once, and not long enough ago. The only way out is back north, the way you came.",
+    "exits": { "north": "lake.gallery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "yana", "max": 1, "respawn": 1200 }
     ]
   }
 }

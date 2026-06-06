@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing to make out, nothing is pinned.
 
 ### Added
+- **The Sunless Lake (depth 4).** The paqcha at the Sunless Falls now has its
+  descent made fast: `down` from `third.falls` drops to a new nine-room zone
+  around a vast underground lake. A generally safe shore-walk runs from the foot
+  of the falls (`lake.strand`, with a weeping chasm-moss harvest) past a fishing
+  shallows and a pinched chokepoint to the far bank, where the next descent is
+  begun but not yet open. Two branches leave the shore: a gravel spit out to **the
+  Pale King** — a glimmer-crusted crayfish miniboss holding the richest water — and
+  a worked-stone side passage past a gallery of Umbral reliefs that decay into
+  twisted figures, ending at **Yana, the lost apprentice**, the first corrupted
+  Umbral a delver meets: kin to Mallki the trader one floor above, and what the
+  deep has made of him. Wandering pool fauna (crayfish, cave-fish, salamanders)
+  are the only risk on the safe path. (Loot and secrets still to come.)
 - **NPC stat editor (`tools/mob-editor/`).** A local, browser-based form for
   editing `data/world/mobs.json` — run `npm run edit-mobs` (or double-click
   `tools/mob-editor/start.bat`) and open `http://localhost:3939`. Edit each mob's common stats (HP, speed, armour, ward,
