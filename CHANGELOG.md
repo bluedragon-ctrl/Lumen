@@ -15,12 +15,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gated so a mob won't recast it while it's still up. Reusable for future
   warder/healer mobs.
 - **Loot for the Sunless Lake.** **the Pale King** now drops a **kingshell plate**
-  (a unique glimmer-veined carapace material — armour recipe to come) and a
+  (a unique glimmer-veined carapace material) and a
   **glimmer crystal**, both guaranteed. **Yana** now fights as the game's first
   real **spellcasting mob** — opening with **Glimmerskin** to crust himself in a
   glimmer shell, then flinging **Glimmer Spikes** — and drops a **glimmer-singer's
   circlet**, a new head-slot caster item (the first magical headpiece: +4 max mana,
   +1 ward, no helm weight), read as his master's old apprentice-mark gone cold.
+- **Kingshell cuirass — the first warded body armour.** **Mallki** now sells **a
+  kingshell method** (`schematic-kingshell-cuirass`), which teaches a smithing
+  recipe forged from the Pale King's own two drops — a **kingshell plate** + a
+  **glimmer crystal**, plus 2 iron bars and 12 shards. Where the chitin/iron line
+  is heavier physical plate paid for in Wits, the **kingshell cuirass** is a light,
+  glimmer-enhanced shell: `armour 2`, **`ward 2`** (the first body armour to carry
+  any), **`+4 max mana`**, **no Wits penalty**, and it draws **`+2 mana`** back into
+  the wearer off every melee blow that lands (`armour.onDamage`). A caster's/battle-
+  mage's bodywear, pairing with the glimmer-singer circlet — all pure data, no new
+  code.
 
 ### Changed
 - **The Inspect window now switches to your target the instant you `attack`**,

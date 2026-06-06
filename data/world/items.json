@@ -727,6 +727,34 @@
     "value": 42,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 4, "attrMod": { "wits": -1 }, "spikes": { "damage": "1d3", "chance": 1 } }
   },
+  "kingshell-cuirass": {
+    "id": "kingshell-cuirass",
+    "name": "a kingshell cuirass",
+    "keywords": ["cuirass", "kingshell", "glimmer", "carapace"],
+    "description": "A cuirass shaped from the Pale King's own carapace, worked to Mallki's patient method — the glimmer-veined shell pared thin and curved close to the body, then woven through with a whole ground crystal so the cold light runs all through it. It is feather-light against the heft of iron or stacked chitin, no slab of plate but a glimmer-enhanced shell, and it carries the deep art with it: hostile weaves slide off the crust, and a blow that lands feeds a flicker of its spent light back into the wearer. Umbral glimmer-craft, and there can only ever be the one.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 2,
+    "value": 140,
+    "armour": {
+      "armour": 2,
+      "ward": 2,
+      "speedPenalty": 0,
+      "maxMana": 4,
+      "onDamage": [{ "type": "restore", "mana": 2, "target": "self" }]
+    }
+  },
+  "schematic-kingshell-cuirass": {
+    "id": "schematic-kingshell-cuirass",
+    "name": "a kingshell method",
+    "keywords": ["method", "schematic", "kingshell", "cuirass"],
+    "description": "A strip of cured gut-skin marked in Mallki's careful hand — the paring of the great shell, the grinding of the crystal, the working of the cold light all through the plate. No words, only the sequence of steps, drawn for a hand that will likely only ever do this once. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "recipe": "forge-kingshell-cuirass"
+  },
   "book-of-basic-smithing": {
     "id": "book-of-basic-smithing",
     "name": "a book of basic smithing",
