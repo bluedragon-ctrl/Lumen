@@ -146,6 +146,37 @@ function playerDefence(world, player) {
   return { armour, ward, evasion: wits * EVASION_PER_WITS };
 }
 
+// Total action-speed penalty from equipped gear: heavy armour (`armour.speedPenalty`)
+// slows the rate a player banks action-energy, and thus how often they act.
+function equipSpeedPenalty(world, player) {
+  let pen = 0;
+  for (const inst of Object.values(player.equipment || {})) {
+    if (!inst) continue;
+    const t = world.items[inst.template];
+    if (t && t.armour && t.armour.speedPenalty) pen += t.armour.speedPenalty;
+  }
+  return pen;
+}
+
+// A player's effective action speed after gear penalties — never below 1, so even
+// the heaviest load still lets them act. Drives energy gain and the bank cap.
+function effectiveSpeed(world, player) {
+  return Math.max(1, (player.speed || 0) - equipSpeedPenalty(world, player));
+}
+
+// A mob's live defence: its template armour/ward/evasion plus any active
+// "protect" buff states (e.g. a self-cast Glimmerskin). Mirrors how
+// playerDefence folds protect states in for players, so a buffed mob is tougher
+// against both melee and the wholesale-negate ward roll.
+function mobDefence(template, mob) {
+  let armour = template.armour || 0;
+  let ward = template.ward || 0;
+  for (const s of (mob && mob.states) || []) {
+    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; }
+  }
+  return { armour, ward, evasion: template.evasion || 0 };
+}
+
 // A flat damage bonus from a scaling attribute, e.g. {attr:"intellect", per:4}
 // adds floor(intellect / 4). Used by both spells (effect.scale) and melee
 // weapons (weapon.scale). No `scale` block → no attribute bonus.
@@ -1017,7 +1048,8 @@ class GameState {
     const events = [];
 
     for (const p of this.players.values()) {
-      p.energy = Math.min(p.energy + p.speed, p.speed * 3);
+      const sp = effectiveSpeed(this.world, p); // heavy gear (speedPenalty) slows action-energy gain
+      p.energy = Math.min(p.energy + sp, sp * 3);
       this._recoverTick(p, events);
     }
     for (const rt of Object.values(this.rooms)) {
@@ -1165,7 +1197,7 @@ class GameState {
       }
       const weapon = weaponOf(w, p);
       const mt = w.mobs[mob.template];
-      const mobDef = { armour: mt.armour || 0, ward: mt.ward || 0, evasion: mt.evasion || 0 };
+      const mobDef = mobDefence(mt, mob);
       const attrs = effectiveAttributes(w, p);
       const per = attrs.perception || 0;
       const attacker = {
@@ -1220,7 +1252,7 @@ class GameState {
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
     if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost); // glimmer burned in the cast (e.g. Glimmer Spike)
 
-    const ward = w.mobs[mob.template].ward || 0;
+    const ward = mobDefence(w.mobs[mob.template], mob).ward || 0;
     if (spell.hostile && wardNegates(ward)) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
@@ -1441,7 +1473,14 @@ class GameState {
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
         if (a.type === "attack") return aggressive && t.attack && candidates.length > 0;
-        if (a.type === "cast") return aggressive && a.spell && this.world.spells[a.spell] && candidates.length > 0;
+        if (a.type === "cast") {
+          const sp = a.spell && this.world.spells[a.spell];
+          if (!aggressive || !sp || !candidates.length) return false;
+          // A beneficial self-buff (e.g. Glimmerskin) is only worth a turn if it
+          // isn't already crusting the mob — otherwise it would recast forever.
+          if (!sp.hostile) return !this._mobHasState(m, (sp.effect && sp.effect.name) || sp.effect && sp.effect.type);
+          return true;
+        }
         if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && candidates.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
@@ -1750,7 +1789,7 @@ class GameState {
     const targetEmitsLight = isPlayer ? false : !!tmt.emitsLight;
     const defence = isPlayer
       ? playerDefence(this.world, target.actor)
-      : { armour: tmt.armour || 0, ward: tmt.ward || 0, evasion: tmt.evasion || 0 };
+      : mobDefence(tmt, target.actor);
     const attacker = {
       band: t.perception,
       hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
@@ -1816,7 +1855,8 @@ class GameState {
   _mobCast(m, t, roomId, events, enemies, spellId) {
     const rt = this.rooms[roomId];
     const spell = this.world.spells[spellId];
-    if (!spell || !spell.hostile) return; // only hostile spells engage an enemy this way
+    if (!spell) return;
+    if (!spell.hostile) return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
     const eff = spell.effect || {};
     const target = this._topThreat(m, enemies) || enemies[Math.floor(Math.random() * enemies.length)];
     if (!target) return;
@@ -1825,7 +1865,7 @@ class GameState {
     const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
     const targetName = isPlayer ? target.actor.name : tmt.name;
 
-    const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (tmt.ward || 0);
+    const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (mobDefence(tmt, target.actor).ward || 0);
     const resisted = wardNegates(ward);
     let damage = 0, killed = false, death = null, effectName = null;
     if (!resisted) {
@@ -1860,6 +1900,40 @@ class GameState {
       p.pending = { type: "attack", targetId: m.id };
       events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
     }
+  }
+
+  /** A mob casts a beneficial spell on *itself* — the support side of mob casting
+   *  (e.g. an Umbral glimmer-singer crusting Glimmerskin over its own hide before
+   *  it spikes you). Mobs pay no mana/shards; defence/heal magnitudes are baked
+   *  from the mob's own attributes, mirroring castBeneficial. Reusable for future
+   *  warder/healer mobs. The _mobAct filter gates a refresh-buff so it isn't recast
+   *  while already up. */
+  _mobCastSelf(m, t, roomId, events, spell) {
+    const rt = this.rooms[roomId];
+    const eff = spell.effect || {};
+    const attrs = t.attributes || {};
+    if (eff.type === "protect") {
+      const armour = scaledAmount(attrs, eff.armour);
+      const ward = scaledAmount(attrs, eff.ward);
+      this.applyEffect(m, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
+    } else if (eff.type === "restore") {
+      this.applyRestore(m, eff);
+    } else {
+      const bonus = spellScaleBonus(attrs, eff.scale);
+      const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+      this.applyEffect(m, { ...eff, magnitude });
+      if (eff.type === "emit-light") rt.light = this.computeRoomLight(roomId);
+    }
+    events.push({
+      type: "mob-cast-self", roomId, mobId: m.id, mobName: t.name,
+      emitsLight: !!t.emitsLight, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
+    });
+  }
+
+  /** True if a mob currently carries an active state by name (used to gate a
+   *  refresh self-buff so it isn't recast while still up). */
+  _mobHasState(m, name) {
+    return !!name && (m.states || []).some((s) => s.name === name);
   }
 
   _mobMove(m, t, roomId, events, verb, exits) {
@@ -2006,4 +2080,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel };

@@ -156,6 +156,29 @@
     "shards": 8,
     "output": { "template": "chitin-cuirass", "qty": 1 }
   },
+  "forge-kingshell-cuirass": {
+    "id": "forge-kingshell-cuirass",
+    "name": "Kingshell Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "kingshell-plate", "qty": 1 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "silver-bar", "qty": 2 }
+    ],
+    "shards": 12,
+    "output": { "template": "kingshell-cuirass", "qty": 1 }
+  },
+  "forge-dense-chitin-cuirass": {
+    "id": "forge-dense-chitin-cuirass",
+    "name": "Dense Chitin Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 3 },
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 12,
+    "output": { "template": "dense-chitin-cuirass", "qty": 1 }
+  },
   "forge-heavy-chitin-plate": {
     "id": "forge-heavy-chitin-plate",
     "name": "Heavy Chitin Plate",

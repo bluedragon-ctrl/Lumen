@@ -5,6 +5,66 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Buff-casting mobs (engine).** A mob's `cast` action may now name a
+  **non-hostile** spell, which it lays on **itself** as a self-buff (see
+  `state._mobCastSelf`) — defence/heal magnitudes baked from the mob's own
+  attributes, mirroring player `castBeneficial`. A mob's live defence now folds in
+  active `protect` states (`mobDefence`), so a self-cast Glimmerskin actually
+  toughens the caster against melee and the ward-negate roll. A refresh-buff is
+  gated so a mob won't recast it while it's still up. Reusable for future
+  warder/healer mobs.
+- **Loot for the Sunless Lake.** **the Pale King** now drops a **kingshell plate**
+  (a unique glimmer-veined carapace material) and a
+  **glimmer crystal**, both guaranteed. **Yana** now fights as the game's first
+  real **spellcasting mob** — opening with **Glimmerskin** to crust himself in a
+  glimmer shell, then flinging **Glimmer Spikes** — and drops a **glimmer-singer's
+  circlet**, a new head-slot caster item (the first magical headpiece: +4 max mana,
+  +1 ward, no helm weight), read as his master's old apprentice-mark gone cold.
+- **Kingshell cuirass — the first warded body armour.** **Mallki** now sells **a
+  kingshell method** (`schematic-kingshell-cuirass`), which teaches a smithing
+  recipe forged from the Pale King's own two drops — a **kingshell plate** + a
+  **glimmer crystal**, plus 2 silver bars and 12 shards. Where the chitin/iron line
+  is heavier physical plate paid for in Wits, the **kingshell cuirass** is a light,
+  glimmer-enhanced shell: `armour 2`, **`ward 2`** (the first body armour to carry
+  any), **`+4 max mana`**, **no Wits penalty**, and it draws **`+2 mana`** back into
+  the wearer off every melee blow that lands (`armour.onDamage`). A caster's/battle-
+  mage's bodywear, pairing with the glimmer-singer circlet — all pure data, no new
+  code.
+- **Dense chitin cuirass — the heaviest tank, and `speedPenalty` made real.**
+  **Mallki** also sells **a dense chitin method** (`schematic-dense-chitin-cuirass`),
+  a smithing recipe forged from **dense chitin plate ×3** (the Old Grinder's drop,
+  finally given a use) + 2 iron bars + 12 shards. The **dense chitin cuirass** is the
+  game's heaviest armour — `armour 4` (top), `+8 max HP`, `Wits −2` — and the
+  counterpart to the light kingshell shell. To make "heavy" mean heavy, the
+  long-documented-but-unwired **`speedPenalty`** field is now live: equipped
+  `armour.speedPenalty` lowers a player's effective action speed (`effectiveSpeed`),
+  so they bank action-energy — and thus act and swing — more slowly. The dense
+  cuirass carries `speedPenalty 2` (speed 12 → 10); the player panel shows the
+  reduced speed. No existing gear changes (everything else is `speedPenalty 0`).
+- **A silver seam in the Sunless Lake.** `lake.fissure` (the worked-stone side
+  passage) now holds a **silver vein** — a local source of silver ore at depth 4,
+  so the kingshell cuirass's silver requirement can be supplied near where it's
+  found rather than only from the depth-2 mine.
+- **Secret: the Drowned Claimant.** `lake.islet` (the King's Reach) now hides a
+  dead prospector's silt-logged cache among the bone-heap — `search` it (Perception
+  3) to turn up glimmer shards, lamp-oil, and a leather jerkin. The reward for
+  beating the Pale King and looking closer.
+- **Secret: Yana's keepsake.** `lake.warren` hides **an apprentice's glimmer-charm**
+  in the swept wreckage — `search` (Perception 4) to find the unfinished neck-charm
+  Yana was making under Mallki before the deep took him (neck slot: Perception +2,
+  Ward +2; a senses-and-magic-guard piece, distinct from the Intellect mind-charm).
+  The emotional capstone of the Mallki→Yana arc.
+- **Secret: Behind the Paqcha.** A 10th room hidden behind the waterfall at
+  `lake.strand` — `search` (Perception 4) reveals a slick ledge through the spray
+  into **`lake.shrine`**, an old Umbral shrine to the paqcha they named, lamp-lit
+  and untouched by the Rush, holding a respawning glimmer crystal and a pile of
+  offered shards.
+- **Palecaps on the lake shore.** `lake.strand` now grows a small patch of
+  **palecap mushrooms** in the weeping-moss glow — the lake's first foraged food
+  besides the fishing shallows, and consistent with fungus growing where there's
+  light.
+
 ### Changed
 - **Spawn rules** — Spawn speed updates (rim.cellar, rim.hatchery).
 - **The Inspect window now switches to your target the instant you `attack`**,
@@ -14,6 +74,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing to make out, nothing is pinned.
 
 ### Added
+- **The Sunless Lake (depth 4).** The paqcha at the Sunless Falls now has its
+  descent made fast: `down` from `third.falls` drops to a new nine-room zone
+  around a vast underground lake. A generally safe shore-walk runs from the foot
+  of the falls (`lake.strand`, with a weeping chasm-moss harvest) past a fishing
+  shallows and a pinched chokepoint to the far bank, where the next descent is
+  begun but not yet open. Two branches leave the shore: a gravel spit out to **the
+  Pale King** — a glimmer-crusted crayfish miniboss holding the richest water — and
+  a worked-stone side passage past a gallery of Umbral reliefs that decay into
+  twisted figures, ending at **Yana, the lost apprentice**, the first corrupted
+  Umbral a delver meets: kin to Mallki the trader one floor above, and what the
+  deep has made of him. Wandering pool fauna (crayfish, cave-fish, salamanders)
+  are the only risk on the safe path. (Loot and secrets still to come.)
 - **NPC stat editor (`tools/mob-editor/`).** A local, browser-based form for
   editing `data/world/mobs.json` — run `npm run edit-mobs` (or double-click
   `tools/mob-editor/start.bat`) and open `http://localhost:3939`. Edit each mob's common stats (HP, speed, armour, ward,
