@@ -158,7 +158,7 @@ function renderRoom(room) {
   exits.innerHTML = "";
   if (room.exits.length) {
     exits.appendChild(label("exits:"));
-    for (const dir of room.exits) exits.appendChild(chip(dir, "exit", () => sendCommand(dir)));
+    for (const e of room.exits) exits.appendChild(chip(e.to ? `${e.dir} → ${e.to}` : e.dir, "exit", () => sendCommand(e.dir)));
   }
 
   // Contents
@@ -417,7 +417,7 @@ function argCandidates(cmd) {
       if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
       return out;
     }
-    case "go": case "move": return room ? room.exits.slice() : [];
+    case "go": case "move": return room ? room.exits.map((e) => e.dir) : [];
     default: return []; // say / emote / douse / stop / help — free text or no arg
   }
 }

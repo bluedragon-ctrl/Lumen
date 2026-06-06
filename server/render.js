@@ -118,13 +118,19 @@ function buildRoomView(state, p) {
       canSee: see,
       harmed: isHarmedByLight(p.perception, light),
       description: see ? room.description : null,
-      // Normal exits, plus any hidden exits this player has discovered.
+      // Normal exits, plus any hidden exits this player has discovered. Each
+      // carries `to`: the destination room's name when the room is lit enough to
+      // see (you can read where the passage leads), else null in the dark.
       exits: [
-        ...Object.keys(room.exits || {}),
-        ...Object.keys(room.hiddenExits || {}).filter((dir) => isDiscovered(p, discoveryKey(room.id, "exit", dir))),
+        ...Object.keys(room.exits || {}).map((dir) => ({ dir, to: room.exits[dir] })),
+        ...Object.keys(room.hiddenExits || {})
+          .filter((dir) => isDiscovered(p, discoveryKey(room.id, "exit", dir)))
+          .map((dir) => ({ dir, to: room.hiddenExits[dir] })),
         // An open, visible door fixture (a trapdoor, gate) opens a way in its direction.
-        ...rt.fixtures.filter((f) => { const ft = w.fixtures[f.template]; return ft && ft.door && f.open && fixtureVisibleTo(p, f); }).map((f) => w.fixtures[f.template].door.dir),
-      ],
+        ...rt.fixtures
+          .filter((f) => { const ft = w.fixtures[f.template]; return ft && ft.door && f.open && fixtureVisibleTo(p, f); })
+          .map((f) => { const d = w.fixtures[f.template].door; return { dir: d.dir, to: d.to }; }),
+      ].map((e) => ({ dir: e.dir, to: see && w.rooms[e.to] ? w.rooms[e.to].name : null })),
       contents: { players, mobs, items, fixtures },
     },
   };

@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **The Inspect window now switches to your target the instant you `attack`**,
+  instead of waiting for the first swing to land on a later tick. Combat keeps
+  this view pinned and refreshes the target's HP each swing (unchanged), so the
+  readout no longer pops in unpredictably mid-fight. In the dark, where there is
+  nothing to make out, nothing is pinned.
+
 ### Added
 - **NPC stat editor (`tools/mob-editor/`).** A local, browser-based form for
   editing `data/world/mobs.json` — run `npm run edit-mobs` (or double-click
@@ -21,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   open `http://localhost:3940`. Pick a room, add/remove/edit its spawn rows, then
   validate + preview the diff or open a PR via `gh`. Field-level splice: only the
   `spawns` value of an edited room is rewritten, every other byte is preserved.
+- **Exit destinations on the room panel.** Each exit chip now reads `north → Rim Inn`
+  when the room is lit enough to see — you can tell where a passage leads at a glance.
+  In the dark the chips fall back to bare directions (you feel the openings but can't
+  read where they go). Covers normal, discovered-hidden, and open-door-fixture exits.
+
 - **Weeping Chasm-Moss** — lore-canon bioluminescent predatory moss that grows over
   abyssal rivers and hot vents (`docs/lore.md` updated). Yields `weeping-chasm-moss`
   (harvestable material, value 8), processed at an alchemist's bench via
