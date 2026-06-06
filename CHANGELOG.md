@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Buff-casting mobs (engine).** A mob's `cast` action may now name a
+  **non-hostile** spell, which it lays on **itself** as a self-buff (see
+  `state._mobCastSelf`) — defence/heal magnitudes baked from the mob's own
+  attributes, mirroring player `castBeneficial`. A mob's live defence now folds in
+  active `protect` states (`mobDefence`), so a self-cast Glimmerskin actually
+  toughens the caster against melee and the ward-negate roll. A refresh-buff is
+  gated so a mob won't recast it while it's still up. Reusable for future
+  warder/healer mobs.
+- **Loot for the Sunless Lake.** **the Pale King** now drops a **kingshell plate**
+  (a unique glimmer-veined carapace material — armour recipe to come) and a
+  **glimmer crystal**, both guaranteed. **Yana** now fights as the game's first
+  real **spellcasting mob** — opening with **Glimmerskin** to crust himself in a
+  glimmer shell, then flinging **Glimmer Spikes** — and drops a **glimmer-singer's
+  circlet**, a new head-slot caster item (the first magical headpiece: +4 max mana,
+  +1 ward, no helm weight), read as his master's old apprentice-mark gone cold.
+
 ### Changed
 - **The Inspect window now switches to your target the instant you `attack`**,
   instead of waiting for the first swing to land on a later tick. Combat keeps

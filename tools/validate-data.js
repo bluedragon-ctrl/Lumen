@@ -222,8 +222,16 @@ function main() {
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
       if (a.type === "cast") {
-        if (!a.spell || !has(spells, a.spell)) errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
-        else if (!spells[a.spell].hostile) errs.push(`mob ${id}: cast action spell ${a.spell} must be hostile`);
+        if (!a.spell || !has(spells, a.spell)) {
+          errs.push(`mob ${id}: cast action references missing spell ${a.spell}`);
+        } else if (!spells[a.spell].hostile) {
+          // A non-hostile cast is a self-buff a mob lays on itself (see
+          // state._mobCastSelf) — valid only for effect kinds that path handles.
+          const SELF_CASTABLE = ["protect", "restore", "heal-over-time", "emit-light"];
+          const t = (spells[a.spell].effect || {}).type;
+          if (!SELF_CASTABLE.includes(t))
+            errs.push(`mob ${id}: non-hostile cast spell ${a.spell} has effect "${t}" a mob can't self-cast (use one of ${SELF_CASTABLE.join(", ")})`);
+        }
       }
       if (a.type === "summon") {
         if (!a.mob || !has(mobs, a.mob)) errs.push(`mob ${id}: summon action references missing mob ${a.mob}`);

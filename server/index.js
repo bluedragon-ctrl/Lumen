@@ -339,6 +339,16 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-cast-self") {
+    // A mob wove a beneficial spell over itself (e.g. Yana's Glimmerskin). The
+    // effect is already applied; narrate to everyone present, light-gating the name.
+    for (const o of state.playersIn(ev.roomId)) {
+      const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      sendToPlayer(o.id, { type: "combat", text: `${cap(an)} draws ${ev.spellName} about itself.` });
+    }
+    return;
+  }
+
   if (ev.type === "combat-stop") {
     sendToPlayer(ev.playerId, { type: "log", text: ev.reason });
     return;

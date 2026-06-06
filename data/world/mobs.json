@@ -599,7 +599,10 @@
       { "type": "idle", "weight": 3 },
       { "type": "emote", "weight": 2, "messages": ["spreads both claws wide, shell scraping on the bone-littered rock", "clacks its pincers in a slow, grinding rhythm", "drags itself a half-circle, glimmer-light sliding over its plates", "raises a claw the length of a forearm and holds it, waiting"] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "kingshell-plate", "chance": 1 },
+      { "template": "crystal", "chance": 1 }
+    ]
   },
   "yana": {
     "id": "yana",
@@ -618,12 +621,16 @@
     "attack": { "damage": "1d6", "actionCost": 13 },
     "lightBane": { "above": 2, "damage": "1d3" },
     "xp": 22,
-    "shards": "1d4",
+    "shards": "2d4",
     "actions": [
-      { "type": "attack", "weight": 8 },
-      { "type": "idle", "weight": 3 },
-      { "type": "emote", "weight": 2, "messages": ["shields its eyes and hisses, though there is no light to hurt it", "mouths a soft, rounded word in the Umbral tongue, then loses it", "claws at the swept-bare shelves as if looking for something", "turns the dead cold-lamp over in its long hands and sets it down again"] }
+      { "type": "cast", "weight": 3, "spell": "glimmerskin" },
+      { "type": "cast", "weight": 5, "spell": "glimmer-spike" },
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["shields its eyes and hisses, though there is no light to hurt it", "mouths a soft, rounded word in the Umbral tongue, then loses it", "claws at the swept-bare shelves as if looking for something", "drags a fingertip through the air in the start of a half-remembered glyph, then forgets the rest"] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "glimmer-singer-circlet", "chance": 1 }
+    ]
   }
 }

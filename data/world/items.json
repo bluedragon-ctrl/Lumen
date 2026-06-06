@@ -111,6 +111,17 @@
     "value": 85,
     "armour": { "maxMana": 5 }
   },
+  "glimmer-singer-circlet": {
+    "id": "glimmer-singer-circlet",
+    "name": "a glimmer-singer's circlet",
+    "keywords": ["circlet", "diadem", "glimmer", "singer", "umbral"],
+    "description": "A thin band of cold grey Umbral metal for the brow, its channel inlaid with a hair-fine thread of glimmer that never quite stops glowing. It is a glimmer-singer's mark — worn by the few Umbrals taught to draw the deep art up out of the shards, and by the apprentices set on that long road. It deepens the well a caster draws from and turns a little hostile magic aside, yet sits light as a whisper, no helm at all. This one is tarnished and cold, its light gone faint, as though it had been worn a long time in the dark by someone who had forgotten what it was for.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 0,
+    "value": 95,
+    "armour": { "maxMana": 4, "ward": 1, "speedPenalty": 0 }
+  },
   "ring-of-sight": {
     "id": "ring-of-sight",
     "name": "a ring of sight",
@@ -479,6 +490,15 @@
     "type": "material",
     "weight": 2,
     "value": 28,
+    "stackable": true
+  },
+  "kingshell-plate": {
+    "id": "kingshell-plate",
+    "name": "a kingshell plate",
+    "description": "A single great scute prised from the Pale King's back — pale, translucent shell gone yellow and stone-hard with age, and threaded through with veins of raw glimmer grown into the plate where the cold lake water lapped longest. It is heavier and richer than any stonebug's, the captive light in it lending the shell a faint, slow glow. There is only ever one, and an armourer who knew the working of it could make something well out of the ordinary.",
+    "type": "material",
+    "weight": 3,
+    "value": 45,
     "stackable": true
   },
   "chitin-spike": {
