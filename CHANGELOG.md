@@ -50,6 +50,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dead prospector's silt-logged cache among the bone-heap — `search` it (Perception
   3) to turn up glimmer shards, lamp-oil, and a leather jerkin. The reward for
   beating the Pale King and looking closer.
+- **Secret: Yana's keepsake.** `lake.warren` hides **an apprentice's glimmer-charm**
+  in the swept wreckage — `search` (Perception 4) to find the unfinished neck-charm
+  Yana was making under Mallki before the deep took him (neck slot: Perception +2,
+  Ward +2; a senses-and-magic-guard piece, distinct from the Intellect mind-charm).
+  The emotional capstone of the Mallki→Yana arc.
+- **Secret: Behind the Paqcha.** A 10th room hidden behind the waterfall at
+  `lake.strand` — `search` (Perception 4) reveals a slick ledge through the spray
+  into **`lake.shrine`**, an old Umbral shrine to the paqcha they named, lamp-lit
+  and untouched by the Rush, holding a respawning glimmer crystal and a pile of
+  offered shards.
 - **Palecaps on the lake shore.** `lake.strand` now grows a small patch of
   **palecap mushrooms** in the weeping-moss glow — the lake's first foraged food
   besides the fishing shallows, and consistent with fungus growing where there's

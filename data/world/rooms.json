@@ -613,8 +613,9 @@
     "name": "The Drowned Strand",
     "depth": 4,
     "ambientLight": 1,
-    "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. Where that cold light falls steadiest, a scatter of pale mushrooms has taken to the damp sand — the first growing things to feed on a glow since the river far above. The air is all cold mist and the smell of deep water. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
+    "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. Where that cold light falls steadiest, a scatter of pale mushrooms has taken to the damp sand — the first growing things to feed on a glow since the river far above. The air is all cold mist and the smell of deep water. Where the fall meets the rock to the west, the spray hangs across the stone like a curtain, and what lies behind the falling water is lost to sight. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
     "exits": { "up": "third.falls", "east": "lake.shallows" },
+    "hiddenExits": { "west": { "to": "lake.shrine", "perception": 4, "name": "a slick ledge behind the falls" } },
     "fixtures": ["weeping-moss-curtain"],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
@@ -728,12 +729,29 @@
     "name": "Yana's Hollow",
     "depth": 4,
     "ambientLight": 0,
-    "description": "The passage ends in a low, square hollow — a dwelling, once, and unmistakably a brother to Mallki's clean lamp-lit room far above: the same carved shelves, the same cold-lamp niche, the same care in the cut of the walls. But the lamp is long dead, the shelves are swept to the floor and the floor is fouled, and the careful order has been clawed apart from within and rebuilt into something a beast would make. Whatever light there is comes from the thing that keeps this place now — a faint blue-green glow moving under grey skin, the very same glow Mallki carries, but stretched thin over a frame gone tall and wrong, flinching from even the memory of light. This was an Umbral once, and not long enough ago. The only way out is back north, the way you came.",
+    "description": "The passage ends in a low, square hollow — a dwelling, once, and unmistakably a brother to Mallki's clean lamp-lit room far above: the same carved shelves, the same cold-lamp niche, the same care in the cut of the walls. But the lamp is long dead, the shelves are swept to the floor and the floor is fouled, and the careful order has been clawed apart from within and rebuilt into something a beast would make. Whatever light there is comes from the thing that keeps this place now — a faint blue-green glow moving under grey skin, the very same glow Mallki carries, but stretched thin over a frame gone tall and wrong, flinching from even the memory of light. This was an Umbral once, and not long enough ago. Something small lies half-buried in the swept wreckage by the dead lamp, where the thing returns to claw and worry at the filth. The only way out is back north, the way you came.",
     "exits": { "north": "lake.gallery" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "apprentice-glimmer-charm", "hidden": { "perception": 4 } }
+    ],
     "spawns": [
       { "mob": "yana", "max": 1, "respawn": 1200 }
     ]
+  },
+  "lake.shrine": {
+    "id": "lake.shrine",
+    "zone": "fourth-lake",
+    "name": "Behind the Paqcha",
+    "depth": 4,
+    "ambientLight": 0,
+    "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. The only way out is back east, through the water.",
+    "exits": { "east": "lake.strand" },
+    "fixtures": ["umbral-coldlamp"],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 900 },
+      { "template": "shards", "qty": 12 }
+    ],
+    "spawns": []
   }
 }

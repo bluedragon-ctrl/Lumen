@@ -100,6 +100,17 @@
     "value": 110,
     "armour": { "attrMod": { "intellect": 2 } }
   },
+  "apprentice-glimmer-charm": {
+    "id": "apprentice-glimmer-charm",
+    "name": "an apprentice's glimmer-charm",
+    "keywords": ["charm", "amulet", "glimmer", "apprentice"],
+    "description": "A flat disc of river-smoothed stone on a frayed gut cord, its face scored with the lightless-eye glyph the Umbrals work into their charms — but the cut is a learner's, uneven and started over twice, and the thread of glimmer set into it runs thin and stops short, the work never finished. Even half-made it does what such a charm should: it sharpens the wearer's notice in the dark and lays a faint cold ward against hostile light. Mallki's teaching is plain in every careful, clumsy line of it — the first charm of a hand that never got to make a second.",
+    "type": "armour",
+    "slot": "neck",
+    "weight": 0,
+    "value": 120,
+    "armour": { "ward": 2, "attrMod": { "perception": 2 } }
+  },
   "umbral-glimmer-ring": {
     "id": "umbral-glimmer-ring",
     "name": "an Umbral glimmer-ring",
