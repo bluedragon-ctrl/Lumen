@@ -1252,8 +1252,25 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       const tag = faction === "player" ? " (player-allied)" : "";
       return selfAndViews(state, player, `Spawned ${n}× ${t.name}${tag} here.`);
     }
+    case "@give": {
+      // Drop an item (by template id) straight into the admin's pack — a testing
+      // aid for gear/consumables/materials you'd otherwise have to craft or grind
+      // for. `count` stacks for stackables, else mints that many instances; it is
+      // clamped to a sane ceiling.
+      const [itemId, rawN] = arg.split(/\s+/);
+      if (!itemId || !state.world.items[itemId])
+        return [{ type: "error", text: `Usage: @give <itemId> [count]. Unknown item "${itemId || ""}".` }];
+      const t = state.world.items[itemId];
+      const n = Math.max(1, Math.min(99, parseInt(rawN, 10) || 1));
+      if (t.stackable) {
+        addToInventory(player, makeItemInstance({ template: itemId, qty: n }, state.world), state.world);
+      } else {
+        for (let i = 0; i < n; i++) addToInventory(player, makeItemInstance({ template: itemId }, state.world), state.world);
+      }
+      return selfAndViews(state, player, `Conjured ${n}× ${t.name} into your pack.`);
+    }
     case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count] [wild|player]" }];
+      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count] [wild|player]\n  @give <itemId> [count]" }];
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }

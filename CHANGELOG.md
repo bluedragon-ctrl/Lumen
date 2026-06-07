@@ -35,6 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `glimmersteel-bar ×2 + glimmer-dust ×1` (15 shards); **Tobin the tinker-smith**
   sells the schematic.
 
+- **`@give <itemId> [count]` admin command.** A testing aid mirroring `@spawn`:
+  drops any item template straight into the admin's pack — stacking for
+  stackables, minting separate instances otherwise (count clamped to 99). Saves
+  having to craft or grind for gear/consumables/materials when exercising a
+  change. Listed in `@help`.
+
 - **Inline colour markup for console text.** Authored messages can now tint a
   run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the
   colour holds until end of line and resets on the next, drawn from a small
