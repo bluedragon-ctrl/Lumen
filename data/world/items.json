@@ -19,6 +19,17 @@
     "value": 30,
     "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
   },
+  "glimmersteel-lamp": {
+    "id": "glimmersteel-lamp",
+    "rarity": "rare",
+    "name": "a glimmersteel lamp",
+    "description": "A lamp cased in glimmer-alloyed steel, a thread of captive light wound through the housing so the wick has only to carry the burn, not be it. It throws a clean, cold glare brighter than any brass lantern, and sips its oil so slowly a single flask outlasts three. Dear work, and prized by delvers who mean to stay down a long while.",
+    "type": "light",
+    "slot": "light",
+    "weight": 2,
+    "value": 160,
+    "light": { "output": 5, "fuelMax": 900, "burnPerTick": 0.5, "fuelItem": "lamp-oil", "refuelPerUnit": 450 }
+  },
   "short-sword": {
     "id": "short-sword",
     "name": "a short sword",
@@ -458,6 +469,16 @@
     "value": 80,
     "stackable": true,
     "recipe": "craft-glimmersteel-staff"
+  },
+  "schematic-glimmersteel-lamp": {
+    "id": "schematic-glimmersteel-lamp",
+    "name": "a glimmersteel lamp schematic",
+    "description": "One of Tobin's diagrams, and a rare clean one — the casing of a lantern in glimmer-alloyed steel and the threading of captive light through the housing, so it burns brighter and sups its oil at a crawl. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 30,
+    "stackable": true,
+    "recipe": "craft-glimmersteel-lamp"
   },
   "schematic-starsilver": {
     "id": "schematic-starsilver",
