@@ -35,6 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `glimmersteel-bar ×2 + glimmer-dust ×1` (15 shards); **Tobin the tinker-smith**
   sells the schematic.
 
+- **`@give <itemId> [count]` admin command.** A testing aid mirroring `@spawn`:
+  drops any item template straight into the admin's pack — stacking for
+  stackables, minting separate instances otherwise (count clamped to 99). Saves
+  having to craft or grind for gear/consumables/materials when exercising a
+  change. Listed in `@help`.
 - **Glimmersteel coil — gear that quickens mana regen.** Worn gear can now carry
   an `armour.manaRegen` bonus, added to the standing mana trickle and refreshed
   whenever gear changes (and re-derived on admit, so it survives a reload). The
