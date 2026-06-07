@@ -35,6 +35,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `glimmersteel-bar ×2 + glimmer-dust ×1` (15 shards); **Tobin the tinker-smith**
   sells the schematic.
 
+- **Shard grenade — a thrown area bomb.** A new `damage-room` consumable effect:
+  `throw`/`hurl`/`lob` (or `use`) a bomb to blast **every hostile in the room at
+  once** for its rolled damage, crediting and threatening the thrower so survivors
+  turn on them. Peaceful NPCs (and anyone not already fighting you) are spared, and
+  a throw into an empty room is refused so the bomb isn't wasted. The **shard
+  grenade** itself hits for `4d6` physical; crafted at an **alchemy** station from
+  `glimmer-dust ×1 + iron-bar ×1` (8 shards), with **Tobin the tinker-smith**
+  selling the schematic. `examine` shows a thrown bomb's damage and reach.
+
 - **Inline colour markup for console text.** Authored messages can now tint a
   run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the
   colour holds until end of line and resets on the next, drawn from a small

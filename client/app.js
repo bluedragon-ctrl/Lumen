@@ -397,7 +397,7 @@ const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
 const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
   "attack", "kill", "stop", "sit", "sleep", "stand", "wake", "rest", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
-  "drink", "quaff", "use", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "train", "help",
+  "drink", "quaff", "use", "throw", "hurl", "lob", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "train", "help",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;

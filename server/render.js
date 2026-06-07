@@ -168,6 +168,7 @@ function itemSpecLines(tmpl, w, viewer) {
   const eff = tmpl.consumable && tmpl.consumable.effect;
   if (eff && typeof eff === "object") {
     if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
+    else if (eff.type === "damage-room") lines.push(`throw: ${eff.damage}${eff.damageType ? ` ${eff.damageType}` : ""} damage to every foe in the room (single use)`);
     else lines.push(`drink: ${eff.type}`);
   }
   if (tmpl.scroll && tmpl.scroll.spell) {

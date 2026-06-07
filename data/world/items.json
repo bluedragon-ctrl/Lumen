@@ -440,6 +440,27 @@
     "stackable": true,
     "consumable": { "flavour": "It erupts in a searing white glare — the dark flees the room and light-shy things recoil and shriek.", "effect": { "type": "emit-light", "name": "Searing Light", "magnitude": 10, "duration": 30 } }
   },
+  "shard-grenade": {
+    "id": "shard-grenade",
+    "rarity": "uncommon",
+    "name": "a shard grenade",
+    "description": "A fist-sized iron casing packed tight with pressed glimmer dust and a fistful of jagged shards. Wind the friction-cap, throw, and the captive light lets go all at once — a single white crack that flings razor splinters through everything in the room. One throw and it's spent; Tobin swears the trick is winding the cap, not the throwing.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 40,
+    "stackable": true,
+    "consumable": { "flavour": "The captive light lets go in a single white crack, flinging razor shards through everything in the room.", "effect": { "type": "damage-room", "damageType": "physical", "damage": "4d6", "cause": "shrapnel" } }
+  },
+  "schematic-shard-grenade": {
+    "id": "schematic-shard-grenade",
+    "name": "a shard grenade schematic",
+    "description": "One of Tobin's soot-smudged diagrams — the packing of pressed glimmer dust against loose shards in an iron casing, and the friction-cap that sets it off on a throw. A warning is scrawled twice in the margin. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 10,
+    "stackable": true,
+    "recipe": "craft-shard-grenade"
+  },
   "schematic-searing-flare": {
     "id": "schematic-searing-flare",
     "name": "a flare schematic",
