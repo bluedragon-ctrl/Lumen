@@ -45,6 +45,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `examine` now also lists a piece of gear's max-HP, max-mana and mana-regen
   bonuses (previously hidden), and no longer prints `armour 0, ward 0` for
   pure-bonus gear like rings.
+- **Shard grenade — a thrown area bomb.** A new `damage-room` consumable effect:
+  `throw`/`hurl`/`lob` (or `use`) a bomb to blast **every hostile in the room at
+  once** for its rolled damage, crediting and threatening the thrower so survivors
+  turn on them. Peaceful NPCs (and anyone not already fighting you) are spared, and
+  a throw into an empty room is refused so the bomb isn't wasted. The **shard
+  grenade** itself hits for `4d6` physical; crafted at an **alchemy** station from
+  `glimmer-dust ×1 + iron-bar ×1` (8 shards), with **Tobin the tinker-smith**
+  selling the schematic. `examine` shows a thrown bomb's damage and reach.
 
 - **Inline colour markup for console text.** Authored messages can now tint a
   run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the

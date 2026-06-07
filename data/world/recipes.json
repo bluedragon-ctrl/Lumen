@@ -67,6 +67,17 @@
     ],
     "output": { "template": "searing-flare", "qty": 1 }
   },
+  "craft-shard-grenade": {
+    "id": "craft-shard-grenade",
+    "name": "Shard Grenade",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "glimmer-dust", "qty": 1 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "shard-grenade", "qty": 1 }
+  },
   "mushroom-soup": {
     "id": "mushroom-soup",
     "name": "Mushroom Soup",

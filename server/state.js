@@ -1318,6 +1318,35 @@ class GameState {
   }
 
   /**
+   * Resolve a thrown area bomb (a consumable's `damage-room` effect). Rolls fresh
+   * damage per target and applies it to every mob in `targets` (the caller has
+   * already filtered to the eligible — hostile or already-engaged — mobs, so a
+   * stray toss never blasts a peaceful shopkeeper). Threatens the thrower so
+   * survivors turn on them, rouses any sleeper the blast doesn't kill, and credits
+   * the thrower with kills (loot/xp). Mob removal, light recompute and the kill's
+   * spoils are handled by `_hurtMob`. Returns one result per target for the caller
+   * to narrate: `{ id, name, damage, killed, death }`.
+   */
+  detonateRoom(player, spec, targets, events = []) {
+    const w = this.world;
+    const roomId = player.location;
+    const rt = this.rooms[roomId];
+    const results = [];
+    // Snapshot the targets — _hurtMob splices the dead out of rt.mobs mid-loop.
+    for (const mob of [...targets]) {
+      const t = w.mobs[mob.template];
+      const damage = Math.max(1, rollDice(spec.damage));
+      this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
+      const death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
+      if (!death && this._rouse(mob))
+        events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light });
+      results.push({ id: mob.id, name: t.name, damage, killed: !!death, death });
+    }
+    rt.light = this.computeRoomLight(roomId); // a luminous mob blasted apart changes the room
+    return results;
+  }
+
+  /**
    * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
    * `target` is the normalized descriptor the command handler built:
    *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
