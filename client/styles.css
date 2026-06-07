@@ -60,6 +60,28 @@ body {
 .line-combat { color: var(--combat); }
 .line-gold { color: var(--gold); font-weight: 600; text-shadow: 0 0 6px rgba(242, 193, 78, .35); }
 
+/* Inline colour markup (`<#name>…`), rendered as .mk-* spans. A small, themed
+   palette — not arbitrary hex — so authored content stays on-key. `gray` mutes
+   (e.g. recipes you can't currently afford); `rainbow` is reserved for rare
+   flourishes like a named boss. */
+.mk-gray { color: var(--muted); }
+.mk-red { color: var(--combat); }
+.mk-green { color: var(--rarity-uncommon); }
+.mk-gold { color: var(--gold); }
+.mk-blue { color: var(--mana); }
+.mk-cyan { color: var(--accent); }
+.mk-magenta { color: var(--rarity-epic); }
+.mk-rainbow {
+  background: linear-gradient(90deg, #d07f7f, #f2c14e, #5cb87a, #5b9bd5, #a974d6, #d07f7f);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  font-weight: 600;
+  animation: mk-rainbow-pan 6s linear infinite;
+}
+@keyframes mk-rainbow-pan { to { background-position: 200% 0; } }
+@media (prefers-reduced-motion: reduce) { .mk-rainbow { animation: none; } }
+
 /* Room-change divider: a hairline rule with the room name + depth centred in it,
    so scrollback reads as per-room chapters. */
 .room-divider {

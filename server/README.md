@@ -92,6 +92,16 @@ Admin commands are prefixed with `@` (`@create-player`, `@list-players`,
   "lines": ["type: weapon", "damage: 1d6 physical"], "hints": ["…"] } }
 ```
 
+**Inline colour markup.** Any console `text` (`system` / `log` / `error` /
+`combat` / `gold`) may contain `<#name>` tags: the named colour tints the rest
+of that line and resets at the next newline. The palette is small and themed
+(`gray`, `red`, `green`, `gold`, `blue`, `cyan`, `magenta`, `rainbow`) and maps
+to the same CSS variables as the semantic `line-*` classes — unknown names are
+dropped. This is for *authored* emphasis within a line (e.g. greying recipes you
+can't afford, a `<#rainbow>` boss name); the message `type` still carries the
+line's *meaning* and base colour. Player-typed text (`say`/`emote`) has these
+tags stripped server-side (`stripMarkup`), so markup stays trusted styling.
+
 `look <target>` (and clicking an entity) returns an `examine` view rendered in
 the Inspect window. The payload is generic — `bars` (e.g. HP), `lines` (specs),
 `hints` (interactions) — so it extends without protocol churn. A subsequent
@@ -242,8 +252,10 @@ them provokes them.
 
 `craft <recipe>` produces a recipe's `output` when the player is at a fixture whose
 `station` matches, **knows** the recipe (`knownRecipes`), and has the `inputs` plus
-any `shards` cost — all then consumed. `recipes` lists known recipes and flags which
-need a station you're not standing at. Shards are both currency and a crafting
+any `shards` cost — all then consumed. `recipes` lists known recipes split into
+**Here** (station in the room) and **Elsewhere** (station to seek appended),
+ordered by output kind (gear by slot, then consumables, then materials), greying
+any you can't currently afford the inputs for. Shards are both currency and a crafting
 component (the abyss's reason-for-being), so recipes may spend them directly.
 
 ### Status effects & potions
