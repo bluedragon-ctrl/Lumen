@@ -29,10 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   deep-craft (the sight/wits rings, spiked chitin, barbed flail, gloom-silk,
   light potions, searing flare, …) are **Uncommon**. Like any examine detail,
   rarity colour is only legible in adequate light.
-- **Item chips now read as objects, not beings.** Ground-item and fixture chips
-  are squared off, while players and mobs keep their pill shape — so it's clear
-  at a glance what's an item and what's an NPC (and a blue Rare item no longer
-  reads as another player).
+- **Three distinct chip silhouettes — beings, items, fixtures.** Players and
+  mobs keep their pill shape (round = alive); loose **items** are soft-cornered
+  squares; **fixtures** are hard-cornered with a leading `⌂` marker, so a
+  room-anchored installation never reads as a being or a pick-up-able item. (A
+  blue Rare item also no longer reads as a blue, mana-coloured player chip.)
 - **Buff-casting mobs (engine).** A mob's `cast` action may now name a
   **non-hostile** spell, which it lays on **itself** as a self-buff (see
   `state._mobCastSelf`) — defence/heal magnitudes baked from the mob's own

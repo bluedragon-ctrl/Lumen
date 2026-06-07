@@ -113,10 +113,15 @@ body {
 .chip.fixture { border-color: #4a4030; }
 .chip.player { border-color: var(--mana); color: var(--mana); }
 .chip.item { color: var(--text); }
-/* Shape tells beings from things at a glance: living actors (players, mobs)
-   stay pill-shaped; inert objects (items, fixtures) are squared off. This also
-   keeps a blue rare item readable next to a blue (mana-coloured) player chip. */
-.chip.item, .chip.fixture { border-radius: 5px; }
+/* Three distinct chip silhouettes. Living actors (players, mobs) stay
+   pill-shaped — round reads as alive. Loose objects (items) are soft-cornered.
+   Fixtures are room-anchored: hard square corners plus a leading "⌂" marker
+   so a built-in installation never reads as a being or a pick-up-able item.
+   (Shape also keeps a blue rare item distinct from a blue, mana-coloured
+   player chip.) */
+.chip.item { border-radius: 5px; }
+.chip.fixture { border-radius: 0; }
+.chip.fixture::before { content: "⌂"; opacity: .75; font-size: 11px; }
 /* Rarity frames on item chips (Common stays neutral — no rule). */
 .chip.item.rarity-uncommon { border-color: var(--rarity-uncommon); color: var(--rarity-uncommon); }
 .chip.item.rarity-rare { border-color: var(--rarity-rare); color: var(--rarity-rare); }
