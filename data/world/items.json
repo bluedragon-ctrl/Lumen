@@ -679,7 +679,7 @@
     "slot": "hand",
     "weight": 2,
     "value": 28,
-    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12 }
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 12 }
   },
   "iron-mace": {
     "id": "iron-mace",
@@ -689,7 +689,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 30,
-    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 3 } }
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 } }
   },
   "chitin-helm": {
     "id": "chitin-helm",

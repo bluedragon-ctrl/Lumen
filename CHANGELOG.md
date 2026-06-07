@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Iron weapon balance.** The **iron sword** now hits for `1d8` (was `1d6`),
+  making it a clear step up from the bought short sword at the same speed. The
+  **iron mace** keeps its lower `1d6` base but now scales harder with Might
+  (`/2`, was `/3`), so it starts behind the sword and overtakes it as Might
+  climbs — a strength-bruiser to the sword's all-rounder.
 - **Weapon examine shows the full damage formula.** Inspecting a weapon now
   spells out the attribute scaling every swing gets — the weapon's own `scale`
   or the default **Might/4** when it declares none — plus the viewer's current
