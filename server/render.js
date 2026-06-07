@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, MELEE_SCALE } = require("./state");
 
 // How a posture reads to OTHERS in the room (the social tag). Standing is the
 // default and shows nothing.
@@ -14,7 +14,7 @@ const POSTURE_LABEL = { sitting: "sitting", sleeping: "asleep" };
 function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
-  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null };
+  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null, rarity: t.rarity || "common" };
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
     v.lit = !!inst.lit;
@@ -142,13 +142,18 @@ function buildRoomView(state, p) {
 // intentionally generic — `bars`/`lines`/`hints` — so HP bars, stats, and
 // interaction hints can grow without protocol churn.
 
-function itemSpecLines(tmpl, w) {
+function itemSpecLines(tmpl, w, viewer) {
   const lines = [`type: ${tmpl.type}`];
   if (tmpl.weapon) {
     const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
-    lines.push(`damage: ${dmg}`, `action cost: ${tmpl.weapon.actionCost}`);
-    const sc = tmpl.weapon.scale;
-    if (sc && sc.attr) lines.push(`scales with: ${sc.attr} / ${sc.per || 1}`);
+    // Every melee swing adds an attribute bonus — the weapon's own `scale`, or
+    // the default Might/4 when it declares none. Show the rule (so a plain sword
+    // reads differently from a Might-scaling one) plus the viewer's current
+    // bonus, so two same-dice weapons aren't indistinguishable.
+    const sc = (tmpl.weapon.scale && tmpl.weapon.scale.attr) ? tmpl.weapon.scale : MELEE_SCALE;
+    const bonus = viewer ? spellScaleBonus(effectiveAttributes(w, viewer), sc) : null;
+    const cur = bonus ? `+${bonus} ` : "";
+    lines.push(`damage: ${dmg} ${cur}(${sc.attr}/${sc.per || 1})`, `action cost: ${tmpl.weapon.actionCost}`);
   }
   if (tmpl.armour) {
     lines.push(`armour ${tmpl.armour.armour}, ward ${tmpl.armour.ward}`);
@@ -234,7 +239,7 @@ function buildExamineView(state, p, q) {
       const t = w.items[i.template];
       if (hit(i.id, t.name))
         return detailed
-          ? entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) })
+          ? entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) })
           : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const f of rt.fixtures) {
@@ -279,12 +284,12 @@ function buildExamineView(state, p, q) {
   // Carried items are always examined clearly (in hand).
   for (const i of p.inventory) {
     const t = w.items[i.template];
-    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) });
+    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
   }
   for (const slot of Object.values(p.equipment)) {
     if (slot && hit(slot.id, w.items[slot.template].name)) {
       const t = w.items[slot.template];
-      return entity("item", slot.id, t.name, t.description, { lines: itemSpecLines(t, w) });
+      return entity("item", slot.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
     }
   }
   return null;

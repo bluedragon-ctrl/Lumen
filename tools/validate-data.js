@@ -69,6 +69,7 @@ function main() {
 
   const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
   const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
+  const RARITIES = ["common", "uncommon", "rare", "epic", "legendary"];
 
   // Combat triggers (see GameState.applyHitOutcome): `onHit` is a list of effect
   // specs an attacker lands on a hit (mob `attack.onHit` / item `weapon.onHit`);
@@ -117,6 +118,9 @@ function main() {
   };
 
   for (const [id, it] of Object.entries(items)) {
+    // Rarity is optional and defaults to "common"; if set it must be a known tier.
+    if (it.rarity != null && !RARITIES.includes(it.rarity))
+      errs.push(`item ${id}: unknown rarity "${it.rarity}" (known: ${RARITIES.join(", ")})`);
     // Every tradeable item needs a buy `value`; currency (shards) is exempt.
     if (it.type !== "currency") {
       if (typeof it.value !== "number" || it.value < 0)

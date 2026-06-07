@@ -5,7 +5,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Iron weapon balance.** The **iron sword** now hits for `1d8` (was `1d6`),
+  making it a clear step up from the bought short sword at the same speed. The
+  **iron mace** keeps its lower `1d6` base but now scales harder with Might
+  (`/2`, was `/3`), so it starts behind the sword and overtakes it as Might
+  climbs — a strength-bruiser to the sword's all-rounder.
+- **Weapon examine shows the full damage formula.** Inspecting a weapon now
+  spells out the attribute scaling every swing gets — the weapon's own `scale`
+  or the default **Might/4** when it declares none — plus the viewer's current
+  bonus, e.g. `damage: 1d8 +2 (might/2)`. Previously the implicit Might/4 was
+  hidden, so a plain sword and a Might-scaling weapon could read identically.
+  The `spells` list likewise now shows the caster's current attribute bonus on
+  damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
+
 ### Added
+- **Item rarity tiers.** Items carry an optional `rarity`
+  (`common`/`uncommon`/`rare`/`epic`/`legendary`, default Common). The client
+  surfaces it two ways: a coloured frame on the ground-item chip (Common stays
+  neutral; Uncommon green, Rare blue, Epic purple, Legendary orange) and a tier
+  badge in the Inspect window. Glimmersteel/starsilver stock and the
+  unique-mob & Umbral pieces are now **Rare**; minor-magic gear and worked
+  deep-craft (the sight/wits rings, spiked chitin, barbed flail, gloom-silk,
+  light potions, searing flare, …) are **Uncommon**. Like any examine detail,
+  rarity colour is only legible in adequate light.
+- **Three distinct chip silhouettes — beings, items, fixtures.** Players and
+  mobs keep their pill shape (round = alive); loose **items** are soft-cornered
+  squares; **fixtures** are hard-cornered with a leading `⌂` marker, so a
+  room-anchored installation never reads as a being or a pick-up-able item. (A
+  blue Rare item also no longer reads as a blue, mana-coloured player chip.)
 - **Buff-casting mobs (engine).** A mob's `cast` action may now name a
   **non-hostile** spell, which it lays on **itself** as a self-buff (see
   `state._mobCastSelf`) — defence/heal magnitudes baked from the mob's own

@@ -10,7 +10,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { makeItemInstance, addToFloor, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { makeItemInstance, addToFloor, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus } = require("./state");
 const { EXPLORE_XP } = require("./config");
 
 // Searching the room for hidden features costs roughly one action's worth of
@@ -884,9 +884,11 @@ function spellList(state, player) {
     if (!s) continue;
     let tail = "";
     const e = s.effect || {};
-    if (e.type === "damage")
-      tail = ` — ${e.damage} ${e.damageType || "physical"} damage` +
-        (e.scale ? ` (+${e.scale.attr}/${e.scale.per})` : "");
+    if (e.type === "damage") {
+      const bonus = e.scale ? spellScaleBonus(effectiveAttributes(w, player), e.scale) : 0;
+      tail = ` — ${e.damage} ${bonus ? `+${bonus} ` : ""}${e.damageType || "physical"} damage` +
+        (e.scale ? ` (${e.scale.attr}/${e.scale.per})` : "");
+    }
     else if (e.type === "heal-over-time")
       tail = ` — heals ${e.magnitude || 0}${e.scale ? `+${e.scale.attr}/${e.scale.per}` : ""} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${e.duration || 0}`;
     else if (e.type === "protect") {

@@ -173,7 +173,10 @@ function renderRoom(room) {
     const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
     c.appendChild(chip(m.name + posture(m), cls, () => sendCommand("look " + m.id)));
   }
-  for (const it of items) c.appendChild(chip(it.qty != null ? `${it.name} ×${it.qty}` : it.name, "item", () => sendCommand("look " + it.id)));
+  for (const it of items) {
+    const cls = "item" + (it.rarity && it.rarity !== "common" ? " rarity-" + it.rarity : "");
+    c.appendChild(chip(it.qty != null ? `${it.name} ×${it.qty}` : it.name, cls, () => sendCommand("look " + it.id)));
+  }
   for (const f of fixtures) c.appendChild(chip(f.name, "fixture" + (f.lit ? " luminous" : ""), () => sendCommand("look " + f.id)));
   if (!players.length && !mobs.length && !items.length && !fixtures.length && room.canSee) {
     c.appendChild(label("nothing of note here."));
@@ -190,6 +193,17 @@ function renderExamine(e) {
 
   $("ex-name").textContent = e.name;
   $("ex-kind").textContent = e.kind;
+
+  // Rarity badge (items only). Capitalised tier name, tinted by the rarity
+  // palette — color plus the word, so it reads without relying on hue alone.
+  const rar = $("ex-rarity");
+  if (e.rarity) {
+    rar.hidden = false;
+    rar.className = "rarity-badge rarity-" + e.rarity;
+    rar.textContent = e.rarity[0].toUpperCase() + e.rarity.slice(1);
+  } else {
+    rar.hidden = true;
+  }
   $("ex-desc").textContent = e.description || "";
 
   const bars = $("ex-bars");
