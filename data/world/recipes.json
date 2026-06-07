@@ -67,6 +67,17 @@
     ],
     "output": { "template": "searing-flare", "qty": 1 }
   },
+  "craft-shard-grenade": {
+    "id": "craft-shard-grenade",
+    "name": "Shard Grenade",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "glimmer-dust", "qty": 1 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "shard-grenade", "qty": 1 }
+  },
   "mushroom-soup": {
     "id": "mushroom-soup",
     "name": "Mushroom Soup",
@@ -264,6 +275,17 @@
     ],
     "shards": 15,
     "output": { "template": "glimmersteel-lamp", "qty": 1 }
+  },
+  "craft-glimmersteel-coil": {
+    "id": "craft-glimmersteel-coil",
+    "name": "Glimmersteel Coil",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 12,
+    "output": { "template": "glimmersteel-coil", "qty": 1 }
   },
   "alloy-starsilver": {
     "id": "alloy-starsilver",

@@ -582,6 +582,9 @@ function drink(state, player, arg, ctx, verb = "use") {
   const spec = t.consumable.effect;
   if (!spec || typeof spec !== "object" || !spec.type)
     return [{ type: "error", text: `${t.name} fizzles uselessly — nothing happens.` }];
+  // A thrown area bomb is its own resolution — it consumes only on a throw that
+  // has something to hit, so it can refuse (and keep the bomb) in an empty room.
+  if (spec.type === "damage-room") return throwBomb(state, player, idx, inst, t, spec, ctx, verb);
   // Consume one, then apply the effect primitive.
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
   else player.inventory.splice(idx, 1);
@@ -604,6 +607,48 @@ function drink(state, player, arg, ctx, verb = "use") {
   const flavourText = t.consumable.flavour || EFFECT_FLAVOUR[spec.type];
   const flavour = flavourText ? ` ${flavourText}` : "";
   return selfAndViews(state, player, `You ${verb} ${t.name}.${flavour}`);
+}
+
+// `throw`/`use <bomb>`: detonate a `damage-room` consumable, blasting every
+// eligible mob in the room at once. Only hostile (or already-engaged) mobs catch
+// the blast, so a stray toss in town won't blow up a peaceful shopkeeper — and
+// with nothing to hit the throw is refused and the bomb kept. Per-target damage,
+// threat and kills live in state.detonateRoom; this filters, consumes, narrates,
+// and sticks the thrower to a survivor so they keep swinging (like a hostile cast).
+function throwBomb(state, player, idx, inst, t, spec, ctx, verb) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const targets = rt.mobs.filter((m) => {
+    const mt = w.mobs[m.template];
+    return mt.hostile || (m.aggro && m.aggro[player.id] > 0);
+  });
+  if (!targets.length)
+    return [{ type: "error", text: `There's nothing here for ${t.name} to catch — best not waste it.` }];
+
+  autoStand(player); // you surge to your feet to make the throw
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(idx, 1);
+
+  const results = state.detonateRoom(player, spec, targets);
+  const killed = results.filter((r) => r.killed);
+  const hurt = results.filter((r) => !r.killed);
+  const xp = killed.reduce((s, r) => s + (r.death.xp || 0), 0);
+  const loot = killed.flatMap((r) => r.death.loot || []);
+
+  // Keep swinging at a survivor if not already committed (mirrors a hostile cast).
+  const survivor = rt.mobs.find((m) => hurt.some((r) => r.id === m.id));
+  if (!player.pending && player.hp > 0 && survivor)
+    player.pending = { type: "attack", targetId: survivor.id };
+
+  let outcome = "";
+  if (hurt.length) outcome += ` It tears into ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (killed.length) outcome += ` It blasts apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
+  if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
+
+  ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls ${t.name} and it bursts in a storm of glimmer-fire and shrapnel!` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const flavour = t.consumable.flavour ? ` ${t.consumable.flavour}` : "";
+  return selfAndViews(state, player, `You hurl ${t.name}.${flavour}${outcome}`, "combat");
 }
 
 // Drink/draw from a `restore` fixture (a seep, a spring). Heals hp/mana like a
@@ -1358,6 +1403,10 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "toggle":
     case "flip":
       return use(state, player, arg, ctx);
+    case "throw":
+    case "hurl":
+    case "lob":
+      return drink(state, player, arg, ctx, "throw");
     case "open":
       return operateDoor(state, player, arg, ctx, true);
     case "close":

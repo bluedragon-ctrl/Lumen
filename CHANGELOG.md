@@ -40,6 +40,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stackables, minting separate instances otherwise (count clamped to 99). Saves
   having to craft or grind for gear/consumables/materials when exercising a
   change. Listed in `@help`.
+- **Glimmersteel coil — gear that quickens mana regen.** Worn gear can now carry
+  an `armour.manaRegen` bonus, added to the standing mana trickle and refreshed
+  whenever gear changes (and re-derived on admit, so it survives a reload). The
+  **glimmersteel coil** is a `finger`-slot ring (rare, value 120) granting
+  `+0.125`/tick — doubling the default standing regen, so a caster's well refills
+  even on the move. Forged at a **smithing** station from `glimmersteel-bar ×1 +
+  glimmer-dust ×1` (12 shards); **Tobin the tinker-smith** sells the schematic.
+  `examine` now also lists a piece of gear's max-HP, max-mana and mana-regen
+  bonuses (previously hidden), and no longer prints `armour 0, ward 0` for
+  pure-bonus gear like rings.
+- **Shard grenade — a thrown area bomb.** A new `damage-room` consumable effect:
+  `throw`/`hurl`/`lob` (or `use`) a bomb to blast **every hostile in the room at
+  once** for its rolled damage, crediting and threatening the thrower so survivors
+  turn on them. Peaceful NPCs (and anyone not already fighting you) are spared, and
+  a throw into an empty room is refused so the bomb isn't wasted. The **shard
+  grenade** itself hits for `4d6` physical; crafted at an **alchemy** station from
+  `glimmer-dust ×1 + iron-bar ×1` (8 shards), with **Tobin the tinker-smith**
+  selling the schematic. `examine` shows a thrown bomb's damage and reach.
 
 - **Inline colour markup for console text.** Authored messages can now tint a
   run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the
