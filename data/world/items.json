@@ -91,6 +91,7 @@
   },
   "umbral-mind-charm": {
     "id": "umbral-mind-charm",
+    "rarity": "rare",
     "name": "an Umbral mind-charm",
     "keywords": ["charm", "amulet", "mind", "umbral"],
     "description": "A flat disc of dark, river-smoothed stone hung on a cord of woven gut, its face inlaid with a single thread of glimmer worked into the lightless-eye glyph. It rests cool against the breastbone, and the longer it is worn the clearer the wearer's thoughts seem to run — as though the cold light lent the mind an edge. Umbral work, and patient: they carve these for their own glimmer-singers and part with them rarely.",
@@ -102,6 +103,7 @@
   },
   "apprentice-glimmer-charm": {
     "id": "apprentice-glimmer-charm",
+    "rarity": "rare",
     "name": "an apprentice's glimmer-charm",
     "keywords": ["charm", "amulet", "glimmer", "apprentice"],
     "description": "A flat disc of river-smoothed stone on a frayed gut cord, its face scored with the lightless-eye glyph the Umbrals work into their charms — but the cut is a learner's, uneven and started over twice, and the thread of glimmer set into it runs thin and stops short, the work never finished. Even half-made it does what such a charm should: it sharpens the wearer's notice in the dark and lays a faint cold ward against hostile light. Mallki's teaching is plain in every careful, clumsy line of it — the first charm of a hand that never got to make a second.",
@@ -113,6 +115,7 @@
   },
   "umbral-glimmer-ring": {
     "id": "umbral-glimmer-ring",
+    "rarity": "rare",
     "name": "an Umbral glimmer-ring",
     "keywords": ["ring", "band", "glimmer", "umbral"],
     "description": "A plain band of cold grey metal, its inner face grooved with a hair-fine channel of glimmer that never quite stops glowing. Worn against the skin it deepens the well a caster draws from — a small, steady reservoir of borrowed light to spend on the weave. Old Umbral craft, the channel-work finer than any surface smith could cut.",
@@ -124,6 +127,7 @@
   },
   "glimmer-singer-circlet": {
     "id": "glimmer-singer-circlet",
+    "rarity": "rare",
     "name": "a glimmer-singer's circlet",
     "keywords": ["circlet", "diadem", "glimmer", "singer", "umbral"],
     "description": "A thin band of cold grey Umbral metal for the brow, its channel inlaid with a hair-fine thread of glimmer that never quite stops glowing. It is a glimmer-singer's mark — worn by the few Umbrals taught to draw the deep art up out of the shards, and by the apprentices set on that long road. It deepens the well a caster draws from and turns a little hostile magic aside, yet sits light as a whisper, no helm at all. This one is tarnished and cold, its light gone faint, as though it had been worn a long time in the dark by someone who had forgotten what it was for.",
@@ -135,6 +139,7 @@
   },
   "ring-of-sight": {
     "id": "ring-of-sight",
+    "rarity": "uncommon",
     "name": "a ring of sight",
     "keywords": ["ring", "sight"],
     "description": "A slim silver band graven with a fine, open eye. The pattern is an old silversmith's conceit, but worked to Vesper's method it does more than flatter — it sharpens the wearer's notice, the flick of movement at the dark's edge and the seam a careless delver walks straight past.",
@@ -146,6 +151,7 @@
   },
   "ring-of-wits": {
     "id": "ring-of-wits",
+    "rarity": "uncommon",
     "name": "a ring of wits",
     "keywords": ["ring", "wits"],
     "description": "A slim silver band chased with a knot of interlacing lines that draws the eye in and never quite lets it settle. Worked to Vesper's method, it keeps the wearer's thoughts quick and their guard quicker — the small, steady edge that turns a blow aside or shrugs off a hostile weave.",
@@ -310,6 +316,7 @@
   },
   "minor-light-potion": {
     "id": "minor-light-potion",
+    "rarity": "uncommon",
     "name": "a minor light potion",
     "description": "A small vial of cold, captured luminescence, thumbed from a lightbug's gland. Drink it and your own skin glows softly for a time.",
     "type": "consumable",
@@ -320,6 +327,7 @@
   },
   "light-potion": {
     "id": "light-potion",
+    "rarity": "uncommon",
     "name": "a light potion",
     "description": "A vial of suspended luminescence, brighter and longer-lived than the minor draught. Drink it and you blaze like a held torch.",
     "type": "consumable",
@@ -358,6 +366,7 @@
   },
   "glimmer-dust": {
     "id": "glimmer-dust",
+    "rarity": "uncommon",
     "name": "a measure of glimmer dust",
     "description": "Glimmer ground to a fine, cold-glinting powder — crystal and coin alike end here. The smith's true reagent, and the alchemist's.",
     "type": "material",
@@ -367,6 +376,7 @@
   },
   "glimmersteel-bar": {
     "id": "glimmersteel-bar",
+    "rarity": "rare",
     "name": "a glimmersteel bar",
     "description": "Iron alloyed with glimmer, its grey shot through with threads of cold, captive light. Harder than honest steel, and dearer — stock for a finer class of gear.",
     "type": "material",
@@ -376,6 +386,7 @@
   },
   "glimmersteel-sword": {
     "id": "glimmersteel-sword",
+    "rarity": "rare",
     "name": "a glimmersteel sword",
     "description": "A long blade forged from glimmer-alloyed steel, its edge holding a faint, cold inner light that never quite fades. Lighter and meaner than honest iron, and balanced so finely it seems to lend strength to the arm that swings it. A small fortune in bars, and rarer still in the skill to work them.",
     "type": "weapon",
@@ -387,6 +398,7 @@
   },
   "glimmersteel-staff": {
     "id": "glimmersteel-staff",
+    "rarity": "rare",
     "name": "a glimmersteel staff",
     "description": "A slender rod of glimmer-alloyed steel, cool to the grip, a vein of captive light running its length and pooling bright at the head. It is no great weapon — but a focus: held while casting it steadies the will and deepens the well a caster draws from. Arcane work, half-forged and half-attuned.",
     "type": "weapon",
@@ -398,6 +410,7 @@
   },
   "starsilver-bar": {
     "id": "starsilver-bar",
+    "rarity": "rare",
     "name": "a starsilver bar",
     "description": "Silver smelted through with glimmer dust until the metal holds a cold, captive shimmer all its own — frozen starlight, the old tales would have it, though no smith alive can say what glimmer truly is. Dearer than glimmersteel and finer still; stock for the rarest gear the deep allows.",
     "type": "material",
@@ -407,6 +420,7 @@
   },
   "searing-flare": {
     "id": "searing-flare",
+    "rarity": "uncommon",
     "name": "a searing flare",
     "description": "A waxed paper cartridge packed with glimmer dust and a lightbug's gland. Cracked alight, it floods the dark with a searing glare — blinding to wield by, and agony to anything that fears the light.",
     "type": "consumable",
@@ -496,6 +510,7 @@
   },
   "dense-chitin-plate": {
     "id": "dense-chitin-plate",
+    "rarity": "rare",
     "name": "a slab of dense chitin",
     "description": "A scute prised from one of the deep's oldest armoured things — not grey like ordinary stonebug plate, but dark-banded and near-black where mineral has worked into the shell over decades. It is heavier than it looks, notched a little by whatever took it off the beast, and rings like ceramic when you knock it.",
     "type": "material",
@@ -505,6 +520,7 @@
   },
   "kingshell-plate": {
     "id": "kingshell-plate",
+    "rarity": "rare",
     "name": "a kingshell plate",
     "description": "A single great scute prised from the Pale King's back — pale, translucent shell gone yellow and stone-hard with age, and threaded through with veins of raw glimmer grown into the plate where the cold lake water lapped longest. It is heavier and richer than any stonebug's, the captive light in it lending the shell a faint, slow glow. There is only ever one, and an armourer who knew the working of it could make something well out of the ordinary.",
     "type": "material",
@@ -532,6 +548,7 @@
   },
   "silver-bar": {
     "id": "silver-bar",
+    "rarity": "uncommon",
     "name": "a silver bar",
     "description": "A pale ingot cast from smelted ore, cool and solid in the hand, bearing the faint marks of the mould. The smith's stock for fine work — harder-won than iron, and worth the getting.",
     "type": "material",
@@ -706,6 +723,7 @@
   },
   "dense-chitin-cuirass": {
     "id": "dense-chitin-cuirass",
+    "rarity": "rare",
     "name": "a dense chitin cuirass",
     "keywords": ["cuirass", "dense", "chitin", "carapace"],
     "description": "A cuirass beaten from slabs of dense, mineral-banded chitin — the near-black, ceramic-hard plate of the deep's oldest armoured things — fitted to Mallki's pattern and bound to an iron frame. It is the heaviest thing a delver can wear and turns aside very nearly everything, but it sits like a second skeleton of stone: a body inside it lumbers, slow to move and slower to strike, and the dark has long to close before a swing comes round.",
@@ -738,6 +756,7 @@
   },
   "barbed-flail": {
     "id": "barbed-flail",
+    "rarity": "uncommon",
     "name": "a barbed flail",
     "description": "A knot of thornbug spikes bound to a swinging head on a short chain — it does not so much strike as tear, leaving ragged, weeping wounds that will not close. Quick and light, it asks little strength; what it asks for is time, and a foe with nowhere to bleed out.",
     "type": "weapon",
@@ -752,6 +771,7 @@
   },
   "spiked-chitin-armor": {
     "id": "spiked-chitin-armor",
+    "rarity": "uncommon",
     "name": "spiked chitin armour",
     "description": "A stonebug-shell cuirass studded all over with thornbug spikes, points turned outward like a cornered pillbug's. It guards a delver no worse than plain chitin — and makes the dark pay for laying hands on them, every blow drawing its own blood back on the barbs.",
     "type": "armour",
@@ -762,6 +782,7 @@
   },
   "kingshell-cuirass": {
     "id": "kingshell-cuirass",
+    "rarity": "rare",
     "name": "a kingshell cuirass",
     "keywords": ["cuirass", "kingshell", "glimmer", "carapace"],
     "description": "A cuirass shaped from the Pale King's own carapace, worked to Mallki's patient method — the glimmer-veined shell pared thin and curved close to the body over a frame of fine drawn silver, then woven through with a whole ground crystal so the cold light runs all through it. It is feather-light against the heft of iron or stacked chitin, no slab of plate but a glimmer-enhanced shell, and it carries the deep art with it: hostile weaves slide off the crust, and a blow that lands feeds a flicker of its spent light back into the wearer. Umbral glimmer-craft, and there can only ever be the one.",
@@ -829,6 +850,7 @@
   },
   "gloom-silk": {
     "id": "gloom-silk",
+    "rarity": "uncommon",
     "name": "a spool of gloom-silk",
     "description": "Fine thread drawn from dried weeping chasm-moss fibres and processed at the alchemist's bench. Faintly luminous, cool to the touch, and stronger than it has any right to look. The stuff of deep-made cloth.",
     "type": "material",

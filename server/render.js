@@ -14,7 +14,7 @@ const POSTURE_LABEL = { sitting: "sitting", sleeping: "asleep" };
 function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
-  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null };
+  const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null, rarity: t.rarity || "common" };
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
     v.lit = !!inst.lit;
@@ -234,7 +234,7 @@ function buildExamineView(state, p, q) {
       const t = w.items[i.template];
       if (hit(i.id, t.name))
         return detailed
-          ? entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) })
+          ? entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w) })
           : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
     }
     for (const f of rt.fixtures) {
@@ -279,12 +279,12 @@ function buildExamineView(state, p, q) {
   // Carried items are always examined clearly (in hand).
   for (const i of p.inventory) {
     const t = w.items[i.template];
-    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { lines: itemSpecLines(t, w) });
+    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w) });
   }
   for (const slot of Object.values(p.equipment)) {
     if (slot && hit(slot.id, w.items[slot.template].name)) {
       const t = w.items[slot.template];
-      return entity("item", slot.id, t.name, t.description, { lines: itemSpecLines(t, w) });
+      return entity("item", slot.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w) });
     }
   }
   return null;

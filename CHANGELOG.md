@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Item rarity tiers.** Items carry an optional `rarity`
+  (`common`/`uncommon`/`rare`/`epic`/`legendary`, default Common). The client
+  surfaces it two ways: a coloured frame on the ground-item chip (Common stays
+  neutral; Uncommon green, Rare blue, Epic purple, Legendary orange) and a tier
+  badge in the Inspect window. Glimmersteel/starsilver stock and the
+  unique-mob & Umbral pieces are now **Rare**; minor-magic gear and worked
+  deep-craft (the sight/wits rings, spiked chitin, barbed flail, gloom-silk,
+  light potions, searing flare, …) are **Uncommon**. Like any examine detail,
+  rarity colour is only legible in adequate light.
+- **Item chips now read as objects, not beings.** Ground-item and fixture chips
+  are squared off, while players and mobs keep their pill shape — so it's clear
+  at a glance what's an item and what's an NPC (and a blue Rare item no longer
+  reads as another player).
 - **Buff-casting mobs (engine).** A mob's `cast` action may now name a
   **non-hostile** spell, which it lays on **itself** as a self-buff (see
   `state._mobCastSelf`) — defence/heal magnitudes baked from the mob's own

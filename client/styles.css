@@ -14,6 +14,12 @@
   --hostile: #d07f7f;
   --lumin: #d8c873;
   --gold: #f2c14e;
+  /* Item rarity ladder. Common is intentionally neutral (no colour) — colour
+     only appears once an item is worth noticing. */
+  --rarity-uncommon: #5cb87a;
+  --rarity-rare: #5b9bd5;
+  --rarity-epic: #a974d6;
+  --rarity-legendary: #d99a4e;
 }
 
 * { box-sizing: border-box; }
@@ -107,6 +113,22 @@ body {
 .chip.fixture { border-color: #4a4030; }
 .chip.player { border-color: var(--mana); color: var(--mana); }
 .chip.item { color: var(--text); }
+/* Shape tells beings from things at a glance: living actors (players, mobs)
+   stay pill-shaped; inert objects (items, fixtures) are squared off. This also
+   keeps a blue rare item readable next to a blue (mana-coloured) player chip. */
+.chip.item, .chip.fixture { border-radius: 5px; }
+/* Rarity frames on item chips (Common stays neutral — no rule). */
+.chip.item.rarity-uncommon { border-color: var(--rarity-uncommon); color: var(--rarity-uncommon); }
+.chip.item.rarity-rare { border-color: var(--rarity-rare); color: var(--rarity-rare); }
+.chip.item.rarity-epic { border-color: var(--rarity-epic); color: var(--rarity-epic); }
+.chip.item.rarity-legendary { border-color: var(--rarity-legendary); color: var(--rarity-legendary); }
+
+/* Rarity badge in the Inspect header. */
+.rarity-badge { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.rarity-badge.rarity-uncommon { color: var(--rarity-uncommon); }
+.rarity-badge.rarity-rare { color: var(--rarity-rare); }
+.rarity-badge.rarity-epic { color: var(--rarity-epic); }
+.rarity-badge.rarity-legendary { color: var(--rarity-legendary); }
 .label { color: var(--muted); font-size: 12px; margin-right: 2px; align-self: center; }
 
 /* Light bands — the live atmospheric tint of the room view */
