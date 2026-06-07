@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
 
 ### Added
+- **Drinkable fixtures.** A fixture can now declare a `restore` block
+  (`{ hp, mana }`); `use`/`drink <fixture>` draws from it and heals on the spot,
+  with the fixture staying put. The **dark seep** restores `+2 HP / +2 MP`, and a
+  new **carved stone font** behind the falls in the Umbral shrine (*Behind the
+  Paqcha*) gives the same — a small sanctuary apart from the undrinkable black
+  lake, for delvers who find the hidden ledge.
+
 - **Item rarity tiers.** Items carry an optional `rarity`
   (`common`/`uncommon`/`rare`/`epic`/`legendary`, default Common). The client
   surfaces it two ways: a coloured frame on the ground-item chip (Common stays

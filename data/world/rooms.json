@@ -747,7 +747,7 @@
     "ambientLight": 0,
     "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. The only way out is back east, through the water.",
     "exits": { "east": "lake.strand" },
-    "fixtures": ["umbral-coldlamp"],
+    "fixtures": ["umbral-coldlamp", "shrine-font"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 },
       { "template": "shards", "qty": 12 }

@@ -503,6 +503,12 @@ function use(state, player, arg, ctx) {
       return ft && (ft.switch || ft.door) && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
     if (f) return w.fixtures[f.template].door ? toggleDoor(state, player, f, ctx) : toggleFixture(state, player, f, ctx);
+    // A fixture you drink/draw from (a seep, a spring) restores hp/mana on use.
+    const rf = rt.fixtures.find((f) => {
+      const ft = w.fixtures[f.template];
+      return ft && ft.restore && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+    });
+    if (rf) return drinkFixture(state, player, rf, ctx);
   }
   // A carried/equipped light source toggles lit/doused (works in the dark — that's
   // the point of lighting one). Checked before the drink/eat fallback.
@@ -593,6 +599,21 @@ function drink(state, player, arg, ctx, verb = "use") {
   const flavourText = t.consumable.flavour || EFFECT_FLAVOUR[spec.type];
   const flavour = flavourText ? ` ${flavourText}` : "";
   return selfAndViews(state, player, `You ${verb} ${t.name}.${flavour}`);
+}
+
+// Drink/draw from a `restore` fixture (a seep, a spring). Heals hp/mana like a
+// `restore` consumable, but the fixture stays put — it's a place, not an item.
+function drinkFixture(state, player, f, ctx) {
+  const w = state.world;
+  const ft = w.fixtures[f.template];
+  const r = state.applyRestore(player, ft.restore);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} drinks from ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const parts = [];
+  if (r.hp) parts.push(`+${r.hp} HP`);
+  if (r.mana) parts.push(`+${r.mana} MP`);
+  const gain = parts.length ? ` (${parts.join(", ")})` : " It does nothing for you.";
+  return selfAndViews(state, player, `You drink from ${ft.name}.${gain}`);
 }
 
 function craft(state, player, arg, ctx) {
