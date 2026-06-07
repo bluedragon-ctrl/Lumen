@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Weapon examine shows the full damage formula.** Inspecting a weapon now
+  spells out the attribute scaling every swing gets — the weapon's own `scale`
+  or the default **Might/4** when it declares none — plus the viewer's current
+  bonus, e.g. `damage: 1d8 +2 (might/2)`. Previously the implicit Might/4 was
+  hidden, so a plain sword and a Might-scaling weapon could read identically.
+  The `spells` list likewise now shows the caster's current attribute bonus on
+  damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
+
 ### Added
 - **Item rarity tiers.** Items carry an optional `rarity`
   (`common`/`uncommon`/`rare`/`epic`/`legendary`, default Common). The client
