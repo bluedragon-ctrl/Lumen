@@ -254,6 +254,17 @@
     "shards": 10,
     "output": { "template": "glimmersteel-staff", "qty": 1 }
   },
+  "craft-glimmersteel-lamp": {
+    "id": "craft-glimmersteel-lamp",
+    "name": "Glimmersteel Lamp",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 15,
+    "output": { "template": "glimmersteel-lamp", "qty": 1 }
+  },
   "alloy-starsilver": {
     "id": "alloy-starsilver",
     "name": "Starsilver Bar",

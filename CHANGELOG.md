@@ -28,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
 
 ### Added
+- **Glimmersteel lamp.** A craftable high-end light source: output **5** (a step
+  past the brass lantern's 4), `fuelMax` **900**, and a `burnPerTick` of **0.5**
+  with `refuelPerUnit` **450** — so it burns brighter yet sips its oil, a single
+  flask outlasting three in a lantern. Forged at a **smithing** station from
+  `glimmersteel-bar ×2 + glimmer-dust ×1` (15 shards); **Tobin the tinker-smith**
+  sells the schematic.
+
 - **Inline colour markup for console text.** Authored messages can now tint a
   run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the
   colour holds until end of line and resets on the next, drawn from a small
