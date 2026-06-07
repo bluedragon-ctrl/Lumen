@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **`recipes` is sorted and split by where you can make it.** The known-recipe
+  list now shows a **Here** block (recipes whose station is in the room) before
+  an **Elsewhere** block (with the station to seek appended), and within each
+  orders output by kind — worn gear by slot, then consumables, then materials.
+  Recipes you can't currently afford the components/shards for are **greyed
+  out**, so what you can make right now reads at a glance.
+- **Shop `list` greys what you can't afford.** Wares priced above your shard
+  balance are shown greyed, matching the `recipes` treatment.
 - **Iron weapon balance.** The **iron sword** now hits for `1d8` (was `1d6`),
   making it a clear step up from the bought short sword at the same speed. The
   **iron mace** keeps its lower `1d6` base but now scales harder with Might
@@ -20,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
 
 ### Added
+- **Inline colour markup for console text.** Authored messages can now tint a
+  run of text with `<#name>` (e.g. `<#gray>`, `<#gold>`, `<#rainbow>`); the
+  colour holds until end of line and resets on the next, drawn from a small
+  themed palette in `styles.css`. Player-typed text (say/emote) has these tags
+  stripped server-side, so it stays trusted styling for content and effects.
+
 - **Drinkable fixtures.** A fixture can now declare a `restore` block
   (`{ hp, mana }`); `use`/`drink <fixture>` draws from it and heals on the spot,
   with the fixture staying put. The **dark seep** restores `+2 HP / +2 MP`, and a

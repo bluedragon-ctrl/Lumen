@@ -414,9 +414,14 @@ function shopList(state, player) {
   const w = state.world;
   const lines = [`${sh.t.name} trades:`];
   const sells = sh.t.shop.sells || [];
+  const purse = player.shards || 0;
   if (sells.length) {
     lines.push("Sells (you buy):");
-    for (const o of sells) lines.push(`  ${w.items[o.template].name} — ${buyPrice(o, w.items[o.template])} shards`);
+    for (const o of sells) {
+      const price = buyPrice(o, w.items[o.template]);
+      const line = `  ${w.items[o.template].name} — ${price} shards`;
+      lines.push(price > purse ? `<#gray>${line}` : line);
+    }
   }
   lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
   lines.push(`You have ${player.shards || 0} shards.`);
@@ -658,20 +663,58 @@ function craft(state, player, arg, ctx) {
   return msgs;
 }
 
+// Order a recipe list by what it outputs: worn gear first (by slot, weapon →
+// armour → trinket → light), then consumables, then raw materials, then the
+// rest. Keeps the list reading top-to-bottom from "things you wield" to "things
+// you stockpile" rather than in arbitrary definition order.
+const CRAFT_SLOT_ORDER = ["hand", "body", "head", "neck", "finger", "light"];
+function craftSortKey(item) {
+  const s = CRAFT_SLOT_ORDER.indexOf(item.slot);
+  if (s >= 0) return s;
+  if (item.type === "consumable") return CRAFT_SLOT_ORDER.length;
+  if (item.type === "material") return CRAFT_SLOT_ORDER.length + 2;
+  return CRAFT_SLOT_ORDER.length + 1;
+}
+
+// Can the player pay a recipe's inputs (components + shards) right now? Used
+// only to grey the list — `craft` re-checks before consuming anything.
+function canAfford(player, r) {
+  for (const inp of r.inputs || [])
+    if (countItem(player, inp.template) < (inp.qty || 1)) return false;
+  return (player.shards || 0) >= (r.shards || 0);
+}
+
 function recipes(state, player) {
   const w = state.world;
   const known = player.knownRecipes || [];
   if (!known.length) return [{ type: "log", text: "You know no recipes." }];
   const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
-  const lines = ["You know how to craft:"];
-  for (const rid of known) {
-    const r = w.recipes[rid];
-    if (!r) continue;
+  const recs = known.map((rid) => w.recipes[rid]).filter(Boolean);
+  // Plain code-unit compare for the name tiebreak — `localeCompare` pulls in the
+  // host locale's collation, which on some machines sorts the "ch" digraph after
+  // "h" (Czech-style) and scrambles names like Chitin vs Glimmersteel.
+  const byName = (a, b) => {
+    const na = a.name || a.id, nb = b.name || b.id;
+    return na < nb ? -1 : na > nb ? 1 : 0;
+  };
+  recs.sort((a, b) =>
+    craftSortKey(w.items[a.output.template]) - craftSortKey(w.items[b.output.template]) ||
+    byName(a, b));
+  // One line per recipe; greyed (via `<#gray>` markup) when you lack the
+  // components/shards to make it. In the "elsewhere" block the station you'd
+  // need is appended, since those recipes span different stations.
+  const fmt = (r, withStation) => {
     const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
     if (r.shards) ins.push(`${r.shards} shards`);
-    const station = here.has(r.station) ? "" : ` — needs ${stationLabel(w, r.station)}`;
-    lines.push(`  ${r.name || rid}: ${ins.join(", ")} → ${w.items[r.output.template].name}${station}`);
-  }
+    const where = withStation ? ` — at ${stationLabel(w, r.station)}` : "";
+    const line = `  ${r.name || r.id}: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
+    return canAfford(player, r) ? line : `<#gray>${line}`;
+  };
+  const hereRecs = recs.filter((r) => here.has(r.station));
+  const awayRecs = recs.filter((r) => !here.has(r.station));
+  const lines = ["You know how to craft:"];
+  if (hereRecs.length) lines.push("", "Here:", ...hereRecs.map((r) => fmt(r, false)));
+  if (awayRecs.length) lines.push("", "Elsewhere:", ...awayRecs.map((r) => fmt(r, true)));
   return [{ type: "log", text: lines.join("\n") }];
 }
 
@@ -761,14 +804,22 @@ function fish(state, player, arg, ctx) {
   return selfAndViews(state, player, `You hook ${catchName} and swing it ashore.${fishedOut}`);
 }
 
+// Colour markup (`<#name>…`, see client renderMarkup) is authored-content only.
+// Strip it from anything a player types so chat/emotes can't inject colours.
+function stripMarkup(s) {
+  return String(s).replace(/<#[a-z0-9-]+>/gi, "");
+}
+
 function say(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Say what?" }];
+  text = stripMarkup(text);
   ctx.toRoom(player.location, { type: "log", text: `${player.name} says: ${text}` }, player.id);
   return [{ type: "log", text: `You say: ${text}` }];
 }
 
 function emote(state, player, text, ctx) {
   if (!text) return [{ type: "error", text: "Emote what?" }];
+  text = stripMarkup(text);
   const line = `${player.name} ${text}`;
   ctx.toRoom(player.location, { type: "log", text: line }, player.id);
   return [{ type: "log", text: line }];

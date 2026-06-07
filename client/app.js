@@ -110,8 +110,44 @@ function appendToLog(el) {
 function addLine(text, kind) {
   const div = document.createElement("div");
   div.className = "line-" + (kind || "log");
-  div.textContent = text;
+  renderMarkup(div, text);
   appendToLog(div);
+}
+
+// Inline colour markup: `<#name>` tints the rest of its line with the named
+// colour (see .mk-* in styles.css). Colour resets at every newline, so a stray
+// tag can never bleed past one line. Unknown names are dropped silently. Server
+// content uses this (e.g. greyed-out recipes you can't afford, a rainbow boss);
+// player-authored text has its tags stripped server-side, so this stays trusted
+// styling — we still build spans via textContent, never innerHTML.
+const MARKUP_COLOURS = new Set([
+  "gray", "grey", "red", "green", "gold", "blue", "cyan", "magenta", "rainbow",
+]);
+function renderMarkup(parent, text) {
+  const re = /<#([a-z0-9-]+)>/gi;
+  text.split("\n").forEach((line, i) => {
+    if (i > 0) parent.appendChild(document.createTextNode("\n"));
+    let idx = 0, cls = null, m;
+    const flush = (str) => {
+      if (!str) return;
+      if (cls) {
+        const span = document.createElement("span");
+        span.className = cls;
+        span.textContent = str;
+        parent.appendChild(span);
+      } else {
+        parent.appendChild(document.createTextNode(str));
+      }
+    };
+    re.lastIndex = 0;
+    while ((m = re.exec(line))) {
+      flush(line.slice(idx, m.index));
+      const name = m[1].toLowerCase() === "grey" ? "gray" : m[1].toLowerCase();
+      cls = MARKUP_COLOURS.has(m[1].toLowerCase()) ? "mk-" + name : null;
+      idx = re.lastIndex;
+    }
+    flush(line.slice(idx));
+  });
 }
 
 // A muted "chapter break" in the console marking arrival in a new room. Inserted
