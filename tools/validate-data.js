@@ -68,6 +68,10 @@ function main() {
   }
 
   const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
+  // Consumables add `damage-room` — a thrown area bomb that blasts every foe in
+  // the room (see commands.throwBomb / state.detonateRoom). Not valid on a weapon
+  // onHit/onDamage trigger, so it lives apart from EFFECT_TYPES.
+  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room"];
   const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
   const RARITIES = ["common", "uncommon", "rare", "epic", "legendary"];
 
@@ -176,7 +180,7 @@ function main() {
       if (typeof eff !== "object")
         errs.push(`item ${id}: consumable.effect must be an effect object { type, ... }`);
       else {
-        if (!EFFECT_TYPES.includes(eff.type)) errs.push(`item ${id}: unknown effect type "${eff.type}" (known: ${EFFECT_TYPES.join(", ")})`);
+        if (!CONSUMABLE_EFFECT_TYPES.includes(eff.type)) errs.push(`item ${id}: unknown effect type "${eff.type}" (known: ${CONSUMABLE_EFFECT_TYPES.join(", ")})`);
         if (eff.magnitude != null && typeof eff.magnitude !== "number") errs.push(`item ${id}: effect.magnitude must be a number`);
         if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`item ${id}: effect.duration must be a positive number (ticks)`);
         if (eff.hp != null && typeof eff.hp !== "number") errs.push(`item ${id}: effect.hp must be a number`);
