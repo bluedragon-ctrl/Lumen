@@ -136,6 +136,18 @@
     "value": 85,
     "armour": { "maxMana": 5 }
   },
+  "glimmersteel-coil": {
+    "id": "glimmersteel-coil",
+    "rarity": "rare",
+    "name": "a glimmersteel coil",
+    "keywords": ["coil", "ring", "band", "glimmersteel"],
+    "description": "A band for the finger wound from a single hair-fine wire of glimmersteel, coiled tight around a mote of pressed glimmer dust at its heart. The captive light never quite stops welling up, and worn against the skin it seeps slowly back into the wearer — so a caster's well refills even on the move, where idle hands would only crawl. Tobin's work, and the one contraption of his that does just what he claims.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 120,
+    "armour": { "manaRegen": 0.125 }
+  },
   "glimmer-singer-circlet": {
     "id": "glimmer-singer-circlet",
     "rarity": "rare",
@@ -459,6 +471,16 @@
     "value": 80,
     "stackable": true,
     "recipe": "forge-glimmersteel-sword"
+  },
+  "schematic-glimmersteel-coil": {
+    "id": "schematic-glimmersteel-coil",
+    "name": "a glimmersteel coil schematic",
+    "description": "One of Tobin's diagrams, and a proud one — the winding of a single glimmersteel wire around a mote of pressed glimmer dust so the captive light seeps back into the wearer rather than burning off. He'll tell you twice it's his own design. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 30,
+    "stackable": true,
+    "recipe": "craft-glimmersteel-coil"
   },
   "schematic-glimmersteel-staff": {
     "id": "schematic-glimmersteel-staff",
