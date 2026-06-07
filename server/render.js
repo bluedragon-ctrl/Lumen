@@ -156,8 +156,12 @@ function itemSpecLines(tmpl, w, viewer) {
     lines.push(`damage: ${dmg} ${cur}(${sc.attr}/${sc.per || 1})`, `action cost: ${tmpl.weapon.actionCost}`);
   }
   if (tmpl.armour) {
-    lines.push(`armour ${tmpl.armour.armour}, ward ${tmpl.armour.ward}`);
+    const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0;
+    if (ar || wd) lines.push(`armour ${ar}, ward ${wd}`); // skip for pure-bonus gear (a ring, a coil)
     if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
+    if (tmpl.armour.maxHp) lines.push(`max HP +${tmpl.armour.maxHp}`);
+    if (tmpl.armour.maxMana) lines.push(`max mana +${tmpl.armour.maxMana}`);
+    if (tmpl.armour.manaRegen) lines.push(`mana regen +${tmpl.armour.manaRegen}/tick`);
     const mod = tmpl.armour.attrMod;
     if (mod) lines.push(...Object.entries(mod).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`));
   }

@@ -818,19 +818,35 @@ class GameState {
     return bonus;
   }
 
+  /** The standing mana-regen rate for a player: the template's global trickle plus
+   *  any bonus from equipped gear (`armour.manaRegen`, e.g. a glimmersteel coil).
+   *  Summed across every slot and folded into `deriveStats`, refreshed whenever
+   *  gear changes — so the base stays a tuning constant while gear can deepen it. */
+  manaRegenFor(player) {
+    let bonus = 0;
+    for (const inst of Object.values(player.equipment || {})) {
+      if (!inst) continue;
+      const t = this.world.items[inst.template];
+      if (t && t.armour && t.armour.manaRegen) bonus += t.armour.manaRegen;
+    }
+    return (this.world.playerTemplate.manaRegen || 0) + bonus;
+  }
+
   /**
    * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
-   * max HP (Vitality), max Mana (Intellect), and the low-light sight band
-   * (Perception). Idempotent — always derived from `attributes` plus the
-   * template's perception band as the baseline-at-3 anchor, so it is safe to
-   * re-run on every admit (like the manaRegen re-sync). Innate Ward/evasion
-   * (Wits), to-hit/crit (Perception), and melee damage (Might) are applied live
-   * at combat time, not stored here. Does NOT touch current hp/mana — callers clamp.
+   * max HP (Vitality), max Mana (Intellect), the standing mana-regen rate (global
+   * trickle + gear), and the low-light sight band (Perception). Idempotent —
+   * always derived from `attributes`/gear plus the template's perception band as
+   * the baseline-at-3 anchor, so it is safe to re-run on every admit and whenever
+   * gear changes. Innate Ward/evasion (Wits), to-hit/crit (Perception), and melee
+   * damage (Might) are applied live at combat time, not stored here. Does NOT
+   * touch current hp/mana — callers clamp.
    */
   deriveStats(player) {
     const a = player.attributes || {};
     player.maxHp = (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
     player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT + this._equipManaBonus(player);
+    player.manaRegen = this.manaRegenFor(player);
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
     const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);
     const dimBelow = Math.max(band.blindBelow, band.dimBelow - sight);
@@ -925,9 +941,10 @@ class GameState {
     if (player.mana == null) player.mana = player.maxMana;
     player.hp = Math.min(player.hp, player.maxHp);
     player.mana = Math.min(player.mana, player.maxMana);
-    // manaRegen is a global tuning constant (not per-character progress), so always
-    // re-sync it from the template — tuning changes then apply to existing saves too.
-    player.manaRegen = this.world.playerTemplate.manaRegen || 0;
+    // manaRegen's base is a global tuning constant (not per-character progress), so
+    // always re-derive it — tuning changes then apply to existing saves too — adding
+    // any bonus from gear worn into the session (e.g. a glimmersteel coil).
+    player.manaRegen = this.manaRegenFor(player);
     // Admin always knows every recipe — handy for testing. Re-synced on each
     // login, so recipes added to the world after the admin save are picked up.
     if (player.isAdmin) player.knownRecipes = Object.keys(this.world.recipes);

@@ -35,6 +35,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `glimmersteel-bar ×2 + glimmer-dust ×1` (15 shards); **Tobin the tinker-smith**
   sells the schematic.
 
+- **Glimmersteel coil — gear that quickens mana regen.** Worn gear can now carry
+  an `armour.manaRegen` bonus, added to the standing mana trickle and refreshed
+  whenever gear changes (and re-derived on admit, so it survives a reload). The
+  **glimmersteel coil** is a `finger`-slot ring (rare, value 120) granting
+  `+0.125`/tick — doubling the default standing regen, so a caster's well refills
+  even on the move. Forged at a **smithing** station from `glimmersteel-bar ×1 +
+  glimmer-dust ×1` (12 shards); **Tobin the tinker-smith** sells the schematic.
+  `examine` now also lists a piece of gear's max-HP, max-mana and mana-regen
+  bonuses (previously hidden), and no longer prints `armour 0, ward 0` for
+  pure-bonus gear like rings.
 - **Shard grenade — a thrown area bomb.** A new `damage-room` consumable effect:
   `throw`/`hurl`/`lob` (or `use`) a bomb to blast **every hostile in the room at
   once** for its rolled damage, crediting and threatening the thrower so survivors
