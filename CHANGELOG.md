@@ -63,8 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the schematic.
 - **A depth-1 moss source.** The Dripping Tunnel (`abyss.tunnel`) now bears a
   **weeping-moss-fringe** — a sparse mineable variant of the deep moss curtain (2
-  charges, 200-tick respawn) — so `weeping-chasm-moss` (and the mana tonic it
-  brews) is reachable near the rim, not only in the depth-3+ river caves.
+  charges, 320-tick respawn) — so `weeping-chasm-moss` (and the mana tonic it
+  brews) is reachable near the rim, not only in the depth-3+ river caves. The
+  deep `weeping-moss-curtain` veins also slow to a 320-tick respawn (was 150).
 - **Acid bomb — a thrown corroding cloud.** A sibling of the shard grenade, but
   it leaves a lingering **damage-over-time** instead of an instant burst: each
   caught mob takes `1d4`/tick for 6 ticks (~15 magical, **armour-ignoring**),

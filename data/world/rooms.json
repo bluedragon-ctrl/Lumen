@@ -235,7 +235,7 @@
     "id": "abyss.tunnel",
     "zone": "abyss",
     "name": "The Dripping Tunnel",
-    "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. The dark is absolute, and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
+    "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. A thin fringe of moss clings to the wet stone above it, glowing the faintest blue-white — too dim to truly light the place, where the dark is otherwise absolute and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
     "depth": 1,
     "ambientLight": 0,
     "exits": { "east": "abyss.first", "west": "abyss.grotto" },
