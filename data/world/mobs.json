@@ -220,7 +220,7 @@
       { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] }
     ],
     "shop": {
-      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-sword" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
+      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "schematic-glimmersteel-sword" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
     }
   },
   "rim-hatcher": {
@@ -260,7 +260,7 @@
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }]
+      "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmer-dust" }, { "template": "schematic-pressed-glimmer-dust" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }]
     }
   },
   "cave-lurker": {

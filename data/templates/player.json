@@ -13,6 +13,6 @@
     { "template": "scroll-spark" }
   ],
   "startEquipment": { "hand": "short-sword", "body": null, "head": null, "neck": null, "finger": null, "light": null },
-  "knownRecipes": ["minor-light-potion", "smelt-iron", "smelt-silver", "forge-iron-dagger", "glimmer-dust", "pressed-glimmer-dust", "glimmersteel"],
+  "knownRecipes": ["minor-light-potion", "smelt-iron", "smelt-silver", "forge-iron-dagger"],
   "knownSpells": []
 }

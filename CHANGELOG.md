@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Player panel now shows gear-modified attributes.** The attributes block (and
+  the Perception-derived crit chance) is rendered from a player's *effective*
+  attributes — base plus equipped-gear `attrMod` — rather than the raw base. So
+  donning an iron helm that dulls **Wits −1** is reflected in the panel, matching
+  the value combat (Ward, evasion, to-hit) already used.
+
 ### Changed
 - **`recipes` is sorted and split by where you can make it.** The known-recipe
   list now shows a **Here** block (recipes whose station is in the room) before
@@ -26,6 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hidden, so a plain sword and a Might-scaling weapon could read identically.
   The `spells` list likewise now shows the caster's current attribute bonus on
   damage spells (e.g. `1d6 +1 fire damage (intellect/4)`), for parity.
+- **Glimmer crafting is now gated behind schematics.** New characters no longer
+  start knowing **Glimmer Dust**, **Pressed Glimmer Dust**, or the **Glimmersteel
+  Bar** smelt — the entry point to all glimmer-work. The three methods are now
+  taught by schematics: **Vesper the glimmer-mage** sells the two dust methods
+  (`schematic-glimmer-dust`, `schematic-pressed-glimmer-dust`) and **Tobin the
+  tinker-smith** sells the `schematic-glimmersteel-bar` smelt, so the glimmer
+  line is something a delver buys into rather than knows from the rim.
 
 ### Added
 - **Glimmersteel lamp.** A craftable high-end light source: output **5** (a step

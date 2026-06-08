@@ -523,6 +523,36 @@
     "stackable": true,
     "recipe": "craft-glimmersteel-lamp"
   },
+  "schematic-glimmersteel-bar": {
+    "id": "schematic-glimmersteel-bar",
+    "name": "a glimmersteel-bar schematic",
+    "description": "The first page of Tobin's glimmer-work — the smelting of glimmer dust into molten iron so the light beds into the metal instead of guttering out, drawn off as a bar of cold-shining glimmersteel. Every blade and casing he sells begins here. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "recipe": "glimmersteel"
+  },
+  "schematic-glimmer-dust": {
+    "id": "schematic-glimmer-dust",
+    "name": "a glimmer-dust schematic",
+    "description": "A page of Vesper's careful hand — the grinding and settling of a raw crystal into a measure of glimmer dust, the captive light loosed but not lost, ready to alloy or burn. The first thing she teaches anyone serious about the glimmer. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "recipe": "glimmer-dust"
+  },
+  "schematic-pressed-glimmer-dust": {
+    "id": "schematic-pressed-glimmer-dust",
+    "name": "a pressed-glimmer-dust schematic",
+    "description": "A note in Vesper's hand for the days the crystals run short — pressing a measure of glimmer dust from bought stock and a fistful of shards rather than grinding it from a crystal at all. Dearer, she'll grant, but it asks no crystal. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "recipe": "pressed-glimmer-dust"
+  },
   "schematic-starsilver": {
     "id": "schematic-starsilver",
     "name": "a starsilver schematic",
