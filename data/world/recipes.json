@@ -112,21 +112,23 @@
     "shards": 8,
     "output": { "template": "shard-grenade", "qty": 1 }
   },
-  "mushroom-soup": {
-    "id": "mushroom-soup",
-    "name": "Mushroom Soup",
+  "hearty-broth": {
+    "id": "hearty-broth",
+    "name": "Hearty Broth",
     "station": "cooking",
     "inputs": [
-      { "template": "palecap-mushroom", "qty": 2 }
+      { "template": "palecap-mushroom", "qty": 2 },
+      { "template": "rat-meat", "qty": 1 }
     ],
-    "output": { "template": "mushroom-soup", "qty": 1 }
+    "output": { "template": "hearty-broth", "qty": 1 }
   },
   "cooked-skewer": {
     "id": "cooked-skewer",
     "name": "Bug-Meat Skewer",
     "station": "cooking",
     "inputs": [
-      { "template": "bug-meat", "qty": 1 }
+      { "template": "bug-meat", "qty": 1 },
+      { "template": "bug-tallow", "qty": 1 }
     ],
     "output": { "template": "cooked-skewer", "qty": 1 }
   },
@@ -138,6 +140,29 @@
       { "template": "grub", "qty": 3 }
     ],
     "output": { "template": "roasted-grubs", "qty": 1 }
+  },
+  "deep-stew": {
+    "id": "deep-stew",
+    "name": "Deep Stew",
+    "station": "cooking",
+    "inputs": [
+      { "template": "beer", "qty": 1 },
+      { "template": "bug-meat", "qty": 1 },
+      { "template": "palecap-mushroom", "qty": 1 },
+      { "template": "bug-tallow", "qty": 1 }
+    ],
+    "shards": 2,
+    "output": { "template": "deep-stew", "qty": 1 }
+  },
+  "render-lamp-oil": {
+    "id": "render-lamp-oil",
+    "name": "Rendered Lamp-Oil",
+    "station": "cooking",
+    "inputs": [
+      { "template": "bug-tallow", "qty": 2 }
+    ],
+    "shards": 1,
+    "output": { "template": "lamp-oil", "qty": 1 }
   },
   "forge-iron-sword": {
     "id": "forge-iron-sword",

@@ -89,7 +89,7 @@
       { "type": "idle", "weight": 4 },
       { "type": "emote", "weight": 2, "messages": ["lets out a shrill squeak", "gnaws at the stone", "twitches its whiskers", "sniffs the air"] }
     ],
-    "loot": []
+    "loot": [{ "template": "rat-meat", "chance": 0.6 }]
   },
   "cave-bat": {
     "id": "cave-bat",
@@ -136,7 +136,7 @@
       { "type": "emote", "weight": 2, "messages": ["lets out a shrill, rattling screech", "bares a mouthful of yellowed incisors", "lashes her scaled tail across the bones", "drags a delver's femur closer with one clawed foot"] },
       { "type": "summon", "weight": 2, "mob": "giant-rat", "count": 2, "max": 4, "verb": "throws back her head and shrieks; vermin boil out of the dark" }
     ],
-    "loot": [{ "template": "crystal", "chance": 1 }]
+    "loot": [{ "template": "crystal", "chance": 1 }, { "template": "rat-meat", "chance": 1 }]
   },
   "deep-dweller": {
     "id": "deep-dweller",
@@ -180,7 +180,7 @@
       { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
     ],
     "shop": {
-      "sells": [{ "template": "mushroom-soup" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "beer" }, { "template": "book-of-cooking", "price": 8 }]
+      "sells": [{ "template": "hearty-broth" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "deep-stew" }, { "template": "beer" }, { "template": "book-of-cooking", "price": 8 }, { "template": "book-of-hearty-cooking", "price": 60 }]
     }
   },
   "rim-shopkeeper": {
@@ -200,7 +200,7 @@
       { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "schematic-render-oil" }]
     }
   },
   "rim-smith": {
@@ -327,7 +327,7 @@
       { "type": "idle", "weight": 5 },
       { "type": "emote", "weight": 2, "messages": ["grazes at the moss with slow mandibles", "trundles a slow half-circle", "tucks its plates tighter, then relaxes"] }
     ],
-    "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "bug-meat", "chance": 1 }]
+    "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "bug-meat", "chance": 1 }, { "template": "bug-tallow", "chance": 0.5 }]
   },
   "thornbug": {
     "id": "thornbug",
