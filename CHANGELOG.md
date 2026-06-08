@@ -5,6 +5,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **A produce economy on stonebugs and rats.** Two common mobs become supply
+  chains. **Stonebugs** now also drop **`bug-tallow`** (≈50%) on top of chitin and
+  bug-meat — the keystone for a new **oil-rendering** craft (`bug-tallow ×2 →
+  lamp-oil` at a cooking fire, so lantern fuel is farmable, not buy-only) and the
+  kitchen's standard frying fat. **Giant rats** drop **`rat-meat`** (≈60%; Gnaw
+  always), edible raw in a pinch and the meat for Maeve's broth.
+- **Deep stew — the best field food.** A four-ingredient dish (`beer + bug-meat +
+  palecap + bug-tallow`) restoring **+12 HP / +6 mana**. Taught by a tier-2
+  **`book-of-hearty-cooking`** Maeve keeps back from the common cookbook.
+- **Garrick sells an `oil-rendering` schematic**, gating the new render craft.
+- Maeve now stocks the **deep stew** ready-made alongside her other dishes.
+
+### Changed
+- **Mushroom soup is now Hearty Broth.** Maeve's signature is renamed (item/recipe
+  id `mushroom-soup` → `hearty-broth`) and made meatier — `palecap ×2 + rat-meat
+  ×1`, restoring **+8 HP / +6 mana** (was +5/+5) — reflecting the cellar-bred meat
+  the inn lore always implied went into the broth-pot.
+- **Bug-meat skewers are fried in tallow.** `cooked-skewer` now also takes
+  `bug-tallow ×1` and heals **+9 HP** (was +8), weaving the new fat into a staple.
+
 ### Fixed
 - **Player panel now shows gear-modified attributes.** The attributes block (and
   the Perception-derived crit chance) is rendered from a player's *effective*

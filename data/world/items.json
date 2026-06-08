@@ -229,6 +229,15 @@
     "value": 6,
     "stackable": true
   },
+  "bug-tallow": {
+    "id": "bug-tallow",
+    "name": "a lump of bug-tallow",
+    "description": "A fistful of pale, waxy fat rendered from under a stonebug's plates. It keeps for weeks and burns clean — the Rim's cheapest source of lamp-oil, and good frying fat for the broth-pots besides.",
+    "type": "material",
+    "weight": 1,
+    "value": 3,
+    "stackable": true
+  },
   "scroll-spark": {
     "id": "scroll-spark",
     "name": "a Scroll of Spark",
@@ -327,15 +336,15 @@
     "value": 8,
     "stackable": true
   },
-  "mushroom-soup": {
-    "id": "mushroom-soup",
-    "name": "a bowl of pale mushroom soup",
-    "description": "A steaming bowl of soup, thick with palecap mushrooms and a little stolen warmth from the inn's hearth. Hearty fare for a delver — it mends body and mind alike.",
+  "hearty-broth": {
+    "id": "hearty-broth",
+    "name": "a bowl of hearty broth",
+    "description": "A steaming bowl of Maeve's own broth, thick with palecap mushrooms and the dark, tender meat the Lantern's Rest breeds down in its cellar. The signature fare of the inn — it mends body and mind alike, and has sent many a shaken delver back down the shaft with their nerve restored.",
     "type": "consumable",
     "weight": 1,
-    "value": 5,
+    "value": 8,
     "stackable": true,
-    "consumable": { "effect": { "type": "restore", "hp": 5, "mana": 5 } }
+    "consumable": { "effect": { "type": "restore", "hp": 8, "mana": 6 } }
   },
   "minor-light-potion": {
     "id": "minor-light-potion",
@@ -526,6 +535,16 @@
     "stackable": true,
     "recipe": "searing-flare"
   },
+  "schematic-render-oil": {
+    "id": "schematic-render-oil",
+    "name": "an oil-rendering method",
+    "description": "A single greasy card in Garrick's blunt hand — the rendering of stonebug tallow down over a low flame into clean-burning lamp-oil. He'll part with the method, he says, since a delver who renders their own still buys the flasks off him when the herd runs thin. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "recipe": "render-lamp-oil"
+  },
   "schematic-glimmersteel-sword": {
     "id": "schematic-glimmersteel-sword",
     "name": "a glimmersteel sword schematic",
@@ -664,7 +683,17 @@
     "weight": 1,
     "value": 40,
     "stackable": true,
-    "teaches": { "recipes": ["mushroom-soup", "cooked-skewer", "roasted-grubs"] }
+    "teaches": { "recipes": ["hearty-broth", "cooked-skewer", "roasted-grubs"] }
+  },
+  "book-of-hearty-cooking": {
+    "id": "book-of-hearty-cooking",
+    "name": "a book of hearty cooking",
+    "description": "A slim, butter-stained folio in Maeve's hand, kept back from the common cookbook — the one recipe she does not give away with the rest. Pages of close notes on the long, slow building of a proper deep stew, the browning and the simmering and the patience it wants. Study it to fix the method in memory; the folio falls to crumbs as you take in the last page.",
+    "type": "book",
+    "weight": 1,
+    "value": 60,
+    "stackable": true,
+    "teaches": { "recipes": ["deep-stew"] }
   },
   "chitin-plate": {
     "id": "chitin-plate",
@@ -784,17 +813,43 @@
       "effect": { "type": "restore", "hp": 3 }
     }
   },
+  "rat-meat": {
+    "id": "rat-meat",
+    "name": "a cut of rat-meat",
+    "description": "A stringy, dark haunch off a giant rat. Gamey and tough raw — but meat is meat this near the dark, and cooked down in a broth it eats honest enough. Maeve buys it without asking where it came from.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 3,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You gnaw the raw rat-meat down. It is tough and gamey and cold, but it takes the worst edge off your hunger.",
+      "effect": { "type": "restore", "hp": 2 }
+    }
+  },
   "cooked-skewer": {
     "id": "cooked-skewer",
     "name": "a bug-meat skewer",
-    "description": "Cubes of bug-meat charred over the inn's hearth and slid steaming off an iron spit. The heat renders the rubber out of it; it eats hot, savoury, and almost respectable.",
+    "description": "Cubes of bug-meat rolled in rendered tallow and charred over the inn's hearth, slid steaming off an iron spit. The fat crisps the outside and renders the rubber out of it; it eats hot, savoury, and almost respectable.",
     "type": "consumable",
     "weight": 1,
     "value": 9,
     "stackable": true,
     "consumable": {
-      "flavour": "You eat the skewer hot off the spit. The seared meat is rich and filling, and strength flows back into your limbs.",
-      "effect": { "type": "restore", "hp": 8 }
+      "flavour": "You eat the skewer hot off the spit. The seared, fat-crisped meat is rich and filling, and strength flows back into your limbs.",
+      "effect": { "type": "restore", "hp": 9 }
+    }
+  },
+  "deep-stew": {
+    "id": "deep-stew",
+    "name": "a bowl of deep stew",
+    "description": "A thick, dark stew of bug-meat and palecap browned in tallow and simmered long in small beer until the whole bowl turns rich and heady. It is the closest thing to a feast a delver gets this side of the rim — it sits heavy and warm, mending flesh and steadying the mind both.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 14,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the deep stew slowly, savouring it. Rich and warming, it fills you to the back teeth and a settled strength flows back into your limbs and your mind alike.",
+      "effect": { "type": "restore", "hp": 12, "mana": 6 }
     }
   },
   "beer": {

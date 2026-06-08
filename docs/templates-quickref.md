@@ -63,7 +63,7 @@ Type-specific blocks (include exactly the one matching `type`):
 // recipe item: names a recipe id that must exist
 "recipe": "searing-flare"
 // book: teaches every listed recipe/spell at once (ids must exist; ≥1 total). Consumed on study.
-"teaches": { "recipes": ["mushroom-soup", "cooked-skewer"], "spells": ["spark"] }
+"teaches": { "recipes": ["hearty-broth", "cooked-skewer"], "spells": ["spark"] }
 ```
 
 `currency` (shards) skips `value`/`slot`. `treasure`/`material` are usually just
