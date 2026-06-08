@@ -373,6 +373,35 @@
       "effect": { "type": "heal-over-time", "name": "Regeneration", "magnitude": 3, "interval": 3, "duration": 24, "good": true }
     }
   },
+  "mana-tonic": {
+    "id": "mana-tonic",
+    "rarity": "uncommon",
+    "name": "a mana tonic",
+    "description": "A vial of moss-steeped water that has kept the chasm-river's cold, and a little of its quiet. It glows the faintest blue-white, like deep water remembering light. Drunk down, it settles the mind and lets the will run clear again.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 30,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the tonic down. It is cold and still and tastes of stone, and the noise behind your eyes quiets — the well of your will brimming again.",
+      "effect": { "type": "restore", "mana": 12 }
+    }
+  },
+  "acid-bomb": {
+    "id": "acid-bomb",
+    "rarity": "uncommon",
+    "name": "an acid bomb",
+    "description": "A thin-walled vial of venom rendered down past poison into something that simply eats — amber, fuming, and faintly warm through the glass. Thrown, it bursts and the fumes cling, corroding everything in the room for a while after. One throw and it's spent.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 30,
+    "stackable": true,
+    "consumable": {
+      "flavour": "The bomb shatters and a fume of amber acid sprays across the room, hissing and clinging where it lands.",
+      "burst": "a fuming amber spray",
+      "effect": { "type": "damage-room", "dot": { "name": "acid", "damage": "1d4", "duration": 6 }, "cause": "acid" }
+    }
+  },
   "iron-ore": {
     "id": "iron-ore",
     "name": "a chunk of iron ore",
@@ -606,6 +635,26 @@
     "value": 30,
     "stackable": true,
     "recipe": "regeneration-draught"
+  },
+  "schematic-mana-tonic": {
+    "id": "schematic-mana-tonic",
+    "name": "a mana tonic recipe",
+    "description": "A page in Vesper's careful hand — the steeping of chasm-moss in cold still water and the drawing-off of its quiet, so a draught of it clears the mind and refills the will. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 25,
+    "stackable": true,
+    "recipe": "mana-tonic"
+  },
+  "schematic-acid-bomb": {
+    "id": "schematic-acid-bomb",
+    "name": "an acid bomb recipe",
+    "description": "A page in Vesper's careful hand, the margins eaten through in two places — the rendering of centipede venom down past poison into a caustic that keeps eating where it lands. She notes, drily, to mix it at arm's length. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 25,
+    "stackable": true,
+    "recipe": "acid-bomb"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",

@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the value combat (Ward, evasion, to-hit) already used.
 
 ### Changed
+- **Thrown bombs can leave a lingering cloud.** A `damage-room` consumable's
+  effect now takes an optional `dot` block (`{ name, damage, duration }`) applied
+  to each caught mob as a damage-over-time, an instant `damage` burst, or both —
+  and its room-burst line is now data-driven (`consumable.burst`) instead of
+  hardcoded shrapnel (the shard grenade keeps its existing text via the default).
 - **`recipes` is sorted and split by where you can make it.** The known-recipe
   list now shows a **Here** block (recipes whose station is in the room) before
   an **Elsewhere** block (with the station to seek appended), and within each
@@ -51,6 +56,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   witchglow's coaxed virtue into a slow mending the raw mushrooms can't reach.
   **Vesper the glimmer-mage** sells the schematic. Pure data — reuses the
   existing `heal-over-time` effect primitive.
+- **Mana tonic — a craftable mana potion.** Fills a real gap (there was no
+  dedicated mana restore — only `beer` +4 and `mushroom-soup` +5). Drunk, it
+  restores **12 MP**. Uncommon, value 30. Brewed at an **alchemy** station from
+  `weeping-chasm-moss ×1 + vial ×1` (4 shards). **Vesper the glimmer-mage** sells
+  the schematic.
+- **Acid bomb — a thrown corroding cloud.** A sibling of the shard grenade, but
+  it leaves a lingering **damage-over-time** instead of an instant burst: each
+  caught mob takes `1d4`/tick for 6 ticks (~15 magical, **armour-ignoring**),
+  crediting the thrower on a corrosion kill like a bleed. The anti-armour answer
+  to foes shrapnel bounces off. Uncommon, value 30. Brewed at an **alchemy**
+  station from `venom-gland ×2 + vial ×1` (4 shards). **Vesper the glimmer-mage**
+  sells the schematic.
 - **Glimmersteel lamp.** A craftable high-end light source: output **5** (a step
   past the brass lantern's 4), `fuelMax` **900**, and a `burnPerTick` of **0.5**
   with `refuelPerUnit` **450** — so it burns brighter yet sips its oil, a single

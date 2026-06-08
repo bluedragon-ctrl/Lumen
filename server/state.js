@@ -1318,14 +1318,17 @@ class GameState {
   }
 
   /**
-   * Resolve a thrown area bomb (a consumable's `damage-room` effect). Rolls fresh
-   * damage per target and applies it to every mob in `targets` (the caller has
-   * already filtered to the eligible — hostile or already-engaged — mobs, so a
-   * stray toss never blasts a peaceful shopkeeper). Threatens the thrower so
-   * survivors turn on them, rouses any sleeper the blast doesn't kill, and credits
-   * the thrower with kills (loot/xp). Mob removal, light recompute and the kill's
-   * spoils are handled by `_hurtMob`. Returns one result per target for the caller
-   * to narrate: `{ id, name, damage, killed, death }`.
+   * Resolve a thrown area bomb (a consumable's `damage-room` effect), applying it to
+   * every mob in `targets` (the caller has already filtered to the eligible — hostile
+   * or already-engaged — mobs, so a stray toss never blasts a peaceful shopkeeper).
+   * A bomb carries an instant burst (`damage`, fresh-rolled per target), a lingering
+   * `dot` ({ name, damage, duration } — a corroding/poison cloud applied as a
+   * damage-over-time state, credited to the thrower like an `onHit` venom), or both.
+   * Either way it threatens the thrower so survivors turn on them, rouses any sleeper
+   * it doesn't kill, and credits the thrower with kills (loot/xp). Mob removal, light
+   * recompute and the kill's spoils are handled by `_hurtMob` (and, for the DoT, by
+   * `_tickEffects`). Returns one result per target for the caller to narrate:
+   * `{ id, name, damage, dot, killed, death }`.
    */
   detonateRoom(player, spec, targets, events = []) {
     const w = this.world;
@@ -1335,12 +1338,24 @@ class GameState {
     // Snapshot the targets — _hurtMob splices the dead out of rt.mobs mid-loop.
     for (const mob of [...targets]) {
       const t = w.mobs[mob.template];
-      const damage = Math.max(1, rollDice(spec.damage));
-      this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
-      const death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
+      let damage = 0;
+      let death = null;
+      if (spec.damage != null) {
+        damage = Math.max(1, rollDice(spec.damage));
+        this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
+        death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
+      }
+      // A lingering cloud sinks a DoT into anything the burst didn't outright kill,
+      // stamped with the thrower so a corrosion kill credits them (like a bleed).
+      let dot = false;
+      if (spec.dot && !death) {
+        this.applyEffect(mob, { type: "damage-over-time", name: spec.dot.name || spec.cause || "poison", damage: spec.dot.damage, duration: spec.dot.duration, sourceId: player.id, good: false });
+        this._addThreat(mob, player.id, 1); // the splash sticks the thrower in its sights
+        dot = true;
+      }
       if (!death && this._rouse(mob))
         events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light });
-      results.push({ id: mob.id, name: t.name, damage, killed: !!death, death });
+      results.push({ id: mob.id, name: t.name, damage, dot, killed: !!death, death });
     }
     rt.light = this.computeRoomLight(roomId); // a luminous mob blasted apart changes the room
     return results;

@@ -22,6 +22,28 @@
     "shards": 6,
     "output": { "template": "regeneration-draught", "qty": 1 }
   },
+  "mana-tonic": {
+    "id": "mana-tonic",
+    "name": "Mana Tonic",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "weeping-chasm-moss", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 4,
+    "output": { "template": "mana-tonic", "qty": 1 }
+  },
+  "acid-bomb": {
+    "id": "acid-bomb",
+    "name": "Acid Bomb",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "venom-gland", "qty": 2 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 4,
+    "output": { "template": "acid-bomb", "qty": 1 }
+  },
   "smelt-iron": {
     "id": "smelt-iron",
     "name": "Iron Bar",
