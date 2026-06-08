@@ -148,6 +148,13 @@
     "type": "resource",
     "mine": { "template": "weeping-chasm-moss", "yield": 1, "charges": 4, "respawn": 150, "energy": 10 }
   },
+  "weeping-moss-fringe": {
+    "id": "weeping-moss-fringe",
+    "name": "a fringe of weeping chasm-moss",
+    "description": "Where the seep-water beads and falls, a thin fringe of bioluminescent moss has taken to the wet rock, trailing a few hair-fine tendrils into the dark. It glows the faintest blue-white — a stray outrider of the great curtains that hang in the deep river-caves below. Pull a clump free and it comes away easily, tendrils and all.",
+    "type": "resource",
+    "mine": { "template": "weeping-chasm-moss", "yield": 1, "charges": 2, "respawn": 200, "energy": 10 }
+  },
   "vesper-field-journal": {
     "id": "vesper-field-journal",
     "name": "Vesper's field journal",

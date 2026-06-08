@@ -239,7 +239,7 @@
     "depth": 1,
     "ambientLight": 0,
     "exits": { "east": "abyss.first", "west": "abyss.grotto" },
-    "fixtures": ["dripping-pool"],
+    "fixtures": ["dripping-pool", "weeping-moss-fringe"],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 45 }]
   },
