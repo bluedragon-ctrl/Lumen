@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caught mob takes `1d4`/tick for 6 ticks (~15 magical, **armour-ignoring**),
   crediting the thrower on a corrosion kill like a bleed. The anti-armour answer
   to foes shrapnel bounces off. Uncommon, value 30. Brewed at an **alchemy**
-  station from `venom-gland ×2 + vial ×1` (4 shards). **Vesper the glimmer-mage**
+  station from `venom-gland ×1 + vial ×1` (4 shards). **Vesper the glimmer-mage**
   sells the schematic.
 - **Glimmersteel lamp.** A craftable high-end light source: output **5** (a step
   past the brass lantern's 4), `fuelMax` **900**, and a `burnPerTick` of **0.5**

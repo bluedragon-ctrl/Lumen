@@ -38,7 +38,7 @@
     "name": "Acid Bomb",
     "station": "alchemy",
     "inputs": [
-      { "template": "venom-gland", "qty": 2 },
+      { "template": "venom-gland", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
     "shards": 4,
