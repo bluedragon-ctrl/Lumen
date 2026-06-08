@@ -359,6 +359,20 @@
     "stackable": true,
     "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 3, "duration": 360 } }
   },
+  "regeneration-draught": {
+    "id": "regeneration-draught",
+    "rarity": "uncommon",
+    "name": "a regeneration draught",
+    "description": "A cloudy tincture that holds a faint, cold green light deep in the glass, the witchglow's poison tamed and turned to mending. Drunk down, it does not close a wound at a stroke — it settles warm beneath the skin and knits torn flesh slowly, a little with every breath, until the warmth fades.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 35,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the draught down. It sits warm and heavy in your gut, and a slow, crawling warmth begins to knit you back together.",
+      "effect": { "type": "heal-over-time", "name": "Regeneration", "magnitude": 3, "interval": 3, "duration": 24, "good": true }
+    }
+  },
   "iron-ore": {
     "id": "iron-ore",
     "name": "a chunk of iron ore",
@@ -582,6 +596,16 @@
     "value": 60,
     "stackable": true,
     "recipe": "forge-ring-of-wits"
+  },
+  "schematic-regeneration-draught": {
+    "id": "schematic-regeneration-draught",
+    "name": "a regeneration draught recipe",
+    "description": "A water-stained page in Vesper's careful hand — the steeping of palecap, the patient drawing-off of the witchglow's poison, the long cold distillation that turns the two to a slow mending. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 30,
+    "stackable": true,
+    "recipe": "regeneration-draught"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",

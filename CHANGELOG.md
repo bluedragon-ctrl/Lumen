@@ -42,6 +42,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line is something a delver buys into rather than knows from the rim.
 
 ### Added
+- **Regeneration draught — a craftable heal-over-time potion.** A portable,
+  no-mana counterpart to the **Regeneration** spell that bridges the gap between
+  instant food and casting: drunk down it knits **3 HP every 3 ticks for 24
+  ticks** (24 HP over ~24s), ticking on through combat rather than bursting you
+  out of it. Uncommon, value 35. Brewed at an **alchemy** station from
+  `palecap-mushroom ×2 + witchglow-cap ×1 + vial ×1` (6 shards) — distilling the
+  witchglow's coaxed virtue into a slow mending the raw mushrooms can't reach.
+  **Vesper the glimmer-mage** sells the schematic. Pure data — reuses the
+  existing `heal-over-time` effect primitive.
 - **Glimmersteel lamp.** A craftable high-end light source: output **5** (a step
   past the brass lantern's 4), `fuelMax` **900**, and a `burnPerTick` of **0.5**
   with `refuelPerUnit` **450** — so it burns brighter yet sips its oil, a single
