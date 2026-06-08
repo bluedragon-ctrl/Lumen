@@ -193,6 +193,21 @@ function main() {
         if (eff.mana != null && typeof eff.mana !== "number") errs.push(`item ${id}: effect.mana must be a number`);
         if (eff.damage != null && (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage)))
           errs.push(`item ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
+        // A thrown bomb may burst (instant `damage`), leave a lingering `dot`
+        // (corroding/poison cloud), or both — but it must do at least one.
+        if (eff.type === "damage-room") {
+          if (eff.damage == null && eff.dot == null)
+            errs.push(`item ${id}: damage-room needs a "damage" burst, a "dot" cloud, or both`);
+          if (eff.dot != null) {
+            if (typeof eff.dot !== "object") errs.push(`item ${id}: effect.dot must be an object { damage, duration }`);
+            else {
+              if (typeof eff.dot.damage !== "string" || !DICE_RE.test(eff.dot.damage))
+                errs.push(`item ${id}: effect.dot.damage "${eff.dot.damage}" is not valid dice notation`);
+              if (eff.dot.duration != null && (typeof eff.dot.duration !== "number" || eff.dot.duration <= 0))
+                errs.push(`item ${id}: effect.dot.duration must be a positive number (ticks)`);
+            }
+          }
+        }
       }
     }
   }

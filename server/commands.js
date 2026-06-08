@@ -631,21 +631,24 @@ function throwBomb(state, player, idx, inst, t, spec, ctx, verb) {
 
   const results = state.detonateRoom(player, spec, targets);
   const killed = results.filter((r) => r.killed);
-  const hurt = results.filter((r) => !r.killed);
+  const hurt = results.filter((r) => !r.killed && r.damage > 0);
+  const poisoned = results.filter((r) => !r.killed && r.dot);
   const xp = killed.reduce((s, r) => s + (r.death.xp || 0), 0);
   const loot = killed.flatMap((r) => r.death.loot || []);
 
-  // Keep swinging at a survivor if not already committed (mirrors a hostile cast).
-  const survivor = rt.mobs.find((m) => hurt.some((r) => r.id === m.id));
+  // Keep swinging at any survivor if not already committed (mirrors a hostile cast).
+  const survivor = rt.mobs.find((m) => results.some((r) => !r.killed && r.id === m.id));
   if (!player.pending && player.hp > 0 && survivor)
     player.pending = { type: "attack", targetId: survivor.id };
 
   let outcome = "";
   if (hurt.length) outcome += ` It tears into ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (poisoned.length) outcome += ` The ${spec.cause || "cloud"} clings to ${poisoned.map((r) => r.name).join(", ")}.`;
   if (killed.length) outcome += ` It blasts apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
-  ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls ${t.name} and it bursts in a storm of glimmer-fire and shrapnel!` }, player.id);
+  const burst = t.consumable.burst || "a storm of glimmer-fire and shrapnel";
+  ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls ${t.name} and it bursts in ${burst}!` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const flavour = t.consumable.flavour ? ` ${t.consumable.flavour}` : "";
   return selfAndViews(state, player, `You hurl ${t.name}.${flavour}${outcome}`, "combat");
