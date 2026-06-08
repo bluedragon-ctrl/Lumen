@@ -30,6 +30,7 @@ function buildPlayerView(state, p) {
   for (const [slot, inst] of Object.entries(p.equipment)) equipment[slot] = itemView(inst, w);
   const defence = playerDefence(w, p); // Armour (vs physical) + Ward (vs magical) from gear
   const sp = effectiveSpeed(w, p); // base speed minus heavy-gear speedPenalty
+  const eff = effectiveAttributes(w, p); // base attributes plus gear attrMod — what combat actually reads
   return {
     type: "player",
     player: {
@@ -51,8 +52,8 @@ function buildPlayerView(state, p) {
       armour: defence.armour,
       ward: defence.ward, // gear Ward + innate Ward from Wits
       evasion: defence.evasion, // Wits-derived dodge (fraction, e.g. 0.06)
-      crit: ((p.attributes && p.attributes.perception) || 0) * 0.01, // Perception crit chance (fraction)
-      attributes: p.attributes,
+      crit: (eff.perception || 0) * 0.01, // Perception crit chance (fraction), gear-modified
+      attributes: eff, // effective attributes (base + gear attrMod), matching what combat uses
       perception: p.perception,
       equipment,
       inventory: p.inventory.map((i) => itemView(i, w)),
