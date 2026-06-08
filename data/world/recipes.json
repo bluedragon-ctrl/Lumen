@@ -10,6 +10,18 @@
     "shards": 5,
     "output": { "template": "minor-light-potion", "qty": 1 }
   },
+  "regeneration-draught": {
+    "id": "regeneration-draught",
+    "name": "Regeneration Draught",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "palecap-mushroom", "qty": 2 },
+      { "template": "witchglow-cap", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "regeneration-draught", "qty": 1 }
+  },
   "smelt-iron": {
     "id": "smelt-iron",
     "name": "Iron Bar",
