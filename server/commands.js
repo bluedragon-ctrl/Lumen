@@ -36,7 +36,7 @@ const VERBS = [
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
-  "mine", "dig", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  "mine", "dig", "gather", "forage", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
 ];
@@ -66,6 +66,7 @@ const HELP = [
   "  recipes               — list recipes you know",
   "  craft | make <recipe> — craft at the matching station here",
   "  mine | dig [vein]     — work ore loose from a vein in the room",
+  "  gather | forage [cluster] — pick mushrooms or other crops by hand (also `use <cluster>`)",
   "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
   "  drink | quaff | eat <item> — consume a potion or food",
   "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
@@ -514,6 +515,12 @@ function use(state, player, arg, ctx) {
       return ft && ft.restore && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
     if (rf) return drinkFixture(state, player, rf, ctx);
+    // A harvestable fixture (a mushroom cluster) — `use` it to pick by hand.
+    const hf = rt.fixtures.find((f) => {
+      const ft = w.fixtures[f.template];
+      return ft && ft.harvest && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+    });
+    if (hf) return gather(state, player, arg, ctx);
   }
   // A carried/equipped light source toggles lit/doused (works in the dark — that's
   // the point of lighting one). Checked before the drink/eat fallback.
@@ -776,6 +783,12 @@ function mine(state, player, arg, ctx) {
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find anything worth mining." }];
   const veins = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].mine);
+  // A mushroom cluster isn't ore, but players reach for `mine` on anything that
+  // looks workable. Redirect to the hand-picking path when there's no vein to
+  // swing at (or the named target is a harvestable bed), so the instinct works.
+  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
+  if (beds.length && (!veins.length || (arg && beds.some((b) => b.template.toLowerCase().includes(arg.toLowerCase()) || w.fixtures[b.template].name.toLowerCase().includes(arg.toLowerCase())))))
+    return gather(state, player, arg, ctx);
   if (!veins.length) return [{ type: "error", text: "There is nothing to mine here." }];
   let f;
   if (arg) {
@@ -802,6 +815,46 @@ function mine(state, player, arg, ctx) {
   ctx.refreshRoom(player.location, player.id);
   const thin = f.charges <= 0 ? " The seam runs thin and gives no more." : "";
   return selfAndViews(state, player, `You work ${oreName} loose.${thin}`);
+}
+
+// `gather` (alias `forage`): pick by hand from a harvestable fixture — a glowing
+// mushroom cluster, say. Shares the charged-harvest rhythm of `mine`/`fish` (the
+// fixture holds a few crops that deplete and regrow on a timer, see
+// state._mineTick) but reads as plucking, not digging — no pick required.
+function gather(state, player, arg, ctx) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  if (!canSee(player.perception, rt.light))
+    return [{ type: "error", text: "It is too dark to find anything worth gathering." }];
+  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
+  if (!beds.length) return [{ type: "error", text: "There is nothing here to gather." }];
+  let f;
+  if (arg) {
+    const ql = arg.toLowerCase();
+    f = beds.find((v) => v.template.toLowerCase().includes(ql) || w.fixtures[v.template].name.toLowerCase().includes(ql));
+    if (!f) return [{ type: "error", text: `There is no "${arg}" to gather here.` }];
+  } else if (beds.length === 1) {
+    f = beds[0];
+  } else {
+    return [{ type: "error", text: `Gather what? ${beds.map((v) => w.fixtures[v.template].name).join(", ")}.` }];
+  }
+  const ft = w.fixtures[f.template];
+  const h = ft.harvest;
+  if (f.charges <= 0)
+    return [{ type: "error", text: `${ft.name} has been picked clean — give it time to grow back.` }];
+  const cost = h.energy || player.speed; // ~one tick's worth of effort per pick
+  if (player.energy < cost)
+    return [{ type: "error", text: "You are too spent to forage just now." }];
+  player.energy -= cost;
+  f.charges -= 1;
+  const qty = h.yield || 1;
+  addToInventory(player, makeItemInstance({ template: h.template, qty }, w), w);
+  const itemName = w.items[h.template].name;
+  const verb = h.verb || "gather";
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${itemName} from ${ft.name}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const bare = f.charges <= 0 ? " That is the last of them — the cluster is bare." : "";
+  return selfAndViews(state, player, `You ${verb} ${itemName}.${bare}`);
 }
 
 // `fish` (alias `angle`): work a baited line in fishing water. Mirrors `mine` —
@@ -1500,6 +1553,9 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "mine":
     case "dig":
       return mine(state, player, arg, ctx);
+    case "gather":
+    case "forage":
+      return gather(state, player, arg, ctx);
     case "fish":
     case "angle":
       return fish(state, player, arg, ctx);

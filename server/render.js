@@ -276,6 +276,23 @@ function buildExamineView(state, p, q) {
           lines.push(`yield left: ${left}/${t.mine.charges}`);
           hints.push(left > 0 ? "Work it with `mine`." : "Worked out — leave it time to recover.");
         }
+        if (t.harvest) {
+          const left = f.charges != null ? f.charges : t.harvest.charges;
+          lines.push(`crop: ${w.items[t.harvest.template].name}`);
+          lines.push(`ready: ${left}/${t.harvest.charges}`);
+          const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "a cluster of glow-caps" → "cluster of glow-caps"
+          hints.push(left > 0 ? `Pick them by hand with \`gather\` (or \`use ${callName}\`).` : "Picked clean — leave it time to grow back.");
+        }
+        if (t.fish) {
+          hints.push(`Work a line here with \`fish\`.`);
+        }
+        if (t.restore) {
+          const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "a dark seep" → "dark seep"
+          hints.push(`Drink from it with \`use ${callName}\`.`);
+        }
+        // No affordance at all → say so plainly, so a player can tell inert scenery
+        // (a relief, a pillar, a bone pile) from something they can work or take.
+        if (!hints.length) hints.push("It's part of the cavern — nothing here to work or take.");
         return entity("fixture", f.id, t.name, t.description, { lines, hints });
       }
     }
