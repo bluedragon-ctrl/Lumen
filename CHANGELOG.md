@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glowing mushroom clusters can be picked — and every fixture now tells you what
+  it affords.** The `glow-caps` and `witchglow-cluster` fixtures (long pure scenery,
+  with their caps trickling onto the floor nearby) are now harvestable via a new
+  `harvest` fixture block — a charged crop that depletes and regrows on a timer just
+  like an ore vein or fishing pool. A new **`gather`/`forage`** verb (and `use
+  <cluster>`) picks them by hand; **`mine`** redirects to it when there's no vein to
+  swing at, so the player's instinct works either way. Floor spawns are kept, so the
+  clusters are a second, faster source. Examining *any* fixture now shows an
+  affordance hint — *"Pick them by hand with `gather`"*, *"Work it with `mine`"*,
+  *"Work a line here with `fish`"*, *"Drink from it with `use …`"*, or, for genuine
+  scenery, *"It's part of the cavern — nothing here to work or take."* — so players
+  can tell what's interactive without trial and error. Validator now checks `harvest`
+  blocks alongside `mine`/`fish`.
+- **Mallki's cold glimmer-lamp can be switched.** The `umbral-coldlamp` was always-on
+  scenery; players reasonably expected to `use` it like any lamp. It's now a switch
+  fixture (a sliding stone shutter hoods or bares the glimmer) that gives 1 light when
+  on, and starts lit so the hollow's lighting is unchanged.
 - **The Grazing Hollow — a stonebug feeding ground behind Mallki's garden.** A new
   depth-3 room (`third.grazing`) opening south off the Sunless Garden, where wild
   stonebugs drift in to crop a broad, untamed mat of glowing moss. Nothing is penned:
@@ -73,6 +90,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `bug-tallow ×1` and heals **+9 HP** (was +8), weaving the new fat into a staple.
 
 ### Fixed
+- **Summoned guardians no longer pick fights.** A player's summon (the Glimmer Husk,
+  the Wisp) is a defensive guard, but it inherited the proactive-hunter behaviour of
+  any `hostile` mob and would aggro and engage wild creatures on sight even while its
+  master stood idle. A player-faction summon now never hunts on its own: it engages
+  only what it has traded blows with, or what its owner is already fighting (it piles
+  into the master's fights like a `helper`). Stand peacefully beside a stonebug and
+  your husk stands with you; lift a hand against it and the husk lifts with you.
+- **Light fuel gauge updates while standing still.** A lit lantern/torch burns fuel
+  every tick, but the player panel only refreshed when the view was re-sent (on move,
+  vitals change, etc.) — so an idle player saw their fuel frozen until it suddenly hit
+  empty. The burn loop now nudges a `vitals` refresh at least once per ten ticks while a
+  light is burning, so the gauge ticks down visibly.
 - **Player panel now shows gear-modified attributes.** The attributes block (and
   the Perception-derived crit chance) is rendered from a player's *effective*
   attributes — base plus equipped-gear `attrMod` — rather than the raw base. So
