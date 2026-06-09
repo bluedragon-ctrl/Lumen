@@ -332,7 +332,7 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "emit-light", "heal-over-time", "protect", "sleep", "summon"];
+  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "emit-light", "heal-over-time", "protect", "sleep", "summon"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {
@@ -350,12 +350,42 @@ function main() {
       errs.push(`spell ${id}: manaCost must be a non-negative number`);
     if (sp.shardCost != null && (typeof sp.shardCost !== "number" || sp.shardCost < 0))
       errs.push(`spell ${id}: shardCost must be a non-negative number`);
+    // A material component consumed on cast (e.g. Glimmer Husk's chitin plate).
+    if (sp.itemCost != null) {
+      if (!Array.isArray(sp.itemCost)) errs.push(`spell ${id}: itemCost must be an array of { template, qty }`);
+      else for (const c of sp.itemCost) {
+        if (!c || typeof c !== "object" || !has(items, c.template)) errs.push(`spell ${id}: itemCost references missing item ${c && c.template}`);
+        if (c && c.qty != null && (typeof c.qty !== "number" || c.qty <= 0)) errs.push(`spell ${id}: itemCost qty must be a positive number`);
+      }
+    }
     const eff = sp.effect;
     if (!eff || typeof eff !== "object" || !eff.type) {
       errs.push(`spell ${id}: effect must be an object { type, ... }`);
     } else if (!SPELL_EFFECT_TYPES.includes(eff.type)) {
       errs.push(`spell ${id}: unknown effect type "${eff.type}" (known: ${SPELL_EFFECT_TYPES.join(", ")})`);
     } else if (eff.type === "damage") {
+      if (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage))
+        errs.push(`spell ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
+      if (eff.scale != null) {
+        if (typeof eff.scale !== "object" || !eff.scale.attr) errs.push(`spell ${id}: effect.scale must be { attr, per }`);
+        else if (eff.scale.per != null && (typeof eff.scale.per !== "number" || eff.scale.per <= 0))
+          errs.push(`spell ${id}: effect.scale.per must be a positive number`);
+      }
+    } else if (eff.type === "damage-over-time") {
+      // A clinging burn (Witchfire): per-tick dice over a timed duration, with an
+      // optional Intellect `durationScale` lengthening the burn and an `emitLight`
+      // glow shed for as long as it smoulders.
+      if (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage))
+        errs.push(`spell ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
+      if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
+      if (eff.emitLight != null && (typeof eff.emitLight !== "number" || eff.emitLight < 0)) errs.push(`spell ${id}: effect.emitLight must be a non-negative number (light the burning foe sheds)`);
+      if (eff.durationScale != null) {
+        if (typeof eff.durationScale !== "object" || !eff.durationScale.attr) errs.push(`spell ${id}: effect.durationScale must be { attr, per }`);
+        else if (eff.durationScale.per != null && (typeof eff.durationScale.per !== "number" || eff.durationScale.per <= 0))
+          errs.push(`spell ${id}: effect.durationScale.per must be a positive number`);
+      }
+    } else if (eff.type === "damage-room") {
+      // An area burst (Arc Flash): per-target dice + optional attribute scaling, via detonateRoom.
       if (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage))
         errs.push(`spell ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
       if (eff.scale != null) {
@@ -384,6 +414,12 @@ function main() {
       if (!eff.mob || !has(mobs, eff.mob)) errs.push(`spell ${id}: summon effect references missing mob ${eff.mob}`);
       if (eff.count != null && (typeof eff.count !== "number" || eff.count <= 0)) errs.push(`spell ${id}: summon count must be a positive number`);
       if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: summon duration must be a positive number (ticks)`);
+      // durationScale lengthens the summon's lifetime with an attribute (ticks per point).
+      if (eff.durationScale != null) {
+        if (typeof eff.durationScale !== "object" || !eff.durationScale.attr) errs.push(`spell ${id}: effect.durationScale must be { attr, per }`);
+        else if (eff.durationScale.per != null && (typeof eff.durationScale.per !== "number" || eff.durationScale.per <= 0))
+          errs.push(`spell ${id}: effect.durationScale.per must be a positive number`);
+      }
       if (eff.group != null && typeof eff.group !== "string") errs.push(`spell ${id}: summon group must be a string`);
     }
   }

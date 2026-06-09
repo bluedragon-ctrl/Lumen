@@ -318,6 +318,46 @@
     "stackable": true,
     "scroll": { "spell": "glimmer-spike" }
   },
+  "scroll-witchfire": {
+    "id": "scroll-witchfire",
+    "name": "a Scroll of Witchfire",
+    "description": "Greasy vellum the colour of old smoke, the glyphs charred at their edges as though the spell had tried to eat its way off the page. Study it to learn the Witchfire weave — a clinging glimmer-burn that gnaws at a foe over time — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 55,
+    "stackable": true,
+    "scroll": { "spell": "witchfire" }
+  },
+  "scroll-arc-flash": {
+    "id": "scroll-arc-flash",
+    "name": "a Scroll of Arc Flash",
+    "description": "Stiff vellum that seems to hold a faint charge of its own, the central glyph a tight crackle-knot ringed with warding marks; a thumb drawn across it prickles. Study it to learn the Arc Flash war-spell — a blinding crack of light that lashes every foe in the room — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 80,
+    "stackable": true,
+    "scroll": { "spell": "arc-flash" }
+  },
+  "scroll-glimmer-storm": {
+    "id": "scroll-glimmer-storm",
+    "name": "a Scroll of Glimmer Storm",
+    "description": "Heavy vellum gone stiff and silver-flecked, the glyphs raised in ridges of ground glimmer that catch the light like a scatter of broken glass. Study it to learn the Glimmer Storm weave — a squall of raw glimmer that scores every foe in the room and burns shards as it strikes — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 110,
+    "stackable": true,
+    "scroll": { "spell": "glimmer-storm" }
+  },
+  "scroll-glimmer-husk": {
+    "id": "scroll-glimmer-husk",
+    "name": "a Scroll of Glimmer Husk",
+    "description": "Cured gut-skin rather than vellum, marked in Mallki's careful hand — the binding of glimmer through a worked chitin plate until the shell wakes and stands. Study it to learn the Glimmer Husk weave — a guard raised from a plate and a fistful of glimmer — and the skin curls to nothing as you take in the last glyph.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 100,
+    "stackable": true,
+    "scroll": { "spell": "glimmer-husk" }
+  },
   "palecap-mushroom": {
     "id": "palecap-mushroom",
     "name": "a palecap mushroom",
