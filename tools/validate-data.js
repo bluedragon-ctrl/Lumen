@@ -300,6 +300,15 @@ function main() {
       if (f.mine.energy != null && (typeof f.mine.energy !== "number" || f.mine.energy < 0))
         errs.push(`fixture ${id}: mine.energy must be a non-negative number`);
     }
+    if (f.harvest) {
+      if (!has(items, f.harvest.template)) errs.push(`fixture ${id}: harvest.template missing item ${f.harvest.template}`);
+      for (const k of ["charges", "respawn"])
+        if (typeof f.harvest[k] !== "number" || f.harvest[k] <= 0) errs.push(`fixture ${id}: harvest.${k} must be a positive number`);
+      if (f.harvest.yield != null && (typeof f.harvest.yield !== "number" || f.harvest.yield <= 0))
+        errs.push(`fixture ${id}: harvest.yield must be a positive number`);
+      if (f.harvest.energy != null && (typeof f.harvest.energy !== "number" || f.harvest.energy < 0))
+        errs.push(`fixture ${id}: harvest.energy must be a non-negative number`);
+    }
     if (f.fish) {
       if (!has(items, f.fish.template)) errs.push(`fixture ${id}: fish.template missing item ${f.fish.template}`);
       if (f.fish.bait != null && !has(items, f.fish.bait)) errs.push(`fixture ${id}: fish.bait missing item ${f.fish.bait}`);

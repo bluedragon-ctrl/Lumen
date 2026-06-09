@@ -504,6 +504,8 @@ function dispatchEvent(ev) {
   if (ev.type === "vein-recover") {
     const text = ev.kind === "fish"
       ? `The water stirs — the fish are biting at ${ev.fixtureName} again.`
+      : ev.kind === "growth"
+      ? `Fresh caps have grown back across ${ev.fixtureName}.`
       : `${cap(ev.fixtureName)} has fresh ore to work again.`;
     for (const o of state.playersIn(ev.roomId)) {
       if (canSee(o.perception, state.rooms[ev.roomId].light)) {
