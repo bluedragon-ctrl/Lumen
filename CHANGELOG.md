@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Grazing Hollow — a stonebug feeding ground behind Mallki's garden.** A new
+  depth-3 room (`third.grazing`) opening south off the Sunless Garden, where wild
+  stonebugs drift in to crop a broad, untamed mat of glowing moss. Nothing is penned:
+  Mallki simply lives beside the herd and takes what the balance allows, making his
+  hollow a genuinely self-sustaining place and giving the stonebug economy (chitin
+  plate, bug meat, bug tallow) a home at its source. Adds the `umbral-stonebug-grounds`
+  fixture and a stonebug spawn.
+- **A water source for Mallki's hollow.** New `umbral-cistern` fixture in the Sunless
+  Garden — a tended stone basin catching a clean seep, drinkable via `use` (+2 HP,
+  +2 MP, same as a dark seep). Its overflow runs a worked channel down to the Grazing
+  Hollow, so the garden, the herd, and any delver passing through all draw on the same
+  water — the last piece that makes the hollow self-sustaining.
 - **Glimmer Husk — an Umbral craft-summon.** A glimmer construct you *build* rather
   than conjure: **Glimmer Husk** (8 mana + 4 shards + **1 chitin plate**, consumed)
   raises a slow, armoured, spined guard (18 HP, armour 3, 1d4 melee + 1d4 spike

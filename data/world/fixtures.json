@@ -134,6 +134,20 @@
     "type": "scenery",
     "emitsLight": 2
   },
+  "umbral-cistern": {
+    "id": "umbral-cistern",
+    "name": "a stone cistern",
+    "description": "A broad basin cut square from the floor catches a thread of clean water seeping clear through the rock above, drop by patient drop. The overflow is led off in a shallow worked channel that threads away among the beds. The water is dark and bitterly cold and looks fit to drink — kept so, like everything Mallki tends. It is what feeds the garden, and the garden feeds him.",
+    "type": "scenery",
+    "restore": { "hp": 2, "mana": 2 }
+  },
+  "umbral-stonebug-grounds": {
+    "id": "umbral-stonebug-grounds",
+    "name": "the grazing grounds",
+    "description": "The cavern floor lies thick with glowing moss, broad and untamed, climbing the lower walls and spilling between the stones. No furrows, no fences — just good feed left to grow, and the slow grey shapes that drift in out of the dark to crop it. The stonebugs come and go as they please; the moss only grows the faster for their grazing, and that easy balance has fed shell, meat, and tallow up to the hollow for longer than anyone can say.",
+    "type": "scenery",
+    "emitsLight": 2
+  },
   "umbral-coldlamp": {
     "id": "umbral-coldlamp",
     "name": "a cold glimmer-lamp",

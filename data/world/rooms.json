@@ -597,14 +597,28 @@
     "name": "The Sunless Garden",
     "depth": 3,
     "ambientLight": 0,
-    "description": "A cavern given over wholly to cultivation: terraced beds of dark earth climb the walls, each furred with a tended, even crop of luminous fungus that breathes a soft blue-green light over the whole chamber. The air is rich and damp and faintly sweet. Pale grubs work the richest beds, fattening on the crop — Mallki lets them be, and picks them off for the line when they grow bold. This is where the Umbral feeds himself, and has, by the look of it, for longer than the Rim has stood. The only way out is back up to the hollow, north.",
-    "exits": { "north": "third.dwelling" },
-    "fixtures": ["umbral-garden-beds"],
+    "description": "A cavern given over wholly to cultivation: terraced beds of dark earth climb the walls, each furred with a tended, even crop of luminous fungus that breathes a soft blue-green light over the whole chamber. The air is rich and damp and faintly sweet. A stone cistern set into the floor catches a clean seep drop by drop and leads the overflow off among the beds in a worked channel. Pale grubs work the richest beds, fattening on the crop — Mallki lets them be, and picks them off for the line when they grow bold. This is where the Umbral feeds himself, and has, by the look of it, for longer than the Rim has stood. The way back up to the hollow is north; a low passage south carries the smell of stone and grazing beasts.",
+    "exits": { "north": "third.dwelling", "south": "third.grazing" },
+    "fixtures": ["umbral-garden-beds", "umbral-cistern"],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
     ],
     "spawns": [
       { "mob": "grub", "max": 2, "respawn": 120 }
+    ]
+  },
+  "third.grazing": {
+    "id": "third.grazing",
+    "zone": "third-umbral",
+    "name": "The Grazing Hollow",
+    "depth": 3,
+    "ambientLight": 0,
+    "description": "The passage opens into a wide, low hollow where the moss grows thick and wild, glowing blue-green across the floor and up the lower walls. Stonebugs drift through it in slow, patient circuits, armoured backs catching the soft light, mandibles working the feed — they come and go as they like, in out of the dark, drawn by the easy grazing and the thread of cistern-water that trickles down the channel from the garden to pool against the far wall. Nothing here is penned or fenced. Mallki simply lives beside the herd, takes what the balance allows, and lets the moss grow back the faster for their cropping. The garden lies back north.",
+    "exits": { "north": "third.garden" },
+    "fixtures": ["umbral-stonebug-grounds"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 3, "respawn": 90 }
     ]
   },
   "lake.strand": {
