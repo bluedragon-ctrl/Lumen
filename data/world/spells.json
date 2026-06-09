@@ -3,10 +3,10 @@
     "id": "spark",
     "name": "Spark",
     "description": "A snapping bolt of static light, conjured from the air and flung at a foe. The first cantrip every delver learns — cheap, quick, and bright enough to sting. It strikes true so long as you can see your mark; only a creature's Ward blunts it.",
-    "manaCost": 4,
+    "manaCost": 3,
     "hostile": true,
     "target": "creature",
-    "effect": { "type": "damage", "damageType": "magical", "damage": "1d4", "scale": { "attr": "intellect", "per": 4 } }
+    "effect": { "type": "damage", "damageType": "magical", "damage": "2d4", "scale": { "attr": "intellect", "per": 3 } }
   },
   "regeneration": {
     "id": "regeneration",
@@ -38,9 +38,9 @@
   "summon-wisp": {
     "id": "summon-wisp",
     "name": "Summon Wisp",
-    "description": "A weave that conjures a knot of cold light into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its light at your foes, but the binding frays — in a few minutes it slips loose and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
+    "description": "A weave that conjures a knot of cold light into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its light at your foes, but the binding frays — the keener your Intellect the longer it holds, yet in time it always slips loose and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
     "manaCost": 10,
-    "effect": { "type": "summon", "mob": "wisp", "count": 1, "duration": 180, "group": "summon-wisp" }
+    "effect": { "type": "summon", "mob": "wisp", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "summon-wisp" }
   },
   "candlelight": {
     "id": "candlelight",
@@ -84,16 +84,53 @@
     "manaCost": 7,
     "hostile": true,
     "target": "creature",
-    "effect": { "type": "damage", "damageType": "magical", "damage": "1d8", "scale": { "attr": "intellect", "per": 3 } }
+    "effect": { "type": "damage", "damageType": "magical", "damage": "2d8", "scale": { "attr": "intellect", "per": 3 } }
   },
   "glimmer-spike": {
     "id": "glimmer-spike",
     "name": "Glimmer Spike",
     "description": "The mage's heaviest single strike: a spike of raw glimmer dragged up out of the shards themselves and driven through a foe like a spear of frozen light. It burns mana and shards together, for the glimmer is spent in the casting and cannot be reclaimed — but nothing else a delver can throw bites as deep. It scales with Intellect, and Ward alone can blunt it. Cast it at any foe you can see.",
-    "manaCost": 8,
+    "manaCost": 9,
     "shardCost": 3,
     "hostile": true,
     "target": "creature",
-    "effect": { "type": "damage", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
+    "effect": { "type": "damage", "damageType": "magical", "damage": "3d8", "scale": { "attr": "intellect", "per": 2 } }
+  },
+  "witchfire": {
+    "id": "witchfire",
+    "name": "Witchfire",
+    "description": "A weave that sinks a clinging, cold-burning glimmer into a foe's flesh — no great blow, but it smoulders and gnaws for seconds after, eating away even as you turn to the next mark. The burning glimmer sheds a faint light of its own, so a witchfired foe glows where it stands, marked in the dark. The mage's patient weapon: cast it and close, and let the burn do its work while your blade does yours. It clings a heartbeat for every point of your Intellect, so a keener mind burns longer and brighter; a creature's Ward shrugs the whole weave off, but once it catches nothing but death puts it out. Cast it at any foe you can see.",
+    "manaCost": 5,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage-over-time", "name": "Witchfire", "damage": "1d4", "durationScale": { "attr": "intellect", "per": 1 }, "good": false, "emitLight": 1 }
+  },
+  "arc-flash": {
+    "id": "arc-flash",
+    "name": "Arc Flash",
+    "description": "The delver gathers a charge of stored light to a snapping pitch and lets it arc loose all at once — a blinding crack of static brilliance that lashes every foe sharing the dark with you. Hungry for mana and scattered across a whole pack rather than driven deep into one, it is the war-spell for when the gloom comes at you many at once. It scales with Intellect, though a creature's Ward may yet earth the arc before it bites. Cast it and the room cracks white.",
+    "manaCost": 8,
+    "hostile": true,
+    "target": "room",
+    "effect": { "type": "damage-room", "damageType": "magical", "damage": "2d6", "cause": "arc-flash", "scale": { "attr": "intellect", "per": 4 } }
+  },
+  "glimmer-storm": {
+    "id": "glimmer-storm",
+    "name": "Glimmer Storm",
+    "description": "Where Glimmer Spike drives all its glimmer into a single foe, the Storm scatters it wide — the caster drags a fistful of raw glimmer up out of the shards and flings it spinning through the whole chamber, a lashing squall of razor light that scores every foe sharing the dark. The glimmer is spent in the casting and cannot be reclaimed, so it burns shards as well as mana, and it asks a keen Intellect to shape so much light at once. Each foe's Ward may yet turn its share of the storm aside. Cast it and the room fills with cutting light.",
+    "manaCost": 10,
+    "shardCost": 5,
+    "hostile": true,
+    "target": "room",
+    "effect": { "type": "damage-room", "damageType": "magical", "damage": "3d6", "cause": "glimmer-storm", "scale": { "attr": "intellect", "per": 3 } }
+  },
+  "glimmer-husk": {
+    "id": "glimmer-husk",
+    "name": "Glimmer Husk",
+    "description": "An Umbral working, learned from the deep-folk who build rather than conjure: the caster sets down a worked chitin plate, drags raw glimmer up out of the shards, and binds it through the shell until the dead plate shudders and stands. What rises is a slow, spined husk — no great striker, but armoured and patient, and it plants itself between its maker and the dark to take the blows a mage cannot. The glimmer is spent in the binding and the plate is worked past saving, so the weave costs both; the keener your Intellect, the longer the binding holds before it frays. Bind another and the first slumps lifeless.",
+    "manaCost": 8,
+    "shardCost": 4,
+    "itemCost": [{ "template": "chitin-plate", "qty": 1 }],
+    "effect": { "type": "summon", "mob": "glimmer-husk", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "glimmer-husk" }
   }
 }

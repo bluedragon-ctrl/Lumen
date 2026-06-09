@@ -68,6 +68,29 @@
     ],
     "loot": []
   },
+  "glimmer-husk": {
+    "id": "glimmer-husk",
+    "name": "a glimmer husk",
+    "keywords": ["husk", "glimmer", "construct", "guard"],
+    "description": "A squat, hunched thing built from a single broad chitin plate, hand-worked into a shell and quickened with bound glimmer that shows only as a dim, inward shimmer deep in its seams — too faint to light anything around it. It moves in slow, deliberate lurches, spines bristling along its back, and turns its eyeless front toward whatever threatens the one who made it. Umbral work — a guard you carry as a plate and raise where you need it.",
+    "maxHp": 18,
+    "speed": 9,
+    "armour": 3,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 6, "intellect": 0, "wits": 2, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "xp": 0,
+    "attack": { "damage": "1d4", "actionCost": 16 },
+    "spikes": { "damage": "1d4", "chance": 1 },
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 1, "messages": ["grinds a slow half-turn, spines rasping", "pulses a dull blue-green through its seams", "plants itself square between you and the dark"] }
+    ],
+    "loot": []
+  },
   "giant-rat": {
     "id": "giant-rat",
     "name": "a giant rat",
@@ -260,7 +283,7 @@
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmer-dust" }, { "template": "schematic-pressed-glimmer-dust" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
+      "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-witchfire" }, { "template": "scroll-arc-flash" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmer-dust" }, { "template": "schematic-pressed-glimmer-dust" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
     }
   },
   "cave-lurker": {
@@ -573,7 +596,7 @@
       { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-kingshell-cuirass" }, { "template": "schematic-dense-chitin-cuirass" }]
+      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-kingshell-cuirass" }, { "template": "schematic-dense-chitin-cuirass" }]
     }
   },
   "pale-king": {

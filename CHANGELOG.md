@@ -6,6 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glimmer Husk — an Umbral craft-summon.** A glimmer construct you *build* rather
+  than conjure: **Glimmer Husk** (8 mana + 4 shards + **1 chitin plate**, consumed)
+  raises a slow, armoured, spined guard (18 HP, armour 3, 1d4 melee + 1d4 spike
+  reflect) that plants itself between the mage and the dark — the melee counterpart to
+  the ranged, fragile Wisp. Sold by Mallki (`scroll-glimmer-husk`). Adds a reusable
+  `itemCost` material-component path to spells (validated, and priced alongside
+  mana/shards in one place — a shared `costShortfall`/`spendCost` pair the command
+  handler and every cast-resolution path now use).
+- **Three new attack spells fill out the mage's kit.** **Witchfire** (5 mana) — a
+  clinging damage-over-time burn (`1d4`/tick; resisted wholesale by Ward, otherwise
+  unstoppable once it catches) that rewards cast-then-melee. Intellect lengthens the
+  burn rather than hitting harder — it clings one tick per point of Intellect
+  (`length = int`: 3 ticks at INT 3, 12 at INT 12) — so a keener mage gets more total
+  damage *and* a longer mark. The burn also sheds a dim
+  light, so a witchfired foe glows where it stands — marked in the dark, and lighting
+  the fight for as long as it smoulders. **Arc Flash** (8 mana) — an Intellect-scaled area burst
+  (`2d6 + int/4`) that lashes every hostile in the room at once; each foe rolls its
+  own Ward, so a warded creature may earth the arc and take nothing. **Glimmer Storm**
+  (10 mana + 5 shards) — a heavier, shard-burning area spell (`3d6 + int/3`, per-target
+  Ward roll) that hits harder and scales better than Arc Flash; the deep sibling of
+  Glimmer Spike, sold by Mallki down the river. Witchfire and Arc Flash are sold by
+  Vesper (`scroll-witchfire`, `scroll-arc-flash`); Glimmer Storm by Mallki
+  (`scroll-glimmer-storm`). `cast` and the `spells` listing handle the new
+  damage-over-time and area shapes; `detonateRoom` now folds in a caster's Intellect
+  bonus and an optional per-target Ward roll (thrown bombs unaffected by either).
 - **A produce economy on stonebugs and rats.** Two common mobs become supply
   chains. **Stonebugs** now also drop **`bug-tallow`** (≈50%) on top of chitin and
   bug-meat — the keystone for a new **oil-rendering** craft (`bug-tallow ×2 →
@@ -19,6 +44,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
 ### Changed
+- **Summon lifetime now scales with Intellect.** Both **Summon Wisp** and **Glimmer
+  Husk** last `30 ticks per point of Intellect` (≈1:30 at INT 3, ≈6:00 at INT 12), so
+  a keener summoner holds their conjuration far longer. (Generalized via a
+  `durationScale` field + `durationScaleBonus` helper, shared with Witchfire.)
+- **Mage damage spells rebalanced into a clear ladder.** **Spark** buffed from
+  `1d4 + int/4` @ 4 mana to **`2d4 + int/3` @ 3 mana** — now worth the keystroke
+  over a free swing instead of strictly worse. To preserve progression, **Bolt**
+  goes `1d8 → 2d8 + int/3` and **Glimmer Spike** goes `2d6 + int/3 @ 8 mana → 3d8
+  + int/2 @ 9 mana`, with the heavier spells scaling harder on Intellect.
 - **Mushroom soup is now Hearty Broth.** Maeve's signature is renamed (item/recipe
   id `mushroom-soup` → `hearty-broth`) and made meatier — `palecap ×2 + rat-meat
   ×1`, restoring **+8 HP / +6 mana** (was +5/+5) — reflecting the cellar-bred meat

@@ -186,6 +186,16 @@ function spellScaleBonus(attrs, scale) {
   return Math.floor(v / (scale.per || 1));
 }
 
+// A duration/lifetime bonus from a scaling attribute, in TICKS. Unlike the damage
+// bonus above (where `per` is a divisor), here `per` is a multiplier — ticks of
+// duration added per point of the attribute: {attr:"intellect", per:15} adds 15
+// ticks per point of Intellect (so Witchfire's per:1 still yields `length = int`).
+function durationScaleBonus(attrs, scale) {
+  if (!scale || !scale.attr) return 0;
+  const v = (attrs && attrs[scale.attr] != null) ? attrs[scale.attr] : 0;
+  return Math.floor(v * (scale.per != null ? scale.per : 1));
+}
+
 // Resolve a `{ base?, scale? }` amount spec (e.g. a Glimmerskin armour/ward
 // component) against effective attributes: flat base plus an attribute-scaled
 // bonus. A bare number or null is accepted too. Used for baked-at-cast buffs.
@@ -1254,20 +1264,63 @@ class GameState {
   }
 
   /**
-   * Resolve an immediate spell cast by a player at a mob. Spends mana, rolls the
+   * The full price of casting `spell`, in one place: mana, `shardCost` (glimmer burned
+   * in the cast), and any `itemCost` material components (e.g. Glimmer Husk's chitin
+   * plate). Returns a human-readable error string if the caster can't pay — nothing is
+   * spent — or null if they can. The command handler calls this before committing.
+   */
+  costShortfall(player, spell) {
+    const w = this.world;
+    if (Math.floor(player.mana || 0) < (spell.manaCost || 0))
+      return `You lack the mana for ${spell.name} (need ${spell.manaCost}, have ${Math.floor(player.mana || 0)}).`;
+    if (spell.shardCost && (player.shards || 0) < spell.shardCost)
+      return `${spell.name} burns ${spell.shardCost} shards as glimmer and you have ${player.shards || 0}.`;
+    for (const need of spell.itemCost || []) {
+      const have = (player.inventory || []).reduce((n, i) => (i && i.template === need.template ? n + (i.qty || 1) : n), 0);
+      if (have < (need.qty || 1)) {
+        const it = w.items[need.template];
+        return `${spell.name} needs ${it ? it.name : need.template} (${need.qty || 1}) to shape, and you have ${have}.`;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Deduct a spell's full cost — mana, shards, and material components — in one place,
+   * shared by every player cast-resolution path. Assumes the caster can pay (the
+   * command handler has already run `costShortfall`). Shards are a currency counter,
+   * not inventory, so they deduct numerically; `itemCost` pulls instances from the bag.
+   */
+  spendCost(player, spell) {
+    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
+    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    for (const need of spell.itemCost || []) {
+      let remaining = need.qty || 1;
+      for (let i = player.inventory.length - 1; i >= 0 && remaining > 0; i--) {
+        const inst = player.inventory[i];
+        if (!inst || inst.template !== need.template) continue;
+        const take = Math.min(remaining, inst.qty || 1);
+        if (inst.qty != null && inst.qty > take) inst.qty -= take;
+        else player.inventory.splice(i, 1);
+        remaining -= take;
+      }
+    }
+  }
+
+  /**
+   * Resolve an immediate spell cast by a player at a mob. Spends the cost, rolls the
    * target's Ward to (maybe) fizzle the whole spell, then applies the effect
    * primitive — today only `damage` (dice + scaling-attribute bonus). Hostile
    * spells earn the target's threat even when resisted. Returns a result the
    * caller narrates: { resisted } | { damage, killed, death }.
    *
-   * Mana and target validation happen in the command handler; by here the cast
+   * Cost and target validation happen in the command handler; by here the cast
    * is committed. `events` is optional and used to push auto-retaliation events.
    */
   castSpell(player, spell, mob, events = []) {
     const w = this.world;
     const eff = spell.effect || {};
-    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
-    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost); // glimmer burned in the cast (e.g. Glimmer Spike)
+    this.spendCost(player, spell);
 
     const ward = mobDefence(w.mobs[mob.template], mob).ward || 0;
     if (spell.hostile && wardNegates(ward)) {
@@ -1295,6 +1348,21 @@ class GameState {
         result.killed = true;
         result.death = this._killMob(mob, player); // removes mob, drops loot/shards, awards xp
       }
+    } else if (eff.type === "damage-over-time") {
+      // A clinging burn (Witchfire): no immediate blow, but a DoT stamped with the
+      // caster so a smoulder-kill credits them (like a bleed). Intellect lengthens the
+      // burn (more total damage, and a longer-lasting mark) rather than hitting harder.
+      // Ward already had its wholesale chance to fizzle it above; per-tick damage runs
+      // in _tickEffects.
+      const duration = (eff.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), eff.durationScale);
+      this.applyEffect(mob, { type: "damage-over-time", name: eff.name || spell.name, damage: eff.damage, duration, sourceId: player.id, good: false });
+      // The burning glimmer glows: a matching emit-light state marks the foe in the
+      // dark for as long as it smoulders (summed into room light by computeRoomLight).
+      if (eff.emitLight) this.applyEffect(mob, { type: "emit-light", name: eff.name || spell.name, magnitude: eff.emitLight, duration, good: false });
+      this._addThreat(mob, player.id, 1);
+      result.dot = true;
+      result.duration = duration;
+      result.name = eff.name || spell.name;
     } else if (spell.hostile) {
       this._addThreat(mob, player.id, 1);
     }
@@ -1318,6 +1386,20 @@ class GameState {
   }
 
   /**
+   * Resolve a hostile area spell (`effect.type === "damage-room"`, e.g. Arc Flash) cast
+   * by a player. Spends mana and any `shardCost`, then blasts every mob in `targets`
+   * (the caller has already filtered to the eligible) through the shared bomb
+   * resolver, folding the caster's Intellect in as a flat per-target bonus. Returns
+   * detonateRoom's per-target results for the caller to narrate.
+   */
+  castRoomSpell(player, spell, targets, events = []) {
+    const eff = spell.effect || {};
+    this.spendCost(player, spell);
+    const bonus = spellScaleBonus(effectiveAttributes(this.world, player), eff.scale);
+    return this.detonateRoom(player, eff, targets, bonus, events, true); // a magical burst rolls each foe's Ward
+  }
+
+  /**
    * Resolve a thrown area bomb (a consumable's `damage-room` effect), applying it to
    * every mob in `targets` (the caller has already filtered to the eligible — hostile
    * or already-engaged — mobs, so a stray toss never blasts a peaceful shopkeeper).
@@ -1329,8 +1411,14 @@ class GameState {
    * recompute and the kill's spoils are handled by `_hurtMob` (and, for the DoT, by
    * `_tickEffects`). Returns one result per target for the caller to narrate:
    * `{ id, name, damage, dot, killed, death }`.
+   *
+   * `bonus` is a flat per-target damage add (a caster's Intellect scaling for an
+   * area spell); a thrown bomb passes none. `wardCheck` opts a target's Ward into a
+   * per-target negation roll (a magical area *spell* — each foe's Ward may shrug the
+   * burst off; see wardNegates), which a thrown bomb (mundane shrapnel/acid) skips.
+   * A warded-off target still takes the thrower's threat but no damage or DoT.
    */
-  detonateRoom(player, spec, targets, events = []) {
+  detonateRoom(player, spec, targets, bonus = 0, events = [], wardCheck = false) {
     const w = this.world;
     const roomId = player.location;
     const rt = this.rooms[roomId];
@@ -1338,10 +1426,17 @@ class GameState {
     // Snapshot the targets — _hurtMob splices the dead out of rt.mobs mid-loop.
     for (const mob of [...targets]) {
       const t = w.mobs[mob.template];
+      // A magical burst rolls each foe's Ward independently — a shrugged-off blast
+      // still earns the caster's ire, but lands no damage or burn on that target.
+      if (wardCheck && wardNegates(mobDefence(t, mob).ward || 0)) {
+        this._addThreat(mob, player.id, 1);
+        results.push({ id: mob.id, name: t.name, damage: 0, dot: false, resisted: true, killed: false, death: null });
+        continue;
+      }
       let damage = 0;
       let death = null;
       if (spec.damage != null) {
-        damage = Math.max(1, rollDice(spec.damage));
+        damage = Math.max(1, rollDice(spec.damage) + bonus);
         this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
         death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
       }
@@ -1382,8 +1477,7 @@ class GameState {
     const w = this.world;
     const eff = spell.effect || {};
     const attrs = effectiveAttributes(w, player);
-    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
-    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    this.spendCost(player, spell);
 
     if (eff.type === "restore") {
       const got = this.applyRestore(target.actor, eff);
@@ -1422,9 +1516,14 @@ class GameState {
    */
   castSummon(player, spell, events = []) {
     const eff = spell.effect || {};
-    player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
-    if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    this.spendCost(player, spell); // mana, shards, and the material component (e.g. a chitin plate)
     const group = eff.group || spell.id;
+    // Lifetime scales with the caster's Intellect (durationScale, ticks per point), on
+    // top of any flat base — so a keener mage holds a summon longer. A summon with
+    // neither stays permanent (null).
+    let lifetime = eff.duration != null ? eff.duration : null;
+    if (eff.durationScale)
+      lifetime = (eff.duration || 0) + durationScaleBonus(effectiveAttributes(this.world, player), eff.durationScale);
     const existing = [];
     for (const rt of Object.values(this.rooms))
       for (const m of rt.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
@@ -1432,9 +1531,9 @@ class GameState {
     const made = this._summon({
       roomId: player.location, mobId: eff.mob, count: eff.count || 1,
       faction: "player", ownerId: player.id, summonerId: player.id, group,
-      lifetime: eff.duration != null ? eff.duration : null, by: "player", byName: player.name,
+      lifetime, by: "player", byName: player.name,
     }, events);
-    return { mob: this.world.mobs[eff.mob], count: made.length, replaced: existing.length };
+    return { mob: this.world.mobs[eff.mob], count: made.length, replaced: existing.length, lifetime };
   }
 
   /** Support-spell threat (the deferred aggro hook): healing/buffing an ally makes
@@ -2141,4 +2240,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, MELEE_SCALE };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE };
