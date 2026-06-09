@@ -420,7 +420,7 @@ class GameState {
         const ft = this.world.fixtures[tmplId];
         if (ft && ft.switch) inst.on = !!ft.switch.on; // switchable fixtures carry on/off state
         if (ft && ft.door) inst.open = !!ft.door.open; // door fixtures carry open/shut state
-        if (ft && (ft.mine || ft.fish)) { const res = ft.mine || ft.fish; inst.charges = res.charges; inst.regrow = res.respawn; } // resource veins/pools deplete as worked
+        if (ft && (ft.mine || ft.fish || ft.harvest)) { const res = ft.mine || ft.fish || ft.harvest; inst.charges = res.charges; inst.regrow = res.respawn; } // resource veins/pools/beds deplete as worked
         if (typeof f === "object" && f.hidden) { inst.hidden = f.hidden; inst.discoveryKey = discoveryKey(id, "fix", tmplId); }
         this.rooms[id].fixtures.push(inst);
       }
@@ -606,13 +606,13 @@ class GameState {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const f of rt.fixtures) {
         const ft = this.world.fixtures[f.template];
-        const res = ft && (ft.mine || ft.fish);
+        const res = ft && (ft.mine || ft.fish || ft.harvest);
         if (!res) continue;
         if (f.charges >= res.charges) { f.regrow = res.respawn; continue; }
         if (--f.regrow > 0) continue;
         f.charges = res.charges;
         f.regrow = res.respawn;
-        events.push({ type: "vein-recover", roomId, fixtureName: ft.name, kind: ft.fish ? "fish" : "ore" });
+        events.push({ type: "vein-recover", roomId, fixtureName: ft.name, kind: ft.fish ? "fish" : ft.harvest ? "growth" : "ore" });
       }
     }
   }
@@ -1099,6 +1099,11 @@ class GameState {
           const consumed = !(tmpl.light && tmpl.light.fuelItem);
           if (consumed) p.equipment.light = null;
           events.push({ type: "light-out", playerId: p.id, item: li.template, consumed });
+        } else if (this.tick % 10 === 0) {
+          // Fuel ticks down every tick, but the gauge only refreshes when the player
+          // view is re-sent (on move, vitals, etc.). Nudge it periodically so an idle
+          // player still watches their light burn down rather than jumping at the end.
+          events.push({ type: "vitals", playerId: p.id });
         }
       }
     }
@@ -1589,13 +1594,19 @@ class GameState {
     // on each enemy it can perceive. A mob it has actually traded blows with (a
     // live combat-threat entry) is engaged outright — being hit bypasses the ramp.
     this._pruneAggro(m, enemies);
-    const hunts = t.hostile || self.faction === "player";
+    // A player's summon is a *defensive guard*, not an independent aggressor: it
+    // never proactively hunts (even if its template is `hostile`, as a combat
+    // summon is). It engages only what it has traded blows with or what its owner
+    // is already fighting (the assist pass below). Wild mobs hunt as ever.
+    const hunts = !!t.hostile && self.faction !== "player";
     this._detectAndDecay(m, t, enemies, rt.light, hunts, roomId, events);
     // A sitting mob that engaged stood up in _engageTell; one still seated noticed
     // nobody worth rising for this action — stay at rest (no wander/emote).
     if (m.posture === "sitting") return;
-    // A `helper` piles into any fight a same-faction ally is already in.
-    if (t.helper) this._assistPass(m, t, enemies, rt.light, roomId, events);
+    // A `helper` (and every player-summon — it backs its owner) piles into any
+    // fight a same-faction ally is already in. This is how a defensive summon
+    // joins the master's fight without ever starting one of its own.
+    if (t.helper || self.faction === "player") this._assistPass(m, t, enemies, rt.light, roomId, events);
     const engagedTargets = enemies.filter((c) => this._isEngaged(m, t, c));
     const inCombat = this._alerted(m); // alerted (combat threat or live detection) → won't wander
 
