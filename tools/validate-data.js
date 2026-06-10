@@ -23,6 +23,7 @@ function main() {
   const fixtures = read("data/world/fixtures.json");
   const recipes = read("data/world/recipes.json");
   const spells = read("data/world/spells.json");
+  const quests = read("data/world/quests.json");
   const player = read("data/templates/player.json");
 
   const errs = [];
@@ -433,6 +434,60 @@ function main() {
     }
   }
 
+  // Quests: data-driven goals (data/world/quests.json). A `start` trigger offers
+  // the quest; ordered `steps` each carry exactly one objective; `rewards` pay out
+  // on completion. Every referenced template (mob/item/fixture/room/recipe/spell)
+  // must resolve.
+  const QUEST_TRIGGERS = ["talk", "use", "item", "enter"];
+  const OBJ_KEYS = ["kill", "deliver", "use", "collect"];
+  for (const [id, q] of Object.entries(quests)) {
+    if (q.id !== id) errs.push(`quest ${id}: id field mismatch (${q.id})`);
+    if (typeof q.name !== "string" || !q.name) errs.push(`quest ${id}: name must be a non-empty string`);
+    if (q.repeatable != null && typeof q.repeatable !== "boolean") errs.push(`quest ${id}: repeatable must be a boolean`);
+    const s = q.start;
+    if (!s || typeof s !== "object" || !QUEST_TRIGGERS.includes(s.trigger)) {
+      errs.push(`quest ${id}: start.trigger must be one of ${QUEST_TRIGGERS.join(", ")}`);
+    } else {
+      if (s.trigger === "talk" && !has(mobs, s.npc)) errs.push(`quest ${id}: start.npc references missing mob ${s.npc}`);
+      if (s.trigger === "use" && !has(fixtures, s.fixture)) errs.push(`quest ${id}: start.fixture references missing fixture ${s.fixture}`);
+      if (s.trigger === "item" && !has(items, s.item)) errs.push(`quest ${id}: start.item references missing item ${s.item}`);
+      if (s.trigger === "enter" && !has(rooms, s.room)) errs.push(`quest ${id}: start.room references missing room ${s.room}`);
+    }
+    if (!Array.isArray(q.steps) || !q.steps.length) {
+      errs.push(`quest ${id}: needs a non-empty steps array`);
+    } else {
+      q.steps.forEach((step, i) => {
+        const present = OBJ_KEYS.filter((k) => step[k] != null);
+        if (present.length !== 1) { errs.push(`quest ${id} step ${i}: must have exactly one objective key (${OBJ_KEYS.join("/")})`); return; }
+        const kind = present[0];
+        if (["kill", "deliver", "collect"].includes(kind) && step.count != null && (typeof step.count !== "number" || step.count <= 0))
+          errs.push(`quest ${id} step ${i}: count must be a positive number`);
+        if (kind === "kill" && !has(mobs, step.kill)) errs.push(`quest ${id} step ${i}: kill references missing mob ${step.kill}`);
+        if (kind === "collect" && !has(items, step.collect)) errs.push(`quest ${id} step ${i}: collect references missing item ${step.collect}`);
+        if (kind === "use" && !has(fixtures, step.use)) errs.push(`quest ${id} step ${i}: use references missing fixture ${step.use}`);
+        if (kind === "deliver") {
+          if (!has(items, step.deliver)) errs.push(`quest ${id} step ${i}: deliver references missing item ${step.deliver}`);
+          if (!has(mobs, step.npc)) errs.push(`quest ${id} step ${i}: deliver.npc references missing mob ${step.npc}`);
+        }
+        if (step.text != null && typeof step.text !== "string") errs.push(`quest ${id} step ${i}: text must be a string`);
+      });
+    }
+    const r = q.rewards;
+    if (r != null) {
+      if (typeof r !== "object") errs.push(`quest ${id}: rewards must be an object`);
+      else {
+        if (r.xp != null && (typeof r.xp !== "number" || r.xp < 0)) errs.push(`quest ${id}: rewards.xp must be a non-negative number`);
+        if (r.shards != null && (typeof r.shards !== "number" || r.shards < 0)) errs.push(`quest ${id}: rewards.shards must be a non-negative number`);
+        for (const it of r.items || []) {
+          if (!it || !has(items, it.template)) errs.push(`quest ${id}: rewards.items references missing item ${it && it.template}`);
+          if (it && it.qty != null && (typeof it.qty !== "number" || it.qty <= 0)) errs.push(`quest ${id}: rewards.items qty must be a positive number`);
+        }
+        for (const rid of r.recipes || []) if (!has(recipes, rid)) errs.push(`quest ${id}: rewards.recipes references missing recipe ${rid}`);
+        for (const sid of r.spells || []) if (!has(spells, sid)) errs.push(`quest ${id}: rewards.spells references missing spell ${sid}`);
+      }
+    }
+  }
+
   if (!has(rooms, player.startLocation))
     errs.push(`player: startLocation references missing room ${player.startLocation}`);
   for (const i of player.startInventory || [])
@@ -470,7 +525,8 @@ function main() {
   console.log(
     `OK: ${Object.keys(rooms).length} rooms, ${Object.keys(items).length} items, ` +
       `${Object.keys(mobs).length} mobs, ${Object.keys(fixtures).length} fixtures, ` +
-      `${Object.keys(recipes).length} recipes, ${Object.keys(spells).length} spells. ` +
+      `${Object.keys(recipes).length} recipes, ${Object.keys(spells).length} spells, ` +
+      `${Object.keys(quests).length} quests. ` +
       `All references resolve; all rooms reachable from ${player.startLocation}.`
   );
 }

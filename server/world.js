@@ -21,6 +21,7 @@ function loadWorld() {
     fixtures: readJson("world/fixtures.json"),
     recipes: readJson("world/recipes.json"),
     spells: readJson("world/spells.json"),
+    quests: readJson("world/quests.json"),
     playerTemplate: readJson("templates/player.json"),
   };
   // Static content must not be mutated at runtime; freeze the top level.

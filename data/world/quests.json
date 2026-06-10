@@ -1,0 +1,57 @@
+{
+  "warrens-thinning": {
+    "id": "warrens-thinning",
+    "name": "Thin the Warrens",
+    "description": "Maeve needs the warren rats culled — and their meat for the inn's pot.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-innkeeper",
+      "offerText": "\"The rats are breeding fast in the warren below. Cull the brood and bring me the meat — the pot's been thin all week, and I'll pay you in hot food and shards.\""
+    },
+    "steps": [
+      { "kill": "giant-rat", "count": 5, "text": "Cull 5 giant rats in the warren" },
+      { "deliver": "rat-meat", "count": 5, "npc": "rim-innkeeper", "text": "Bring 5 cuts of rat meat to Maeve" }
+    ],
+    "rewards": {
+      "xp": 45,
+      "shards": 25,
+      "items": [{ "template": "hearty-broth", "qty": 3 }]
+    }
+  },
+  "vespers-caps": {
+    "id": "vespers-caps",
+    "name": "Caps for the Mage",
+    "description": "Vesper needs glowing palecap mushrooms from the deep clusters for her glimmer-work.",
+    "start": {
+      "trigger": "enter",
+      "room": "rim.mageshed",
+      "offerText": "Vesper looks up from her bench. \"Headed down into the dark? Then do me a turn — palecap mushrooms grow on the glow-cap clusters below. Pick me a few and bring them back; I render their light into my work, and I pay for the trouble.\""
+    },
+    "steps": [
+      { "collect": "palecap-mushroom", "count": 3, "text": "Pick 3 palecap mushrooms from a glow-cap cluster" },
+      { "deliver": "palecap-mushroom", "count": 3, "npc": "rim-mage", "text": "Bring the mushrooms to Vesper" }
+    ],
+    "rewards": {
+      "xp": 35,
+      "shards": 20
+    }
+  },
+  "glimmer-for-vesper": {
+    "id": "glimmer-for-vesper",
+    "name": "A Shard of Light",
+    "description": "A whole glimmer crystal is a rare find — Vesper would give much to study one intact.",
+    "start": {
+      "trigger": "item",
+      "item": "crystal",
+      "offerText": "The crystal pulses with trapped light, whole and uncracked — a rare thing to pull from the dark unbroken. Vesper the glimmer-mage would give a great deal to study one like this."
+    },
+    "steps": [
+      { "deliver": "crystal", "count": 1, "npc": "rim-mage", "text": "Bring the glimmer crystal to Vesper in the Mage's Shed" }
+    ],
+    "rewards": {
+      "xp": 30,
+      "shards": 30,
+      "spells": ["spark"]
+    }
+  }
+}
