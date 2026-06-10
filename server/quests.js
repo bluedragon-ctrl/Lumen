@@ -317,4 +317,18 @@ function log(state, player) {
   return [{ type: "log", text: lines.join("\n") }];
 }
 
-module.exports = { offer, noteKill, noteAcquire, noteUse, noteEnter, handleTalk, handleGive, log };
+/** True if any of `player`'s active quests is sitting on a `deliver` step aimed
+ *  at `npcTemplate` — the "you owe me something" check NPC reactions use.
+ *  Read-only; mirrors the delivery scan in handleTalk. */
+function hasPendingDelivery(state, player, npcTemplate) {
+  const q = ensure(player);
+  for (const [qid, entry] of Object.entries(q.active)) {
+    const quest = state.world.quests[qid];
+    if (!quest) continue;
+    const step = quest.steps[entry.step];
+    if (step && objectiveOf(step) === "deliver" && step.npc === npcTemplate) return true;
+  }
+  return false;
+}
+
+module.exports = { offer, noteKill, noteAcquire, noteUse, noteEnter, handleTalk, handleGive, hasPendingDelivery, log };
