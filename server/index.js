@@ -9,6 +9,7 @@ const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { execute } = require("./commands");
+const quests = require("./quests");
 const { canSee } = require("./light");
 const accounts = require("./accounts");
 
@@ -560,6 +561,9 @@ function dispatchEvent(ev) {
         sendToPlayer(a.playerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
         roomCtx.toRoom(ev.roomId, { type: "gold", text: `${pl.name} reaches level ${up.level}!` }, a.playerId);
       }
+      // Quest progress for this kill (melee / DoT path). A spell or bomb kill is
+      // credited inline in commands.js instead, so a kill never counts twice.
+      for (const m of quests.noteKill(state, pl, ev.victimTemplate)) sendToPlayer(a.playerId, m);
       sendToPlayer(a.playerId, buildPlayerView(state, pl));
     }
     roomCtx.refreshRoom(ev.roomId, ev.killerId);

@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Quests — goals that string the world's systems together.** A new data-driven
+  quest system (`data/world/quests.json` + `server/quests.js`): a quest is acquired
+  by **talking to an NPC**, **using a fixture**, **acquiring an item**, or **entering
+  a location** for the first time, then worked through as **ordered steps** — *kill N
+  monsters*, *deliver N items to an NPC*, *use a fixture*, or *collect N of an item* —
+  and pays out **XP, shards, items, and recipes/spells** on completion. New commands:
+  **`talk <npc>`** (take quests, hear what they need), **`give <item> <npc>`** (hand
+  over delivery goods), and **`quest`/`journal`** (the console quest log, split *In
+  progress* / *Finished*). Quests are one-time by default (`repeatable: true` opts
+  back in) and persist with the character. Three starter quests ship: *Thin the Warrens*
+  (talk to Maeve — cull rats, bring meat for the pot), *Caps for the Mage* (entering
+  Vesper's shed — gather palecap mushrooms and bring them back), and *A Shard of Light*
+  (picking up a glimmer crystal — return it to Vesper). Validator now checks quest data;
+  data model documents the schema.
 - **Glowing mushroom clusters can be picked — and every fixture now tells you what
   it affords.** The `glow-caps` and `witchglow-cluster` fixtures (long pure scenery,
   with their caps trickling onto the floor nearby) are now harvestable via a new

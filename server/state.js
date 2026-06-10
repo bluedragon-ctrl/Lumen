@@ -905,6 +905,7 @@ class GameState {
       restTicks: 0, // counts ticks toward the next rest-recovery point (see _recoverTick)
       knownRecipes: [...(t.knownRecipes || [])],
       knownSpells: [...(t.knownSpells || [])],
+      quests: { active: {}, done: [] }, // quest log: in-progress cursors + finished ids (see quests.js)
       visitedRooms: [t.startLocation], // first-entry explore XP; the spawn room is free
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
@@ -939,6 +940,10 @@ class GameState {
     if (!Array.isArray(player.knownRecipes)) player.knownRecipes = [...(this.world.playerTemplate.knownRecipes || [])];
     if (!Array.isArray(player.knownSpells)) player.knownSpells = [...(this.world.playerTemplate.knownSpells || [])];
     if (!Array.isArray(player.discovered)) player.discovered = []; // permanently-found hidden features (keys)
+    // Quest log added later: backfill the container so older saves can take quests.
+    if (!player.quests || typeof player.quests !== "object") player.quests = { active: {}, done: [] };
+    if (!player.quests.active || typeof player.quests.active !== "object") player.quests.active = {};
+    if (!Array.isArray(player.quests.done)) player.quests.done = [];
     if (player.unspentPoints == null) player.unspentPoints = 0; // banked attribute points (leveling added later)
     // Explore XP added later: seed with the current room so a pre-existing delver
     // isn't paid for re-treading ground, then earns from the next new room on.
@@ -2170,7 +2175,7 @@ class GameState {
     const xp = t.xp || 0;
     const participants = mob.noSpoils ? [] : this._awardKillXp(mob, killerPlayer, xp, roomId); // shared credit (Model A); summons award nothing
     this.rooms[roomId].light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killerPlayer ? killerPlayer.id : null, loot, xp: participants.length ? xp : 0, cause, participants };
+    return { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, victimTemplate: mob.template, roomId, killerId: killerPlayer ? killerPlayer.id : null, loot, xp: participants.length ? xp : 0, cause, participants };
   }
 
   /**
@@ -2195,7 +2200,7 @@ class GameState {
     const xp = t.xp || 0;
     const participants = (killer && !mob.noSpoils) ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit; summons award nothing
     rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, roomId, killerId: killer ? killer.id : null, loot, xp: (killer && !mob.noSpoils) ? xp : 0, cause, participants };
+    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, victimTemplate: mob.template, roomId, killerId: killer ? killer.id : null, loot, xp: (killer && !mob.noSpoils) ? xp : 0, cause, participants };
     events.push(death);
     return death;
   }

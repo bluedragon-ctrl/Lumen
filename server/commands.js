@@ -12,6 +12,17 @@ const { buildRoomView, buildPlayerView, buildExamineView } = require("./render")
 const { canSee } = require("./light");
 const { makeItemInstance, addToFloor, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus } = require("./state");
 const { EXPLORE_XP } = require("./config");
+const quests = require("./quests");
+
+const cap = (s) => (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
+
+// Credit quest kill-progress for a kill landed BY this player on the command path
+// (a spell or thrown bomb, where the death is returned inline rather than as a
+// tick event). Melee/DoT kills are credited in index.js, so a kill never counts
+// twice. Returns the player-facing quest messages to append after the views.
+function questKill(state, player, death) {
+  return death && death.victimTemplate ? quests.noteKill(state, player, death.victimTemplate) : [];
+}
 
 // Searching the room for hidden features costs roughly one action's worth of
 // energy, so it competes with attacking and can't be spammed mid-combat.
@@ -37,6 +48,7 @@ const VERBS = [
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
   "mine", "dig", "gather", "forage", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  "talk", "give", "deliver", "quest", "quests", "journal",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
 ];
@@ -70,6 +82,9 @@ const HELP = [
   "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
   "  drink | quaff | eat <item> — consume a potion or food",
   "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
+  "  talk <npc>            — speak with a creature (take quests, hear what they need)",
+  "  give <item> <npc>     — hand an item to someone (deliver quest goods)",
+  "  quest | journal       — your quest log (in progress / finished)",
   "  say <text>            — speak to others in the room",
   "  emote | me <text>     — perform an action",
   "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
@@ -258,6 +273,7 @@ function move(state, player, dir, ctx) {
   // each room pays once). Award before building views so the player view is current.
   let tail = "";
   let ups = [];
+  let qmsgs = [];
   if (!Array.isArray(player.visitedRooms)) player.visitedRooms = [];
   if (!player.visitedRooms.includes(dest)) {
     player.visitedRooms.push(dest);
@@ -265,10 +281,12 @@ function move(state, player, dir, ctx) {
       ups = state.awardXp(player, EXPLORE_XP);
       tail = ` You map new ground. (+${EXPLORE_XP} xp)`;
     }
+    qmsgs = quests.noteEnter(state, player, dest); // a quest may begin on first arrival
   }
   const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
   const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}`);
   announceLevelUps(player, ups, ctx, msgs);
+  msgs.push(...qmsgs);
   return msgs;
 }
 
@@ -365,9 +383,12 @@ function get(state, player, arg, ctx) {
   }
   addToInventory(player, inst, state.world);
   const name = t.name;
+  const qmsgs = quests.noteAcquire(state, player, inst.template); // before views so rewards show
   ctx.toRoom(player.location, { type: "log", text: `${player.name} picks up ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You pick up ${name}.`);
+  const out = selfAndViews(state, player, `You pick up ${name}.`);
+  out.push(...qmsgs);
+  return out;
 }
 
 function drop(state, player, arg, ctx) {
@@ -445,8 +466,11 @@ function buy(state, player, arg, ctx) {
     return [{ type: "error", text: `You can't afford ${name} — ${price} shards, you have ${player.shards || 0}.` }];
   player.shards -= price;
   addToInventory(player, makeItemInstance({ template: offer.template }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, offer.template);
   ctx.toRoom(player.location, { type: "log", text: `${player.name} buys ${name} from ${sh.t.name}.` }, player.id);
-  return selfAndViews(state, player, `You buy ${name} for ${price} shards. (${player.shards} left)`);
+  const out = selfAndViews(state, player, `You buy ${name} for ${price} shards. (${player.shards} left)`);
+  out.push(...qmsgs);
+  return out;
 }
 
 function sell(state, player, arg, ctx) {
@@ -504,23 +528,36 @@ function use(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (arg && canSee(player.perception, rt.light)) {
     const ql = arg.toLowerCase();
+    // Any visible fixture matching arg, regardless of kind — `use`-ing it credits
+    // quest `use` objectives/triggers even for plain scenery. Quest reward grants
+    // happen here, before the mechanical handler builds its views.
+    const anyFix = rt.fixtures.find((f) => {
+      const ft = w.fixtures[f.template];
+      return ft && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+    });
+    const qmsgs = anyFix ? quests.noteUse(state, player, anyFix.template) : [];
+    const withQuest = (arr) => { arr.push(...qmsgs); return arr; };
+
     const f = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
       return ft && (ft.switch || ft.door) && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
-    if (f) return w.fixtures[f.template].door ? toggleDoor(state, player, f, ctx) : toggleFixture(state, player, f, ctx);
+    if (f) return withQuest(w.fixtures[f.template].door ? toggleDoor(state, player, f, ctx) : toggleFixture(state, player, f, ctx));
     // A fixture you drink/draw from (a seep, a spring) restores hp/mana on use.
     const rf = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
       return ft && ft.restore && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
-    if (rf) return drinkFixture(state, player, rf, ctx);
+    if (rf) return withQuest(drinkFixture(state, player, rf, ctx));
     // A harvestable fixture (a mushroom cluster) — `use` it to pick by hand.
     const hf = rt.fixtures.find((f) => {
       const ft = w.fixtures[f.template];
       return ft && ft.harvest && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
     });
-    if (hf) return gather(state, player, arg, ctx);
+    if (hf) return withQuest(gather(state, player, arg, ctx));
+    // A quest-only fixture (scenery with no mechanical function) still counts as
+    // "used" — acknowledge it so the verb isn't an "unknown" dead end.
+    if (anyFix) return withQuest(selfAndViews(state, player, `You handle ${w.fixtures[anyFix.template].name}.`));
   }
   // A carried/equipped light source toggles lit/doused (works in the dark — that's
   // the point of lighting one). Checked before the drink/eat fallback.
@@ -654,11 +691,14 @@ function throwBomb(state, player, idx, inst, t, spec, ctx, verb) {
   if (killed.length) outcome += ` It blasts apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
+  const qmsgs = killed.flatMap((r) => questKill(state, player, r.death));
   const burst = t.consumable.burst || "a storm of glimmer-fire and shrapnel";
   ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls ${t.name} and it bursts in ${burst}!` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const flavour = t.consumable.flavour ? ` ${t.consumable.flavour}` : "";
-  return selfAndViews(state, player, `You hurl ${t.name}.${flavour}${outcome}`, "combat");
+  const out = selfAndViews(state, player, `You hurl ${t.name}.${flavour}${outcome}`, "combat");
+  out.push(...qmsgs);
+  return out;
 }
 
 // Drink/draw from a `restore` fixture (a seep, a spring). Heals hp/mana like a
@@ -705,6 +745,7 @@ function craft(state, player, arg, ctx) {
   for (const inp of r.inputs || []) removeItem(player, inp.template, inp.qty || 1);
   if (cost) player.shards -= cost;
   addToInventory(player, makeItemInstance({ template: r.output.template, qty: r.output.qty || 1 }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, r.output.template);
   const outName = w.items[r.output.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} works at ${stationLabel(w, r.station)}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
@@ -715,6 +756,7 @@ function craft(state, player, arg, ctx) {
   const ups = xp ? state.awardXp(player, xp) : [];
   const msgs = selfAndViews(state, player, `You craft ${outName}.${cost ? ` (−${cost} shards)` : ""}${xp ? ` (+${xp} xp)` : ""}`);
   announceLevelUps(player, ups, ctx, msgs);
+  msgs.push(...qmsgs);
   return msgs;
 }
 
@@ -810,11 +852,14 @@ function mine(state, player, arg, ctx) {
   f.charges -= 1;
   const qty = ft.mine.yield || 1;
   addToInventory(player, makeItemInstance({ template: ft.mine.template, qty }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, ft.mine.template);
   const oreName = w.items[ft.mine.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} works ${oreName} from ${ft.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const thin = f.charges <= 0 ? " The seam runs thin and gives no more." : "";
-  return selfAndViews(state, player, `You work ${oreName} loose.${thin}`);
+  const out = selfAndViews(state, player, `You work ${oreName} loose.${thin}`);
+  out.push(...qmsgs);
+  return out;
 }
 
 // `gather` (alias `forage`): pick by hand from a harvestable fixture — a glowing
@@ -849,12 +894,15 @@ function gather(state, player, arg, ctx) {
   f.charges -= 1;
   const qty = h.yield || 1;
   addToInventory(player, makeItemInstance({ template: h.template, qty }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, h.template);
   const itemName = w.items[h.template].name;
   const verb = h.verb || "gather";
   ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${itemName} from ${ft.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const bare = f.charges <= 0 ? " That is the last of them — the cluster is bare." : "";
-  return selfAndViews(state, player, `You ${verb} ${itemName}.${bare}`);
+  const out = selfAndViews(state, player, `You ${verb} ${itemName}.${bare}`);
+  out.push(...qmsgs);
+  return out;
 }
 
 // `fish` (alias `angle`): work a baited line in fishing water. Mirrors `mine` —
@@ -898,11 +946,14 @@ function fish(state, player, arg, ctx) {
   f.charges -= 1;
   const qty = spec.yield || 1;
   addToInventory(player, makeItemInstance({ template: spec.template, qty }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, spec.template);
   const catchName = w.items[spec.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} hauls ${catchName} from ${ft.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const fishedOut = f.charges <= 0 ? " The water goes still; nothing more is biting for now." : "";
-  return selfAndViews(state, player, `You hook ${catchName} and swing it ashore.${fishedOut}`);
+  const out = selfAndViews(state, player, `You hook ${catchName} and swing it ashore.${fishedOut}`);
+  out.push(...qmsgs);
+  return out;
 }
 
 // Colour markup (`<#name>…`, see client renderMarkup) is authored-content only.
@@ -1179,13 +1230,16 @@ function cast(state, player, arg, ctx) {
   if (res.killed) {
     const d = res.death;
     const lootTxt = d.loot && d.loot.length ? ` It leaves behind ${d.loot.join(", ")}.` : "";
+    const qmsgs = questKill(state, player, d);
     ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}` }, player.id);
     ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(
+    const out = selfAndViews(
       state, player,
       `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`,
       "combat"
     );
+    out.push(...qmsgs);
+    return out;
   }
 
   ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
@@ -1228,9 +1282,12 @@ function castBurst(state, player, spell, ctx) {
   if (resisted.length) outcome += ` ${resisted.map((r) => r.name).join(", ")} ${resisted.length === 1 ? "shrugs" : "shrug"} the burst off, warded.`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
+  const qmsgs = killed.flatMap((r) => questKill(state, player, r.death));
   ctx.toRoom(player.location, { type: "combat", text: `${player.name} looses a blinding ${verb} and the room erupts in white light!` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You loose ${spell.name}; light floods the chamber.${outcome}`, "combat");
+  const out = selfAndViews(state, player, `You loose ${spell.name}; light floods the chamber.${outcome}`, "combat");
+  out.push(...qmsgs);
+  return out;
 }
 
 // Format a tick count as m:ss for narration (one tick = one second). Mirrors
@@ -1364,6 +1421,56 @@ function train(state, player, arg) {
   const left = player.unspentPoints;
   const tail = left ? ` (${left} point${left === 1 ? "" : "s"} left)` : "";
   return selfAndViews(state, player, `You train ${attr} to ${player.attributes[attr]}.${tail}`);
+}
+
+// `talk <npc>` (alias `greet`/`ask`): speak with a creature here. Offers any quest
+// that NPC has for you and reminds you of deliveries they're owed (see quests.js).
+function talk(state, player, arg, ctx) {
+  if (!arg) return [{ type: "error", text: "Talk to whom?" }];
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const mob = rt.mobs.find((m) => {
+    const t = w.mobs[m.template];
+    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
+  });
+  if (!mob) return [{ type: "error", text: `You see no "${arg}" here to talk to.` }];
+  const msgs = quests.handleTalk(state, player, mob);
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} speaks with ${w.mobs[mob.template].name}.` }, player.id);
+  return [...msgs, buildPlayerView(state, player)]; // a taken/auto-advanced quest may change stats
+}
+
+// `give <item> [to] <npc>` (alias `deliver`): hand an item to a creature here. If
+// it satisfies an active deliver step for that NPC, the items are consumed and the
+// quest advances; otherwise the NPC declines and you keep the item.
+function give(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return [{ type: "error", text: "Give what to whom? (give <item> <npc>)" }];
+  // Parse "<item> [to] <npc>": a literal " to " splits item/npc; otherwise the
+  // last word names the npc and the rest the item.
+  let itemQ, npcQ;
+  const idx = arg.toLowerCase().indexOf(" to ");
+  if (idx >= 0) { itemQ = arg.slice(0, idx).trim(); npcQ = arg.slice(idx + 4).trim(); }
+  else { const toks = arg.trim().split(/\s+/); npcQ = toks[toks.length - 1]; itemQ = toks.slice(0, -1).join(" "); }
+  if (!itemQ || !npcQ) return [{ type: "error", text: "Give what to whom? (give <item> <npc>)" }];
+
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const mob = rt.mobs.find((m) => {
+    const t = w.mobs[m.template];
+    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(npcQ, t.name, t.keywords, m.id);
+  });
+  if (!mob) return [{ type: "error", text: `You see no "${npcQ}" here to give anything to.` }];
+  const iidx = findItem(player.inventory, w, itemQ);
+  if (iidx < 0) return [{ type: "error", text: `You aren't carrying "${itemQ}".` }];
+  const inst = player.inventory[iidx];
+  const itemName = w.items[inst.template].name;
+  const npcName = w.mobs[mob.template].name;
+  const res = quests.handleGive(state, player, mob, inst);
+  if (!res.accepted) return [{ type: "error", text: `${cap(npcName)} has no need for ${itemName}.` }];
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} hands ${itemName} to ${npcName}.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  return [...res.msgs, buildRoomView(state, player), buildPlayerView(state, player)];
 }
 
 /** Admin-only commands, prefixed with '@'. */
@@ -1561,6 +1668,17 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return fish(state, player, arg, ctx);
     case "recipes":
       return recipes(state, player);
+    case "talk":
+    case "greet":
+    case "ask":
+      return talk(state, player, arg, ctx);
+    case "give":
+    case "deliver":
+      return give(state, player, arg, ctx);
+    case "quest":
+    case "quests":
+    case "journal":
+      return quests.log(state, player);
     case "say":
       return say(state, player, arg, ctx);
     case "emote":

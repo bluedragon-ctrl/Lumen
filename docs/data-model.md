@@ -439,6 +439,66 @@ at a fixture whose `station` matches, and only for recipes the player has learne
 
 ---
 
+## Quest (static) — `data/world/quests.json`
+
+A map of `questId → quest`. A quest is **acquired** when its `start` trigger fires,
+worked through as **ordered steps** (one objective each), and pays out `rewards` on
+completing the final step. The engine lives in [server/quests.js](../server/quests.js);
+the quest log is shown in the console with `quest` / `journal` (no UI pane).
+
+```json
+{
+  "warrens-thinning": {
+    "id": "warrens-thinning",
+    "name": "Thin the Warrens",
+    "description": "Maeve wants the rat warren culled.",
+    "start": { "trigger": "talk", "npc": "rim-innkeeper", "offerText": "Cull a few for me?" },
+    "steps": [
+      { "kill": "giant-rat", "count": 5, "text": "Cull 5 giant rats" },
+      { "deliver": "rat-meat", "count": 5, "npc": "rim-innkeeper", "text": "Bring 5 cuts to Maeve" }
+    ],
+    "rewards": { "xp": 45, "shards": 25, "items": [{ "template": "hearty-broth", "qty": 3 }] }
+  }
+}
+```
+
+| Field         | Type      | Notes |
+|---------------|-----------|-------|
+| `id`,`name`   | string    | `id` matches the map key; `name` is the journal title. |
+| `description` | string?   | One-line summary shown when the quest is accepted. |
+| `start`       | block     | How the quest is offered (see below). |
+| `steps`       | Step[]    | Ordered objectives; only the current step accrues progress. |
+| `rewards`     | block?    | Paid out once, on completing the last step. |
+| `repeatable`  | bool?     | Default `false` (one-time). `true` lets a finished quest be retaken. |
+
+**Start trigger** — `{ trigger, … , offerText? }`. `offerText` is optional flavour shown on accept.
+
+| `trigger` | Extra field | Fires when… |
+|-----------|-------------|-------------|
+| `talk`    | `npc` (mobId)     | the player `talk`s to that NPC. |
+| `use`     | `fixture` (id)    | the player `use`s that fixture. |
+| `item`    | `item` (id)       | the player acquires that item (pick up / buy / craft). |
+| `enter`   | `room` (roomId)   | the player enters that room for the first time. |
+
+**Step objective** — exactly **one** objective key per step, plus optional `text` (the journal line; a default is generated from the objective if omitted):
+
+| Objective | Shape | Complete when… |
+|-----------|-------|----------------|
+| `kill`    | `{ kill: <mobId>, count }`              | the player is credited with `count` kills of that mob. |
+| `deliver` | `{ deliver: <itemId>, count, npc }`     | the player `give`s `count` of the item to that NPC (consumed). |
+| `use`     | `{ use: <fixtureId> }`                  | the player `use`s that fixture. |
+| `collect` | `{ collect: <itemId>, count }`          | the player **possesses** `count` of the item (live inventory). |
+
+**Rewards** — all optional: `xp` (via `awardXp`, level-ups and all), `shards`,
+`items` (ItemRef[] into the pack), `recipes` (recipe ids taught), `spells` (spell ids taught).
+
+> **Runtime state.** A player's quest log is dynamic state on the player object —
+> `player.quests = { active: { [questId]: { step, progress } }, done: [questId, …] }` —
+> persisted with the rest of the character (not committed). `progress` is the running
+> count for the current `kill`/`deliver` step.
+
+---
+
 ## Status effects (dynamic)
 
 Status effects are runtime buffs/debuffs carried on an actor (`player.states`, a

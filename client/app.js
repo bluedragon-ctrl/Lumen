@@ -398,6 +398,7 @@ const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventor
   "attack", "kill", "stop", "sit", "sleep", "stand", "wake", "rest", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
   "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
   "drink", "quaff", "use", "throw", "hurl", "lob", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "train", "help",
+  "talk", "give", "deliver", "quest", "quests", "journal",
   "north", "south", "east", "west", "up", "down"];
 const history = [];
 let histIdx = -1;
@@ -449,6 +450,13 @@ function argCandidates(cmd) {
     case "unequip": case "remove":
       return p ? [...names(equipped()), ...Object.keys(p.equipment)] : [];
     case "attack": case "kill": case "k": return room ? names(room.contents.mobs) : [];
+    case "talk": case "greet": case "ask": return room ? names(room.contents.mobs) : [];
+    case "give": case "deliver": {
+      // Items you carry, then creatures here to give them to.
+      const out = p ? names(p.inventory) : [];
+      if (room) out.push(...names(room.contents.mobs));
+      return out;
+    }
     case "cast": case "c": {
       // Spell names first, then targetable creatures (cast <spell> <target>).
       const out = p ? (p.spells || []).map((s) => lastWord(s)) : [];
