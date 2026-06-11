@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`third.cave`, depth 3) and the Gloom-Warren's *Black Chimney* (`warren.chasm`,
   depth 7) are linked by a concealed flue worn by the river's overspill — a steep
   shortcut between the two tiers. Hidden from **both** sides: the bottom end (a
-  flowstone fissure in the chimney's west wall) is hinted in the room description
-  and found by `search` at **perception 4** — a fast way back up for a delver deep
-  in the warren; the top end (a drowned crack under the plunge-pool) is unhinted and
-  gated at **perception 8**, so only a sharp-eyed delver finds the way down from
-  above. Reuses the existing hidden-exit/search mechanic; no code changes.
+  flowstone fissure in the chimney's west wall) is hinted by a warm, wet draught and
+  found by `search` at **perception 4** — the search turns up **old prospectors'
+  climbing-rigging** (a new `prospectors-rigging` fixture: pitons and a knotted line),
+  marking the flue as a Rush-era shortcut rigged before the warren went bad, and a
+  fast way back up for a delver deep below; the top end (a drowned crack under the
+  plunge-pool, whose water never overflows) is unhinted and gated at **perception 8**,
+  so only a sharp-eyed delver finds the way down from above. Reuses the existing
+  hidden-exit/search mechanic; no code changes.
 - **The Gloom-Warren (depth 7) — the first hard tier below the lake.** The low,
   unstaked passage south of *The Forward Camp* (`deep.camp`) is now traversable and
   opens into a ten-room, fully-dark warren of big caves crawling with gloom-crawlers.

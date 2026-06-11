@@ -238,6 +238,13 @@
     "type": "resource",
     "mine": { "template": "crystal", "yield": 1, "charges": 2, "respawn": 900, "energy": 45 }
   },
+  "prospectors-rigging": {
+    "id": "prospectors-rigging",
+    "name": "old prospectors' climbing-rigging",
+    "keywords": ["rigging", "rope", "ropes", "line", "pitons", "gear", "climbing"],
+    "description": "Iron pitons hammered deep into the flue at arm's-reach intervals, a knotted climbing-line gone stiff and grey strung between them, and the rotted remains of a rope-sling cinched to the rock. Prospectors rigged this fissure as a shortcut — a fast, ugly climb between the river workings far above and the deep below, cut and equipped before the warren went bad. The line still holds, more or less; the pitons are sound. It was a way down for those in a hurry to be rich, and a way up for those who lived to use it. Whoever last came down it did not climb back out.",
+    "type": "scenery"
+  },
   "gloom-fungus": {
     "id": "gloom-fungus",
     "name": "a patch of pale fungus",
