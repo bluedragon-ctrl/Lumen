@@ -444,6 +444,19 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-react") {
+    // An NPC singled out one player (the `react` action): the target reads the
+    // second-person line, bystanders the third-person one, both light-gated.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const text = o.id === ev.targetId
+        ? `${cap(n)} ${ev.textTarget}.`
+        : `${cap(n)} ${ev.textRoom.replace(/\{name\}/g, ev.targetName)}.`;
+      sendToPlayer(o.id, { type: "log", text });
+    }
+    return;
+  }
+
   if (ev.type === "mob-move") {
     for (const o of state.playersIn(ev.from)) {
       const n = canSeeMob(o, ev.lightFrom, ev.emitsLight) ? ev.mobName : "something";
