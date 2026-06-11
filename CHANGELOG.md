@@ -139,12 +139,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`help` is reorganised, coloured, and admin-aware.** The flat command list is now
-  grouped into titled sections (Getting around, Carrying & gear, Fighting & magic,
-  Resting, Living off the deep, Trade & town, Voice) with gold titles, cyan section
-  headings, and green command signatures via the existing `<#colour>` markup. Admin
-  `@`-commands appear in `help` **only for admins** (everyone keeps `@help`). Entries
-  now show the new targeting syntax (`get [N.]<item> | all`). The client documents
-  `<#reset>`, the tag that returns a line to the default ink mid-string.
+  grouped into titled sections (Exploration, Items & gear, Combat & magic, Gathering
+  & crafting, People & trade, Resting) with a catch-all **Other** before the admin
+  block, rendered with the existing `<#colour>` markup — gold title, cyan section
+  headings, green command signatures. Admin `@`-commands appear in `help` **only for
+  admins** (everyone keeps `@help`). Entries now show the new targeting syntax
+  (`get [N.]<item> | all`). The client documents `<#reset>`, the tag that returns a
+  line to the default ink mid-string.
 
 ### Added
 - **DikuMUD-style target selection.** When several things share a name, pick one

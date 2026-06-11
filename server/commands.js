@@ -59,12 +59,12 @@ const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-
 // titles glow gold, command signatures green, the rest reads in the default ink.
 // `<#reset>` returns to default colour mid-line (any non-palette tag does).
 const HELP_SECTIONS = [
-  ["Getting around", [
+  ["Exploration", [
     "look | examine | x [target] — view the room, or look closely at one thing",
     "search — comb the room for hidden ways and things (needs light + Perception)",
     "north / south / east / west / up / down (n/s/e/w/u/d) — move between rooms",
   ]],
-  ["Carrying & gear", [
+  ["Items & gear", [
     "get | take [N.]<item> | all — pick something up off the floor",
     "drop <item> | all — set something down",
     "inventory | inv | i — list what you are carrying",
@@ -74,37 +74,37 @@ const HELP_SECTIONS = [
     "drink | quaff | eat <item> — consume a potion or food",
     "refuel | fill <item> — refill a fuelled light (a lantern with oil)",
   ]],
-  ["Fighting & magic", [
+  ["Combat & magic", [
     "attack | kill [N.]<target> — set on a creature (stop to break off)",
     "stop — break off your attack",
     "cast | c <spell> [target] — cast a spell you know",
     "spells — list the spells you know",
-    "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
   ]],
-  ["Resting", [
-    "sit | rest — recover HP/MP slowly (1 per 5 ticks)",
-    "sleep — recover faster (1 per 2 ticks), but blind while you do",
-    "stand | wake — get up; moving or attacking also stands you",
-  ]],
-  ["Living off the deep", [
+  ["Gathering & crafting", [
     "mine | dig [vein] — work ore loose from a vein",
     "gather | pick | forage [cluster] — pick moss, mushrooms and crops by hand",
     "fish | angle [water] — work a baited line (spends a grub as bait)",
     "craft | make <recipe> — craft at the matching station here",
     "recipes — list the recipes you know",
   ]],
-  ["Trade & town", [
+  ["People & trade", [
+    "talk <npc> — speak with someone (take quests, hear what they need)",
+    "give <item> <npc> — hand something over (deliver quest goods)",
     "list | shop — see what a trader here buys and sells",
     "buy <item> — buy from a trader here",
     "sell <item> | all — sell to a trader here",
-    "talk <npc> — speak with someone (take quests, hear what they need)",
-    "give <item> <npc> — hand something over (deliver quest goods)",
-    "quest | journal — your quest log (in progress / finished)",
-  ]],
-  ["Voice", [
     "say <text> — speak to everyone in the room",
     "emote | me <text> — perform an action others can see",
+  ]],
+  ["Resting", [
+    "sit | rest — recover HP/MP slowly (1 per 5 ticks)",
+    "sleep — recover faster (1 per 2 ticks), but blind while you do",
+    "stand | wake — get up; moving or attacking also stands you",
+  ]],
+  ["Other", [
+    "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
     "train [attribute] — spend a level-up point (no arg: show progress)",
+    "quest | journal — your quest log (in progress / finished)",
     "help | ? — this list",
   ]],
 ];
