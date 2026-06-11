@@ -238,6 +238,15 @@
     "value": 3,
     "stackable": true
   },
+  "delver-claim-tag": {
+    "id": "delver-claim-tag",
+    "name": "a delver's claim-tag",
+    "description": "A thumb-length tag of stamped lead on a rotted cord, the kind every registered delver wears below — claim number on one face, the holder's mark on the other. This one reads WENDER, M., the stamp still crisp under a crust of lake-silt. Its owner has no further use for it; Fenn's ledger does.",
+    "type": "material",
+    "weight": 0,
+    "value": 0,
+    "stackable": false
+  },
   "scroll-spark": {
     "id": "scroll-spark",
     "name": "a Scroll of Spark",

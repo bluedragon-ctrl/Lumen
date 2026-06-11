@@ -51,11 +51,11 @@
     "id": "rim.claims",
     "zone": "rim",
     "name": "The Claims Office",
-    "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a bare notice board by the door-flap waits for whatever someone will pay to post. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
+    "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and claims — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
     "depth": 0,
     "ambientLight": 3,
     "exits": { "north": "rim.market" },
-    "fixtures": [],
+    "fixtures": ["notice-board", "claims-ledger"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 60 }]
   },
@@ -719,7 +719,8 @@
     "groundItems": [
       { "template": "shards", "qty": 15, "hidden": { "perception": 3 } },
       { "template": "lamp-oil", "qty": 2, "hidden": { "perception": 3 } },
-      { "template": "leather-jerkin", "hidden": { "perception": 3 } }
+      { "template": "leather-jerkin", "hidden": { "perception": 3 } },
+      { "template": "delver-claim-tag", "respawn": 600 }
     ],
     "spawns": [
       { "mob": "pale-king", "max": 1, "respawn": 1200 }
