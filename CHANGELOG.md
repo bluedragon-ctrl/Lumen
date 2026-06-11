@@ -137,6 +137,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Garrick sells an `oil-rendering` schematic**, gating the new render craft.
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
+### Removed
+- **Tab completion removed from the command input.** The partial-verb abbreviation
+  system on the server already lets you type `ga` for `gather` or `mi` for `mine`;
+  client-side Tab-to-complete added noise without being reliable. Tab now moves focus
+  as the browser expects.
+
 ### Changed
 - **Summon lifetime now scales with Intellect.** Both **Summon Wisp** and **Glimmer
   Husk** last `30 ticks per point of Intellect` (≈1:30 at INT 3, ≈6:00 at INT 12), so
