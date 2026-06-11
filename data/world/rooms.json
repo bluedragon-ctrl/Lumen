@@ -9,7 +9,7 @@
     "exits": { "north": "rim.inn", "east": "rim.market", "west": "rim.workshop", "south": "rim.gate" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": []
+    "spawns": [{ "mob": "rim-watchman", "max": 1, "respawn": 120 }]
   },
   "rim.inn": {
     "id": "rim.inn",
@@ -39,13 +39,25 @@
     "id": "rim.market",
     "zone": "rim",
     "name": "The Rim Market",
-    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, and a mage's shed stands apart to the east.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "west": "rim.plaza", "north": "rim.hatchery", "east": "rim.mageshed" },
+    "exits": { "west": "rim.plaza", "north": "rim.hatchery", "east": "rim.mageshed", "south": "rim.claims" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 60 }]
+  },
+  "rim.claims": {
+    "id": "rim.claims",
+    "zone": "rim",
+    "name": "The Claims Office",
+    "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a bare notice board by the door-flap waits for whatever someone will pay to post. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "north": "rim.market" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 60 }]
   },
   "rim.hatchery": {
     "id": "rim.hatchery",
