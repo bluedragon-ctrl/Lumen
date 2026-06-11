@@ -1730,6 +1730,25 @@ class GameState {
     }
   }
 
+  /** Command-side reaction: the in-character answer when a player TALKS to this
+   *  mob — the first reaction matching that player. The cooldown gate is ignored
+   *  (a direct address always earns an answer) but still stamped, so the tick
+   *  roll doesn't pile on right after. Returns { textTarget, textRoom } or null
+   *  (mob has no react action / no reaction matches). */
+  reactToPlayer(mob, player) {
+    const t = this.world.mobs[mob.template];
+    const action = (t.actions || []).find((a) => a.type === "react" && Array.isArray(a.reactions) && a.reactions.length);
+    if (!action || player.hp <= 0) return null;
+    for (const r of action.reactions) {
+      if (!this._reactMatches(player, r.if, mob.template)) continue;
+      const msg = r.messages[Math.floor(Math.random() * r.messages.length)];
+      if (!mob.reactCd) mob.reactCd = {};
+      mob.reactCd[player.id] = this.tick + (action.cooldown || 120);
+      return { textTarget: msg.target, textRoom: msg.room };
+    }
+    return null;
+  }
+
   /** Exit directions whose destination room shares this room's zone (roamable). */
   _zoneExits(roomId) {
     const room = this.world.rooms[roomId];

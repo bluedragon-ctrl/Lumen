@@ -243,18 +243,16 @@ function noteEnter(state, player, roomId) {
 }
 
 /** `talk <npc>` — offer this NPC's talk-started quests and nudge any pending
- *  delivery they're owed. */
+ *  delivery they're owed. Returns [] when there is no quest business; the talk
+ *  command supplies the fallback (an in-character `react` answer, or a shrug). */
 function handleTalk(state, player, mob) {
   const msgs = [];
   const w = state.world;
   const npc = mob.template;
   const npcName = w.mobs[npc] ? w.mobs[npc].name : "they";
-  let did = false;
   for (const [qid, quest] of Object.entries(w.quests)) {
     if (!quest.start || quest.start.trigger !== "talk" || quest.start.npc !== npc) continue;
-    const before = msgs.length;
     msgs.push(...offer(state, player, qid, { explicit: true }));
-    if (msgs.length > before) did = true;
   }
   const q = ensure(player);
   for (const [qid, entry] of Object.entries(q.active)) {
@@ -265,9 +263,7 @@ function handleTalk(state, player, mob) {
     const item = w.items[step.deliver];
     const short = item ? item.name.replace(/^(a|an|the)\s+/i, "") : step.deliver;
     msgs.push({ type: "log", text: `${cap(npcName)} is waiting on ${step.text || stepLabel(state, step)}. (hand it over with \`give ${short} ${npcName.replace(/^(a|an|the)\s+/i, "").split(/\s+/)[0]}\`)` });
-    did = true;
   }
-  if (!did) msgs.push({ type: "log", text: `${cap(npcName)} has nothing for you right now.` });
   return msgs;
 }
 

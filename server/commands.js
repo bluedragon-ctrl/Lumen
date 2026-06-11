@@ -1425,6 +1425,8 @@ function train(state, player, arg) {
 
 // `talk <npc>` (alias `greet`/`ask`): speak with a creature here. Offers any quest
 // that NPC has for you and reminds you of deliveries they're owed (see quests.js).
+// With no quest business, an NPC with a `react` action answers in character
+// (the first reaction matching this player); anyone else just shrugs.
 function talk(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Talk to whom?" }];
   const w = state.world;
@@ -1435,8 +1437,21 @@ function talk(state, player, arg, ctx) {
     return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
   });
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to talk to.` }];
+  const t = w.mobs[mob.template];
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} speaks with ${t.name}.` }, player.id);
   const msgs = quests.handleTalk(state, player, mob);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} speaks with ${w.mobs[mob.template].name}.` }, player.id);
+  if (!msgs.length) {
+    const r = state.reactToPlayer(mob, player);
+    if (r) {
+      // Reaction lines may end in quoted speech, so only punctuate when needed
+      // (mirrors the mob-react renderer in index.js).
+      const punct = (s) => (/["!?.]$/.test(s) ? s : `${s}.`);
+      msgs.push({ type: "log", text: punct(`${cap(t.name)} ${r.textTarget}`) });
+      ctx.toRoom(player.location, { type: "log", text: punct(`${cap(t.name)} ${r.textRoom.replace(/\{name\}/g, player.name)}`) }, player.id);
+    } else {
+      msgs.push({ type: "log", text: `${cap(t.name)} has nothing for you right now.` });
+    }
+  }
   return [...msgs, buildPlayerView(state, player)]; // a taken/auto-advanced quest may change stats
 }
 
