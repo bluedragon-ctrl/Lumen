@@ -91,6 +91,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   player has finished that quest (it sits in `quests.done`). Lets vendors reveal
   new wares as a reward for completed work. Data-driven — no new command.
 
+### Added
+- **A second witchglow source — Behind the Paqcha.** The hidden Umbral shrine behind
+  the falls (`lake.shrine`, depth 4) now grows a **witchglow-cluster** in its lamp-lit,
+  spray-damp niche, plus a respawning loose `witchglow-cap`. Gated behind the shrine's
+  perception-4 hidden ledge, it gives lake-tier delvers a witchglow source without
+  backtracking to the depth-1 Spore Vault, while staying scarce.
+
 ### Changed
 - **Two mushroom-cluster fixtures instead of three.** The `glow-caps` and
   `gloom-fungus` fixtures both yielded the same `palecap-mushroom` under different

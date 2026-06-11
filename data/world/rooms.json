@@ -773,12 +773,13 @@
     "name": "Behind the Paqcha",
     "depth": 4,
     "ambientLight": 0,
-    "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. The only way out is back east, through the water.",
+    "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. Where the lamp's cold light falls steadiest, a slender witchglow cluster has crept up the damp niche-wall, dripping its own green glow over the offerings — beautiful, and poison, and grown here in a peace nothing has thought to disturb. The only way out is back east, through the water.",
     "exits": { "east": "lake.strand" },
-    "fixtures": ["umbral-coldlamp", "shrine-font"],
+    "fixtures": ["umbral-coldlamp", "shrine-font", "witchglow-cluster"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 },
-      { "template": "shards", "qty": 12 }
+      { "template": "shards", "qty": 12 },
+      { "template": "witchglow-cap", "qty": 1, "respawn": 150 }
     ],
     "spawns": []
   },
