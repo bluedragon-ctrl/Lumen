@@ -12,12 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`schematic-kingshell-cuirass`), the recipe for the kingshell cuirass. Mirrors the
   shadow-heart chain: a deep boss trophy delivered to the Umbral smith unlocks the
   gear it makes.
-
-### Changed
-- The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
-  *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
-- The **hungering dagger** now forges from a **silver bar** (was iron) + a
-  shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
 - **Shadow-craft: the Starving Dark's heart, and a blade that drinks life.** The
   Starving Dark now drops a **shadow-heart** (a craftable material). Looting one
   auto-offers a quest, *The Heart of the Dark*, to carry it to **Mallki** (the Umbral
@@ -77,6 +71,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Drink the Light` spell, cast on self). `computeRoomLight` already summed source
   outputs; the self-cast path now preserves a negative magnitude instead of flooring
   it at zero.
+- **Quest-gated shop stock.** A trader's `shop.sells` offer may carry a
+  `requiresQuest` id; the item stays hidden from `list` and unbuyable until the
+  player has finished that quest (it sits in `quests.done`). Lets vendors reveal
+  new wares as a reward for completed work. Data-driven — no new command.
+
+### Changed
+- The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
+  *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
+- The **hungering dagger** now forges from a **silver bar** (was iron) + a
+  shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
+
+### Added
 - **The descent below the lake.** The half-built line at The Far Bank
   (`lake.farshore`) is now made fast and runs `down` into two new rooms forming the
   long descent toward the deep: *The Gullet* (depth 5) — a dark, wet switchback
