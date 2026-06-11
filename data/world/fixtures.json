@@ -202,5 +202,33 @@
     "description": "A plank hatch set into the floorboards behind the bar, worn smooth where Maeve lifts it day in, day out. A faint, animal reek drifts up through the seams — and now and then a scrabble of claws on stone. She is quick to wave a delver off it: nothing down there, dear, only stores. Heave it open and a short ladder drops into the cellar.",
     "type": "door",
     "door": { "dir": "down", "to": "rim.cellar", "open": false }
+  },
+  "camp-lamp": {
+    "id": "camp-lamp",
+    "name": "a prospector's oil lamp",
+    "description": "A battered brass lamp left standing on a flat stone, its reservoir still a third full of oil gone thick with the cold. Whoever camped here carried it down from the surface and left it behind — too heavy, or too far gone to matter. A little wheel on the side feeds the wick up or down. Wound down, it sits dark; coax it up and it will burn a while yet.",
+    "type": "switch",
+    "switch": { "emitsLight": 3, "on": false }
+  },
+  "camp-firepit": {
+    "id": "camp-firepit",
+    "name": "a cooking fire",
+    "description": "A ring of blackened stones holds a bed of cold ash and the charred ends of timber hauled down piece by piece from far above. A bent iron grille is propped across it and a soot-caked pot left upturned beside the ring. The fire is long dead, but the makings are all here — strike it up and there is room to cook a catch over the flames.",
+    "type": "crafting",
+    "station": "cooking"
+  },
+  "camp-bench": {
+    "id": "camp-bench",
+    "name": "a makeshift alchemist's bench",
+    "description": "A plank laid across two stacked supply crates, crowded with the tools a delver could carry and no more: a clay burner, a nest of chipped glass, a mortar worn pale at the rim. It is a poor cousin to the benches of the row above, knocked together for a season's work and never struck — but the coils are sound and it will still hold a reaction together.",
+    "type": "crafting",
+    "station": "alchemy"
+  },
+  "camp-seep": {
+    "id": "camp-seep",
+    "name": "a catch-basin of seep-water",
+    "description": "A scooped hollow in the rock, walled round with a low rim of packed clay to catch the clean water that threads down the wall drop by drop. The prospectors who held this camp set it here to spare themselves the climb to the lake. The water is dark and cold and clean enough — a place to drink and gather yourself before the dark below.",
+    "type": "scenery",
+    "restore": { "hp": 2, "mana": 2 }
   }
 }

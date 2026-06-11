@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The descent below the lake.** The half-built line at The Far Bank
+  (`lake.farshore`) is now made fast and runs `down` into two new rooms forming the
+  long descent toward the deep: *The Gullet* (depth 5) — a dark, wet switchback
+  following the lake's outflow — and *The Forward Camp* (depth 6), an abandoned
+  prospectors' camp that serves as a rest/refit haven before the hard areas begin.
+  The camp gains four fixtures: a `camp-lamp` (oil lamp, **off by default**, lights
+  the dark camp when switched on), a `camp-firepit` (cooking station), a `camp-bench`
+  (alchemy station), and a `camp-seep` (water basin restoring a little hp/mana). A
+  low unstaked passage runs on south from the camp — described but not yet
+  traversable — left as the hook for the deep beyond. All data-only.
 - **The notice board is up.** Fenn's Claims Office gains a `notice-board` fixture;
   `use board` reads the postings and picks up the posted work. Three **repeatable**
   board quests: *Bounty: Crawlers on the Descent* (cull 4 gloom-crawlers),
