@@ -1128,5 +1128,36 @@
     "weight": 0,
     "value": 40,
     "stackable": true
+  },
+  "shadow-heart": {
+    "id": "shadow-heart",
+    "name": "a shadow-heart",
+    "description": "A knot of living dark, cut cold from the Starving Dark where its centre coiled thickest — no bigger than a fist, and heavier than a thing that size has any right to be. It drinks the light off your hands as you hold it, sheds a chill that has nothing to do with the deep, and never quite sits still in the palm. The Umbrals' glimmer-craft can bind such a heart into worked steel, if a delver knows the trick of it — and Mallki, of all the deep-folk, is the one to ask.",
+    "type": "material",
+    "weight": 1,
+    "value": 70
+  },
+  "book-of-shadow-binding": {
+    "id": "book-of-shadow-binding",
+    "name": "the Book of Shadow-Binding",
+    "description": "A slim folio of dark, supple hide, worked in Mallki's careful hand and the rounded glyphs of the deep-folk — a glimmer-craft the surface has no name for: the binding of a captured shadow's heart into worked steel, so the hunger of the dark is carried in an edge. Study it to take the working into memory; the deep-folk's secrets are not given twice.",
+    "type": "book",
+    "weight": 1,
+    "value": 120,
+    "teaches": { "recipes": ["forge-hungering-dagger"] }
+  },
+  "hungering-dagger": {
+    "id": "hungering-dagger",
+    "name": "a hungering dagger",
+    "description": "A short, dark blade with a shadow-heart bound cold into the steel of it, so the metal never quite warms and the edge seems to drink the light along its length. It carries the Starving Dark's hunger: every cut it lands draws a little of the life out of the wounded and feeds it back to the hand on the hilt. Quick, and never quite sated.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 90,
+    "weapon": {
+      "damage": { "physical": "1d4" },
+      "actionCost": 10,
+      "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
+    }
   }
 }

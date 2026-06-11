@@ -251,5 +251,13 @@
     "description": "Pale, lightless fungus crusts the seams of the worked stone in soft grey shelves, feeding on the dead air and whatever the dark lets fall rather than on any light — it sheds no glow of its own. Grubs have found it: their slow trails wind pale through the caps where they chew, and a delver who knows the trick of it can pick a few caps for the pot, or gather the grubs for bait.",
     "type": "resource",
     "harvest": { "template": "palecap-mushroom", "verb": "pick", "yield": 1, "charges": 3, "respawn": 150, "energy": 10 }
+  },
+  "umbral-forge": {
+    "id": "umbral-forge",
+    "name": "an Umbral glimmer-hearth",
+    "keywords": ["forge", "hearth", "anvil", "umbral"],
+    "description": "Not a coal forge like the surface keeps, but a squat hearth of fitted stone with a cradle of raw glimmer at its heart, breathing a low blue-white heat that throws no smoke. A worked-stone anvil stands beside it, its face inlaid with the rounded glyphs the deep-folk cut into everything they make. Mallki works chitin, glimmer, and bound steel here in the slow, patient way of his people — and it will serve a delver who has the knowing of a recipe and the makings to hand.",
+    "type": "crafting",
+    "station": "smithing"
   }
 }

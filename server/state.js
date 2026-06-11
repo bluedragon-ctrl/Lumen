@@ -1196,11 +1196,18 @@ class GameState {
     let attackerDeath = null;
     if (!r.hit) return { defenderDeath, attackerDeath };
 
-    // Attacker onHit → the defender (only meaningful while it still lives).
-    if (attacker.onHit && !defenderDeath) {
+    // Attacker onHit → the defender by default (venom, a debuff), but an entry marked
+    // `target: "self"` (or "attacker") lands on the attacker instead — life-steal: a
+    // blade that heals its wielder on a landed hit (the mirror of onDamage's target
+    // axis). Self-target fires even on a killing blow (you drink life as you cut);
+    // defender-target only while the defender still lives.
+    if (attacker.onHit) {
       for (const spec of attacker.onHit) {
         if (!this._rollChance(spec)) continue;
-        this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
+        if (spec.target === "self" || spec.target === "attacker")
+          this._applyTriggerEffect(events, spec, attacker, attacker.hurt, null);
+        else if (!defenderDeath)
+          this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
       }
     }
 

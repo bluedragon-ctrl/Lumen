@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Shadow-craft: the Starving Dark's heart, and a blade that drinks life.** The
+  Starving Dark now drops a **shadow-heart** (a craftable material). Looting one
+  auto-offers a quest, *The Heart of the Dark*, to carry it to **Mallki** (the Umbral
+  trader — the deep-folk understand the shadows). He studies it, **returns it**, and
+  grants the **Book of Shadow-Binding**, a `study`-able tome that teaches an
+  expandable set of shadow-craft recipes (seeded with one). Mallki's Hollow gains an
+  **Umbral glimmer-hearth** — a `smithing` station deep down. The first recipe forges
+  **a hungering dagger**: fast and low base damage, but it **steals life** — every
+  landed hit heals the wielder (2 hp). A new reusable combat primitive backs it: an
+  attacker's `onHit` entry marked `target: "self"` lands on the *attacker* (life-
+  steal), mirroring the defender's `onDamage` target axis — data-attachable to any
+  future weapon or life-draining mob.
 - **A hidden vertical shortcut between depth 3 and depth 7.** The Plunge Cave
   (`third.cave`, depth 3) and the Gloom-Warren's *Black Chimney* (`warren.chasm`,
   depth 7) are linked by a concealed flue worn by the river's overspill — a steep

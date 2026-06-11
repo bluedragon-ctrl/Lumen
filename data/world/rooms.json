@@ -596,9 +596,9 @@
     "name": "Mallki's Hollow",
     "depth": 3,
     "ambientLight": 0,
-    "description": "The worked path opens into a low, dry hollow carved square from the living rock — a dwelling, plainly, and a very old one. A cold glimmer-lamp throws a soft, heatless blue over shelves of river-shells, coils of woven gut-line, and neat stacks of dried fungus. There are no torches and no flame; the light here is kept low and kind, easy on eyes that were never meant for the sun. Mallki keeps this place. The pools lie back north; the light of a tended garden glows up from a passage south.",
+    "description": "The worked path opens into a low, dry hollow carved square from the living rock — a dwelling, plainly, and a very old one. A cold glimmer-lamp throws a soft, heatless blue over shelves of river-shells, coils of woven gut-line, and neat stacks of dried fungus. There are no torches and no flame; the light here is kept low and kind, easy on eyes that were never meant for the sun. Against one wall a squat glimmer-hearth breathes a low blue heat beside a worked-stone anvil — Mallki's forge, where he binds chitin, glimmer, and stranger things still into worked steel. Mallki keeps this place. The pools lie back north; the light of a tended garden glows up from a passage south.",
     "exits": { "north": "third.pools", "south": "third.garden" },
-    "fixtures": ["umbral-coldlamp"],
+    "fixtures": ["umbral-coldlamp", "umbral-forge"],
     "groundItems": [],
     "spawns": [
       { "mob": "umbral-trader", "max": 1, "respawn": 90 }

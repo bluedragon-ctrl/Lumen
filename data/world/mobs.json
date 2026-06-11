@@ -874,6 +874,7 @@
       { "type": "emote", "weight": 2, "messages": ["folds in on itself, and the cold deepens", "shifts — a darker dark sliding across the dark", "leans toward your light like a thing that is hungry for it", "goes utterly still, and the silence presses in"] }
     ],
     "loot": [
+      { "template": "shadow-heart", "chance": 1 },
       { "template": "crystal", "chance": 1 }
     ]
   }
