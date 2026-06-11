@@ -116,7 +116,9 @@ function addLine(text, kind) {
 
 // Inline colour markup: `<#name>` tints the rest of its line with the named
 // colour (see .mk-* in styles.css). Colour resets at every newline, so a stray
-// tag can never bleed past one line. Unknown names are dropped silently. Server
+// tag can never bleed past one line. A non-palette tag (`<#reset>`) is dropped
+// and returns the run to the default ink — used to colour just part of a line.
+// Other unknown names are dropped silently too. Server
 // content uses this (e.g. greyed-out recipes you can't afford, a rainbow boss);
 // player-authored text has its tags stripped server-side, so this stays trusted
 // styling — we still build spans via textContent, never innerHTML.

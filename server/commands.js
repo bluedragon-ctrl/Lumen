@@ -54,47 +54,107 @@ const VERBS = [
 ];
 const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-letter aliases
 
-const HELP = [
-  "Commands:",
-  "  look | examine | x [target] — view the room, or examine something",
-  "  search                — comb the room for hidden things (needs light + Perception)",
-  "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
-  "  get | take | pickup <target> — pick up an item",
-  "  drop <target>         — drop an item",
-  "  inventory | inv | i   — list what you are carrying",
-  "  attack | kill <target> — attack a creature (stop to break off)",
-  "  sit | rest            — sit to recover HP/MP slowly (1 per 5 ticks)",
-  "  sleep                 — sleep to recover faster (1 per 2 ticks), but blind",
-  "  stand | wake          — get up; moving or attacking also stands you",
-  "  cast | c <spell> <target> — cast a spell you know at a creature",
-  "  learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
-  "  spells                — list the spells you know",
-  "  train [attribute]     — spend a level-up point on an attribute (no arg: show progress)",
-  "  equip | wield | wear <item> — equip from inventory (a light source kindles as you equip it)",
-  "  unequip | remove <item|slot> — return equipped gear to inventory",
-  "  list | shop           — see what a trader here buys and sells",
-  "  buy <item>            — buy from a trader here",
-  "  sell <item>           — sell to a trader here",
-  "  recipes               — list recipes you know",
-  "  craft | make <recipe> — craft at the matching station here",
-  "  mine | dig [vein]     — work ore loose from a vein in the room",
-  "  gather | pick | forage [cluster] — pick moss, mushrooms or other crops by hand (also `use <cluster>`)",
-  "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
-  "  drink | quaff | eat <item> — consume a potion or food",
-  "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
-  "  talk <npc>            — speak with a creature (take quests, hear what they need)",
-  "  give <item> <npc>     — hand an item to someone (deliver quest goods)",
-  "  quest | journal       — your quest log (in progress / finished)",
-  "  say <text>            — speak to others in the room",
-  "  emote | me <text>     — perform an action",
-  "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
-  "  help | ?              — this list",
-  "",
-  "Commands can be shortened to any unambiguous prefix (exa→examine, cr→craft).",
-  "Target things by any word in their name (kill innkeeper, get glimmerstone).",
-  "When several match, pick one with a number (kill 2.crawler), or act on every",
-  "one with all (get all, drop all.pelt, sell all.crystal).",
-].join("\n");
+// Help is authored as titled sections of `signature — description` entries, then
+// rendered with inline colour markup (see renderMarkup in the client): section
+// titles glow gold, command signatures green, the rest reads in the default ink.
+// `<#reset>` returns to default colour mid-line (any non-palette tag does).
+const HELP_SECTIONS = [
+  ["Getting around", [
+    "look | examine | x [target] — view the room, or look closely at one thing",
+    "search — comb the room for hidden ways and things (needs light + Perception)",
+    "north / south / east / west / up / down (n/s/e/w/u/d) — move between rooms",
+  ]],
+  ["Carrying & gear", [
+    "get | take [N.]<item> | all — pick something up off the floor",
+    "drop <item> | all — set something down",
+    "inventory | inv | i — list what you are carrying",
+    "equip | wield | wear <item> — put on gear (a light source kindles as you equip it)",
+    "unequip | remove <item|slot> — return equipped gear to your pack",
+    "use | switch <target> — work a fixture, or use/light a carried item",
+    "drink | quaff | eat <item> — consume a potion or food",
+    "refuel | fill <item> — refill a fuelled light (a lantern with oil)",
+  ]],
+  ["Fighting & magic", [
+    "attack | kill [N.]<target> — set on a creature (stop to break off)",
+    "stop — break off your attack",
+    "cast | c <spell> [target] — cast a spell you know",
+    "spells — list the spells you know",
+    "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
+  ]],
+  ["Resting", [
+    "sit | rest — recover HP/MP slowly (1 per 5 ticks)",
+    "sleep — recover faster (1 per 2 ticks), but blind while you do",
+    "stand | wake — get up; moving or attacking also stands you",
+  ]],
+  ["Living off the deep", [
+    "mine | dig [vein] — work ore loose from a vein",
+    "gather | pick | forage [cluster] — pick moss, mushrooms and crops by hand",
+    "fish | angle [water] — work a baited line (spends a grub as bait)",
+    "craft | make <recipe> — craft at the matching station here",
+    "recipes — list the recipes you know",
+  ]],
+  ["Trade & town", [
+    "list | shop — see what a trader here buys and sells",
+    "buy <item> — buy from a trader here",
+    "sell <item> | all — sell to a trader here",
+    "talk <npc> — speak with someone (take quests, hear what they need)",
+    "give <item> <npc> — hand something over (deliver quest goods)",
+    "quest | journal — your quest log (in progress / finished)",
+  ]],
+  ["Voice", [
+    "say <text> — speak to everyone in the room",
+    "emote | me <text> — perform an action others can see",
+    "train [attribute] — spend a level-up point (no arg: show progress)",
+    "help | ? — this list",
+  ]],
+];
+
+const HELP_TIPS = [
+  "Commands shorten to any unambiguous prefix (exa→examine, cr→craft).",
+  "Target by any word in a name (kill innkeeper, get glimmerstone). When several",
+  "match, pick one with a number (kill 2.crawler) or act on all (get all, sell all).",
+];
+
+const ADMIN_HELP_SECTION = ["Admin", [
+  "@create-player <name> — create a new player account",
+  "@list-players — list every account",
+  "@shards <amount> — grant yourself shards",
+  "@xp <amount> — grant yourself experience",
+  "@attr <attribute> <value> — set one of your attributes",
+  "@spawn <mobId> [count] [wild|player] — spawn mobs in this room",
+  "@give <itemId> [count] — conjure an item into your pack",
+]];
+
+// Colour one "signature — description" entry: green signature, default rest.
+function helpEntry(entry) {
+  const i = entry.indexOf(" — ");
+  if (i < 0) return `  <#green>${entry}<#reset>`;
+  return `  <#green>${entry.slice(0, i)}<#reset> — ${entry.slice(i + 3)}`;
+}
+
+function renderHelpSections(sections, title) {
+  const out = [`<#gold>${title}<#reset>`];
+  for (const [heading, entries] of sections) {
+    out.push("", `<#cyan>${heading}<#reset>`);
+    for (const e of entries) out.push(helpEntry(e));
+  }
+  return out;
+}
+
+// The help text for a given player: the standard sections plus footer tips, and
+// the admin section appended only when the player can actually use those verbs.
+function buildHelp(player) {
+  const lines = renderHelpSections(HELP_SECTIONS, "Commands");
+  if (player && player.isAdmin) {
+    lines.push("", `<#cyan>${ADMIN_HELP_SECTION[0]}<#reset>`);
+    for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));
+  }
+  lines.push("", ...HELP_TIPS.map((t) => `<#gray>${t}<#reset>`));
+  return lines.join("\n");
+}
+
+// Back-compat export: the non-admin help string.
+const HELP = buildHelp(null);
 
 const selfAndViews = (state, player, line, kind = "log") => [
   { type: kind, text: line },
@@ -1724,8 +1784,11 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       }
       return selfAndViews(state, player, `Conjured ${n}× ${t.name} into your pack.`);
     }
-    case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count] [wild|player]\n  @give <itemId> [count]" }];
+    case "@help": {
+      const lines = ["<#gold>Admin commands<#reset>", ""];
+      for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));
+      return [{ type: "log", text: lines.join("\n") }];
+    }
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }
@@ -1884,7 +1947,7 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return unequip(state, player, arg, ctx);
     case "help":
     case "?":
-      return [{ type: "log", text: HELP }];
+      return [{ type: "log", text: buildHelp(player) }];
     default: {
       const guess = closestVerb(verb);
       const hint = guess ? ` Did you mean "${guess}"?` : ` Try "help".`;
