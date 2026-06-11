@@ -65,7 +65,10 @@ should colour the tone of all surface content.
 The rough boomtown at the mouth of the Abyss, the last settlement before the dark —
 where prospectors gather, trade in shards, resupply, and stage expeditions. Trades
 in light, rope, steel, broth, and tallow. Established figures: **Maeve** (innkeeper),
-**Garrick** (sour quartermaster), **Tobin** (half-mad tinker-smith).
+**Garrick** (sour quartermaster), **Tobin** (half-mad tinker-smith), **Fenn**
+(self-appointed claims-recorder — nobody appointed him, but no claim is real until
+it crosses his counter), **Hale** (watchman — an ex-sellsword paid in shards by the
+traders to walk the village and be seen; the Rim has no formal law).
 
 ## The Umbrals
 

@@ -365,6 +365,67 @@
       "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-witchfire" }, { "template": "scroll-arc-flash" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmer-dust" }, { "template": "schematic-pressed-glimmer-dust" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
     }
   },
+  "rim-recorder": {
+    "id": "rim-recorder",
+    "name": "Fenn the claims-recorder",
+    "keywords": ["fenn", "recorder", "claims", "clerk"],
+    "description": "A narrow, ink-stained man behind a counter polished smooth by shard payments, wire-pinched lenses low on his nose and a ledger chained to the desk. Nobody appointed him; he simply started writing things down when the Rush began, and now no claim at the Rim is real until it crosses his counter. He knows who owns every claimed seam below — and which owners stopped coming up.",
+    "maxHp": 16,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 2, "vitality": 4, "intellect": 7, "wits": 6, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["dips his pen and scratches a long entry into the ledger", "squares a stack of claim papers edge to edge", "stamps a document with a small lead seal, twice", "runs a finger down a column of names, lips moving", "blots the ledger and frowns at the smudge"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "peers over his lenses: \"Do try not to die with claims outstanding. The paperwork is substantial.\"", "room": "peers at {name}'s wounds over his lenses." }
+        ] },
+        { "if": { "slotEmpty": "body" }, "messages": [
+          { "target": "notes your bare back with a sniff: \"Unarmoured. I'll pencil your claim as 'short-term'.\"", "room": "makes a small note while eyeing {name}'s bare back." }
+        ] },
+        { "messages": [
+          { "target": "squares a stack of claim papers: \"Registrations, disputes, transfers of deceased delvers' seams. Which is it?\"", "room": "squares his papers and looks at {name} expectantly." },
+          { "target": "dips his pen: \"Every claimed seam below has a name on it up here. Mostly dead ones.\"", "room": "tells {name}, primly, that every claimed seam below has a name on it." }
+        ] }
+      ] }
+    ]
+  },
+  "rim-watchman": {
+    "id": "rim-watchman",
+    "name": "Hale the watchman",
+    "keywords": ["hale", "watchman", "guard", "watch"],
+    "description": "A broad, weathered ex-sellsword with a plain cudgel on his belt and a slow, deliberate stride, paid in shards by the traders to walk the village and be seen. He came down with the Rush, weighed a prospector's odds against a watchman's wage, and chose the steadier work. Little at the Rim surprises him; less escapes him.",
+    "maxHp": 28,
+    "speed": 12,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 7, "vitality": 7, "intellect": 3, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 9 },
+      { "type": "wander", "weight": 2, "verb": "moves on along his round", "scope": "zone" },
+      { "type": "emote", "weight": 1, "messages": ["rests a hand on his cudgel and scans the lane", "rolls a shard across his knuckles, watching the street", "checks a shutter's latch with one big thumb", "stifles a yawn that goes on a while", "nods to a passing delver without breaking stride"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "looks your wounds over: \"Trouble below, or trouble up here? The second kind's my business.\"", "room": "looks {name}'s wounds over, unhurried." }
+        ] },
+        { "if": { "slotEmpty": "hand" }, "messages": [
+          { "target": "taps the haft of his cudgel: \"Bare-handed at the Rim's edge? Hope you're quick, friend.\"", "room": "glances at {name}'s empty hands and taps his cudgel." }
+        ] },
+        { "messages": [
+          { "target": "nods as he passes: \"Quiet round so far. Keep it that way for me, eh?\"", "room": "nods to {name} as he passes." },
+          { "target": "says: \"Seen three fortunes walk down this week. Seen one walk back up.\"", "room": "shares a word with {name} about his rounds." }
+        ] }
+      ] }
+    ]
+  },
   "cave-lurker": {
     "id": "cave-lurker",
     "name": "a cave lurker",

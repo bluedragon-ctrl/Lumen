@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Two new Rim figures.** **Fenn the claims-recorder** keeps the new **Claims
+  Office** (`rim.claims`, a plank-and-canvas annex south of the market) — a
+  self-appointed clerk whose chained ledger names every claimed seam below; his
+  bare notice board is the planned anchor for posted bounty/contract quests.
+  **Hale the watchman** — an ex-sellsword paid by the traders to be seen —
+  patrols the whole village (the first *wandering* social NPC), reacting to
+  delvers wherever his round takes him. Both carry full `react` sets; lore.md's
+  Rim roster updated. Peacekeeping behaviour and claims/bounty quests are
+  planned follow-ups.
 - **NPCs notice you.** A new data-driven **`react` mob action** lets an NPC single
   out one player in the room and address them directly — nudge a quest delivery
   they owe (`delivery`), fuss over their wounds (`hpBelow`), comment on their gear
