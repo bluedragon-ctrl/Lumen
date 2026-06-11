@@ -310,7 +310,22 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the pens", "picks a bold grub off the mushroom beds and pockets it for bait", "checks a clutch of pale eggs against the glow", "wipes her hands on a work-stiff apron"] }
+      { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the pens", "picks a bold grub off the mushroom beds and pockets it for bait", "checks a clutch of pale eggs against the glow", "wipes her hands on a work-stiff apron"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "equipped": "torch" }, "messages": [
+          { "target": "edges between your torch and the cells: \"Mind the flame, please — the bugs go dark when they're frightened.\"", "room": "edges between {name}'s torch and the cells." }
+        ] },
+        { "if": { "slotEmpty": "light" }, "messages": [
+          { "target": "says, barely above a whisper: \"No light on you? Even my bugs won't go past the gate bare.\"", "room": "looks {name} over and frowns at the missing glow." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "winces at your wounds: \"Oh — oh, you're hurt. Sit by the warm cells a moment; they don't mind.\"", "room": "fusses {name} toward the warm glow of the cells." }
+        ] },
+        { "messages": [
+          { "target": "offers a shy smile: \"The wild ones down in the hollow were singing last night. The cells sang back.\"", "room": "tells {name}, shyly, about the bugs' singing." },
+          { "target": "coaxes a lightbug off her sleeve to circle you once, then calls it back.", "room": "lets a lightbug circle {name} once before calling it back." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "bug-meat" }]
