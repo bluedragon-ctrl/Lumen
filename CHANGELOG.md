@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Wick's first quest.** *Wings over the Hatchery* (`talk wick`): cave-bats are
   picking her lightbugs off the wire — cull 4 in the roosts below. Pays shards and
   two minor light potions (her own stock's making).
+- **Wick's stall stocks up.** Alongside bug-meat she now sells dead grubs (bait for
+  the deep pools, finally buyable topside), minor light potions, and luminescent
+  glands — all products of her own sheds. Bug-tallow deliberately *not* stocked: it
+  would arbitrage straight into the new tallow standing order.
+- **Fenn's story quest.** *Quiet Too Long* (`talk fenn`): a fourth-level seam is
+  registered to one Marl Wender, three seasons quiet — find his claim-tag where the
+  deep left him (the Pale King's bone-littered islet, completing the dead-delver
+  cache already hidden there) and lay it on the counter so Fenn can cross the name
+  out. New `delver-claim-tag` item; the office's **chained ledger** is now an
+  examinable fixture (Wender's entry underlined twice), and Fenn gained a react
+  line for delvers wearing unregistered glimmersteel.
 - **Two new Rim figures.** **Fenn the claims-recorder** keeps the new **Claims
   Office** (`rim.claims`, a plank-and-canvas annex south of the market) — a
   self-appointed clerk whose chained ledger names every claimed seam below; his

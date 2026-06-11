@@ -331,7 +331,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "bug-meat" }]
+      "sells": [{ "template": "bug-meat" }, { "template": "grub" }, { "template": "minor-light-potion" }, { "template": "luminescent-gland" }]
     }
   },
   "rim-mage": {
@@ -393,6 +393,9 @@
         ] },
         { "if": { "slotEmpty": "body" }, "messages": [
           { "target": "notes your bare back with a sniff: \"Unarmoured. I'll pencil your claim as 'short-term'.\"", "room": "makes a small note while eyeing {name}'s bare back." }
+        ] },
+        { "if": { "equipped": "glimmersteel-sword" }, "messages": [
+          { "target": "eyes your glimmersteel blade over his lenses: \"Fine metal. Registered where, exactly?\"", "room": "eyes {name}'s glimmersteel blade and reaches for his pen." }
         ] },
         { "messages": [
           { "target": "squares a stack of claim papers: \"Registrations, disputes, transfers of deceased delvers' seams. Which is it?\"", "room": "squares his papers and looks at {name} expectantly." },

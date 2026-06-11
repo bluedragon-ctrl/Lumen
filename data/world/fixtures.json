@@ -184,6 +184,12 @@
     "type": "scenery",
     "restore": { "hp": 2, "mana": 2 }
   },
+  "claims-ledger": {
+    "id": "claims-ledger",
+    "name": "the chained ledger",
+    "description": "A great canvas-bound ledger chained to the counter, swollen with years of entries in Fenn's cramped, exact hand: claim numbers, seam depths, holders' marks, transfer fees. Whole columns of names are struck through — sold out, bought up, or simply crossed off. Against the quiet ones Fenn pencils a date and waits; against the quiet-too-long he writes nothing at all, only underlines the name and leaves the seam hanging. One entry near the back — WENDER, M., fourth level — is underlined twice.",
+    "type": "scenery"
+  },
   "notice-board": {
     "id": "notice-board",
     "name": "the notice board",

@@ -72,6 +72,24 @@
       "items": [{ "template": "minor-light-potion", "qty": 2 }]
     }
   },
+  "fenn-quiet-claim": {
+    "id": "fenn-quiet-claim",
+    "name": "Quiet Too Long",
+    "description": "A seam on the fourth level is registered to one Marl Wender, three seasons quiet. Fenn's ledger wants certainty before he crosses the name out.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-recorder",
+      "offerText": "Fenn opens the chained ledger to a page near the back and taps a name underlined twice. \"Wender, M. A seam on the fourth level, three seasons quiet. The ledger wants certainty before I cross a man out. Every registered delver wears a claim-tag below — find his, wherever he ended, and lay it on this counter. Start where the water ends up. The lake keeps most of what the deep takes.\""
+    },
+    "steps": [
+      { "collect": "delver-claim-tag", "count": 1, "text": "Find Marl Wender's claim-tag, wherever the deep left him" },
+      { "deliver": "delver-claim-tag", "count": 1, "npc": "rim-recorder", "text": "Lay the claim-tag on Fenn's counter" }
+    ],
+    "rewards": {
+      "xp": 60,
+      "shards": 45
+    }
+  },
   "board-crawler-bounty": {
     "id": "board-crawler-bounty",
     "name": "Bounty: Crawlers on the Descent",

@@ -55,7 +55,7 @@
     "depth": 0,
     "ambientLight": 3,
     "exits": { "north": "rim.market" },
-    "fixtures": ["notice-board"],
+    "fixtures": ["notice-board", "claims-ledger"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 60 }]
   },
@@ -719,7 +719,8 @@
     "groundItems": [
       { "template": "shards", "qty": 15, "hidden": { "perception": 3 } },
       { "template": "lamp-oil", "qty": 2, "hidden": { "perception": 3 } },
-      { "template": "leather-jerkin", "hidden": { "perception": 3 } }
+      { "template": "leather-jerkin", "hidden": { "perception": 3 } },
+      { "template": "delver-claim-tag", "respawn": 600 }
     ],
     "spawns": [
       { "mob": "pale-king", "max": 1, "respawn": 1200 }
