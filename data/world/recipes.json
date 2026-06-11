@@ -390,7 +390,7 @@
     "name": "Hungering Dagger",
     "station": "smithing",
     "inputs": [
-      { "template": "iron-bar", "qty": 1 },
+      { "template": "silver-bar", "qty": 1 },
       { "template": "shadow-heart", "qty": 1 }
     ],
     "shards": 8,

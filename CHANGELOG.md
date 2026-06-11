@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Pale King's armour is now Mallki's to teach.** Looting a **kingshell plate**
+  from the Pale King auto-offers a quest, *The King's Shell*, to carry it to
+  **Mallki** — who returns the plate and grants the **kingshell method**
+  (`schematic-kingshell-cuirass`), the recipe for the kingshell cuirass. Mirrors the
+  shadow-heart chain: a deep boss trophy delivered to the Umbral smith unlocks the
+  gear it makes.
+
+### Changed
+- The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
+  *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
+- The **hungering dagger** now forges from a **silver bar** (was iron) + a
+  shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
 - **Shadow-craft: the Starving Dark's heart, and a blade that drinks life.** The
   Starving Dark now drops a **shadow-heart** (a craftable material). Looting one
   auto-offers a quest, *The Heart of the Dark*, to carry it to **Mallki** (the Umbral

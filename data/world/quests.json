@@ -165,5 +165,26 @@
         { "template": "book-of-shadow-binding" }
       ]
     }
+  },
+  "kings-shell": {
+    "id": "kings-shell",
+    "name": "The King's Shell",
+    "description": "The Pale King's carapace is armour enough for a delver, if it can be worked — and the surface has no smith who would know where to begin. Mallki, the Umbral trader, works the deep's own shell, and would want to see a kingshell plate.",
+    "start": {
+      "trigger": "item",
+      "item": "kingshell-plate",
+      "offerText": "The kingshell plate is heavy as a shield and harder, apex shell crusted with raw glimmer — armour, if a hand that knew the deep's craft could work it. Mallki, the qhatuq by the river, is that hand."
+    },
+    "steps": [
+      { "deliver": "kingshell-plate", "count": 1, "npc": "umbral-trader", "text": "Bring the kingshell plate to Mallki by the river" }
+    ],
+    "rewards": {
+      "xp": 40,
+      "shards": 20,
+      "items": [
+        { "template": "kingshell-plate" },
+        { "template": "schematic-kingshell-cuirass" }
+      ]
+    }
   }
 }
