@@ -247,7 +247,7 @@ function main() {
       }
     }
     for (const a of m.actions || []) {
-      if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon"].includes(a.type))
+      if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon", "react"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
@@ -267,6 +267,27 @@ function main() {
         if (!a.mob || !has(mobs, a.mob)) errs.push(`mob ${id}: summon action references missing mob ${a.mob}`);
         if (a.count != null && (typeof a.count !== "number" || a.count <= 0)) errs.push(`mob ${id}: summon count must be a positive number`);
         if (a.max != null && (typeof a.max !== "number" || a.max <= 0)) errs.push(`mob ${id}: summon max must be a positive number`);
+      }
+      if (a.type === "react") {
+        // Player-targeted NPC reactions: ordered conditions + {target, room} line pairs.
+        if (!Array.isArray(a.reactions) || !a.reactions.length)
+          errs.push(`mob ${id}: react action needs a non-empty reactions array`);
+        if (a.cooldown != null && (typeof a.cooldown !== "number" || a.cooldown <= 0))
+          errs.push(`mob ${id}: react cooldown must be a positive number`);
+        for (const r of a.reactions || []) {
+          if (!Array.isArray(r.messages) || !r.messages.length || r.messages.some((p) => !p || typeof p.target !== "string" || typeof p.room !== "string"))
+            errs.push(`mob ${id}: react reaction needs non-empty messages of { target, room } string pairs`);
+          const c = r.if;
+          if (!c) continue;
+          if (c.delivery != null && c.delivery !== true)
+            errs.push(`mob ${id}: react if.delivery must be true`);
+          if (c.hpBelow != null && (typeof c.hpBelow !== "number" || c.hpBelow <= 0 || c.hpBelow > 1))
+            errs.push(`mob ${id}: react if.hpBelow must be a number in (0, 1]`);
+          if (c.slotEmpty != null && typeof c.slotEmpty !== "string")
+            errs.push(`mob ${id}: react if.slotEmpty must be a slot name string`);
+          if (c.equipped != null && !has(items, c.equipped))
+            errs.push(`mob ${id}: react if.equipped references missing item ${c.equipped}`);
+        }
       }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);

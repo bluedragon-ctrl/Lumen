@@ -160,17 +160,14 @@ function advanceIfComplete(state, player, qid, msgs) {
 }
 
 /** Start a quest if the player is eligible (not already active; not done unless
- *  repeatable). `opts.explicit` makes an already-finished quest say so (used by
- *  `talk`). Auto-advances a first step that's already satisfied. */
-function offer(state, player, qid, opts = {}) {
+ *  repeatable — a finished one is offered silently, so `talk` can fall through
+ *  to a `react` answer). Auto-advances a first step that's already satisfied. */
+function offer(state, player, qid) {
   const msgs = [];
   const quest = state.world.quests[qid];
   if (!quest) return msgs;
   if (isActive(player, qid)) return msgs;
-  if (isDone(player, qid) && !quest.repeatable) {
-    if (opts.explicit) msgs.push({ type: "log", text: `You have already completed "${quest.name}".` });
-    return msgs;
-  }
+  if (isDone(player, qid) && !quest.repeatable) return msgs;
   ensure(player).active[qid] = { step: 0, progress: 0 };
   // offerText is authored verbatim (quote NPC speech in the data; leave descriptive
   // item/enter triggers unquoted), shown muted.
@@ -243,18 +240,16 @@ function noteEnter(state, player, roomId) {
 }
 
 /** `talk <npc>` — offer this NPC's talk-started quests and nudge any pending
- *  delivery they're owed. */
+ *  delivery they're owed. Returns [] when there is no quest business; the talk
+ *  command supplies the fallback (an in-character `react` answer, or a shrug). */
 function handleTalk(state, player, mob) {
   const msgs = [];
   const w = state.world;
   const npc = mob.template;
   const npcName = w.mobs[npc] ? w.mobs[npc].name : "they";
-  let did = false;
   for (const [qid, quest] of Object.entries(w.quests)) {
     if (!quest.start || quest.start.trigger !== "talk" || quest.start.npc !== npc) continue;
-    const before = msgs.length;
-    msgs.push(...offer(state, player, qid, { explicit: true }));
-    if (msgs.length > before) did = true;
+    msgs.push(...offer(state, player, qid));
   }
   const q = ensure(player);
   for (const [qid, entry] of Object.entries(q.active)) {
@@ -265,9 +260,7 @@ function handleTalk(state, player, mob) {
     const item = w.items[step.deliver];
     const short = item ? item.name.replace(/^(a|an|the)\s+/i, "") : step.deliver;
     msgs.push({ type: "log", text: `${cap(npcName)} is waiting on ${step.text || stepLabel(state, step)}. (hand it over with \`give ${short} ${npcName.replace(/^(a|an|the)\s+/i, "").split(/\s+/)[0]}\`)` });
-    did = true;
   }
-  if (!did) msgs.push({ type: "log", text: `${cap(npcName)} has nothing for you right now.` });
   return msgs;
 }
 
@@ -317,4 +310,18 @@ function log(state, player) {
   return [{ type: "log", text: lines.join("\n") }];
 }
 
-module.exports = { offer, noteKill, noteAcquire, noteUse, noteEnter, handleTalk, handleGive, log };
+/** True if any of `player`'s active quests is sitting on a `deliver` step aimed
+ *  at `npcTemplate` — the "you owe me something" check NPC reactions use.
+ *  Read-only; mirrors the delivery scan in handleTalk. */
+function hasPendingDelivery(state, player, npcTemplate) {
+  const q = ensure(player);
+  for (const [qid, entry] of Object.entries(q.active)) {
+    const quest = state.world.quests[qid];
+    if (!quest) continue;
+    const step = quest.steps[entry.step];
+    if (step && objectiveOf(step) === "deliver" && step.npc === npcTemplate) return true;
+  }
+  return false;
+}
+
+module.exports = { offer, noteKill, noteAcquire, noteUse, noteEnter, handleTalk, handleGive, hasPendingDelivery, log };

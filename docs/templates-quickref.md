@@ -113,9 +113,53 @@ common fields + `stackable`.
 }
 ```
 
-Action types: `attack | cast | emote | wander | idle | flee | summon`. `emote`
-needs a non-empty `messages[]`. `onDamage` (defender-side trigger array) mirrors
-item armour `onDamage` — see data-model "Combat triggers" for the full shape.
+Action types: `attack | cast | emote | wander | idle | flee | summon | react`.
+`emote` needs a non-empty `messages[]`. `onDamage` (defender-side trigger array)
+mirrors item armour `onDamage` — see data-model "Combat triggers" for the full
+shape.
+
+### NPC reactions — the `react` action
+
+Lets an NPC single out **one player** and address them directly. Fires two ways:
+
+1. **Ambient (tick roll):** when the weighted roll picks `react`, the NPC picks a
+   visible player whose per-player `cooldown` lapsed and runs the list below.
+2. **`talk <npc>`:** when the player has no quest business with this NPC (no
+   offer to make, no delivery owed, nothing just finished), the NPC answers with
+   their matching reaction — always (cooldown ignored, but armed so the tick
+   roll doesn't pile on). An NPC *without* a `react` action keeps the generic
+   "has nothing for you right now."
+
+```jsonc
+{ "type": "react", "weight": 3, "cooldown": 120,   // cooldown: ticks per player (default 120)
+  "reactions": [                                    // ORDER = PRIORITY: first entry with a matching player wins
+    { "if": { "delivery": true },                   // player's ACTIVE quest step delivers to THIS NPC
+      "messages": [                                 // random pair; author BOTH voices —
+        { "target": "catches your eye: \"Those for my pot, love?\"",   // 2nd person, what the target reads
+          "room": "catches {name}'s eye and nods at their pack." } ] },// 3rd person for bystanders; {name} = target
+    { "if": { "hpBelow": 0.4 },                     // hp < 40% of maxHp
+      "messages": [ { "target": "…", "room": "… {name} …" } ] },
+    { "if": { "slotEmpty": "body" },                // nothing equipped in that slot (hand|body|head|light)
+      "messages": [ { "target": "…", "room": "…" } ] },
+    { "if": { "equipped": "torch" },                // that item template equipped in any slot
+      "messages": [ { "target": "…", "room": "…" } ] },
+    { "messages": [ { "target": "…", "room": "…" } ] }  // no `if` = unconditional fallback (small talk) — put LAST
+  ] }
+```
+
+- **Conditions AND together** within one `if`; order reactions most-specific
+  first and end with the fallback so `talk` always has an answer.
+- **Punctuation:** lines may end in quoted speech (`…dear."`) — a closing period
+  is added only when missing, so don't double-punctuate plain lines.
+- **Quest delivery interplay:** while a delivery is owed, `talk` shows the
+  engine's "is waiting on …" nudge (with the exact `give` command) — the
+  `delivery` reaction is the *ambient* version of that nudge, the NPC calling
+  across the room unprompted. Author it for any NPC named in a quest `deliver`
+  step so the world reminds the player without them asking.
+- Light-gated like `emote` (an unseen NPC reads as "something …"), and the NPC
+  must itself see (room light vs its perception band) to react ambiently.
+- Worked example: `rim-innkeeper` in `mobs.json`. Full semantics: data-model
+  "Mob actions".
 
 **Perception band** (gates sight & combat accuracy): `blindBelow` = min light to
 see at all (0 = darkvision); `dimBelow` = light for clear sight (partial between);

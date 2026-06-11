@@ -1659,6 +1659,7 @@ class GameState {
         }
         if (a.type === "summon") return aggressive && a.mob && this.world.mobs[a.mob] && candidates.length > 0 && this._broodCount(m.id) < (a.max != null ? a.max : Infinity);
         if (a.type === "wander") return !inCombat && wanderDirs(a).length > 0;
+        if (a.type === "react") return Array.isArray(a.reactions) && a.reactions.length > 0 && this.playersIn(roomId).length > 0;
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
@@ -1672,12 +1673,80 @@ class GameState {
     if (choice.type === "attack") return this._mobAttack(m, t, roomId, events, candidates);
     if (choice.type === "cast") return this._mobCast(m, t, roomId, events, candidates, choice.spell);
     if (choice.type === "summon") return this._mobSummon(m, t, roomId, events, choice);
+    if (choice.type === "react") return this._mobReact(m, t, roomId, choice, events);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
       events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
       return;
     }
     if (choice.type === "wander") return this._mobMove(m, t, roomId, events, choice.verb || "wanders off", wanderDirs(choice));
+  }
+
+  // --- Targeted NPC reactions (the `react` action) ---------------------------
+  // A social mob singles out one player it can see and addresses them directly —
+  // a quest-delivery nudge, a comment on their wounds or gear, or plain small
+  // talk. Reactions are authored on the template (`reactions`, ordered: first
+  // entry with a matching player wins); a per-player cooldown on the instance
+  // keeps the NPC from pestering anyone and rotates it between players.
+
+  /** Does `player` match a reaction's `if` conditions? All keys must hold (AND);
+   *  no `if` at all is the unconditional small-talk fallback. */
+  _reactMatches(player, cond, npcTemplateId) {
+    if (!cond) return true;
+    // Lazy require: quests.js requires state.js at load time, so a top-level
+    // require back would leave one side half-initialised. By call time both are loaded.
+    if (cond.delivery && !require("./quests").hasPendingDelivery(this, player, npcTemplateId)) return false;
+    if (cond.hpBelow != null && !(player.hp < player.maxHp * cond.hpBelow)) return false;
+    if (cond.slotEmpty && player.equipment && player.equipment[cond.slotEmpty]) return false;
+    if (cond.equipped && !Object.values(player.equipment || {}).some((i) => i && i.template === cond.equipped)) return false;
+    return true;
+  }
+
+  /** Resolve one `react` action: pick a visible, off-cooldown player matching the
+   *  highest-priority reaction and push a `mob-react` event. Silently degrades to
+   *  idle when nobody qualifies. Cooldowns live on the instance (`reactCd`,
+   *  playerId -> lapse tick), in-memory only, pruned of absent/expired entries. */
+  _mobReact(m, t, roomId, action, events) {
+    const rt = this.rooms[roomId];
+    if (!canSee(t.perception, rt.light)) return; // too dark for the NPC to make anyone out
+    if (!m.reactCd) m.reactCd = {};
+    const present = this.playersIn(roomId).filter((p) => p.hp > 0);
+    for (const id of Object.keys(m.reactCd))
+      if (m.reactCd[id] <= this.tick || !present.some((p) => p.id === id)) delete m.reactCd[id];
+    const ready = present.filter((p) => m.reactCd[p.id] == null);
+    if (!ready.length) return;
+    for (const r of action.reactions || []) {
+      const matches = ready.filter((p) => this._reactMatches(p, r.if, m.template));
+      if (!matches.length) continue;
+      const target = matches[Math.floor(Math.random() * matches.length)];
+      const msg = r.messages[Math.floor(Math.random() * r.messages.length)];
+      m.reactCd[target.id] = this.tick + (action.cooldown || 120);
+      events.push({
+        type: "mob-react", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight,
+        light: rt.light, targetId: target.id, targetName: target.name,
+        textTarget: msg.target, textRoom: msg.room,
+      });
+      return;
+    }
+  }
+
+  /** Command-side reaction: the in-character answer when a player TALKS to this
+   *  mob — the first reaction matching that player. The cooldown gate is ignored
+   *  (a direct address always earns an answer) but still stamped, so the tick
+   *  roll doesn't pile on right after. Returns { textTarget, textRoom } or null
+   *  (mob has no react action / no reaction matches). */
+  reactToPlayer(mob, player) {
+    const t = this.world.mobs[mob.template];
+    const action = (t.actions || []).find((a) => a.type === "react" && Array.isArray(a.reactions) && a.reactions.length);
+    if (!action || player.hp <= 0) return null;
+    for (const r of action.reactions) {
+      if (!this._reactMatches(player, r.if, mob.template)) continue;
+      const msg = r.messages[Math.floor(Math.random() * r.messages.length)];
+      if (!mob.reactCd) mob.reactCd = {};
+      mob.reactCd[player.id] = this.tick + (action.cooldown || 120);
+      return { textTarget: msg.target, textRoom: msg.room };
+    }
+    return null;
   }
 
   /** Exit directions whose destination room shares this room's zone (roamable). */
