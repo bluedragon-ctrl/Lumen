@@ -132,5 +132,23 @@
     "shardCost": 4,
     "itemCost": [{ "template": "chitin-plate", "qty": 1 }],
     "effect": { "type": "summon", "mob": "glimmer-husk", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "glimmer-husk" }
+  },
+  "drink-light": {
+    "id": "drink-light",
+    "name": "Drink the Light",
+    "description": "Not a weave of light but its unmaking. The dark gathers itself, and the glow is drawn out of the air — torch, lamp, and kindled cantrip all guttering at once — until the chamber drowns in black. It is the working of things that hate the light and cannot bear it on their skin: drink the room dry, and the dark is theirs again. A creature reads the world by other senses than sight, and hunts the blind it leaves behind.",
+    "manaCost": 0,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "emit-light", "name": "Drink the Light", "magnitude": -8, "duration": 6, "refresh": true }
+  },
+  "snuff": {
+    "id": "snuff",
+    "name": "Snuff",
+    "description": "A grasping reach of dark closes over a delver's flame and pinches it dead — torch, lantern, or kindled spark, it makes no difference to the thing that hates them all. The light is simply gone, and must be struck anew in a dark that was only ever waiting for it to fail.",
+    "manaCost": 0,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "douse", "name": "Snuff" }
   }
 }

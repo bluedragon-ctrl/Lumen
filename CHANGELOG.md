@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Gloom-Warren (depth 7) — the first hard tier below the lake.** The low,
+  unstaked passage south of *The Forward Camp* (`deep.camp`) is now traversable and
+  opens into a fully-dark warren of big caves crawling with gloom-crawlers: *Where
+  the Dark Goes Bad* (the threshold), *The Crawling Hall* (a vast swarm gallery),
+  *The Moulting Drift* (a husk-choked branch with an unworked glimmer seam), and
+  *The Drowned Black* (the lair). Difficulty is a clear step above the deep lake:
+  the swarm itself is the threat — many weak crawlers in a dark you can barely see
+  in — anchored by **elder gloom-crawlers** (elite: ~40 hp, armoured, a festering
+  *gloom-rot* bite, too old to flinch from a torch) and a boss, **the Starving
+  Dark**.
+- **The Starving Dark — a living shadow, the first of its kind a delver meets.** A
+  light-vulnerable boss (`lightBane` from *any* light) that fights to take your
+  light away: it **snuffs** your carried flame and **drinks the room to black**,
+  then closes in the dark of its own making (it sees in the black where you flail).
+  Bright light is the weapon that unmakes it — a true tug-of-war over the dark. It
+  answers the question the empty camp asks. The reusable shadow kit below is built
+  so it won't be the last of its kind.
+- **Two reusable darkness mob-abilities** (data-attachable, for the shadow family to
+  come): a `douse` spell effect that snuffs a target's equipped light (new `Snuff`
+  spell), and **darkness auras** via an `emit-light` effect authored with a
+  *negative* magnitude — it subtracts from room light rather than adding (new
+  `Drink the Light` spell, cast on self). `computeRoomLight` already summed source
+  outputs; the self-cast path now preserves a negative magnitude instead of flooring
+  it at zero.
 - **The descent below the lake.** The half-built line at The Far Bank
   (`lake.farshore`) is now made fast and runs `down` into two new rooms forming the
   long descent toward the deep: *The Gullet* (depth 5) — a dark, wet switchback

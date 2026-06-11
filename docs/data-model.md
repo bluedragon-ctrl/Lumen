@@ -515,7 +515,7 @@ An **effect spec** is the descriptor authored on the source (e.g. a consumable's
 
 | Field       | Type    | Notes |
 |-------------|---------|-------|
-| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch); `summon` (see below). |
+| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch — a **negative** `magnitude` is a *darkness aura* that subtracts, drinking the room toward black); `summon` (see below). |
 | `name`      | string  | Display label for the state chip. |
 | `magnitude` | number  | Effect strength (e.g. light output). |
 | `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |

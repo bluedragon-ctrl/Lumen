@@ -802,11 +802,73 @@
     "depth": 6,
     "ambientLight": 0,
     "description": "The throat opens onto a wide, dry ledge set back from the water, and the roar drops to a steady hush below. Prospectors held this place once — the last flat, dry ground before the dark goes bad — and the bones of their camp are still here: a ring of fire-blackened stones, a plank bench knocked together across two crates, a brass lamp standing dark on a flat rock, bedrolls rotted to felt against the wall. They meant to push deeper from here and stage their finds on the climb out. The chalk tallies by the bench break off mid-season, and no one struck the camp or carried it home; it was simply left. It is a good place to strike a light, cook a catch, and gather yourself — for the camp ends where the prospectors' nerve did. A low passage runs on south into a colder dark, unstaked and unmarked, where no line has yet been made fast. The stair climbs back up toward the lake.",
-    "exits": { "up": "deep.gullet" },
+    "exits": { "up": "deep.gullet", "south": "warren.throat" },
     "fixtures": ["camp-lamp", "camp-firepit", "camp-bench", "camp-seep"],
     "groundItems": [
       { "template": "lamp-oil", "qty": 1, "respawn": 600 }
     ],
     "spawns": []
+  },
+  "warren.throat": {
+    "id": "warren.throat",
+    "zone": "gloom-warren",
+    "name": "Where the Dark Goes Bad",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The low passage south of the camp pinches down to a crawl and then lets go all at once into a colder, larger dark. The roar of the lake is gone; there is no glow here, no moss, no growing thing — the stone is dry and dead and the air sits heavy and still, the way air sits in a place that has not been disturbed in a long time. This is where the prospectors' chalk-line ends and their nerve ended with it: the last stake is hammered into the rock just inside the mouth, the line knotted off and cut, going no further. Beyond it the floor is fouled with the litter of old feeding — cracked shell, gnawed bone, pale moulted husks shed by things that grew too big for them — and something low and wet shifts in the black just past the edge of your light. The camp is back to the north. South and down, the warren opens out.",
+    "exits": { "north": "deep.camp", "south": "warren.hall" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 3, "respawn": 30 }
+    ]
+  },
+  "warren.hall": {
+    "id": "warren.hall",
+    "zone": "gloom-warren",
+    "name": "The Crawling Hall",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "A vast black gallery, so wide your light cannot find its walls and so high the ceiling is only a guess — a held breath of a cavern, and you the one small warmth in all of it. The floor is a slow tide of pale bodies: gloom-crawlers in their dozens, flowing over one another and the heaped middens of their feeding, a dry endless rasp of flesh on stone that comes from every side at once. They do not mind the dark; they own it. Raise a light and the nearest of them rouse and turn toward the warmth of it, the whole tide stirring your way — and somewhere out in the black the larger shapes shift, the old ones, too big to hurry and too patient to need to. A side passage breaks off west into a narrower dark; the way deeper drops down; the throat climbs back north.",
+    "exits": { "north": "warren.throat", "west": "warren.drift", "down": "warren.lair" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+    ]
+  },
+  "warren.drift": {
+    "id": "warren.drift",
+    "zone": "gloom-warren",
+    "name": "The Moulting Drift",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The west passage opens into a long, low drift where the crawlers come to shed. The floor climbs in soft pale dunes of moulted husk, knee-deep in places, dry and brittle and whispering underfoot — years of it, the cast skins of a colony that never leaves. The air is thick with a chalk-fine dust that catches in the throat. Bigger husks lie further in, split lengthwise and big as a man, the moults of the old ones; and where the dunes bank against the far wall a seam of raw glimmer crusts the stone, lit cold and faint by its own deep glow, never yet worked by any hand. The hall lies back east.",
+    "exits": { "east": "warren.hall" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 1200 },
+      { "template": "shards", "qty": 6, "respawn": 1200 }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 30 },
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+    ]
+  },
+  "warren.lair": {
+    "id": "warren.lair",
+    "zone": "gloom-warren",
+    "name": "The Drowned Black",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The drop lets you down into the deepest cave of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers thin out and then stop — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends. The only way out is back up.",
+    "exits": { "up": "warren.hall" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "the-starving-dark", "max": 1, "respawn": 1800 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 40 }
+    ]
   }
 }
