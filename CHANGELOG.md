@@ -77,6 +77,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Ambient NPC emotes are half as frequent.** A global `EMOTE_WEIGHT_SCALE`
+  (0.5) thins idle mob chatter to cut console spam, applied to `emote` actions
+  before the per-tick action roll. Targeted `react` actions are exempt — they
+  already carry a per-player cooldown and can deliver quest nudges.
 - The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
   *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
 - The **hungering dagger** now forges from a **silver bar** (was iron) + a
