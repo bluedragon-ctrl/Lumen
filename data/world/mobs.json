@@ -200,7 +200,27 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] }
+      { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "delivery": true }, "messages": [
+          { "target": "catches your eye: \"Those for my pot, love? Hand them over while they're fresh.\"", "room": "catches {name}'s eye and nods at their pack." },
+          { "target": "wipes her hands on her apron: \"Don't keep an old woman waiting on her stores, dear.\"", "room": "wipes her hands on her apron and beckons {name} over to the bar." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "clucks her tongue at your wounds: \"Sit down by the hearth before you fall down, love.\"", "room": "clucks her tongue at {name}'s wounds and points them to the hearth." },
+          { "target": "pushes a bowl of broth at you: \"You're white as a palecap. Eat.\"", "room": "pushes a bowl of broth across the bar at {name}." }
+        ] },
+        { "if": { "slotEmpty": "body" }, "messages": [
+          { "target": "looks you up and down: \"Going below in your shirtsleeves? Garrick sells jerkins, dear.\"", "room": "looks {name} up and down and shakes her head." }
+        ] },
+        { "if": { "equipped": "torch" }, "messages": [
+          { "target": "nods at your torch: \"Keep it dry and keep it lit — the dark down there drinks them fast.\"", "room": "nods at {name}'s torch approvingly." }
+        ] },
+        { "messages": [
+          { "target": "smiles your way: \"Broth's hot, stool's free, and the dark will keep, love.\"", "room": "says a warm word to {name} across the bar." },
+          { "target": "asks after you: \"Still in one piece, then? Good. Stay that way.\"", "room": "asks {name} how the delving's been." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "hearty-broth" }, { "template": "cooked-skewer" }, { "template": "roasted-grubs" }, { "template": "deep-stew" }, { "template": "beer" }, { "template": "book-of-cooking", "price": 8 }, { "template": "book-of-hearty-cooking", "price": 60 }]
