@@ -53,5 +53,78 @@
       "shards": 30,
       "spells": ["spark"]
     }
+  },
+  "wick-bats": {
+    "id": "wick-bats",
+    "name": "Wings over the Hatchery",
+    "description": "Cave-bats come down off the rim in the dark hours and pick Wick's lightbugs off the wire.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-hatcher",
+      "offerText": "\"The bats found my cells,\" Wick says, barely above a whisper. \"They come down in the dark hours and take my bugs off the wire — the poor things go dim with fright for a day after. The colony roosts in the vault past the First Dark. Thin it for me? I'd pay. And the cells would sing for you.\""
+    },
+    "steps": [
+      { "kill": "cave-bat", "count": 4, "text": "Cull 4 cave-bats in the roosts below" }
+    ],
+    "rewards": {
+      "xp": 40,
+      "shards": 20,
+      "items": [{ "template": "minor-light-potion", "qty": 2 }]
+    }
+  },
+  "board-crawler-bounty": {
+    "id": "board-crawler-bounty",
+    "name": "Bounty: Crawlers on the Descent",
+    "description": "The traders pay a standing bounty on the pale crawlers that hunt the dim margins below the descent.",
+    "repeatable": true,
+    "start": {
+      "trigger": "use",
+      "fixture": "notice-board",
+      "offerText": "A posting in Fenn's careful copy-hand: \"BOUNTY, STANDING. The pale crawlers work the dim margins off the First Dark and take the new-come and the wounded. Four culled keeps the descent passable a while. Payment on the traders' purse.\""
+    },
+    "steps": [
+      { "kill": "gloom-crawler", "count": 4, "text": "Cull 4 gloom-crawlers below the descent" }
+    ],
+    "rewards": {
+      "xp": 20,
+      "shards": 15
+    }
+  },
+  "board-venom-proof": {
+    "id": "board-venom-proof",
+    "name": "Proof of Venom",
+    "description": "Centipedes hunt the grazing galleries on the second floor; Fenn pays the bounty on proof of venom.",
+    "repeatable": true,
+    "start": {
+      "trigger": "use",
+      "fixture": "notice-board",
+      "offerText": "A posting stamped twice with Fenn's lead seal: \"BOUNTY. The centipedes in the second-floor galleries grow bold and the graze thins for it. Three culled, and a venom gland on the counter as proof — no gland, no payment. Settled at this office.\""
+    },
+    "steps": [
+      { "kill": "cave-centipede", "count": 3, "text": "Cull 3 cave-centipedes in the grazing galleries" },
+      { "deliver": "venom-gland", "count": 1, "npc": "rim-recorder", "text": "Lay a venom gland on Fenn's counter as proof" }
+    ],
+    "rewards": {
+      "xp": 25,
+      "shards": 15
+    }
+  },
+  "board-tallow-order": {
+    "id": "board-tallow-order",
+    "name": "Standing Order: Tallow",
+    "description": "Garrick renders bug-tallow into lamp-oil and pays a flat rate for lumps of it, no questions asked.",
+    "repeatable": true,
+    "start": {
+      "trigger": "use",
+      "fixture": "notice-board",
+      "offerText": "A posting gone translucent with grease at one corner: \"STANDING ORDER. Bug-tallow, by the lump, flat rate — the lamps don't fill themselves. Bring it to Garrick at the market stall. Don't haggle. He won't.\""
+    },
+    "steps": [
+      { "deliver": "bug-tallow", "count": 3, "npc": "rim-shopkeeper", "text": "Bring 3 lumps of bug-tallow to Garrick" }
+    ],
+    "rewards": {
+      "xp": 15,
+      "shards": 12
+    }
   }
 }

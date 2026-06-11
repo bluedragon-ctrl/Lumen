@@ -184,6 +184,12 @@
     "type": "scenery",
     "restore": { "hp": 2, "mana": 2 }
   },
+  "notice-board": {
+    "id": "notice-board",
+    "name": "the notice board",
+    "description": "A plank board by the door-flap, pinned edge to edge with postings in Fenn's careful copy-hand — standing bounties the traders pay him to broker, supply orders from the row, and claim notices nobody will ever contest. Each one is squared and priced; Fenn charges by the word. Read it over and take what work suits you.",
+    "type": "scenery"
+  },
   "cellar-hatch": {
     "id": "cellar-hatch",
     "name": "a low cellar hatch",

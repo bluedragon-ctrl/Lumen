@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The notice board is up.** Fenn's Claims Office gains a `notice-board` fixture;
+  `use board` reads the postings and picks up the posted work. Three **repeatable**
+  board quests: *Bounty: Crawlers on the Descent* (cull 4 gloom-crawlers),
+  *Proof of Venom* (cull 3 cave-centipedes and lay a venom gland on Fenn's
+  counter — the only posting settled at the office itself), and *Standing Order:
+  Tallow* (bring 3 lumps of bug-tallow to Garrick, closing the stonebug → lamp-oil
+  loop). Fenn and Garrick gain `delivery` reactions so they call you over when you
+  owe them a hand-in. All data-only — the quest engine already supported
+  `use`-trigger starts and `repeatable`.
+- **Wick's first quest.** *Wings over the Hatchery* (`talk wick`): cave-bats are
+  picking her lightbugs off the wire — cull 4 in the roosts below. Pays shards and
+  two minor light potions (her own stock's making).
 - **Two new Rim figures.** **Fenn the claims-recorder** keeps the new **Claims
   Office** (`rim.claims`, a plank-and-canvas annex south of the market) — a
   self-appointed clerk whose chained ledger names every claimed seam below; his
