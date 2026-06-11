@@ -18,7 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `talk <npc>` uses the same reactions: when an NPC has no quest business for you,
   they now answer in character (first reaction matching you, always — though it
   arms the tick cooldown) instead of the generic "has nothing for you right now"
-  (NPCs without reactions keep the shrug).
+  (NPCs without reactions keep the shrug). A finished non-repeatable quest no
+  longer announces "You have already completed …" on talk — the NPC just chats
+  (the quest log still lists it). Authoring guide: templates-quickref "NPC
+  reactions".
 - **Quests — goals that string the world's systems together.** A new data-driven
   quest system (`data/world/quests.json` + `server/quests.js`): a quest is acquired
   by **talking to an NPC**, **using a fixture**, **acquiring an item**, or **entering

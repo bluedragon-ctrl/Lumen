@@ -160,17 +160,14 @@ function advanceIfComplete(state, player, qid, msgs) {
 }
 
 /** Start a quest if the player is eligible (not already active; not done unless
- *  repeatable). `opts.explicit` makes an already-finished quest say so (used by
- *  `talk`). Auto-advances a first step that's already satisfied. */
-function offer(state, player, qid, opts = {}) {
+ *  repeatable — a finished one is offered silently, so `talk` can fall through
+ *  to a `react` answer). Auto-advances a first step that's already satisfied. */
+function offer(state, player, qid) {
   const msgs = [];
   const quest = state.world.quests[qid];
   if (!quest) return msgs;
   if (isActive(player, qid)) return msgs;
-  if (isDone(player, qid) && !quest.repeatable) {
-    if (opts.explicit) msgs.push({ type: "log", text: `You have already completed "${quest.name}".` });
-    return msgs;
-  }
+  if (isDone(player, qid) && !quest.repeatable) return msgs;
   ensure(player).active[qid] = { step: 0, progress: 0 };
   // offerText is authored verbatim (quote NPC speech in the data; leave descriptive
   // item/enter triggers unquoted), shown muted.
@@ -252,7 +249,7 @@ function handleTalk(state, player, mob) {
   const npcName = w.mobs[npc] ? w.mobs[npc].name : "they";
   for (const [qid, quest] of Object.entries(w.quests)) {
     if (!quest.start || quest.start.trigger !== "talk" || quest.start.npc !== npc) continue;
-    msgs.push(...offer(state, player, qid, { explicit: true }));
+    msgs.push(...offer(state, player, qid));
   }
   const q = ensure(player);
   for (const [qid, entry] of Object.entries(q.active)) {
