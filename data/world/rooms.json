@@ -880,9 +880,9 @@
     "name": "The Long Gallery",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The second great cavern of the warren, longer than it is wide — a black gallery that runs on south past the reach of any light a delver carries, the floor sloping gently down the whole way as though the stone itself is leaning toward the deep. The crawlers are thinner here than in the hall but not gone; they flow along the walls and the long centre in loose, restless streams, all of them moving the same way, downslope, as though something below were calling the whole tide of them down. A side gallery opens west, and from it comes a dry, massed rasping louder than anywhere else in the warren. At the gallery's low end the floor gives out entirely into a black shaft dropping down; the hall lies back north.",
+    "description": "The second great cavern of the warren, longer than it is wide — a black gallery that runs on south past the reach of any light a delver carries, the floor sloping gently down the whole way as though the stone itself is leaning toward the deep. A seam of rust-red iron ore shows in one wall, worth the working for a delver with the arm to spare. The crawlers are thinner here than in the hall but not gone; they flow along the walls and the long centre in loose, restless streams, all of them moving the same way, downslope, as though something below were calling the whole tide of them down. A side gallery opens west, and from it comes a dry, massed rasping louder than anywhere else in the warren. At the gallery's low end the floor gives out entirely into a black shaft dropping down; the hall lies back north.",
     "exits": { "north": "warren.hall", "west": "warren.brood", "down": "warren.chasm" },
-    "fixtures": [],
+    "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
@@ -895,9 +895,9 @@
     "name": "The Brood-Heart",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The west gallery chokes down and then opens into a chamber where the crawlers are not streams but a single heaving mass — they pile here thicker than anywhere else in the warren, layered over one another wall to wall and floor to unseen ceiling, a slow churning carpet of pale flesh that never quite stills and never quite quiets, the dry rasp of them filling the dark like surf. Among the smaller bodies the old ones lie half-buried and content, vast and unhurried, and the cast husks drift waist-deep in the corners. Whatever this place is to them — a heart, a hold, the centre they all return to — they suffer no light in it gladly, and the nearest of them are already turning your way. The only way back is east, the way you came.",
+    "description": "The west gallery chokes down and then opens into a chamber where the crawlers are not streams but a single heaving mass — they pile here thicker than anywhere else in the warren, layered over one another wall to wall and floor to unseen ceiling, a slow churning carpet of pale flesh that never quite stills and never quite quiets, the dry rasp of them filling the dark like surf. Among the smaller bodies the old ones lie half-buried and content, vast and unhurried, and the cast husks drift waist-deep in the corners. Where the far wall shows through the press of them, a vein of raw glimmer threads the rock in dull blue-white seams — a rich find, in a place that means to kill you for the reaching of it. Whatever this place is to them — a heart, a hold, the centre they all return to — they suffer no light in it gladly, and the nearest of them are already turning your way. The only way back is east, the way you came.",
     "exits": { "east": "warren.gallery" },
-    "fixtures": [],
+    "fixtures": ["glimmer-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 5, "respawn": 20 },
@@ -910,9 +910,9 @@
     "name": "The Black Chimney",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery.",
+    "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. Where the old water polished the flue smooth, a pale vein of silver ore runs through the rock within arm's reach of the ledge. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery.",
     "exits": { "up": "warren.gallery", "south": "warren.hush" },
-    "fixtures": [],
+    "fixtures": ["silver-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 2, "respawn": 40 }
@@ -924,11 +924,13 @@
     "name": "The Hush",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The passage off the ledge opens into a small, square chamber, and the moment you cross into it the dark changes its quality — the rasp of the crawlers cuts off behind you, the air goes dead and close, and your light shrinks back to a guttering knot, as though the room itself disapproved of it. The walls here are worked: cut square and true, faced smooth by patient hands long ago, and across the far wall an old relief has been carved — a band of flowing Umbral glyphs gone soft at the edges with age, and at their centre a single hard mark, struck deep and unmistakable in any tongue. It means turn back. Whatever the deep-folk knew when they cut it, they cut it to keep something on the far side of this room, and they did not come back to tend it. The crawlers will not cross the worked threshold; they gather at the passage mouth behind you and no further. Ahead, south, the dark waits. The chimney is back north.",
+    "description": "The passage off the ledge opens into a small, square chamber, and the moment you cross into it the dark changes its quality — the rasp of the crawlers cuts off behind you, the air goes dead and close, and your light shrinks back to a guttering knot, as though the room itself disapproved of it. The walls here are worked: cut square and true, faced smooth by patient hands long ago, and across the far wall an old relief has been carved — a band of flowing Umbral glyphs gone soft at the edges with age, and at their centre a single hard mark, struck deep and unmistakable in any tongue. It means turn back. Whatever the deep-folk knew when they cut it, they cut it to keep something on the far side of this room, and they did not come back to tend it. The crawlers will not cross the worked threshold; they gather at the passage mouth behind you and no further. Something grows here even so: in the cracks of the old worked stone a pale, lightless fungus has taken hold, and a few grubs inch blindly through it, chewing their slow pale trails — the only life willing to share this room with what waits beyond it. Ahead, south, the dark waits. The chimney is back north.",
     "exits": { "north": "warren.chasm", "south": "warren.relict" },
-    "fixtures": [],
+    "fixtures": ["gloom-fungus"],
     "groundItems": [],
-    "spawns": []
+    "spawns": [
+      { "mob": "grub", "max": 3, "respawn": 90 }
+    ]
   },
   "warren.relict": {
     "id": "warren.relict",

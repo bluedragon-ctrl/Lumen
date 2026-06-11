@@ -22,7 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the swarm itself is the threat — many weak crawlers in a dark you can barely see
   in — anchored by **elder gloom-crawlers** (elite: ~40 hp, armoured, a festering
   *gloom-rot* bite, too old to flinch from a torch) and a boss, **the Starving
-  Dark**.
+  Dark**. The warren also carries its own resource nodes: an **iron vein** (The
+  Long Gallery), a **silver vein** (The Black Chimney), and a **mineable glimmer
+  crystal** won at the swarm's heart (The Brood-Heart, via a new `glimmer-vein`
+  fixture), plus a forage pocket in The Hush — a lightless cave-fungus patch (new
+  `gloom-fungus` fixture, sheds no light) with a few grubs feeding on it.
 - **The Starving Dark — a living shadow, the first of its kind a delver meets.** A
   light-vulnerable boss (`lightBane` from *any* light) that fights to take your
   light away: it **snuffs** your carried flame and **drinks the room to black**,
