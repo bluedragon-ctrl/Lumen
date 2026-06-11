@@ -92,6 +92,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Two mushroom-cluster fixtures instead of three.** The `glow-caps` and
+  `gloom-fungus` fixtures both yielded the same `palecap-mushroom` under different
+  names — confusing. They're merged into a single **`pale-cluster`** ("a cluster of
+  pale mushrooms", still emits a faint light) used across the abyss/grazing rooms,
+  leaving a clean two-type split: the pale cluster (→ palecap) and the glowing
+  `witchglow-cluster` (→ witchglow-cap). The merged cluster is **removed from The
+  Hush** (depth 7) to keep the Gloom-Warren dark — that room keeps its lightless
+  scenery fungus and grubs, but no longer offers a palecap harvest node.
 - **Glimmersteel gear is gated through Tobin.** The glimmersteel sword recipe is no
   longer a standalone schematic — it's folded into the new Book of Glimmersteel (with
   the warhammer, cuirass, and helm). The bar recipe (`schematic-glimmersteel-bar`)
