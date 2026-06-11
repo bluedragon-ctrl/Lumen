@@ -578,12 +578,21 @@ function buyPrice(offer, t) {
   return offer && offer.price != null ? offer.price : buyValueOf(t);
 }
 
+// An offer the player is currently allowed to buy. `requiresQuest` keeps stock
+// hidden until that quest is finished — the item only joins the trader's wares
+// once it sits in player.quests.done. Ungated offers are always available.
+function offerUnlocked(player, offer) {
+  if (!offer.requiresQuest) return true;
+  return !!(player.quests && player.quests.done && player.quests.done.includes(offer.requiresQuest));
+}
+
 function shopList(state, player) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
   const lines = [`${sh.t.name} trades:`];
-  const sells = sh.t.shop.sells || [];
+  // Quest-gated stock stays out of the list entirely until earned (offerUnlocked).
+  const sells = (sh.t.shop.sells || []).filter((o) => offerUnlocked(player, o));
   const purse = player.shards || 0;
   if (sells.length) {
     lines.push("Sells (you buy):");
@@ -605,7 +614,7 @@ function buy(state, player, arg, ctx) {
   const w = state.world;
   const ql = arg.toLowerCase();
   const offer = (sh.t.shop.sells || []).find(
-    (s) => s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql)
+    (s) => offerUnlocked(player, s) && (s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql))
   );
   if (!offer) return [{ type: "error", text: `${sh.t.name} doesn't sell "${arg}".` }];
   const name = w.items[offer.template].name;

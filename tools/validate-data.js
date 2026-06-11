@@ -244,6 +244,7 @@ function main() {
       for (const o of m.shop.sells || []) {
         if (!has(items, o.template)) errs.push(`mob ${id}: shop.sells missing template ${o.template}`);
         if (o.price != null && (typeof o.price !== "number" || o.price < 0)) errs.push(`mob ${id}: shop.sells price for ${o.template} must be a non-negative number`);
+        if (o.requiresQuest != null && !has(quests, o.requiresQuest)) errs.push(`mob ${id}: shop.sells requiresQuest ${o.requiresQuest} for ${o.template} is not a known quest`);
       }
     }
     for (const a of m.actions || []) {

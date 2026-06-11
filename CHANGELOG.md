@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Quest-gated shop stock.** A trader's `shop.sells` offer may carry a
+  `requiresQuest` id; the item stays hidden from `list` and unbuyable until the
+  player has finished that quest (it sits in `quests.done`). Lets vendors reveal
+  new wares as a reward for completed work. Data-driven — no new command.
 - **The descent below the lake.** The half-built line at The Far Bank
   (`lake.farshore`) is now made fast and runs `down` into two new rooms forming the
   long descent toward the deep: *The Gullet* (depth 5) — a dark, wet switchback
