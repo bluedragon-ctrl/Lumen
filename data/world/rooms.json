@@ -583,6 +583,7 @@
     "ambientLight": 0,
     "description": "The falls have gnawed a deep pocket back into the rock here, and the river's overspill gathers in a broad, cold plunge-pool that fills most of the floor. The roar of the cataract comes muffled through the stone, and the dark is total but for what light a delver brings. This is no quiet fishing-hole: pale crayfish own the water, eyeless and armoured, claws raised at anything that nears their pool — they swarm the fish the falls wash down, and will turn those same claws on a careless hand. The way out is back south, through the spray.",
     "exits": { "south": "third.falls" },
+    "hiddenExits": { "down": { "to": "warren.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [
@@ -910,8 +911,9 @@
     "name": "The Black Chimney",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. Where the old water polished the flue smooth, a pale vein of silver ore runs through the rock within arm's reach of the ledge. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery.",
+    "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. Where the old water polished the flue smooth, a pale vein of silver ore runs through the rock within arm's reach of the ledge. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery. One stretch of the western wall is split by a flowstone-choked fissure, and a faint draught breathes out of it — warmer and wetter than the warren's dead air, carrying the far ghost of running water, as though the crack climbed toward the living river somewhere high above.",
     "exits": { "up": "warren.gallery", "south": "warren.hush" },
+    "hiddenExits": { "west": { "to": "third.cave", "perception": 4, "name": "a flowstone fissure climbing toward far-off water" } },
     "fixtures": ["silver-vein"],
     "groundItems": [],
     "spawns": [

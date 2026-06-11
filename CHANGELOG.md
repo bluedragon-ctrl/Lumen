@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A hidden vertical shortcut between depth 3 and depth 7.** The Plunge Cave
+  (`third.cave`, depth 3) and the Gloom-Warren's *Black Chimney* (`warren.chasm`,
+  depth 7) are linked by a concealed flue worn by the river's overspill — a steep
+  shortcut between the two tiers. Hidden from **both** sides: the bottom end (a
+  flowstone fissure in the chimney's west wall) is hinted in the room description
+  and found by `search` at **perception 4** — a fast way back up for a delver deep
+  in the warren; the top end (a drowned crack under the plunge-pool) is unhinted and
+  gated at **perception 8**, so only a sharp-eyed delver finds the way down from
+  above. Reuses the existing hidden-exit/search mechanic; no code changes.
 - **The Gloom-Warren (depth 7) — the first hard tier below the lake.** The low,
   unstaked passage south of *The Forward Camp* (`deep.camp`) is now traversable and
   opens into a ten-room, fully-dark warren of big caves crawling with gloom-crawlers.
