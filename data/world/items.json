@@ -520,6 +520,19 @@
     "weapon": { "damage": { "physical": "1d8" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 12 },
     "armour": { "attrMod": { "might": 1 } }
   },
+  "glimmersteel-warhammer": {
+    "id": "glimmersteel-warhammer",
+    "rarity": "rare",
+    "name": "a glimmersteel warhammer",
+    "keywords": ["warhammer", "hammer", "maul", "glimmersteel"],
+    "description": "A great two-fisted head of glimmer-alloyed steel on a banded haft, a vein of cold captive light pooling in the striking face. It is slow off the mark and asks a strong back — but a delver who puts their weight behind it brings the whole brutal mass down on a single point, crushing through shell and plate that would turn a blade. Tobin's heaviest work.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 5,
+    "value": 200,
+    "weapon": { "damage": { "physical": "1d12" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 16 },
+    "armour": { "attrMod": { "might": 1 } }
+  },
   "glimmersteel-staff": {
     "id": "glimmersteel-staff",
     "rarity": "rare",
@@ -1119,12 +1132,12 @@
     "rarity": "rare",
     "name": "the Book of Glimmersteel",
     "keywords": ["book", "glimmersteel", "tobin", "tome"],
-    "description": "A slim, careful volume bound in oiled vellum — Tobin's collected glimmer-work, set down at last in a fairer hand than his own soot-smudged diagrams. The folding and quenching of a glimmersteel blade, the paring and curving of a cuirass, the doming of a helm, each drawn so the captive light beds into the metal instead of guttering out. He parts with it dearly, and only once you've the bar-work to follow it. Study it to fix the whole gear-line in memory at once.",
+    "description": "A slim, careful volume bound in oiled vellum — Tobin's collected glimmer-work, set down at last in a fairer hand than his own soot-smudged diagrams. The folding and quenching of a glimmersteel blade, the casting of a great warhammer's head, the paring and curving of a cuirass, the doming of a helm, each drawn so the captive light beds into the metal instead of guttering out. He parts with it dearly, and only once you've the bar-work to follow it. Study it to fix the whole gear-line in memory at once.",
     "type": "book",
     "weight": 1,
     "value": 250,
     "stackable": true,
-    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm"] }
+    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-warhammer", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm"] }
   },
   "schematic-gloom-silk": {
     "id": "schematic-gloom-silk",

@@ -314,6 +314,16 @@
     "shards": 10,
     "output": { "template": "glimmersteel-sword", "qty": 1 }
   },
+  "forge-glimmersteel-warhammer": {
+    "id": "forge-glimmersteel-warhammer",
+    "name": "Glimmersteel Warhammer",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 3 }
+    ],
+    "shards": 12,
+    "output": { "template": "glimmersteel-warhammer", "qty": 1 }
+  },
   "forge-glimmersteel-cuirass": {
     "id": "forge-glimmersteel-cuirass",
     "name": "Glimmersteel Cuirass",

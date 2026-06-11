@@ -13,9 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   captive light keeps a delver's ear for the dark sharp. Sits between the chitin and
   dense-chitin tiers as the best-balanced gear, distinct from the unique kingshell
   caster shell.
+- **Glimmersteel warhammer.** A rare two-hander forged from 3 glimmersteel bars —
+  `1d12` damage at `actionCost 16` (vs the sword's `1d8`/12) with the same Might
+  scaling and `+1 Might`. Slower but far harder per blow: fewer big hits beat many
+  small ones against armoured foes, where the sword stays better against fast,
+  evasive targets — two distinct glimmersteel playstyles.
 - **The Book of Glimmersteel.** A rare tome sold by **Tobin** that teaches his whole
-  glimmersteel gear-line at once — the sword, cuirass, and helm. Replaces the separate
-  glimmersteel-sword schematic.
+  glimmersteel gear-line at once — the sword, warhammer, cuirass, and helm. Replaces
+  the separate glimmersteel-sword schematic.
 - **The Pale King's armour is now Mallki's to teach.** Looting a **kingshell plate**
   from the Pale King auto-offers a quest, *The King's Shell*, to carry it to
   **Mallki** — who returns the plate and grants the **kingshell method**
