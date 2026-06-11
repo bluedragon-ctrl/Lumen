@@ -314,6 +314,26 @@
     "shards": 10,
     "output": { "template": "glimmersteel-sword", "qty": 1 }
   },
+  "forge-glimmersteel-cuirass": {
+    "id": "forge-glimmersteel-cuirass",
+    "name": "Glimmersteel Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 3 }
+    ],
+    "shards": 12,
+    "output": { "template": "glimmersteel-cuirass", "qty": 1 }
+  },
+  "forge-glimmersteel-helm": {
+    "id": "forge-glimmersteel-helm",
+    "name": "Glimmersteel Helm",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 8,
+    "output": { "template": "glimmersteel-helm", "qty": 1 }
+  },
   "craft-glimmersteel-staff": {
     "id": "craft-glimmersteel-staff",
     "name": "Glimmersteel Staff",

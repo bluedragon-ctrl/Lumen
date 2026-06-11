@@ -532,6 +532,30 @@
     "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12 },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
   },
+  "glimmersteel-cuirass": {
+    "id": "glimmersteel-cuirass",
+    "rarity": "rare",
+    "name": "a glimmersteel cuirass",
+    "keywords": ["cuirass", "glimmersteel", "plate", "armour"],
+    "description": "A cuirass of glimmer-alloyed steel, the plate pared thin and curved close, threads of captive light running cold through the grey. It turns a blow as well as a slab of stacked chitin at a fraction of the heft — and where honest iron rides heavy and closes a delver off from the dark, the glimmer in this keeps the senses clear. Tobin's finest work, and priced like it.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 4,
+    "value": 200,
+    "armour": { "armour": 3, "ward": 1, "speedPenalty": 0 }
+  },
+  "glimmersteel-helm": {
+    "id": "glimmersteel-helm",
+    "rarity": "rare",
+    "name": "a glimmersteel helm",
+    "keywords": ["helm", "glimmersteel", "dome", "armour"],
+    "description": "A close dome of glimmer-alloyed steel with a narrow light-bar at the brow, a vein of cold captive light tracing the crown. It shrugs off a blow as iron does, but sits light and never muffles the ear — the glimmer keeps the wearer's wariness sharp where a plain helm would dull it.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 1,
+    "value": 130,
+    "armour": { "armour": 2, "ward": 1, "speedPenalty": 0 }
+  },
   "starsilver-bar": {
     "id": "starsilver-bar",
     "rarity": "rare",
@@ -593,16 +617,6 @@
     "value": 20,
     "stackable": true,
     "recipe": "render-lamp-oil"
-  },
-  "schematic-glimmersteel-sword": {
-    "id": "schematic-glimmersteel-sword",
-    "name": "a glimmersteel sword schematic",
-    "description": "A careful smith's diagram on oiled vellum — the folding and quenching of glimmer-alloyed steel into a blade that keeps its cold edge. Tobin charges dearly for it; the method is hard-won and the stock dearer. Study it to fix the method in memory.",
-    "type": "recipe",
-    "weight": 0,
-    "value": 80,
-    "stackable": true,
-    "recipe": "forge-glimmersteel-sword"
   },
   "schematic-glimmersteel-coil": {
     "id": "schematic-glimmersteel-coil",
@@ -1099,6 +1113,18 @@
     "value": 400,
     "stackable": true,
     "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
+  },
+  "book-of-glimmersteel": {
+    "id": "book-of-glimmersteel",
+    "rarity": "rare",
+    "name": "the Book of Glimmersteel",
+    "keywords": ["book", "glimmersteel", "tobin", "tome"],
+    "description": "A slim, careful volume bound in oiled vellum — Tobin's collected glimmer-work, set down at last in a fairer hand than his own soot-smudged diagrams. The folding and quenching of a glimmersteel blade, the paring and curving of a cuirass, the doming of a helm, each drawn so the captive light beds into the metal instead of guttering out. He parts with it dearly, and only once you've the bar-work to follow it. Study it to fix the whole gear-line in memory at once.",
+    "type": "book",
+    "weight": 1,
+    "value": 250,
+    "stackable": true,
+    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm"] }
   },
   "schematic-gloom-silk": {
     "id": "schematic-gloom-silk",

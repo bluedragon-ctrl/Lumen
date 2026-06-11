@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glimmersteel armour.** Two new rare pieces forged from glimmersteel bars at the
+  smithing station: a **glimmersteel cuirass** (`armour 3, ward 1`, 3 bars) and a
+  **glimmersteel helm** (`armour 2, ward 1`, 2 bars). Their niche is protection
+  *without* the senses-dulling `wits` penalty every iron/chitin plate carries — the
+  captive light keeps a delver's ear for the dark sharp. Sits between the chitin and
+  dense-chitin tiers as the best-balanced gear, distinct from the unique kingshell
+  caster shell.
+- **The Book of Glimmersteel.** A rare tome sold by **Tobin** that teaches his whole
+  glimmersteel gear-line at once — the sword, cuirass, and helm. Replaces the separate
+  glimmersteel-sword schematic.
 - **The Pale King's armour is now Mallki's to teach.** Looting a **kingshell plate**
   from the Pale King auto-offers a quest, *The King's Shell*, to carry it to
   **Mallki** — who returns the plate and grants the **kingshell method**
@@ -77,6 +87,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Glimmersteel gear is gated through Tobin.** The glimmersteel sword recipe is no
+  longer a standalone schematic — it's folded into the new Book of Glimmersteel (with
+  the cuirass and helm). The bar recipe (`schematic-glimmersteel-bar`) remains the
+  separate gating prerequisite Tobin sells, and the lamp, coil, and staff schematics
+  are unchanged (staff still Vesper's).
 - **Ambient NPC emotes are half as frequent.** A global `EMOTE_WEIGHT_SCALE`
   (0.5) thins idle mob chatter to cut console spam, applied to `emote` actions
   before the per-tick action roll. Targeted `react` actions are exempt — they
