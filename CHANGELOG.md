@@ -138,6 +138,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
 ### Changed
+- **Leaner starting loadout.** A new delver now begins with a single **short sword,
+  unequipped** (was an equipped sword *plus* a spare in the pack) and **no Scroll of
+  Spark** — first weapon and first spell are now choices to make, not freebies. Still
+  starts with a torch; all equipment slots remain seeded empty so `unequip` works.
 - **`help` is reorganised, coloured, and admin-aware.** The flat command list is now
   grouped into titled sections (Exploration, Items & gear, Combat & magic, Gathering
   & crafting, People & trade, Resting) with a catch-all **Other** before the admin
