@@ -13,8 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Reactions are authored in priority order with `{target, room}` message pairs
   (the target reads second person, bystanders read third person with the player's
   name), and a per-player cooldown rotates the NPC's attention between players.
-  **Maeve the innkeeper** is the first to use it; any NPC can gain reactions with
-  a pure `mobs.json` edit. Validator checks the shape; data model documents it.
+  All talking traders use it — **Maeve** (the PoC), **Garrick** (gruff upsells),
+  **Tobin** (scattered tinker-talk), **Vesper** (cool appraisals; delivery nudges
+  for her two quests), and **Mallki** (slow Umbral courtesy; flinches from carried
+  lanterns/torches) — and any NPC can gain reactions with a pure `mobs.json`
+  edit. Validator checks the shape; data model documents it.
   `talk <npc>` uses the same reactions: when an NPC has no quest business for you,
   they now answer in character (first reaction matching you, always — though it
   arms the tick cooldown) instead of the generic "has nothing for you right now"

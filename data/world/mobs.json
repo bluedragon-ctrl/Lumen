@@ -240,7 +240,22 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] }
+      { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "slotEmpty": "body" }, "messages": [
+          { "target": "jerks a thumb at the armour rack: \"Going down bare-backed? Your funeral. Jerkins are priced on the wall.\"", "room": "jerks a thumb from {name} to the armour rack." }
+        ] },
+        { "if": { "equipped": "torch" }, "messages": [
+          { "target": "eyes your torch: \"Burns fast, that. Lanterns cost more because they're worth more.\"", "room": "eyes {name}'s torch and shakes his head." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "looks you over: \"Patch yourself up before you shop. Dead men's shards roll under my floorboards.\"", "room": "looks {name}'s wounds over with a coin-counter's squint." }
+        ] },
+        { "messages": [
+          { "target": "grunts: \"Buy something or stand somewhere else.\"", "room": "grunts at {name} and goes back to his ledger." },
+          { "target": "squints at you: \"Gear costs what it costs. Complaints are free.\"", "room": "squints at {name}, then at his ledger." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "schematic-render-oil" }]
@@ -260,7 +275,22 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] }
+      { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "equipped": "rusted-blade" }, "messages": [
+          { "target": "winces at your rusted blade: \"I could do better than that with my eyes shut. Half shut, anyway.\"", "room": "winces at {name}'s rusted blade." }
+        ] },
+        { "if": { "slotEmpty": "hand" }, "messages": [
+          { "target": "blinks at your empty hands: \"No tool, no blade? Bold. Wrong, but bold.\"", "room": "blinks at {name}'s empty hands." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "glances up from the anvil: \"You look half-finished. Most of my best work does, mind.\"", "room": "glances at {name}'s wounds, then back to his anvil." }
+        ] },
+        { "messages": [
+          { "target": "holds up two odd parts: \"Which fits where, d'you think? No — don't tell me.\"", "room": "holds up two odd parts for {name} to judge." },
+          { "target": "mutters: \"Glimmersteel, see, the trick is the quench—\" and loses the thread.", "room": "starts explaining the quench to {name} and loses the thread." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "schematic-glimmersteel-sword" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
@@ -300,7 +330,21 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] }
+      { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "delivery": true }, "messages": [
+          { "target": "looks up from her bench: \"You have something of mine, I believe. Let's see it.\"", "room": "marks {name} with a cool, appraising eye." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "appraises your wounds coolly: \"Blood loss dulls the mind. See to it; I have no use for dull minds.\"", "room": "appraises {name}'s wounds with detached interest." }
+        ] },
+        { "if": { "slotEmpty": "light" }, "messages": [
+          { "target": "arches a brow: \"Into the dark with no light at all? Courage and folly share a border.\"", "room": "arches a brow at {name}." }
+        ] },
+        { "messages": [
+          { "target": "studies you as though reading a page: \"Ask, if you've a question worth the candle.\"", "room": "studies {name} as though reading a page." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "scroll-candlelight" }, { "template": "scroll-spark" }, { "template": "scroll-bolt" }, { "template": "scroll-witchfire" }, { "template": "scroll-arc-flash" }, { "template": "scroll-sleep" }, { "template": "scroll-mage-armour" }, { "template": "scroll-regeneration" }, { "template": "scroll-summon-wisp" }, { "template": "schematic-glimmer-dust" }, { "template": "schematic-pressed-glimmer-dust" }, { "template": "schematic-glimmersteel-staff" }, { "template": "schematic-starsilver" }, { "template": "schematic-ring-of-sight" }, { "template": "schematic-ring-of-wits" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
@@ -613,7 +657,22 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] }
+      { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "equipped": "lantern" }, "messages": [
+          { "target": "turns his face from the brightness of your lantern: \"Softly, yaku-runa. Your light presses on my eyes.\"", "room": "turns his face from the brightness of {name}'s lantern." }
+        ] },
+        { "if": { "equipped": "torch" }, "messages": [
+          { "target": "tilts his head away from your torch: \"Your fire is loud where mine is soft, yaku-runa.\"", "room": "tilts his head away from {name}'s torch." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "regards your wounds without alarm: \"The deep takes its toll in blood first, yaku-runa. Pay it less.\"", "room": "regards {name}'s wounds with wide, lightless eyes." }
+        ] },
+        { "messages": [
+          { "target": "inclines his head, slow and unhurried: \"Trade, or talk. Both are welcome. Both cost time.\"", "room": "inclines his head to {name}, slow and unhurried." },
+          { "target": "says, slow and careful: \"The river brought you. It will take you back — one way or the other.\"", "room": "says something slow and careful to {name} in the rounded Umbral tongue." }
+        ] }
+      ] }
     ],
     "shop": {
       "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-kingshell-cuirass" }, { "template": "schematic-dense-chitin-cuirass" }]
