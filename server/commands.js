@@ -47,52 +47,114 @@ const VERBS = [
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
-  "mine", "dig", "gather", "forage", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  "mine", "dig", "gather", "forage", "harvest", "pick", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   "talk", "give", "deliver", "quest", "quests", "journal",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
 ];
 const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-letter aliases
 
-const HELP = [
-  "Commands:",
-  "  look | examine | x [target] — view the room, or examine something",
-  "  search                — comb the room for hidden things (needs light + Perception)",
-  "  north/south/east/west/up/down (or n/s/e/w/u/d) — move",
-  "  get | take | pickup <target> — pick up an item",
-  "  drop <target>         — drop an item",
-  "  inventory | inv | i   — list what you are carrying",
-  "  attack | kill <target> — attack a creature (stop to break off)",
-  "  sit | rest            — sit to recover HP/MP slowly (1 per 5 ticks)",
-  "  sleep                 — sleep to recover faster (1 per 2 ticks), but blind",
-  "  stand | wake          — get up; moving or attacking also stands you",
-  "  cast | c <spell> <target> — cast a spell you know at a creature",
-  "  learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
-  "  spells                — list the spells you know",
-  "  train [attribute]     — spend a level-up point on an attribute (no arg: show progress)",
-  "  equip | wield | wear <item> — equip from inventory (a light source kindles as you equip it)",
-  "  unequip | remove <item|slot> — return equipped gear to inventory",
-  "  list | shop           — see what a trader here buys and sells",
-  "  buy <item>            — buy from a trader here",
-  "  sell <item>           — sell to a trader here",
-  "  recipes               — list recipes you know",
-  "  craft | make <recipe> — craft at the matching station here",
-  "  mine | dig [vein]     — work ore loose from a vein in the room",
-  "  gather | forage [cluster] — pick mushrooms or other crops by hand (also `use <cluster>`)",
-  "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
-  "  drink | quaff | eat <item> — consume a potion or food",
-  "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
-  "  talk <npc>            — speak with a creature (take quests, hear what they need)",
-  "  give <item> <npc>     — hand an item to someone (deliver quest goods)",
-  "  quest | journal       — your quest log (in progress / finished)",
-  "  say <text>            — speak to others in the room",
-  "  emote | me <text>     — perform an action",
-  "  refuel | fill <item>  — refill a fuelled light (e.g. a lantern with oil)",
-  "  help | ?              — this list",
-  "",
-  "Commands can be shortened to any unambiguous prefix (exa→examine, cr→craft).",
-  "Target things by any word in their name (kill innkeeper, get glimmerstone).",
-].join("\n");
+// Help is authored as titled sections of `signature — description` entries, then
+// rendered with inline colour markup (see renderMarkup in the client): section
+// titles glow gold, command signatures green, the rest reads in the default ink.
+// `<#reset>` returns to default colour mid-line (any non-palette tag does).
+const HELP_SECTIONS = [
+  ["Exploration", [
+    "look | examine | x [target] — view the room, or look closely at one thing",
+    "search — comb the room for hidden ways and things (needs light + Perception)",
+    "north / south / east / west / up / down (n/s/e/w/u/d) — move between rooms",
+  ]],
+  ["Items & gear", [
+    "get | take [N.]<item> | all — pick something up off the floor",
+    "drop <item> | all — set something down",
+    "inventory | inv | i — list what you are carrying",
+    "equip | wield | wear <item> — put on gear (a light source kindles as you equip it)",
+    "unequip | remove <item|slot> — return equipped gear to your pack",
+    "use | switch <target> — work a fixture, or use/light a carried item",
+    "drink | quaff | eat <item> — consume a potion or food",
+    "refuel | fill <item> — refill a fuelled light (a lantern with oil)",
+  ]],
+  ["Combat & magic", [
+    "attack | kill [N.]<target> — set on a creature (stop to break off)",
+    "stop — break off your attack",
+    "cast | c <spell> [target] — cast a spell you know",
+    "spells — list the spells you know",
+  ]],
+  ["Gathering & crafting", [
+    "mine | dig [vein] — work ore loose from a vein",
+    "gather | pick | forage [cluster] — pick moss, mushrooms and crops by hand",
+    "fish | angle [water] — work a baited line (spends a grub as bait)",
+    "craft | make <recipe> — craft at the matching station here",
+    "recipes — list the recipes you know",
+  ]],
+  ["People & trade", [
+    "talk <npc> — speak with someone (take quests, hear what they need)",
+    "give <item> <npc> — hand something over (deliver quest goods)",
+    "list | shop — see what a trader here buys and sells",
+    "buy <item> — buy from a trader here",
+    "sell <item> | all — sell to a trader here",
+    "say <text> — speak to everyone in the room",
+    "emote | me <text> — perform an action others can see",
+  ]],
+  ["Resting", [
+    "sit | rest — recover HP/MP slowly (1 per 5 ticks)",
+    "sleep — recover faster (1 per 2 ticks), but blind while you do",
+    "stand | wake — get up; moving or attacking also stands you",
+  ]],
+  ["Other", [
+    "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
+    "train [attribute] — spend a level-up point (no arg: show progress)",
+    "quest | journal — your quest log (in progress / finished)",
+    "help | ? — this list",
+  ]],
+];
+
+const HELP_TIPS = [
+  "Commands shorten to any unambiguous prefix (exa→examine, cr→craft).",
+  "Target by any word in a name (kill innkeeper, get glimmerstone). When several",
+  "match, pick one with a number (kill 2.crawler) or act on all (get all, sell all).",
+];
+
+const ADMIN_HELP_SECTION = ["Admin", [
+  "@create-player <name> — create a new player account",
+  "@list-players — list every account",
+  "@shards <amount> — grant yourself shards",
+  "@xp <amount> — grant yourself experience",
+  "@attr <attribute> <value> — set one of your attributes",
+  "@spawn <mobId> [count] [wild|player] — spawn mobs in this room",
+  "@give <itemId> [count] — conjure an item into your pack",
+]];
+
+// Colour one "signature — description" entry: green signature, default rest.
+function helpEntry(entry) {
+  const i = entry.indexOf(" — ");
+  if (i < 0) return `  <#green>${entry}<#reset>`;
+  return `  <#green>${entry.slice(0, i)}<#reset> — ${entry.slice(i + 3)}`;
+}
+
+function renderHelpSections(sections, title) {
+  const out = [`<#gold>${title}<#reset>`];
+  for (const [heading, entries] of sections) {
+    out.push("", `<#cyan>${heading}<#reset>`);
+    for (const e of entries) out.push(helpEntry(e));
+  }
+  return out;
+}
+
+// The help text for a given player: the standard sections plus footer tips, and
+// the admin section appended only when the player can actually use those verbs.
+function buildHelp(player) {
+  const lines = renderHelpSections(HELP_SECTIONS, "Commands");
+  if (player && player.isAdmin) {
+    lines.push("", `<#cyan>${ADMIN_HELP_SECTION[0]}<#reset>`);
+    for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));
+  }
+  lines.push("", ...HELP_TIPS.map((t) => `<#gray>${t}<#reset>`));
+  return lines.join("\n");
+}
+
+// Back-compat export: the non-admin help string.
+const HELP = buildHelp(null);
 
 const selfAndViews = (state, player, line, kind = "log") => [
   { type: kind, text: line },
@@ -136,9 +198,60 @@ function matchesQuery(q, name, keywords, id) {
   return (name || "").toLowerCase().includes(ql);
 }
 
-// Find an item instance matching `q` (by id, keyword, or name) within a list.
+// DikuMUD-style target syntax: split a query into an optional `all` flag, an
+// optional 1-based ordinal (`2.crawler` → the second crawler), and the bare
+// keyword to match. `all`/`all.keyword` set `all` and zero the ordinal.
+//   "all"        -> { all:true,  ordinal:0, keyword:"" }
+//   "all.shard"  -> { all:true,  ordinal:0, keyword:"shard" }
+//   "2.dagger"   -> { all:false, ordinal:2, keyword:"dagger" }
+//   "dagger"     -> { all:false, ordinal:1, keyword:"dagger" }
+function parseTarget(arg) {
+  let q = (arg || "").trim();
+  const lead = q.toLowerCase();
+  if (lead === "all" || lead.startsWith("all.")) {
+    return { all: true, ordinal: 0, keyword: q.slice(3).replace(/^\./, "").trim() };
+  }
+  const m = /^(\d+)\.(.+)$/.exec(q);
+  if (m) return { all: false, ordinal: parseInt(m[1], 10) || 1, keyword: m[2].trim() };
+  return { all: false, ordinal: 1, keyword: q };
+}
+
+// Indices in `list` whose item matches `keyword` (an empty keyword matches all),
+// preserving list order — the basis for ordinal and `all` selection.
+function itemMatches(list, world, keyword) {
+  const idxs = [];
+  list.forEach((i, idx) => {
+    const t = world.items[i.template];
+    if (!keyword || matchesQuery(keyword, t.name, t.keywords, i.id)) idxs.push(idx);
+  });
+  return idxs;
+}
+
+// Find a single item instance matching `q`, honouring an `N.` ordinal prefix.
+// Returns the list index, or -1. A bare `all` (no keyword) isn't a single
+// target, so it finds nothing — bulk commands check `parseTarget().all` first.
 function findItem(list, world, q) {
-  return list.findIndex((i) => matchesQuery(q, world.items[i.template].name, world.items[i.template].keywords, i.id));
+  const { ordinal, keyword } = parseTarget(q);
+  if (!keyword) return -1;
+  const idxs = itemMatches(list, world, keyword);
+  const pick = idxs[(ordinal || 1) - 1];
+  return pick === undefined ? -1 : pick;
+}
+
+// Resolve a mob in the player's room by query, honouring an `N.` ordinal prefix.
+// `requireVisible` gates hidden-mob reveals; `cast` historically skips that
+// check, so it passes false. Returns the mob instance or null.
+function findMobInRoom(state, player, q, requireVisible = true) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const { ordinal, keyword } = parseTarget(q);
+  if (!keyword) return null;
+  const matches = rt.mobs.filter((m) => {
+    const t = w.mobs[m.template];
+    return (!requireVisible || mobVisibleTo(state, player, m)) && (see || t.emitsLight) && matchesQuery(keyword, t.name, t.keywords, m.id);
+  });
+  return matches[(ordinal || 1) - 1] || null;
 }
 
 function addToInventory(player, inst, world) {
@@ -364,40 +477,75 @@ function unequip(state, player, arg, ctx) {
 
 function get(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Get what?" }];
+  const w = state.world;
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light)) return [{ type: "error", text: "It is too dark to find anything." }];
   // Undiscovered hidden items aren't pickable by name — you must `search` first.
   const visible = rt.items.filter((i) => itemVisibleTo(player, i));
-  const vIdx = findItem(visible, state.world, arg);
-  if (vIdx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
-  const inst = rt.items.splice(rt.items.indexOf(visible[vIdx]), 1)[0];
-  const t = state.world.items[inst.template];
-  // Currency isn't carried as an item — gathering it tallies to the purse.
-  if (t.type === "currency") {
-    const amt = inst.qty || 1;
-    player.shards = (player.shards || 0) + amt;
-    const noun = `${amt} shard${amt === 1 ? "" : "s"}`;
-    ctx.toRoom(player.location, { type: "log", text: `${player.name} gathers ${noun}.` }, player.id);
+  const { all, keyword } = parseTarget(arg);
+  // Take a single floor instance into purse (currency) or pack; returns a label
+  // for the picked-up summary, pushing any quest messages onto `qmsgs`.
+  const take = (inst, qmsgs) => {
+    rt.items.splice(rt.items.indexOf(inst), 1);
+    const t = w.items[inst.template];
+    if (t.type === "currency") {
+      const amt = inst.qty || 1;
+      player.shards = (player.shards || 0) + amt;
+      return `${amt} shard${amt === 1 ? "" : "s"}`;
+    }
+    addToInventory(player, inst, w);
+    qmsgs.push(...quests.noteAcquire(state, player, inst.template)); // before views so rewards show
+    return t.name;
+  };
+  if (all) {
+    const targets = itemMatches(visible, w, keyword).map((i) => visible[i]);
+    if (!targets.length) return [{ type: "error", text: keyword ? `There is no "${keyword}" here to get.` : "There is nothing here to get." }];
+    const qmsgs = [];
+    const labels = targets.map((inst) => take(inst, qmsgs));
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} gathers up what lies here.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You gather ${noun}. (${player.shards} total)`);
+    const out = selfAndViews(state, player, `You pick up ${labels.join(", ")}.`);
+    out.push(...qmsgs);
+    return out;
   }
-  addToInventory(player, inst, state.world);
-  const name = t.name;
-  const qmsgs = quests.noteAcquire(state, player, inst.template); // before views so rewards show
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} picks up ${name}.` }, player.id);
+  const vIdx = findItem(visible, w, arg);
+  if (vIdx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
+  const inst = visible[vIdx];
+  const isCurrency = w.items[inst.template].type === "currency";
+  const qmsgs = [];
+  const label = take(inst, qmsgs);
+  const verb = isCurrency ? "gathers" : "picks up";
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb} ${label}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  const out = selfAndViews(state, player, `You pick up ${name}.`);
+  const tail = isCurrency ? ` (${player.shards} total)` : "";
+  const out = selfAndViews(state, player, `You ${isCurrency ? "gather" : "pick up"} ${label}.${tail}`);
   out.push(...qmsgs);
   return out;
 }
 
 function drop(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Drop what?" }];
-  const idx = findItem(player.inventory, state.world, arg);
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const { all, keyword } = parseTarget(arg);
+  if (all) {
+    const targets = itemMatches(player.inventory, w, keyword).map((i) => player.inventory[i]);
+    if (!targets.length) return [{ type: "error", text: keyword ? `You aren't carrying any "${keyword}".` : "You are carrying nothing to drop." }];
+    const labels = [];
+    for (const inst of targets) {
+      player.inventory.splice(player.inventory.indexOf(inst), 1);
+      addToFloor(rt, inst, w);
+      labels.push(w.items[inst.template].name);
+    }
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} sets down a few things.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You drop ${labels.join(", ")}.`);
+  }
+  const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory.splice(idx, 1)[0];
-  addToFloor(state.rooms[player.location], inst, state.world);
-  const name = state.world.items[inst.template].name;
+  addToFloor(rt, inst, w);
+  const name = w.items[inst.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} drops ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You drop ${name}.`);
@@ -478,11 +626,31 @@ function sell(state, player, arg, ctx) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
+  const { all, keyword } = parseTarget(arg);
+  // The trader buys any valued item at its sell value — no per-trader buy list.
+  if (all) {
+    // `sell all` clears out the whole of each matching valued stack at once.
+    const targets = itemMatches(player.inventory, w, keyword).map((i) => player.inventory[i]);
+    const sold = [];
+    let total = 0;
+    for (const inst of targets) {
+      const t = w.items[inst.template];
+      const unit = sellValueOf(t);
+      if (!t.value || unit <= 0) continue; // trader won't buy it — leave it in the pack
+      const qty = inst.qty != null ? inst.qty : 1;
+      player.inventory.splice(player.inventory.indexOf(inst), 1);
+      total += unit * qty;
+      sold.push(qty > 1 ? `${t.name} ×${qty}` : t.name);
+    }
+    if (!sold.length) return [{ type: "error", text: keyword ? `${sh.t.name} won't buy any "${keyword}" from you.` : `${sh.t.name} won't buy anything you're carrying.` }];
+    player.shards = (player.shards || 0) + total;
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} trades with ${sh.t.name}.` }, player.id);
+    return selfAndViews(state, player, `You sell ${sold.join(", ")} for ${total} shards. (${player.shards} total)`);
+  }
   const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory[idx];
   const t = w.items[inst.template];
-  // The trader buys any valued item at its sell value — no per-trader buy list.
   const price = sellValueOf(t);
   if (!t.value || price <= 0) return [{ type: "error", text: `${sh.t.name} won't give you anything for ${t.name}.` }];
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
@@ -800,19 +968,66 @@ function recipes(state, player) {
   // One line per recipe; greyed (via `<#gray>` markup) when you lack the
   // components/shards to make it. In the "elsewhere" block the station you'd
   // need is appended, since those recipes span different stations.
+  // Affordable recipes lead with a green name; ones you can't make yet read fully
+  // grey (the station you'd need is appended in the "Elsewhere" block).
   const fmt = (r, withStation) => {
     const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
     if (r.shards) ins.push(`${r.shards} shards`);
     const where = withStation ? ` — at ${stationLabel(w, r.station)}` : "";
-    const line = `  ${r.name || r.id}: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
-    return canAfford(player, r) ? line : `<#gray>${line}`;
+    const name = r.name || r.id;
+    const rest = `: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
+    return canAfford(player, r) ? `  <#green>${name}<#reset>${rest}` : `<#gray>  ${name}${rest}<#reset>`;
   };
   const hereRecs = recs.filter((r) => here.has(r.station));
   const awayRecs = recs.filter((r) => !here.has(r.station));
-  const lines = ["You know how to craft:"];
-  if (hereRecs.length) lines.push("", "Here:", ...hereRecs.map((r) => fmt(r, false)));
-  if (awayRecs.length) lines.push("", "Elsewhere:", ...awayRecs.map((r) => fmt(r, true)));
+  const lines = ["<#gold>Recipes<#reset>"];
+  if (hereRecs.length) lines.push("", "<#cyan>Here<#reset>", ...hereRecs.map((r) => fmt(r, false)));
+  if (awayRecs.length) lines.push("", "<#cyan>Elsewhere<#reset>", ...awayRecs.map((r) => fmt(r, true)));
   return [{ type: "log", text: lines.join("\n") }];
+}
+
+// `mine` / `gather` / `fish` all pull a resource from a charged fixture and
+// differ only in flavour and which flag the fixture carries (`mine`, `harvest`,
+// `fish`). Players don't know the flag — they reach for the verb the *thing*
+// suggests (`gather moss`, though moss is a `mine` fixture; `mine` a mushroom
+// bed). So when a resource verb has nothing of its own kind to work, it hands
+// the room off to the sibling verb that does. The handler table is filled in
+// after all three are declared (see resourceHandlers, below `fish`).
+const RESOURCE_KINDS = ["mine", "harvest", "fish"];
+const resourceHandlers = {}; // { mine, harvest: gather, fish } — wired up below.
+
+// Visible fixtures in the player's room that carry the given resource flag.
+function resourceFixtures(state, player, kind) {
+  const w = state.world;
+  return state.rooms[player.location].fixtures.filter(
+    (f) => w.fixtures[f.template] && w.fixtures[f.template][kind] && fixtureVisibleTo(player, f)
+  );
+}
+
+// Does `arg` (lower-cased) name this fixture, by template id or display name?
+function fixtureMatchesArg(state, f, ql) {
+  const ft = state.world.fixtures[f.template];
+  return f.template.toLowerCase().includes(ql) || ft.name.toLowerCase().includes(ql);
+}
+
+// When a resource verb can't satisfy `arg` (or has none of its own kind here),
+// pick the sibling handler that should run instead — or null to let the caller
+// proceed with its own logic / error. The caller checks its own kind first, so
+// this only ever delegates work the player's verb wouldn't otherwise do.
+function resourceRedirect(state, player, arg, selfKind) {
+  const ql = arg ? arg.toLowerCase() : null;
+  const others = RESOURCE_KINDS.filter((k) => k !== selfKind)
+    .map((k) => ({ kind: k, fixtures: resourceFixtures(state, player, k) }))
+    .filter((o) => o.fixtures.length);
+  if (!others.length) return null;
+  if (ql) {
+    // With an arg, redirect only when it actually names a sibling-kind fixture.
+    const hit = others.find((o) => o.fixtures.some((f) => fixtureMatchesArg(state, f, ql)));
+    return hit ? resourceHandlers[hit.kind] : null;
+  }
+  // No arg: redirect only when exactly one sibling kind is present, so e.g.
+  // bare `gather` in a room that holds only an ore vein is unambiguous.
+  return others.length === 1 ? resourceHandlers[others[0].kind] : null;
 }
 
 // `mine` (alias `dig`): work ore loose from a resource vein in the room. Veins
@@ -824,13 +1039,14 @@ function mine(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find anything worth mining." }];
-  const veins = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].mine);
-  // A mushroom cluster isn't ore, but players reach for `mine` on anything that
-  // looks workable. Redirect to the hand-picking path when there's no vein to
-  // swing at (or the named target is a harvestable bed), so the instinct works.
-  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
-  if (beds.length && (!veins.length || (arg && beds.some((b) => b.template.toLowerCase().includes(arg.toLowerCase()) || w.fixtures[b.template].name.toLowerCase().includes(arg.toLowerCase())))))
-    return gather(state, player, arg, ctx);
+  const veins = resourceFixtures(state, player, "mine");
+  // Hand off to gather/fish when the player named something that isn't a vein,
+  // or there's nothing to mine here at all, so the wrong-verb instinct lands.
+  const ownMatch = arg && veins.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!veins.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "mine");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!veins.length) return [{ type: "error", text: "There is nothing to mine here." }];
   let f;
   if (arg) {
@@ -871,7 +1087,14 @@ function gather(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find anything worth gathering." }];
-  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
+  const beds = resourceFixtures(state, player, "harvest");
+  // Hand off to mine/fish when the named target isn't a bed, or there's nothing
+  // to gather here — so `gather` works on an ore vein or fishing water too.
+  const ownMatch = arg && beds.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!beds.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "harvest");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!beds.length) return [{ type: "error", text: "There is nothing here to gather." }];
   let f;
   if (arg) {
@@ -914,7 +1137,14 @@ function fish(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find the water, let alone fish it." }];
-  const pools = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].fish);
+  const pools = resourceFixtures(state, player, "fish");
+  // Hand off to mine/gather when the named target isn't water, or there's none
+  // here — so a misplaced `fish` on a vein or mushroom bed still does the work.
+  const ownMatch = arg && pools.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!pools.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "fish");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!pools.length) return [{ type: "error", text: "There is no water to fish here." }];
   let f;
   if (arg) {
@@ -956,6 +1186,12 @@ function fish(state, player, arg, ctx) {
   return out;
 }
 
+// Wire the resource verbs to their fixture flags now that all three exist, so
+// resourceRedirect can hand off between them (see RESOURCE_KINDS, above `mine`).
+resourceHandlers.mine = mine;
+resourceHandlers.harvest = gather;
+resourceHandlers.fish = fish;
+
 // Colour markup (`<#name>…`, see client renderMarkup) is authored-content only.
 // Strip it from anything a player types so chat/emotes can't inject colours.
 function stripMarkup(s) {
@@ -988,12 +1224,7 @@ function lookAt(state, player, arg) {
 function attack(state, player, arg) {
   if (!arg) return [{ type: "error", text: "Attack what?" }];
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = state.world.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, arg);
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
   const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
@@ -1102,7 +1333,7 @@ function spellList(state, player) {
   const w = state.world;
   const known = player.knownSpells || [];
   if (!known.length) return [{ type: "log", text: "You know no spells. Study a scroll to learn one." }];
-  const lines = ["You know how to cast:"];
+  const lines = ["<#gold>Spells<#reset>", ""];
   for (const id of known) {
     const s = w.spells[id];
     if (!s) continue;
@@ -1144,9 +1375,9 @@ function spellList(state, player) {
     // Material components (e.g. a chitin plate for Glimmer Husk) are listed after mana/shards as `name (qty)`.
     const comps = (s.itemCost || []).map((c) => `${w.items[c.template] ? w.items[c.template].name : c.template} (${c.qty || 1})`);
     const cost = [`${s.manaCost || 0} mana`, s.shardCost ? `${s.shardCost} shards` : null, ...comps].filter(Boolean).join(" + ");
-    lines.push(`  ${s.name}: ${cost}${tail}`);
+    lines.push(`  <#green>${s.name}<#reset>: ${cost}${tail}`);
   }
-  lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
+  lines.push("", `<#gray>Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.<#reset>`);
   return [{ type: "log", text: lines.join("\n") }];
 }
 
@@ -1194,12 +1425,7 @@ function cast(state, player, arg, ctx) {
   if (spell.effect && spell.effect.type === "damage-room") return castBurst(state, player, spell, ctx);
 
   if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return (see || t.emitsLight) && matchesQuery(targetQ, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, targetQ, false);
   if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
 
   const mt = w.mobs[mob.template];
@@ -1430,12 +1656,7 @@ function train(state, player, arg) {
 function talk(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Talk to whom?" }];
   const w = state.world;
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, arg);
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to talk to.` }];
   const t = w.mobs[mob.template];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} speaks with ${t.name}.` }, player.id);
@@ -1469,12 +1690,7 @@ function give(state, player, arg, ctx) {
   else { const toks = arg.trim().split(/\s+/); npcQ = toks[toks.length - 1]; itemQ = toks.slice(0, -1).join(" "); }
   if (!itemQ || !npcQ) return [{ type: "error", text: "Give what to whom? (give <item> <npc>)" }];
 
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(npcQ, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, npcQ);
   if (!mob) return [{ type: "error", text: `You see no "${npcQ}" here to give anything to.` }];
   const iidx = findItem(player.inventory, w, itemQ);
   if (iidx < 0) return [{ type: "error", text: `You aren't carrying "${itemQ}".` }];
@@ -1571,11 +1787,35 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       }
       return selfAndViews(state, player, `Conjured ${n}× ${t.name} into your pack.`);
     }
-    case "@help":
-      return [{ type: "log", text: "Admin commands:\n  @create-player <name>\n  @list-players\n  @shards <amount>\n  @xp <amount>\n  @attr <attribute> <value>\n  @spawn <mobId> [count] [wild|player]\n  @give <itemId> [count]" }];
+    case "@help": {
+      const lines = ["<#gold>Admin commands<#reset>", ""];
+      for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));
+      return [{ type: "log", text: lines.join("\n") }];
+    }
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }
+}
+
+// Levenshtein edit distance, bounded use only — VERBS is short. Drives the
+// "did you mean?" hint for a mistyped verb that prefix-abbreviation can't catch.
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+
+// The known verb closest to a typo, if it's near enough to be worth suggesting.
+function closestVerb(verb) {
+  let best = null, bestD = Infinity;
+  for (const v of VERBS) {
+    const d = editDistance(verb, v);
+    if (d < bestD) { bestD = d; best = v; }
+  }
+  return bestD <= 2 ? best : null;
 }
 
 function execute(state, player, input, ctx = NOOP_CTX) {
@@ -1677,6 +1917,8 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return mine(state, player, arg, ctx);
     case "gather":
     case "forage":
+    case "harvest":
+    case "pick":
       return gather(state, player, arg, ctx);
     case "fish":
     case "angle":
@@ -1708,9 +1950,12 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return unequip(state, player, arg, ctx);
     case "help":
     case "?":
-      return [{ type: "log", text: HELP }];
-    default:
-      return [{ type: "error", text: `Unknown command: "${verb}". Try "help".` }];
+      return [{ type: "log", text: buildHelp(player) }];
+    default: {
+      const guess = closestVerb(verb);
+      const hint = guess ? ` Did you mean "${guess}"?` : ` Try "help".`;
+      return [{ type: "error", text: `Unknown command: "${verb}".${hint}` }];
+    }
   }
 }
 

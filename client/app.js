@@ -116,7 +116,9 @@ function addLine(text, kind) {
 
 // Inline colour markup: `<#name>` tints the rest of its line with the named
 // colour (see .mk-* in styles.css). Colour resets at every newline, so a stray
-// tag can never bleed past one line. Unknown names are dropped silently. Server
+// tag can never bleed past one line. A non-palette tag (`<#reset>`) is dropped
+// and returns the run to the default ink — used to colour just part of a line.
+// Other unknown names are dropped silently too. Server
 // content uses this (e.g. greyed-out recipes you can't afford, a rainbow boss);
 // player-authored text has its tags stripped server-side, so this stays trusted
 // styling — we still build spans via textContent, never innerHTML.
@@ -389,96 +391,9 @@ function label(text) {
   el.textContent = text;
   return el;
 }
-// Strip a leading article and take the last word — used for TAB-completion
-// candidates so players can type "lightbug" / "sword" instead of an id.
-const lastWord = (s) => s.replace(/^(a|an|the)\s+/i, "").split(/\s+/).pop();
-
-// --- Command input: history + TAB completion -------------------------------
-const VERBS = ["look", "examine", "go", "move", "get", "take", "drop", "inventory", "say", "emote",
-  "attack", "kill", "stop", "sit", "sleep", "stand", "wake", "rest", "cast", "learn", "study", "spells", "equip", "wield", "wear", "unequip", "remove",
-  "light", "douse", "extinguish", "ignite", "list", "shop", "buy", "sell",
-  "drink", "quaff", "use", "throw", "hurl", "lob", "switch", "toggle", "flip", "refuel", "fill", "craft", "make", "recipes", "train", "help",
-  "talk", "give", "deliver", "quest", "quests", "journal",
-  "north", "south", "east", "west", "up", "down"];
+// --- Command input: history ------------------------------------------------
 const history = [];
 let histIdx = -1;
-let tabState = null; // { base, matches, idx }
-
-// Context-aware completion: the first token completes commands; the argument
-// completes from what THAT command can act on (equipped gear for remove, mobs
-// for attack, ground items for get, etc.).
-function completionCandidates(value) {
-  const parts = value.split(/\s+/);
-  if (parts.length <= 1) return VERBS;
-  return [...new Set(argCandidates(parts[0].toLowerCase()))];
-}
-
-function argCandidates(cmd) {
-  const room = lastRoom;
-  const p = lastPlayer;
-  const names = (arr) => (arr || []).map((x) => lastWord(x.name));
-  const equipped = () => (p ? Object.values(p.equipment).filter(Boolean) : []);
-  switch (cmd) {
-    case "look": case "l": case "examine": case "exam": case "x": {
-      const out = [];
-      if (room) out.push(...names(room.contents.mobs), ...names(room.contents.items), ...names(room.contents.fixtures), ...names(room.contents.players));
-      if (p) out.push(...names(p.inventory), ...names(equipped()));
-      return out;
-    }
-    case "get": case "take": return room ? names(room.contents.items) : [];
-    case "drop": case "sell": return p ? names(p.inventory) : [];
-    case "drink": case "quaff":
-      return p ? p.inventory.filter((i) => i.type === "consumable").map((i) => lastWord(i.name)) : [];
-    case "use": case "switch": case "toggle": case "flip": {
-      const out = room ? names(room.contents.fixtures) : [];
-      if (p) out.push(...p.inventory.filter((i) => i.type === "consumable").map((i) => lastWord(i.name)));
-      return out;
-    }
-    // Recipe names are multi-word ("Iron Dagger"); complete the whole name (lowercased)
-    // rather than just the last word, matching what `learn` tells you to type and what
-    // the server's craft matcher accepts.
-    case "craft": case "make": return p ? (p.recipes || []).map((r) => r.toLowerCase()) : [];
-    case "buy": {
-      // Wares of any trader in the room (their `sells` list, item names).
-      const out = [];
-      if (room) for (const m of room.contents.mobs) if (m.sells) out.push(...m.sells.map(lastWord));
-      return out;
-    }
-    case "train": return ["might", "vitality", "intellect", "wits", "perception"];
-    case "equip": case "wield": case "wear": case "hold":
-      return p ? p.inventory.filter((i) => i.slot).map((i) => lastWord(i.name)) : [];
-    case "unequip": case "remove":
-      return p ? [...names(equipped()), ...Object.keys(p.equipment)] : [];
-    case "attack": case "kill": case "k": return room ? names(room.contents.mobs) : [];
-    case "talk": case "greet": case "ask": return room ? names(room.contents.mobs) : [];
-    case "give": case "deliver": {
-      // Items you carry, then creatures here to give them to.
-      const out = p ? names(p.inventory) : [];
-      if (room) out.push(...names(room.contents.mobs));
-      return out;
-    }
-    case "cast": case "c": {
-      // Spell names first, then targetable creatures (cast <spell> <target>).
-      const out = p ? (p.spells || []).map((s) => lastWord(s)) : [];
-      if (room) out.push(...names(room.contents.mobs));
-      return out;
-    }
-    case "learn": case "study":
-      return p ? p.inventory.filter((i) => i.type === "scroll").map((i) => lastWord(i.name)) : [];
-    case "light": case "ignite": {
-      const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
-      if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
-      return out;
-    }
-    case "refuel": case "fill": {
-      const out = p ? p.inventory.filter((i) => i.type === "light").map((i) => lastWord(i.name)) : [];
-      if (p && p.equipment.light) out.push(lastWord(p.equipment.light.name));
-      return out;
-    }
-    case "go": case "move": return room ? room.exits.map((e) => e.dir) : [];
-    default: return []; // say / emote / douse / stop / help — free text or no arg
-  }
-}
 
 // Safety net: if focus has drifted off the command line (a click elsewhere, a
 // blur), pull it back the instant the player types a printable character — so the
@@ -505,7 +420,6 @@ cmdEl.addEventListener("keydown", (ev) => {
     history.push(text);
     histIdx = history.length;
     cmdEl.value = "";
-    tabState = null;
   } else if (ev.key === "ArrowUp") {
     ev.preventDefault();
     if (histIdx > 0) cmdEl.value = history[--histIdx];
@@ -513,35 +427,8 @@ cmdEl.addEventListener("keydown", (ev) => {
     ev.preventDefault();
     if (histIdx < history.length - 1) cmdEl.value = history[++histIdx];
     else { histIdx = history.length; cmdEl.value = ""; }
-  } else if (ev.key === "Tab") {
-    ev.preventDefault();
-    handleTab();
-  } else {
-    tabState = null;
   }
 });
-
-function handleTab() {
-  const value = cmdEl.value;
-  const head = value.slice(0, value.lastIndexOf(" ") + 1);
-  const token = value.slice(head.length).toLowerCase();
-  if (tabState && tabState.base === value) {
-    // cycle
-    tabState.idx = (tabState.idx + 1) % tabState.matches.length;
-    cmdEl.value = tabState.head + tabState.matches[tabState.idx] + " ";
-    tabState.base = cmdEl.value;
-    return;
-  }
-  const matches = completionCandidates(value).filter((c) => c.startsWith(token));
-  if (!matches.length) return;
-  if (matches.length === 1) {
-    cmdEl.value = head + matches[0] + " ";
-    tabState = null;
-  } else {
-    cmdEl.value = head + matches[0] + " ";
-    tabState = { base: cmdEl.value, head, matches, idx: 0 };
-  }
-}
 
 setPrompt();
 connect();

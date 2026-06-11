@@ -138,6 +138,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
 ### Changed
+- **`spells`, `recipes`, and the quest log share the `help` palette.** All three now
+  open with a gold title, use cyan section headings (recipes' Here/Elsewhere, the
+  quest log's In progress/Finished), and lead each entry with a green name — spells,
+  recipe outputs, active quests. Unaffordable recipes and finished quests read muted
+  grey. Purely cosmetic; unifies the four list screens visually.
+- **Leaner starting loadout.** A new delver now begins with a single **short sword,
+  unequipped** (was an equipped sword *plus* a spare in the pack) and **no Scroll of
+  Spark** — first weapon and first spell are now choices to make, not freebies. Still
+  starts with a torch; all equipment slots remain seeded empty so `unequip` works.
+- **`help` is reorganised, coloured, and admin-aware.** The flat command list is now
+  grouped into titled sections (Exploration, Items & gear, Combat & magic, Gathering
+  & crafting, People & trade, Resting) with a catch-all **Other** before the admin
+  block, rendered with the existing `<#colour>` markup — gold title, cyan section
+  headings, green command signatures. Admin `@`-commands appear in `help` **only for
+  admins** (everyone keeps `@help`). Entries now show the new targeting syntax
+  (`get [N.]<item> | all`). The client documents `<#reset>`, the tag that returns a
+  line to the default ink mid-string.
+
+### Added
+- **DikuMUD-style target selection.** When several things share a name, pick one
+  with an ordinal — `kill 2.crawler`, `get 3.shard` — or act on the whole lot with
+  `all`: `get all`, `get all.shard`, `drop all`, `drop all.pelt`, `sell all`,
+  `sell all.crystal` (a stack sells in full). Works for items (get/drop/sell) and
+  creatures (attack/cast/talk/give), routed through a shared `parseTarget` layer so
+  the syntax is uniform. `help` documents it.
+- **"Did you mean?" on a mistyped command.** An unknown verb that isn't just a
+  prefix now suggests the closest real command (`atttack` → *Did you mean "attack"?*)
+  instead of a bare error.
+
+### Removed
+- **Tab completion removed from the command input.** The partial-verb abbreviation
+  system on the server already lets you type `ga` for `gather` or `mi` for `mine`;
+  client-side Tab-to-complete added noise without being reliable. Tab now moves focus
+  as the browser expects.
+
+### Changed
 - **Summon lifetime now scales with Intellect.** Both **Summon Wisp** and **Glimmer
   Husk** last `30 ticks per point of Intellect` (≈1:30 at INT 3, ≈6:00 at INT 12), so
   a keener summoner holds their conjuration far longer. (Generalized via a
@@ -153,8 +189,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the inn lore always implied went into the broth-pot.
 - **Bug-meat skewers are fried in tallow.** `cooked-skewer` now also takes
   `bug-tallow ×1` and heals **+9 HP** (was +8), weaving the new fat into a staple.
+- **Resource verbs forgive the wrong guess.** `mine`, `gather`, and `fish` all
+  pull a resource from a charged fixture and differ only in flavour, but players
+  reach for whichever verb the *thing* suggests. Each verb now hands off to the
+  sibling that fits when it finds nothing of its own kind — `gather`/`mine`/`fish`
+  a vein, a bed, or fishing water and the right action runs regardless. (Previously
+  only `mine`→`gather` redirected; the courtesy is now symmetric and covers `fish`.)
+- **Weeping chasm-moss is gathered, not mined.** The two moss fixtures are
+  reclassified from `mine` to `harvest` (verb *pull*), matching their "pull a clump
+  free" flavour — so `gather moss` / `pick moss` works as expected. `harvest` and
+  `pick` join `gather`/`forage` as verbs for hand-picked crops.
 
 ### Fixed
+- **Hidden ore veins no longer leak through `mine`.** `mine`/`fish` now skip
+  undiscovered hidden fixtures (as `gather` already did), so the hidden silver vein
+  in the Black Drift is no longer listed by a bare `mine` or workable by name before
+  you `search` it out.
 - **Summoned guardians no longer pick fights.** A player's summon (the Glimmer Husk,
   the Wisp) is a defensive guard, but it inherited the proactive-hunter behaviour of
   any `hostile` mob and would aggro and engage wild creatures on sight even while its
