@@ -94,10 +94,10 @@
     "description": "A wide circle scored into the cellar floor and pinned at its cardinal points with stakes of raw glimmer, the lines chalked over and re-chalked until the stone is pale with them. Within it a loose knot of light is bound and cannot drift past the ring — a captive mark for a delver to throw spells at without bringing the whole Rim down around their ears.",
     "type": "scenery"
   },
-  "glow-caps": {
-    "id": "glow-caps",
-    "name": "a cluster of glow-caps",
-    "description": "Pale mushrooms crowd a damp seam of the wall, each cap breathing a weak, steady light. It is enough to draw the grazers in out of the black to feed — and enough, just, to see them by.",
+  "pale-cluster": {
+    "id": "pale-cluster",
+    "name": "a cluster of pale mushrooms",
+    "description": "Pale, ivory-capped mushrooms crowd a damp seam of the wall, each breathing a weak, steady glow. It is enough to draw the grazers in out of the black to feed — and enough, just, to see them by.",
     "type": "scenery",
     "emitsLight": 1,
     "harvest": { "template": "palecap-mushroom", "verb": "pick", "yield": 1, "charges": 3, "respawn": 120, "energy": 10 }
@@ -244,13 +244,6 @@
     "keywords": ["rigging", "rope", "ropes", "line", "pitons", "gear", "climbing"],
     "description": "Iron pitons hammered deep into the flue at arm's-reach intervals, a knotted climbing-line gone stiff and grey strung between them, and the rotted remains of a rope-sling cinched to the rock. Prospectors rigged this fissure as a shortcut — a fast, ugly climb between the river workings far above and the deep below, cut and equipped before the warren went bad. The line still holds, more or less; the pitons are sound. It was a way down for those in a hurry to be rich, and a way up for those who lived to use it. Whoever last came down it did not climb back out.",
     "type": "scenery"
-  },
-  "gloom-fungus": {
-    "id": "gloom-fungus",
-    "name": "a patch of pale fungus",
-    "description": "Pale, lightless fungus crusts the seams of the worked stone in soft grey shelves, feeding on the dead air and whatever the dark lets fall rather than on any light — it sheds no glow of its own. Grubs have found it: their slow trails wind pale through the caps where they chew, and a delver who knows the trick of it can pick a few caps for the pot, or gather the grubs for bait.",
-    "type": "resource",
-    "harvest": { "template": "palecap-mushroom", "verb": "pick", "yield": 1, "charges": 3, "respawn": 150, "energy": 10 }
   },
   "umbral-forge": {
     "id": "umbral-forge",

@@ -206,11 +206,11 @@
     "id": "abyss.drift",
     "zone": "abyss",
     "name": "The Ore Drift",
-    "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of glow-caps has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
+    "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of pale mushrooms has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
     "depth": 1,
     "ambientLight": 0,
     "exits": { "north": "abyss.gallery", "down": "second.descent" },
-    "fixtures": ["iron-vein", "glow-caps"],
+    "fixtures": ["iron-vein", "pale-cluster"],
     "groundItems": [],
     "spawns": [
       { "mob": "stonebug", "max": 2, "respawn": 60 },
@@ -379,9 +379,9 @@
     "name": "The Grazing Galleries",
     "depth": 2,
     "ambientLight": 1,
-    "description": "A broad, low gallery lit by the soft pulse of glow-caps spread across the damp walls — enough light to graze by, which is exactly what the stonebugs do. Armoured backs catch the glow as the bugs work their slow circuits, and the floor is smooth where they have turned it under them for years. The prospectors' road is north; the galleries open south and east.",
+    "description": "A broad, low gallery lit by the soft pulse of pale mushrooms spread across the damp walls — enough light to graze by, which is exactly what the stonebugs do. Armoured backs catch the glow as the bugs work their slow circuits, and the floor is smooth where they have turned it under them for years. The prospectors' road is north; the galleries open south and east.",
     "exits": { "north": "second.road", "south": "second.graze2", "east": "second.graze4" },
-    "fixtures": ["glow-caps"],
+    "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
       { "mob": "stonebug", "max": 2, "respawn": 60 },
@@ -394,9 +394,9 @@
     "name": "The Spine-Thicket",
     "depth": 2,
     "ambientLight": 1,
-    "description": "A close, low gallery where the glow-caps cluster thick and the thornbugs have followed the food. They crowd the walls in bristling rows — squat, spiked shapes rasping at the caps, indifferent to company until company gets too close. The galleries open back north; the way deepens south.",
+    "description": "A close, low gallery where the pale mushrooms cluster thick and the thornbugs have followed the food. They crowd the walls in bristling rows — squat, spiked shapes rasping at the caps, indifferent to company until company gets too close. The galleries open back north; the way deepens south.",
     "exits": { "north": "second.graze1", "south": "second.graze3" },
-    "fixtures": ["glow-caps"],
+    "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
       { "mob": "thornbug", "max": 2, "respawn": 60 },
@@ -410,9 +410,9 @@
     "name": "The Grinder's Hollow",
     "depth": 2,
     "ambientLight": 1,
-    "description": "The rock here is smooth as dressed stone — not cut, but worn flat by years of slow circling. The glow-caps crowd the walls, and in the centre of it all, older than anything else in the galleries, the great stonebug makes its endless round. The hollow fits it exactly; it made the hollow. The spine-thicket is back north.",
+    "description": "The rock here is smooth as dressed stone — not cut, but worn flat by years of slow circling. The pale mushrooms crowd the walls, and in the centre of it all, older than anything else in the galleries, the great stonebug makes its endless round. The hollow fits it exactly; it made the hollow. The spine-thicket is back north.",
     "exits": { "north": "second.graze2" },
-    "fixtures": ["glow-caps"],
+    "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
       { "mob": "old-grinder", "max": 1, "respawn": 300 }
@@ -424,7 +424,7 @@
     "name": "The Skitter-Crack",
     "depth": 2,
     "ambientLight": 0,
-    "description": "A low, dark crack running off from the galleries — the glow-caps don't reach here, and whatever nests in the crack prefers it that way. The stone underfoot is scored with thin, close marks, the kind many fast legs leave. Something hunts the strays that drift out of the lit galleries. The galleries are back west.",
+    "description": "A low, dark crack running off from the galleries — the pale mushrooms don't reach here, and whatever nests in the crack prefers it that way. The stone underfoot is scored with thin, close marks, the kind many fast legs leave. Something hunts the strays that drift out of the lit galleries. The galleries are back west.",
     "exits": { "west": "second.graze1" },
     "fixtures": [],
     "groundItems": [],
@@ -773,12 +773,13 @@
     "name": "Behind the Paqcha",
     "depth": 4,
     "ambientLight": 0,
-    "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. The only way out is back east, through the water.",
+    "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. Where the lamp's cold light falls steadiest, a slender witchglow cluster has crept up the damp niche-wall, dripping its own green glow over the offerings — beautiful, and poison, and grown here in a peace nothing has thought to disturb. The only way out is back east, through the water.",
     "exits": { "east": "lake.strand" },
-    "fixtures": ["umbral-coldlamp", "shrine-font"],
+    "fixtures": ["umbral-coldlamp", "shrine-font", "witchglow-cluster"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 },
-      { "template": "shards", "qty": 12 }
+      { "template": "shards", "qty": 12 },
+      { "template": "witchglow-cap", "qty": 1, "respawn": 150 }
     ],
     "spawns": []
   },
@@ -928,7 +929,7 @@
     "ambientLight": 0,
     "description": "The passage off the ledge opens into a small, square chamber, and the moment you cross into it the dark changes its quality — the rasp of the crawlers cuts off behind you, the air goes dead and close, and your light shrinks back to a guttering knot, as though the room itself disapproved of it. The walls here are worked: cut square and true, faced smooth by patient hands long ago, and across the far wall an old relief has been carved — a band of flowing Umbral glyphs gone soft at the edges with age, and at their centre a single hard mark, struck deep and unmistakable in any tongue. It means turn back. Whatever the deep-folk knew when they cut it, they cut it to keep something on the far side of this room, and they did not come back to tend it. The crawlers will not cross the worked threshold; they gather at the passage mouth behind you and no further. Something grows here even so: in the cracks of the old worked stone a pale, lightless fungus has taken hold, and a few grubs inch blindly through it, chewing their slow pale trails — the only life willing to share this room with what waits beyond it. Ahead, south, the dark waits. The chimney is back north.",
     "exits": { "north": "warren.chasm", "south": "warren.relict" },
-    "fixtures": ["gloom-fungus"],
+    "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "grub", "max": 3, "respawn": 90 }

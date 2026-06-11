@@ -23,6 +23,11 @@ const MELEE_SCALE = { attr: "might", per: 4 };
 // players use it for recovery + social; mobs use it to author dozing/resting NPCs.
 const SIT_RECOVER_TICKS = 5;
 const SLEEP_RECOVER_TICKS = 2;
+// Global damper on ambient `emote` frequency: each emote action's authored
+// weight is scaled by this before the per-tick action roll, thinning idle
+// chatter without touching every template. Reacts are deliberately exempt —
+// they already carry a per-player cooldown and can deliver quest nudges.
+const EMOTE_WEIGHT_SCALE = 0.5;
 const RESTING = (actor) => actor.posture === "sitting" || actor.posture === "sleeping";
 
 /** Posture-aware sight: a *sleeping* actor perceives nothing — its room view goes
@@ -1670,6 +1675,10 @@ class GameState {
         if (a.type === "emote") return Array.isArray(a.messages) && a.messages.length > 0;
         return a.type === "idle";
       });
+      // Thin ambient emotes globally (clone so we never mutate the template).
+      options = options.map((a) =>
+        a.type === "emote" ? { ...a, weight: (a.weight || 1) * EMOTE_WEIGHT_SCALE } : a
+      );
     } else {
       // Default behaviour for mobs without an actions table: attack if able.
       options = aggressive && t.attack && candidates.length ? [{ type: "attack" }] : [];

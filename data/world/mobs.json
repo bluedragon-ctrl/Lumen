@@ -296,7 +296,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "schematic-glimmersteel-sword" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
+      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "book-of-glimmersteel" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
     }
   },
   "rim-hatcher": {
@@ -671,7 +671,9 @@
       { "type": "idle", "weight": 7 },
       { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "cave-fish", "chance": 1 }
+    ]
   },
   "old-grinder": {
     "id": "old-grinder",
@@ -760,7 +762,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
+      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
     }
   },
   "pale-king": {

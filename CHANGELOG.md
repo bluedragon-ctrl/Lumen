@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glimmersteel armour.** Two new rare pieces forged from glimmersteel bars at the
+  smithing station: a **glimmersteel cuirass** (`armour 3, ward 1`, 3 bars) and a
+  **glimmersteel helm** (`armour 2, ward 1`, 2 bars). Their niche is protection
+  *without* the senses-dulling `wits` penalty every iron/chitin plate carries — the
+  captive light keeps a delver's ear for the dark sharp. Sits between the chitin and
+  dense-chitin tiers as the best-balanced gear, distinct from the unique kingshell
+  caster shell.
+- **Glimmersteel warhammer.** A rare two-hander forged from 3 glimmersteel bars —
+  `1d12` damage at `actionCost 16` (vs the sword's `1d8`/12) with the same Might
+  scaling and `+1 Might`. Slower but far harder per blow: fewer big hits beat many
+  small ones against armoured foes, where the sword stays better against fast,
+  evasive targets — two distinct glimmersteel playstyles.
+- **The Book of Glimmersteel.** A rare tome sold by **Tobin** that teaches his whole
+  glimmersteel gear-line at once — the sword, warhammer, cuirass, and helm. Replaces
+  the separate glimmersteel-sword schematic.
 - **The Pale King's armour is now Mallki's to teach.** Looting a **kingshell plate**
   from the Pale King auto-offers a quest, *The King's Shell*, to carry it to
   **Mallki** — who returns the plate and grants the **kingshell method**
@@ -76,11 +91,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   player has finished that quest (it sits in `quests.done`). Lets vendors reveal
   new wares as a reward for completed work. Data-driven — no new command.
 
+### Added
+- **A second witchglow source — Behind the Paqcha.** The hidden Umbral shrine behind
+  the falls (`lake.shrine`, depth 4) now grows a **witchglow-cluster** in its lamp-lit,
+  spray-damp niche, plus a respawning loose `witchglow-cap`. Gated behind the shrine's
+  perception-4 hidden ledge, it gives lake-tier delvers a witchglow source without
+  backtracking to the depth-1 Spore Vault, while staying scarce.
+- **Mallki sells witchglow caps.** The Umbral trader now stocks `witchglow-cap`
+  (price 12) — a paid, controlled source fitting a deep-folk who knows the wild
+  witchglow of the tunnels, without putting a free farm in his safe hub garden.
+
 ### Changed
+- **Two mushroom-cluster fixtures instead of three.** The `glow-caps` and
+  `gloom-fungus` fixtures both yielded the same `palecap-mushroom` under different
+  names — confusing. They're merged into a single **`pale-cluster`** ("a cluster of
+  pale mushrooms", still emits a faint light) used across the abyss/grazing rooms,
+  leaving a clean two-type split: the pale cluster (→ palecap) and the glowing
+  `witchglow-cluster` (→ witchglow-cap). The merged cluster is **removed from The
+  Hush** (depth 7) to keep the Gloom-Warren dark — that room keeps its lightless
+  scenery fungus and grubs, but no longer offers a palecap harvest node.
+- **Glimmersteel gear is gated through Tobin.** The glimmersteel sword recipe is no
+  longer a standalone schematic — it's folded into the new Book of Glimmersteel (with
+  the warhammer, cuirass, and helm). The bar recipe (`schematic-glimmersteel-bar`)
+  remains the separate gating prerequisite Tobin sells, and the lamp, coil, and staff
+  schematics are unchanged (staff still Vesper's).
+- **Ambient NPC emotes are half as frequent.** A global `EMOTE_WEIGHT_SCALE`
+  (0.5) thins idle mob chatter to cut console spam, applied to `emote` actions
+  before the per-tick action roll. Targeted `react` actions are exempt — they
+  already carry a per-player cooldown and can deliver quest nudges.
 - The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
   *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
 - The **hungering dagger** now forges from a **silver bar** (was iron) + a
   shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
+
+### Fixed
+- **Blind cave-fish now leave a catch when killed.** The swimming `blind-cave-fish`
+  mob dropped nothing on death, so a delver who speared one by hand got nothing —
+  surprising next to the fishing spots that hand over a `cave-fish`. It now drops a
+  blind cave-fish (the same item the line yields).
 
 ### Added
 - **The descent below the lake.** The half-built line at The Far Bank
