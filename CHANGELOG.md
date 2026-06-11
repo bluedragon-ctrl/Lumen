@@ -8,10 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **The Gloom-Warren (depth 7) — the first hard tier below the lake.** The low,
   unstaked passage south of *The Forward Camp* (`deep.camp`) is now traversable and
-  opens into a fully-dark warren of big caves crawling with gloom-crawlers: *Where
-  the Dark Goes Bad* (the threshold), *The Crawling Hall* (a vast swarm gallery),
-  *The Moulting Drift* (a husk-choked branch with an unworked glimmer seam), and
-  *The Drowned Black* (the lair). Difficulty is a clear step above the deep lake:
+  opens into a ten-room, fully-dark warren of big caves crawling with gloom-crawlers.
+  A spine of great caverns — *Where the Dark Goes Bad* (the threshold), *The
+  Crawling Hall* (the hub), *The Long Gallery*, *The Black Chimney* (a natural flue
+  that plunges on past reach — the hook for a deeper tier to come), *The Hush* (a
+  worked-stone chamber where an old **Umbral ward-glyph** reads *turn back* and the
+  crawlers will not cross), *The Last Claim* (the furthest prospector who ever got
+  this deep, dead at the wall with a warning chalked beside them), and *The Drowned
+  Black* (the lair) — with three branches off it: *The Moulting Drift* (husk dunes +
+  an unworked glimmer seam), *The Bone Field* (a feeding ground of bone worked by
+  **scour-slugs**, hiding a search-gated prospector cache), and *The Brood-Heart*
+  (the densest swarm in the warren). Difficulty is a clear step above the deep lake:
   the swarm itself is the threat — many weak crawlers in a dark you can barely see
   in — anchored by **elder gloom-crawlers** (elite: ~40 hp, armoured, a festering
   *gloom-rot* bite, too old to flinch from a torch) and a boss, **the Starving

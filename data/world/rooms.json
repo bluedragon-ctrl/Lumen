@@ -829,8 +829,8 @@
     "name": "The Crawling Hall",
     "depth": 7,
     "ambientLight": 0,
-    "description": "A vast black gallery, so wide your light cannot find its walls and so high the ceiling is only a guess — a held breath of a cavern, and you the one small warmth in all of it. The floor is a slow tide of pale bodies: gloom-crawlers in their dozens, flowing over one another and the heaped middens of their feeding, a dry endless rasp of flesh on stone that comes from every side at once. They do not mind the dark; they own it. Raise a light and the nearest of them rouse and turn toward the warmth of it, the whole tide stirring your way — and somewhere out in the black the larger shapes shift, the old ones, too big to hurry and too patient to need to. A side passage breaks off west into a narrower dark; the way deeper drops down; the throat climbs back north.",
-    "exits": { "north": "warren.throat", "west": "warren.drift", "down": "warren.lair" },
+    "description": "A vast black gallery, so wide your light cannot find its walls and so high the ceiling is only a guess — a held breath of a cavern, and you the one small warmth in all of it. The floor is a slow tide of pale bodies: gloom-crawlers in their dozens, flowing over one another and the heaped middens of their feeding, a dry endless rasp of flesh on stone that comes from every side at once. They do not mind the dark; they own it. Raise a light and the nearest of them rouse and turn toward the warmth of it, the whole tide stirring your way — and somewhere out in the black the larger shapes shift, the old ones, too big to hurry and too patient to need to. A side passage breaks off west into a narrower dark; eastward the floor falls away into a reek of old bone; the warren runs on south, deeper; the throat climbs back north.",
+    "exits": { "north": "warren.throat", "west": "warren.drift", "east": "warren.midden", "south": "warren.gallery" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -856,14 +856,105 @@
       { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
     ]
   },
+  "warren.midden": {
+    "id": "warren.midden",
+    "zone": "gloom-warren",
+    "name": "The Bone Field",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "East of the hall the floor drops a few feet into a wide, low chamber that the warren uses to discard what it cannot eat. The ground is a field of bone — cracked, gnawed, picked clean and pale, heaped in slow drifts against the walls and crunching to splinters underfoot — the leavings of a colony that has fed here a very long time. Rat-bone and bug-shell and the long bones of bigger things lie tangled together, and here and there among them the unmistakable shape of a delver: a staved-in helm, a boot with the foot still in it, a ribcage swept clean. Scour-slugs haul themselves over the heaps in the dark, working the last of the marrow, leaving their clean wet tracks across the dead. Somewhere under the drifts, the crawlers' middens have buried whatever the dead carried down. The hall is back west, up the lip.",
+    "exits": { "west": "warren.hall" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "shards", "qty": 18, "respawn": 1800, "hidden": { "perception": 4 } },
+      { "template": "lamp-oil", "qty": 1, "respawn": 1800, "hidden": { "perception": 4 } }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 30 },
+      { "mob": "scour-slug", "max": 2, "respawn": 120 }
+    ]
+  },
+  "warren.gallery": {
+    "id": "warren.gallery",
+    "zone": "gloom-warren",
+    "name": "The Long Gallery",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The second great cavern of the warren, longer than it is wide — a black gallery that runs on south past the reach of any light a delver carries, the floor sloping gently down the whole way as though the stone itself is leaning toward the deep. The crawlers are thinner here than in the hall but not gone; they flow along the walls and the long centre in loose, restless streams, all of them moving the same way, downslope, as though something below were calling the whole tide of them down. A side gallery opens west, and from it comes a dry, massed rasping louder than anywhere else in the warren. At the gallery's low end the floor gives out entirely into a black shaft dropping down; the hall lies back north.",
+    "exits": { "north": "warren.hall", "west": "warren.brood", "down": "warren.chasm" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+    ]
+  },
+  "warren.brood": {
+    "id": "warren.brood",
+    "zone": "gloom-warren",
+    "name": "The Brood-Heart",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The west gallery chokes down and then opens into a chamber where the crawlers are not streams but a single heaving mass — they pile here thicker than anywhere else in the warren, layered over one another wall to wall and floor to unseen ceiling, a slow churning carpet of pale flesh that never quite stills and never quite quiets, the dry rasp of them filling the dark like surf. Among the smaller bodies the old ones lie half-buried and content, vast and unhurried, and the cast husks drift waist-deep in the corners. Whatever this place is to them — a heart, a hold, the centre they all return to — they suffer no light in it gladly, and the nearest of them are already turning your way. The only way back is east, the way you came.",
+    "exits": { "east": "warren.gallery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 5, "respawn": 20 },
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 200 }
+    ]
+  },
+  "warren.chasm": {
+    "id": "warren.chasm",
+    "zone": "gloom-warren",
+    "name": "The Black Chimney",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery.",
+    "exits": { "up": "warren.gallery", "south": "warren.hush" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 40 }
+    ]
+  },
+  "warren.hush": {
+    "id": "warren.hush",
+    "zone": "gloom-warren",
+    "name": "The Hush",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "The passage off the ledge opens into a small, square chamber, and the moment you cross into it the dark changes its quality — the rasp of the crawlers cuts off behind you, the air goes dead and close, and your light shrinks back to a guttering knot, as though the room itself disapproved of it. The walls here are worked: cut square and true, faced smooth by patient hands long ago, and across the far wall an old relief has been carved — a band of flowing Umbral glyphs gone soft at the edges with age, and at their centre a single hard mark, struck deep and unmistakable in any tongue. It means turn back. Whatever the deep-folk knew when they cut it, they cut it to keep something on the far side of this room, and they did not come back to tend it. The crawlers will not cross the worked threshold; they gather at the passage mouth behind you and no further. Ahead, south, the dark waits. The chimney is back north.",
+    "exits": { "north": "warren.chasm", "south": "warren.relict" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "warren.relict": {
+    "id": "warren.relict",
+    "zone": "gloom-warren",
+    "name": "The Last Claim",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "Past the warded room the worked stone gives way to raw cave again, and here, against the wall, someone made a last stand. A prospector sits where they died, propped against the rock with a spent lantern in their lap and a pick laid across their knees, gone to leather and bone in the dry cold but otherwise undisturbed — even the scour-slugs do not come this far down. They got further than anyone: past the swarm, past the warded hush, almost to the bottom of the warren. On the wall beside them, scratched in chalk by a failing hand, a last claim is staked — a name, a date, and beneath it, smaller: *it drinks the light. do not bring a light.* A few shards have spilled from a rotted pouch, and in their cupped hands, held to the end, is the crystal they came all this way to find. South, the cave opens into a deeper black; north leads back to the hush.",
+    "exits": { "north": "warren.hush", "south": "warren.lair" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "shards", "qty": 15, "respawn": 1800 },
+      { "template": "crystal", "qty": 1, "respawn": 1800 }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 45 }
+    ]
+  },
   "warren.lair": {
     "id": "warren.lair",
     "zone": "gloom-warren",
     "name": "The Drowned Black",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The drop lets you down into the deepest cave of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers thin out and then stop — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends. The only way out is back up.",
-    "exits": { "up": "warren.hall" },
+    "description": "The cave opens south into the deepest hollow of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers do not follow you in — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends, and the dead one's chalk was right. The only way out is back north.",
+    "exits": { "north": "warren.relict" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
