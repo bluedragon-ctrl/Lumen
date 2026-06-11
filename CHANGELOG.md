@@ -97,6 +97,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   spray-damp niche, plus a respawning loose `witchglow-cap`. Gated behind the shrine's
   perception-4 hidden ledge, it gives lake-tier delvers a witchglow source without
   backtracking to the depth-1 Spore Vault, while staying scarce.
+- **Mallki sells witchglow caps.** The Umbral trader now stocks `witchglow-cap`
+  (price 12) — a paid, controlled source fitting a deep-folk who knows the wild
+  witchglow of the tunnels, without putting a free farm in his safe hub garden.
 
 ### Changed
 - **Two mushroom-cluster fixtures instead of three.** The `glow-caps` and
