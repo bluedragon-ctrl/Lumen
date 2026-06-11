@@ -153,8 +153,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the inn lore always implied went into the broth-pot.
 - **Bug-meat skewers are fried in tallow.** `cooked-skewer` now also takes
   `bug-tallow ×1` and heals **+9 HP** (was +8), weaving the new fat into a staple.
+- **Resource verbs forgive the wrong guess.** `mine`, `gather`, and `fish` all
+  pull a resource from a charged fixture and differ only in flavour, but players
+  reach for whichever verb the *thing* suggests. Each verb now hands off to the
+  sibling that fits when it finds nothing of its own kind — `gather`/`mine`/`fish`
+  a vein, a bed, or fishing water and the right action runs regardless. (Previously
+  only `mine`→`gather` redirected; the courtesy is now symmetric and covers `fish`.)
+- **Weeping chasm-moss is gathered, not mined.** The two moss fixtures are
+  reclassified from `mine` to `harvest` (verb *pull*), matching their "pull a clump
+  free" flavour — so `gather moss` / `pick moss` works as expected. `harvest` and
+  `pick` join `gather`/`forage` as verbs for hand-picked crops.
 
 ### Fixed
+- **Hidden ore veins no longer leak through `mine`.** `mine`/`fish` now skip
+  undiscovered hidden fixtures (as `gather` already did), so the hidden silver vein
+  in the Black Drift is no longer listed by a bare `mine` or workable by name before
+  you `search` it out.
 - **Summoned guardians no longer pick fights.** A player's summon (the Glimmer Husk,
   the Wisp) is a defensive guard, but it inherited the proactive-hunter behaviour of
   any `hostile` mob and would aggro and engage wild creatures on sight even while its

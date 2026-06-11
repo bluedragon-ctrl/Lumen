@@ -47,7 +47,7 @@ const VERBS = [
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
-  "mine", "dig", "gather", "forage", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
+  "mine", "dig", "gather", "forage", "harvest", "pick", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   "talk", "give", "deliver", "quest", "quests", "journal",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
@@ -78,7 +78,7 @@ const HELP = [
   "  recipes               — list recipes you know",
   "  craft | make <recipe> — craft at the matching station here",
   "  mine | dig [vein]     — work ore loose from a vein in the room",
-  "  gather | forage [cluster] — pick mushrooms or other crops by hand (also `use <cluster>`)",
+  "  gather | pick | forage [cluster] — pick moss, mushrooms or other crops by hand (also `use <cluster>`)",
   "  fish | angle [water]  — work a baited line in fishing water (spends a grub as bait)",
   "  drink | quaff | eat <item> — consume a potion or food",
   "  use | switch <target> — operate a fixture (lamp), drink/use a carried item, or light/douse a light source",
@@ -815,6 +815,50 @@ function recipes(state, player) {
   return [{ type: "log", text: lines.join("\n") }];
 }
 
+// `mine` / `gather` / `fish` all pull a resource from a charged fixture and
+// differ only in flavour and which flag the fixture carries (`mine`, `harvest`,
+// `fish`). Players don't know the flag — they reach for the verb the *thing*
+// suggests (`gather moss`, though moss is a `mine` fixture; `mine` a mushroom
+// bed). So when a resource verb has nothing of its own kind to work, it hands
+// the room off to the sibling verb that does. The handler table is filled in
+// after all three are declared (see resourceHandlers, below `fish`).
+const RESOURCE_KINDS = ["mine", "harvest", "fish"];
+const resourceHandlers = {}; // { mine, harvest: gather, fish } — wired up below.
+
+// Visible fixtures in the player's room that carry the given resource flag.
+function resourceFixtures(state, player, kind) {
+  const w = state.world;
+  return state.rooms[player.location].fixtures.filter(
+    (f) => w.fixtures[f.template] && w.fixtures[f.template][kind] && fixtureVisibleTo(player, f)
+  );
+}
+
+// Does `arg` (lower-cased) name this fixture, by template id or display name?
+function fixtureMatchesArg(state, f, ql) {
+  const ft = state.world.fixtures[f.template];
+  return f.template.toLowerCase().includes(ql) || ft.name.toLowerCase().includes(ql);
+}
+
+// When a resource verb can't satisfy `arg` (or has none of its own kind here),
+// pick the sibling handler that should run instead — or null to let the caller
+// proceed with its own logic / error. The caller checks its own kind first, so
+// this only ever delegates work the player's verb wouldn't otherwise do.
+function resourceRedirect(state, player, arg, selfKind) {
+  const ql = arg ? arg.toLowerCase() : null;
+  const others = RESOURCE_KINDS.filter((k) => k !== selfKind)
+    .map((k) => ({ kind: k, fixtures: resourceFixtures(state, player, k) }))
+    .filter((o) => o.fixtures.length);
+  if (!others.length) return null;
+  if (ql) {
+    // With an arg, redirect only when it actually names a sibling-kind fixture.
+    const hit = others.find((o) => o.fixtures.some((f) => fixtureMatchesArg(state, f, ql)));
+    return hit ? resourceHandlers[hit.kind] : null;
+  }
+  // No arg: redirect only when exactly one sibling kind is present, so e.g.
+  // bare `gather` in a room that holds only an ore vein is unambiguous.
+  return others.length === 1 ? resourceHandlers[others[0].kind] : null;
+}
+
 // `mine` (alias `dig`): work ore loose from a resource vein in the room. Veins
 // hold a few charges and refill on a timer (see state._mineTick). Each swing
 // spends energy, so a seam can't be stripped in a single tick. Bare-handed for
@@ -824,13 +868,14 @@ function mine(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find anything worth mining." }];
-  const veins = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].mine);
-  // A mushroom cluster isn't ore, but players reach for `mine` on anything that
-  // looks workable. Redirect to the hand-picking path when there's no vein to
-  // swing at (or the named target is a harvestable bed), so the instinct works.
-  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
-  if (beds.length && (!veins.length || (arg && beds.some((b) => b.template.toLowerCase().includes(arg.toLowerCase()) || w.fixtures[b.template].name.toLowerCase().includes(arg.toLowerCase())))))
-    return gather(state, player, arg, ctx);
+  const veins = resourceFixtures(state, player, "mine");
+  // Hand off to gather/fish when the player named something that isn't a vein,
+  // or there's nothing to mine here at all, so the wrong-verb instinct lands.
+  const ownMatch = arg && veins.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!veins.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "mine");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!veins.length) return [{ type: "error", text: "There is nothing to mine here." }];
   let f;
   if (arg) {
@@ -871,7 +916,14 @@ function gather(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find anything worth gathering." }];
-  const beds = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].harvest && fixtureVisibleTo(player, f));
+  const beds = resourceFixtures(state, player, "harvest");
+  // Hand off to mine/fish when the named target isn't a bed, or there's nothing
+  // to gather here — so `gather` works on an ore vein or fishing water too.
+  const ownMatch = arg && beds.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!beds.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "harvest");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!beds.length) return [{ type: "error", text: "There is nothing here to gather." }];
   let f;
   if (arg) {
@@ -914,7 +966,14 @@ function fish(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light))
     return [{ type: "error", text: "It is too dark to find the water, let alone fish it." }];
-  const pools = rt.fixtures.filter((f) => w.fixtures[f.template] && w.fixtures[f.template].fish);
+  const pools = resourceFixtures(state, player, "fish");
+  // Hand off to mine/gather when the named target isn't water, or there's none
+  // here — so a misplaced `fish` on a vein or mushroom bed still does the work.
+  const ownMatch = arg && pools.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!pools.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, "fish");
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
   if (!pools.length) return [{ type: "error", text: "There is no water to fish here." }];
   let f;
   if (arg) {
@@ -955,6 +1014,12 @@ function fish(state, player, arg, ctx) {
   out.push(...qmsgs);
   return out;
 }
+
+// Wire the resource verbs to their fixture flags now that all three exist, so
+// resourceRedirect can hand off between them (see RESOURCE_KINDS, above `mine`).
+resourceHandlers.mine = mine;
+resourceHandlers.harvest = gather;
+resourceHandlers.fish = fish;
 
 // Colour markup (`<#name>…`, see client renderMarkup) is authored-content only.
 // Strip it from anything a player types so chat/emotes can't inject colours.
@@ -1677,6 +1742,8 @@ function execute(state, player, input, ctx = NOOP_CTX) {
       return mine(state, player, arg, ctx);
     case "gather":
     case "forage":
+    case "harvest":
+    case "pick":
       return gather(state, player, arg, ctx);
     case "fish":
     case "angle":
