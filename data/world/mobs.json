@@ -671,7 +671,9 @@
       { "type": "idle", "weight": 7 },
       { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "cave-fish", "chance": 1 }
+    ]
   },
   "old-grinder": {
     "id": "old-grinder",

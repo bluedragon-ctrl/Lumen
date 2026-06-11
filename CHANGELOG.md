@@ -94,9 +94,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Glimmersteel gear is gated through Tobin.** The glimmersteel sword recipe is no
   longer a standalone schematic — it's folded into the new Book of Glimmersteel (with
-  the cuirass and helm). The bar recipe (`schematic-glimmersteel-bar`) remains the
-  separate gating prerequisite Tobin sells, and the lamp, coil, and staff schematics
-  are unchanged (staff still Vesper's).
+  the warhammer, cuirass, and helm). The bar recipe (`schematic-glimmersteel-bar`)
+  remains the separate gating prerequisite Tobin sells, and the lamp, coil, and staff
+  schematics are unchanged (staff still Vesper's).
 - **Ambient NPC emotes are half as frequent.** A global `EMOTE_WEIGHT_SCALE`
   (0.5) thins idle mob chatter to cut console spam, applied to `emote` actions
   before the per-tick action roll. Targeted `react` actions are exempt — they
@@ -105,6 +105,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
 - The **hungering dagger** now forges from a **silver bar** (was iron) + a
   shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
+
+### Fixed
+- **Blind cave-fish now leave a catch when killed.** The swimming `blind-cave-fish`
+  mob dropped nothing on death, so a delver who speared one by hand got nothing —
+  surprising next to the fishing spots that hand over a `cave-fish`. It now drops a
+  blind cave-fish (the same item the line yields).
 
 ### Added
 - **The descent below the lake.** The half-built line at The Far Bank
