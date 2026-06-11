@@ -760,7 +760,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-kingshell-cuirass" }, { "template": "schematic-dense-chitin-cuirass" }]
+      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
     }
   },
   "pale-king": {
@@ -818,6 +818,64 @@
     ],
     "loot": [
       { "template": "glimmer-singer-circlet", "chance": 1 }
+    ]
+  },
+  "elder-gloom-crawler": {
+    "id": "elder-gloom-crawler",
+    "name": "an elder gloom-crawler",
+    "keywords": ["elder", "gloom-crawler", "crawler"],
+    "description": "A gloom-crawler grown vast and old in the deep dark, where nothing ever drove it off and the feeding never stopped. Where its lesser kin flow lightly over the stone, this one hauls itself forward in slow, heaving surges, a pallid mass of segmented flesh the length of a man, its eyeless front fringed with feelers that taste the air for warmth and tremor. Age has thickened it past the reach of a torch's sting — it does not flinch from the small light a delver carries, and will not flee it — but a true brightness still burns the pale hide raw. It reads you long before you see it, and it is patient, and it is always hungry.",
+    "maxHp": 40,
+    "speed": 11,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 14, "intellect": 0, "wits": 4, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "hunt",
+    "hostile": false,
+    "lightAggro": { "above": 0 },
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
+    },
+    "xp": 22,
+    "shards": "2d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["heaves itself forward, flesh dragging over the stone", "fans its feelers wide, tasting for warmth", "lets out a low, wet rattle that fills the dark", "rears its blind front and holds, scenting the air"] }
+    ],
+    "loot": [{ "template": "crystal", "chance": 0.4 }]
+  },
+  "the-starving-dark": {
+    "id": "the-starving-dark",
+    "name": "the Starving Dark",
+    "keywords": ["starving", "dark", "shadow", "living"],
+    "description": "Not a beast but a hole in the light — a coil of living dark that gathered in the dead air beyond the prospectors' camp and learned to feed on the warmth and glow that delvers carry down. It does not bleed and does not breathe; it has no edge the eye can fix on, only a deeper black that shifts against the black, and a cold that leans on the skin like a held breath. Bright light unmakes it, sears it thin and screaming-silent, so it snuffs every flame it can reach and drinks the chamber dry, then closes in the dark of its own making. The crawlers do not serve it. They gather to it the way scavengers trail a killer, drawn to the dark it carries with it. It is the answer to the question the empty camp asks — why the tallies broke off, why no one struck the tents or carried them home. It is the first of its kind a delver meets. It will not be the last.",
+    "maxHp": 90,
+    "speed": 11,
+    "armour": 4,
+    "ward": 2,
+    "attributes": { "might": 9, "vitality": 16, "intellect": 6, "wits": 6, "perception": 9 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 0 },
+    "behavior": "guard",
+    "hostile": true,
+    "lightBane": { "above": 0, "damage": "1d4" },
+    "attack": { "damage": "1d8", "bonus": 2, "actionCost": 13 },
+    "xp": 50,
+    "shards": "2d6",
+    "actions": [
+      { "type": "cast", "weight": 4, "spell": "drink-light" },
+      { "type": "cast", "weight": 4, "spell": "snuff" },
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["folds in on itself, and the cold deepens", "shifts — a darker dark sliding across the dark", "leans toward your light like a thing that is hungry for it", "goes utterly still, and the silence presses in"] }
+    ],
+    "loot": [
+      { "template": "shadow-heart", "chance": 1 },
+      { "template": "crystal", "chance": 1 }
     ]
   }
 }

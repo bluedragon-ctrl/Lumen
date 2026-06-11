@@ -6,10 +6,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Pale King's armour is now Mallki's to teach.** Looting a **kingshell plate**
+  from the Pale King auto-offers a quest, *The King's Shell*, to carry it to
+  **Mallki** — who returns the plate and grants the **kingshell method**
+  (`schematic-kingshell-cuirass`), the recipe for the kingshell cuirass. Mirrors the
+  shadow-heart chain: a deep boss trophy delivered to the Umbral smith unlocks the
+  gear it makes.
+- **Shadow-craft: the Starving Dark's heart, and a blade that drinks life.** The
+  Starving Dark now drops a **shadow-heart** (a craftable material). Looting one
+  auto-offers a quest, *The Heart of the Dark*, to carry it to **Mallki** (the Umbral
+  trader — the deep-folk understand the shadows). He studies it, **returns it**, and
+  grants the **Book of Shadow-Binding**, a `study`-able tome that teaches an
+  expandable set of shadow-craft recipes (seeded with one). Mallki's Hollow gains an
+  **Umbral glimmer-hearth** — a `smithing` station deep down. The first recipe forges
+  **a hungering dagger**: fast and low base damage, but it **steals life** — every
+  landed hit heals the wielder (2 hp). A new reusable combat primitive backs it: an
+  attacker's `onHit` entry marked `target: "self"` lands on the *attacker* (life-
+  steal), mirroring the defender's `onDamage` target axis — data-attachable to any
+  future weapon or life-draining mob.
+- **A hidden vertical shortcut between depth 3 and depth 7.** The Plunge Cave
+  (`third.cave`, depth 3) and the Gloom-Warren's *Black Chimney* (`warren.chasm`,
+  depth 7) are linked by a concealed flue worn by the river's overspill — a steep
+  shortcut between the two tiers. Hidden from **both** sides: the bottom end (a
+  flowstone fissure in the chimney's west wall) is hinted by a warm, wet draught and
+  found by `search` at **perception 4** — the search turns up **old prospectors'
+  climbing-rigging** (a new `prospectors-rigging` fixture: pitons and a knotted line),
+  marking the flue as a Rush-era shortcut rigged before the warren went bad, and a
+  fast way back up for a delver deep below; the top end (a drowned crack under the
+  plunge-pool, whose water never overflows) is unhinted and gated at **perception 8**,
+  so only a sharp-eyed delver finds the way down from above. Reuses the existing
+  hidden-exit/search mechanic; no code changes.
+- **The Gloom-Warren (depth 7) — the first hard tier below the lake.** The low,
+  unstaked passage south of *The Forward Camp* (`deep.camp`) is now traversable and
+  opens into a ten-room, fully-dark warren of big caves crawling with gloom-crawlers.
+  A spine of great caverns — *Where the Dark Goes Bad* (the threshold), *The
+  Crawling Hall* (the hub), *The Long Gallery*, *The Black Chimney* (a natural flue
+  that plunges on past reach — the hook for a deeper tier to come), *The Hush* (a
+  worked-stone chamber where an old **Umbral ward-glyph** reads *turn back* and the
+  crawlers will not cross), *The Last Claim* (the furthest prospector who ever got
+  this deep, dead at the wall with a warning chalked beside them), and *The Drowned
+  Black* (the lair) — with three branches off it: *The Moulting Drift* (husk dunes +
+  an unworked glimmer seam), *The Bone Field* (a feeding ground of bone worked by
+  **scour-slugs**, hiding a search-gated prospector cache), and *The Brood-Heart*
+  (the densest swarm in the warren). Difficulty is a clear step above the deep lake:
+  the swarm itself is the threat — many weak crawlers in a dark you can barely see
+  in — anchored by **elder gloom-crawlers** (elite: ~40 hp, armoured, a festering
+  *gloom-rot* bite, too old to flinch from a torch) and a boss, **the Starving
+  Dark**. The warren also carries its own resource nodes: an **iron vein** (The
+  Long Gallery), a **silver vein** (The Black Chimney), and a **mineable glimmer
+  crystal** won at the swarm's heart (The Brood-Heart, via a new `glimmer-vein`
+  fixture), plus a forage pocket in The Hush — a lightless cave-fungus patch (new
+  `gloom-fungus` fixture, sheds no light) with a few grubs feeding on it.
+- **The Starving Dark — a living shadow, the first of its kind a delver meets.** A
+  light-vulnerable boss (`lightBane` from *any* light) that fights to take your
+  light away: it **snuffs** your carried flame and **drinks the room to black**,
+  then closes in the dark of its own making (it sees in the black where you flail).
+  Bright light is the weapon that unmakes it — a true tug-of-war over the dark. It
+  answers the question the empty camp asks. The reusable shadow kit below is built
+  so it won't be the last of its kind.
+- **Two reusable darkness mob-abilities** (data-attachable, for the shadow family to
+  come): a `douse` spell effect that snuffs a target's equipped light (new `Snuff`
+  spell), and **darkness auras** via an `emit-light` effect authored with a
+  *negative* magnitude — it subtracts from room light rather than adding (new
+  `Drink the Light` spell, cast on self). `computeRoomLight` already summed source
+  outputs; the self-cast path now preserves a negative magnitude instead of flooring
+  it at zero.
 - **Quest-gated shop stock.** A trader's `shop.sells` offer may carry a
   `requiresQuest` id; the item stays hidden from `list` and unbuyable until the
   player has finished that quest (it sits in `quests.done`). Lets vendors reveal
   new wares as a reward for completed work. Data-driven — no new command.
+
+### Changed
+- The kingshell-cuirass method is no longer **sold** by Mallki — it's earned through
+  *The King's Shell* quest (above), so the Pale King's drop is the path to his armour.
+- The **hungering dagger** now forges from a **silver bar** (was iron) + a
+  shadow-heart — tying it to the silver vein in the warren's own Black Chimney.
+
+### Added
 - **The descent below the lake.** The half-built line at The Far Bank
   (`lake.farshore`) is now made fast and runs `down` into two new rooms forming the
   long descent toward the deep: *The Gullet* (depth 5) — a dark, wet switchback

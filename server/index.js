@@ -328,6 +328,7 @@ function dispatchEvent(ev) {
     const who = seen ? ev.mobName : "something";
     let youLine;
     if (ev.resisted) youLine = `${cap(who)} hurls ${ev.spellName} at you, but your ward turns it aside.`;
+    else if (ev.doused) youLine = `${cap(who)} reaches out, and your light gutters and dies — the dark rushes in.`;
     else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
     else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
     sendToPlayer(ev.targetId, { type: "combat", text: youLine });
@@ -335,17 +336,26 @@ function dispatchEvent(ev) {
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "combat", text: `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.` });
+      const line = ev.doused
+        ? `${cap(an)} reaches for ${ev.targetName} and snuffs their light.`
+        : `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.`;
+      sendToPlayer(o.id, { type: "combat", text: line });
     }
     return;
   }
 
   if (ev.type === "mob-cast-self") {
-    // A mob wove a beneficial spell over itself (e.g. Yana's Glimmerskin). The
-    // effect is already applied; narrate to everyone present, light-gating the name.
+    // A mob wove a beneficial spell over itself (e.g. Yana's Glimmerskin), or — when
+    // `darkened` — drank the room's light into a darkness aura. The effect is already
+    // applied; narrate to everyone present, light-gating the name, and on a darkening
+    // refresh each onlooker's view so the room visibly goes black.
     for (const o of state.playersIn(ev.roomId)) {
       const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "combat", text: `${cap(an)} draws ${ev.spellName} about itself.` });
+      const line = ev.darkened
+        ? `${cap(an)} swells, and the light is drawn out of the air — the dark closes over everything.`
+        : `${cap(an)} draws ${ev.spellName} about itself.`;
+      sendToPlayer(o.id, { type: "combat", text: line });
+      if (ev.darkened) sendToPlayer(o.id, buildPlayerView(state, o));
     }
     return;
   }

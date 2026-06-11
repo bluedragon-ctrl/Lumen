@@ -144,5 +144,47 @@
       "xp": 15,
       "shards": 12
     }
+  },
+  "heart-of-the-dark": {
+    "id": "heart-of-the-dark",
+    "name": "The Heart of the Dark",
+    "description": "A shadow-heart, cut cold from the Starving Dark — deep-folk's work, not the surface's. Mallki, the Umbral trader by the river, is the one who would understand it.",
+    "start": {
+      "trigger": "item",
+      "item": "shadow-heart",
+      "offerText": "The shadow-heart sits cold and restless in your pack, drinking the light off your fingers. This is no surface trophy — it is deep-folk's matter, and Mallki, the qhatuq by the river, is the one who would know the binding of it."
+    },
+    "steps": [
+      { "deliver": "shadow-heart", "count": 1, "npc": "umbral-trader", "text": "Carry the shadow-heart to Mallki by the river" }
+    ],
+    "rewards": {
+      "xp": 45,
+      "shards": 25,
+      "items": [
+        { "template": "shadow-heart" },
+        { "template": "book-of-shadow-binding" }
+      ]
+    }
+  },
+  "kings-shell": {
+    "id": "kings-shell",
+    "name": "The King's Shell",
+    "description": "The Pale King's carapace is armour enough for a delver, if it can be worked — and the surface has no smith who would know where to begin. Mallki, the Umbral trader, works the deep's own shell, and would want to see a kingshell plate.",
+    "start": {
+      "trigger": "item",
+      "item": "kingshell-plate",
+      "offerText": "The kingshell plate is heavy as a shield and harder, apex shell crusted with raw glimmer — armour, if a hand that knew the deep's craft could work it. Mallki, the qhatuq by the river, is that hand."
+    },
+    "steps": [
+      { "deliver": "kingshell-plate", "count": 1, "npc": "umbral-trader", "text": "Bring the kingshell plate to Mallki by the river" }
+    ],
+    "rewards": {
+      "xp": 40,
+      "shards": 20,
+      "items": [
+        { "template": "kingshell-plate" },
+        { "template": "schematic-kingshell-cuirass" }
+      ]
+    }
   }
 }

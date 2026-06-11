@@ -230,5 +230,34 @@
     "description": "A scooped hollow in the rock, walled round with a low rim of packed clay to catch the clean water that threads down the wall drop by drop. The prospectors who held this camp set it here to spare themselves the climb to the lake. The water is dark and cold and clean enough — a place to drink and gather yourself before the dark below.",
     "type": "scenery",
     "restore": { "hp": 2, "mana": 2 }
+  },
+  "glimmer-vein": {
+    "id": "glimmer-vein",
+    "name": "a glimmer vein",
+    "description": "A seam of raw glimmer threads the rock, cold mineral light caught in the stone in dull blue-white veins, too faint to push back the dark but unmistakable to a delver's eye. This is the richer find the Rush came down for: worked loose with a patient arm, the seam gives up a whole glimmer crystal before it runs thin — and it is a long, hard while before it is worth the swing again.",
+    "type": "resource",
+    "mine": { "template": "crystal", "yield": 1, "charges": 2, "respawn": 900, "energy": 45 }
+  },
+  "prospectors-rigging": {
+    "id": "prospectors-rigging",
+    "name": "old prospectors' climbing-rigging",
+    "keywords": ["rigging", "rope", "ropes", "line", "pitons", "gear", "climbing"],
+    "description": "Iron pitons hammered deep into the flue at arm's-reach intervals, a knotted climbing-line gone stiff and grey strung between them, and the rotted remains of a rope-sling cinched to the rock. Prospectors rigged this fissure as a shortcut — a fast, ugly climb between the river workings far above and the deep below, cut and equipped before the warren went bad. The line still holds, more or less; the pitons are sound. It was a way down for those in a hurry to be rich, and a way up for those who lived to use it. Whoever last came down it did not climb back out.",
+    "type": "scenery"
+  },
+  "gloom-fungus": {
+    "id": "gloom-fungus",
+    "name": "a patch of pale fungus",
+    "description": "Pale, lightless fungus crusts the seams of the worked stone in soft grey shelves, feeding on the dead air and whatever the dark lets fall rather than on any light — it sheds no glow of its own. Grubs have found it: their slow trails wind pale through the caps where they chew, and a delver who knows the trick of it can pick a few caps for the pot, or gather the grubs for bait.",
+    "type": "resource",
+    "harvest": { "template": "palecap-mushroom", "verb": "pick", "yield": 1, "charges": 3, "respawn": 150, "energy": 10 }
+  },
+  "umbral-forge": {
+    "id": "umbral-forge",
+    "name": "an Umbral glimmer-hearth",
+    "keywords": ["forge", "hearth", "anvil", "umbral"],
+    "description": "Not a coal forge like the surface keeps, but a squat hearth of fitted stone with a cradle of raw glimmer at its heart, breathing a low blue-white heat that throws no smoke. A worked-stone anvil stands beside it, its face inlaid with the rounded glyphs the deep-folk cut into everything they make. Mallki works chitin, glimmer, and bound steel here in the slow, patient way of his people — and it will serve a delver who has the knowing of a recipe and the makings to hand.",
+    "type": "crafting",
+    "station": "smithing"
   }
 }

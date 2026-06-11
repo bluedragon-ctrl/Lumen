@@ -1196,11 +1196,18 @@ class GameState {
     let attackerDeath = null;
     if (!r.hit) return { defenderDeath, attackerDeath };
 
-    // Attacker onHit → the defender (only meaningful while it still lives).
-    if (attacker.onHit && !defenderDeath) {
+    // Attacker onHit → the defender by default (venom, a debuff), but an entry marked
+    // `target: "self"` (or "attacker") lands on the attacker instead — life-steal: a
+    // blade that heals its wielder on a landed hit (the mirror of onDamage's target
+    // axis). Self-target fires even on a killing blow (you drink life as you cut);
+    // defender-target only while the defender still lives.
+    if (attacker.onHit) {
       for (const spec of attacker.onHit) {
         if (!this._rollChance(spec)) continue;
-        this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
+        if (spec.target === "self" || spec.target === "attacker")
+          this._applyTriggerEffect(events, spec, attacker, attacker.hurt, null);
+        else if (!defenderDeath)
+          this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
       }
     }
 
@@ -2112,7 +2119,7 @@ class GameState {
 
     const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (mobDefence(tmt, target.actor).ward || 0);
     const resisted = wardNegates(ward);
-    let damage = 0, killed = false, death = null, effectName = null;
+    let damage = 0, killed = false, death = null, effectName = null, doused = false;
     if (!resisted) {
       if (eff.type === "damage") {
         damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
@@ -2124,16 +2131,27 @@ class GameState {
             ? this._respawn(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
+      } else if (eff.type === "douse") {
+        // Snuff the target's carried light — a shadow's signature reach. Only a player
+        // wields a doused-able lit source (a mob's glow is innate, not a kindled flame),
+        // so it no-ops on a mob target. The delver must relight (a turn) or fight blind;
+        // the room darkens immediately, recomputed below so the band is fresh.
+        if (isPlayer) {
+          const li = target.actor.equipment && target.actor.equipment.light;
+          if (li && li.lit) { li.lit = false; doused = true; }
+        }
+        effectName = eff.name || "Douse";
       } else {
         // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
         this.applyEffect(target.actor, { ...eff });
         effectName = eff.name || eff.type;
       }
     }
+    if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : !!tmt.emitsLight,
-      spellName: spell.name, resisted, damage, effectName, killed,
+      spellName: spell.name, resisted, damage, effectName, doused, killed,
       targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
     });
     if (death) events.push(death);
@@ -2165,13 +2183,21 @@ class GameState {
       this.applyRestore(m, eff);
     } else {
       const bonus = spellScaleBonus(attrs, eff.scale);
-      const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+      const raw = (eff.magnitude || 0) + bonus;
+      // A *darkness* aura is an emit-light effect authored with a negative magnitude
+      // (it drinks the room's light rather than sheds it — see computeRoomLight, which
+      // sums a source's output be it positive or negative). Preserve the negative; a
+      // positive light weave still floors at 1 so a scaling source always shows.
+      const magnitude = raw < 0 ? raw : Math.max(eff.scale ? 1 : 0, raw);
       this.applyEffect(m, { ...eff, magnitude });
       if (eff.type === "emit-light") rt.light = this.computeRoomLight(roomId);
     }
     events.push({
       type: "mob-cast-self", roomId, mobId: m.id, mobName: t.name,
       emitsLight: !!t.emitsLight, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
+      // A negative emit-light weave is a darkness aura, not a self-buff — the client
+      // narrates it as the room being swallowed rather than something drawn "about itself".
+      darkened: eff.type === "emit-light" && ((eff.magnitude || 0) < 0),
     });
   }
 

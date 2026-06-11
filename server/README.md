@@ -264,8 +264,16 @@ Actors carry timed status effects (`player.states`) applied from a data-driven s
 `{ type, name, magnitude, duration }` — the same primitive a potion or (later) a
 spell references. The tick loop counts down each effect and removes it on expiry.
 Implemented primitive: `emit-light` (the actor radiates `magnitude` light, summed
-into room light and shown as a glow). `drink`/`quaff`/`use <potion>` applies the
-item's `consumable.effect`.
+into room light and shown as a glow). A **negative** `magnitude` is a *darkness
+aura* — it subtracts from room light, so a shadow that self-casts one drinks the
+chamber to black (see the `drink-light` spell). `drink`/`quaff`/`use <potion>`
+applies the item's `consumable.effect`.
+
+A second light-touching primitive, `douse`, is a hostile spell effect (no status):
+on a player target it snuffs the equipped light (`lit → false`), forcing a relight
+or a blind fight, and darkens the room at once. Both are mob-castable abilities,
+built reusable for light-hating creatures (see the `snuff`/`drink-light` spells and
+*the Starving Dark*).
 
 ### Switchable fixtures
 

@@ -384,5 +384,16 @@
       { "template": "weeping-chasm-moss", "qty": 3 }
     ],
     "output": { "template": "gloom-silk", "qty": 1 }
+  },
+  "forge-hungering-dagger": {
+    "id": "forge-hungering-dagger",
+    "name": "Hungering Dagger",
+    "station": "smithing",
+    "inputs": [
+      { "template": "silver-bar", "qty": 1 },
+      { "template": "shadow-heart", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "hungering-dagger", "qty": 1 }
   }
 }
