@@ -968,18 +968,21 @@ function recipes(state, player) {
   // One line per recipe; greyed (via `<#gray>` markup) when you lack the
   // components/shards to make it. In the "elsewhere" block the station you'd
   // need is appended, since those recipes span different stations.
+  // Affordable recipes lead with a green name; ones you can't make yet read fully
+  // grey (the station you'd need is appended in the "Elsewhere" block).
   const fmt = (r, withStation) => {
     const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
     if (r.shards) ins.push(`${r.shards} shards`);
     const where = withStation ? ` — at ${stationLabel(w, r.station)}` : "";
-    const line = `  ${r.name || r.id}: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
-    return canAfford(player, r) ? line : `<#gray>${line}`;
+    const name = r.name || r.id;
+    const rest = `: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
+    return canAfford(player, r) ? `  <#green>${name}<#reset>${rest}` : `<#gray>  ${name}${rest}<#reset>`;
   };
   const hereRecs = recs.filter((r) => here.has(r.station));
   const awayRecs = recs.filter((r) => !here.has(r.station));
-  const lines = ["You know how to craft:"];
-  if (hereRecs.length) lines.push("", "Here:", ...hereRecs.map((r) => fmt(r, false)));
-  if (awayRecs.length) lines.push("", "Elsewhere:", ...awayRecs.map((r) => fmt(r, true)));
+  const lines = ["<#gold>Recipes<#reset>"];
+  if (hereRecs.length) lines.push("", "<#cyan>Here<#reset>", ...hereRecs.map((r) => fmt(r, false)));
+  if (awayRecs.length) lines.push("", "<#cyan>Elsewhere<#reset>", ...awayRecs.map((r) => fmt(r, true)));
   return [{ type: "log", text: lines.join("\n") }];
 }
 
@@ -1330,7 +1333,7 @@ function spellList(state, player) {
   const w = state.world;
   const known = player.knownSpells || [];
   if (!known.length) return [{ type: "log", text: "You know no spells. Study a scroll to learn one." }];
-  const lines = ["You know how to cast:"];
+  const lines = ["<#gold>Spells<#reset>", ""];
   for (const id of known) {
     const s = w.spells[id];
     if (!s) continue;
@@ -1372,9 +1375,9 @@ function spellList(state, player) {
     // Material components (e.g. a chitin plate for Glimmer Husk) are listed after mana/shards as `name (qty)`.
     const comps = (s.itemCost || []).map((c) => `${w.items[c.template] ? w.items[c.template].name : c.template} (${c.qty || 1})`);
     const cost = [`${s.manaCost || 0} mana`, s.shardCost ? `${s.shardCost} shards` : null, ...comps].filter(Boolean).join(" + ");
-    lines.push(`  ${s.name}: ${cost}${tail}`);
+    lines.push(`  <#green>${s.name}<#reset>: ${cost}${tail}`);
   }
-  lines.push(`Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.`);
+  lines.push("", `<#gray>Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.<#reset>`);
   return [{ type: "log", text: lines.join("\n") }];
 }
 

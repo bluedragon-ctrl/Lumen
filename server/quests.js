@@ -294,19 +294,21 @@ function handleGive(state, player, mob, itemInst) {
 function log(state, player) {
   const w = state.world;
   const q = ensure(player);
-  const lines = ["Quests", "", "In progress:"];
+  // Mirrors the `help` palette: gold title, cyan headings, green active-quest
+  // names; finished quests read muted grey. (See renderMarkup in the client.)
+  const lines = ["<#gold>Quests<#reset>", "", "<#cyan>In progress<#reset>"];
   const active = Object.entries(q.active).filter(([qid]) => w.quests[qid]);
-  if (!active.length) lines.push("  (none)");
+  if (!active.length) lines.push("  <#gray>(none)<#reset>");
   for (const [qid, entry] of active) {
     const quest = w.quests[qid];
     const step = quest.steps[entry.step];
     const prog = stepProgress(state, player, quest, entry);
-    lines.push(`  ${quest.name} — ${step.text || stepLabel(state, step)}${prog ? ` (${prog})` : ""}`);
+    lines.push(`  <#green>${quest.name}<#reset> — ${step.text || stepLabel(state, step)}${prog ? ` (${prog})` : ""}`);
   }
-  lines.push("", "Finished:");
+  lines.push("", "<#cyan>Finished<#reset>");
   const done = q.done.filter((id) => w.quests[id]);
-  if (!done.length) lines.push("  (none)");
-  for (const id of done) lines.push(`  ${w.quests[id].name} ✓`);
+  if (!done.length) lines.push("  <#gray>(none)<#reset>");
+  for (const id of done) lines.push(`  <#gray>${w.quests[id].name} ✓<#reset>`);
   return [{ type: "log", text: lines.join("\n") }];
 }
 

@@ -138,6 +138,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
 ### Changed
+- **`spells`, `recipes`, and the quest log share the `help` palette.** All three now
+  open with a gold title, use cyan section headings (recipes' Here/Elsewhere, the
+  quest log's In progress/Finished), and lead each entry with a green name — spells,
+  recipe outputs, active quests. Unaffordable recipes and finished quests read muted
+  grey. Purely cosmetic; unifies the four list screens visually.
 - **Leaner starting loadout.** A new delver now begins with a single **short sword,
   unequipped** (was an equipped sword *plus* a spare in the pack) and **no Scroll of
   Spark** — first weapon and first spell are now choices to make, not freebies. Still
