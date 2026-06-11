@@ -92,6 +92,8 @@ const HELP = [
   "",
   "Commands can be shortened to any unambiguous prefix (exa→examine, cr→craft).",
   "Target things by any word in their name (kill innkeeper, get glimmerstone).",
+  "When several match, pick one with a number (kill 2.crawler), or act on every",
+  "one with all (get all, drop all.pelt, sell all.crystal).",
 ].join("\n");
 
 const selfAndViews = (state, player, line, kind = "log") => [
@@ -136,9 +138,60 @@ function matchesQuery(q, name, keywords, id) {
   return (name || "").toLowerCase().includes(ql);
 }
 
-// Find an item instance matching `q` (by id, keyword, or name) within a list.
+// DikuMUD-style target syntax: split a query into an optional `all` flag, an
+// optional 1-based ordinal (`2.crawler` → the second crawler), and the bare
+// keyword to match. `all`/`all.keyword` set `all` and zero the ordinal.
+//   "all"        -> { all:true,  ordinal:0, keyword:"" }
+//   "all.shard"  -> { all:true,  ordinal:0, keyword:"shard" }
+//   "2.dagger"   -> { all:false, ordinal:2, keyword:"dagger" }
+//   "dagger"     -> { all:false, ordinal:1, keyword:"dagger" }
+function parseTarget(arg) {
+  let q = (arg || "").trim();
+  const lead = q.toLowerCase();
+  if (lead === "all" || lead.startsWith("all.")) {
+    return { all: true, ordinal: 0, keyword: q.slice(3).replace(/^\./, "").trim() };
+  }
+  const m = /^(\d+)\.(.+)$/.exec(q);
+  if (m) return { all: false, ordinal: parseInt(m[1], 10) || 1, keyword: m[2].trim() };
+  return { all: false, ordinal: 1, keyword: q };
+}
+
+// Indices in `list` whose item matches `keyword` (an empty keyword matches all),
+// preserving list order — the basis for ordinal and `all` selection.
+function itemMatches(list, world, keyword) {
+  const idxs = [];
+  list.forEach((i, idx) => {
+    const t = world.items[i.template];
+    if (!keyword || matchesQuery(keyword, t.name, t.keywords, i.id)) idxs.push(idx);
+  });
+  return idxs;
+}
+
+// Find a single item instance matching `q`, honouring an `N.` ordinal prefix.
+// Returns the list index, or -1. A bare `all` (no keyword) isn't a single
+// target, so it finds nothing — bulk commands check `parseTarget().all` first.
 function findItem(list, world, q) {
-  return list.findIndex((i) => matchesQuery(q, world.items[i.template].name, world.items[i.template].keywords, i.id));
+  const { ordinal, keyword } = parseTarget(q);
+  if (!keyword) return -1;
+  const idxs = itemMatches(list, world, keyword);
+  const pick = idxs[(ordinal || 1) - 1];
+  return pick === undefined ? -1 : pick;
+}
+
+// Resolve a mob in the player's room by query, honouring an `N.` ordinal prefix.
+// `requireVisible` gates hidden-mob reveals; `cast` historically skips that
+// check, so it passes false. Returns the mob instance or null.
+function findMobInRoom(state, player, q, requireVisible = true) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const see = canSee(player.perception, rt.light);
+  const { ordinal, keyword } = parseTarget(q);
+  if (!keyword) return null;
+  const matches = rt.mobs.filter((m) => {
+    const t = w.mobs[m.template];
+    return (!requireVisible || mobVisibleTo(state, player, m)) && (see || t.emitsLight) && matchesQuery(keyword, t.name, t.keywords, m.id);
+  });
+  return matches[(ordinal || 1) - 1] || null;
 }
 
 function addToInventory(player, inst, world) {
@@ -364,40 +417,75 @@ function unequip(state, player, arg, ctx) {
 
 function get(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Get what?" }];
+  const w = state.world;
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light)) return [{ type: "error", text: "It is too dark to find anything." }];
   // Undiscovered hidden items aren't pickable by name — you must `search` first.
   const visible = rt.items.filter((i) => itemVisibleTo(player, i));
-  const vIdx = findItem(visible, state.world, arg);
-  if (vIdx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
-  const inst = rt.items.splice(rt.items.indexOf(visible[vIdx]), 1)[0];
-  const t = state.world.items[inst.template];
-  // Currency isn't carried as an item — gathering it tallies to the purse.
-  if (t.type === "currency") {
-    const amt = inst.qty || 1;
-    player.shards = (player.shards || 0) + amt;
-    const noun = `${amt} shard${amt === 1 ? "" : "s"}`;
-    ctx.toRoom(player.location, { type: "log", text: `${player.name} gathers ${noun}.` }, player.id);
+  const { all, keyword } = parseTarget(arg);
+  // Take a single floor instance into purse (currency) or pack; returns a label
+  // for the picked-up summary, pushing any quest messages onto `qmsgs`.
+  const take = (inst, qmsgs) => {
+    rt.items.splice(rt.items.indexOf(inst), 1);
+    const t = w.items[inst.template];
+    if (t.type === "currency") {
+      const amt = inst.qty || 1;
+      player.shards = (player.shards || 0) + amt;
+      return `${amt} shard${amt === 1 ? "" : "s"}`;
+    }
+    addToInventory(player, inst, w);
+    qmsgs.push(...quests.noteAcquire(state, player, inst.template)); // before views so rewards show
+    return t.name;
+  };
+  if (all) {
+    const targets = itemMatches(visible, w, keyword).map((i) => visible[i]);
+    if (!targets.length) return [{ type: "error", text: keyword ? `There is no "${keyword}" here to get.` : "There is nothing here to get." }];
+    const qmsgs = [];
+    const labels = targets.map((inst) => take(inst, qmsgs));
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} gathers up what lies here.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You gather ${noun}. (${player.shards} total)`);
+    const out = selfAndViews(state, player, `You pick up ${labels.join(", ")}.`);
+    out.push(...qmsgs);
+    return out;
   }
-  addToInventory(player, inst, state.world);
-  const name = t.name;
-  const qmsgs = quests.noteAcquire(state, player, inst.template); // before views so rewards show
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} picks up ${name}.` }, player.id);
+  const vIdx = findItem(visible, w, arg);
+  if (vIdx < 0) return [{ type: "error", text: `There is no "${arg}" here to get.` }];
+  const inst = visible[vIdx];
+  const isCurrency = w.items[inst.template].type === "currency";
+  const qmsgs = [];
+  const label = take(inst, qmsgs);
+  const verb = isCurrency ? "gathers" : "picks up";
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb} ${label}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  const out = selfAndViews(state, player, `You pick up ${name}.`);
+  const tail = isCurrency ? ` (${player.shards} total)` : "";
+  const out = selfAndViews(state, player, `You ${isCurrency ? "gather" : "pick up"} ${label}.${tail}`);
   out.push(...qmsgs);
   return out;
 }
 
 function drop(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Drop what?" }];
-  const idx = findItem(player.inventory, state.world, arg);
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const { all, keyword } = parseTarget(arg);
+  if (all) {
+    const targets = itemMatches(player.inventory, w, keyword).map((i) => player.inventory[i]);
+    if (!targets.length) return [{ type: "error", text: keyword ? `You aren't carrying any "${keyword}".` : "You are carrying nothing to drop." }];
+    const labels = [];
+    for (const inst of targets) {
+      player.inventory.splice(player.inventory.indexOf(inst), 1);
+      addToFloor(rt, inst, w);
+      labels.push(w.items[inst.template].name);
+    }
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} sets down a few things.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    return selfAndViews(state, player, `You drop ${labels.join(", ")}.`);
+  }
+  const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory.splice(idx, 1)[0];
-  addToFloor(state.rooms[player.location], inst, state.world);
-  const name = state.world.items[inst.template].name;
+  addToFloor(rt, inst, w);
+  const name = w.items[inst.template].name;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} drops ${name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
   return selfAndViews(state, player, `You drop ${name}.`);
@@ -478,11 +566,31 @@ function sell(state, player, arg, ctx) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
+  const { all, keyword } = parseTarget(arg);
+  // The trader buys any valued item at its sell value — no per-trader buy list.
+  if (all) {
+    // `sell all` clears out the whole of each matching valued stack at once.
+    const targets = itemMatches(player.inventory, w, keyword).map((i) => player.inventory[i]);
+    const sold = [];
+    let total = 0;
+    for (const inst of targets) {
+      const t = w.items[inst.template];
+      const unit = sellValueOf(t);
+      if (!t.value || unit <= 0) continue; // trader won't buy it — leave it in the pack
+      const qty = inst.qty != null ? inst.qty : 1;
+      player.inventory.splice(player.inventory.indexOf(inst), 1);
+      total += unit * qty;
+      sold.push(qty > 1 ? `${t.name} ×${qty}` : t.name);
+    }
+    if (!sold.length) return [{ type: "error", text: keyword ? `${sh.t.name} won't buy any "${keyword}" from you.` : `${sh.t.name} won't buy anything you're carrying.` }];
+    player.shards = (player.shards || 0) + total;
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} trades with ${sh.t.name}.` }, player.id);
+    return selfAndViews(state, player, `You sell ${sold.join(", ")} for ${total} shards. (${player.shards} total)`);
+  }
   const idx = findItem(player.inventory, w, arg);
   if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
   const inst = player.inventory[idx];
   const t = w.items[inst.template];
-  // The trader buys any valued item at its sell value — no per-trader buy list.
   const price = sellValueOf(t);
   if (!t.value || price <= 0) return [{ type: "error", text: `${sh.t.name} won't give you anything for ${t.name}.` }];
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
@@ -1053,12 +1161,7 @@ function lookAt(state, player, arg) {
 function attack(state, player, arg) {
   if (!arg) return [{ type: "error", text: "Attack what?" }];
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = state.world.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, arg);
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to attack.` }];
   player.pending = { type: "attack", targetId: mob.id };
   const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
@@ -1259,12 +1362,7 @@ function cast(state, player, arg, ctx) {
   if (spell.effect && spell.effect.type === "damage-room") return castBurst(state, player, spell, ctx);
 
   if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return (see || t.emitsLight) && matchesQuery(targetQ, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, targetQ, false);
   if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
 
   const mt = w.mobs[mob.template];
@@ -1495,12 +1593,7 @@ function train(state, player, arg) {
 function talk(state, player, arg, ctx) {
   if (!arg) return [{ type: "error", text: "Talk to whom?" }];
   const w = state.world;
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(arg, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, arg);
   if (!mob) return [{ type: "error", text: `You see no "${arg}" here to talk to.` }];
   const t = w.mobs[mob.template];
   ctx.toRoom(player.location, { type: "log", text: `${player.name} speaks with ${t.name}.` }, player.id);
@@ -1534,12 +1627,7 @@ function give(state, player, arg, ctx) {
   else { const toks = arg.trim().split(/\s+/); npcQ = toks[toks.length - 1]; itemQ = toks.slice(0, -1).join(" "); }
   if (!itemQ || !npcQ) return [{ type: "error", text: "Give what to whom? (give <item> <npc>)" }];
 
-  const rt = state.rooms[player.location];
-  const see = canSee(player.perception, rt.light);
-  const mob = rt.mobs.find((m) => {
-    const t = w.mobs[m.template];
-    return mobVisibleTo(state, player, m) && (see || t.emitsLight) && matchesQuery(npcQ, t.name, t.keywords, m.id);
-  });
+  const mob = findMobInRoom(state, player, npcQ);
   if (!mob) return [{ type: "error", text: `You see no "${npcQ}" here to give anything to.` }];
   const iidx = findItem(player.inventory, w, itemQ);
   if (iidx < 0) return [{ type: "error", text: `You aren't carrying "${itemQ}".` }];
@@ -1641,6 +1729,27 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
     default:
       return [{ type: "error", text: `Unknown admin command: "${verb}". Try "@help".` }];
   }
+}
+
+// Levenshtein edit distance, bounded use only — VERBS is short. Drives the
+// "did you mean?" hint for a mistyped verb that prefix-abbreviation can't catch.
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+
+// The known verb closest to a typo, if it's near enough to be worth suggesting.
+function closestVerb(verb) {
+  let best = null, bestD = Infinity;
+  for (const v of VERBS) {
+    const d = editDistance(verb, v);
+    if (d < bestD) { bestD = d; best = v; }
+  }
+  return bestD <= 2 ? best : null;
 }
 
 function execute(state, player, input, ctx = NOOP_CTX) {
@@ -1776,8 +1885,11 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "help":
     case "?":
       return [{ type: "log", text: HELP }];
-    default:
-      return [{ type: "error", text: `Unknown command: "${verb}". Try "help".` }];
+    default: {
+      const guess = closestVerb(verb);
+      const hint = guess ? ` Did you mean "${guess}"?` : ` Try "help".`;
+      return [{ type: "error", text: `Unknown command: "${verb}".${hint}` }];
+    }
   }
 }
 

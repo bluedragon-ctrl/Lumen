@@ -137,6 +137,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Garrick sells an `oil-rendering` schematic**, gating the new render craft.
 - Maeve now stocks the **deep stew** ready-made alongside her other dishes.
 
+### Added
+- **DikuMUD-style target selection.** When several things share a name, pick one
+  with an ordinal — `kill 2.crawler`, `get 3.shard` — or act on the whole lot with
+  `all`: `get all`, `get all.shard`, `drop all`, `drop all.pelt`, `sell all`,
+  `sell all.crystal` (a stack sells in full). Works for items (get/drop/sell) and
+  creatures (attack/cast/talk/give), routed through a shared `parseTarget` layer so
+  the syntax is uniform. `help` documents it.
+- **"Did you mean?" on a mistyped command.** An unknown verb that isn't just a
+  prefix now suggests the closest real command (`atttack` → *Did you mean "attack"?*)
+  instead of a bare error.
+
 ### Removed
 - **Tab completion removed from the command input.** The partial-verb abbreviation
   system on the server already lets you type `ga` for `gather` or `mi` for `mine`;
