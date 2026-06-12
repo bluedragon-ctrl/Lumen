@@ -91,6 +91,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   player has finished that quest (it sits in `quests.done`). Lets vendors reveal
   new wares as a reward for completed work. Data-driven — no new command.
 
+### Changed
+- **Skittish prey — grubs and cave-fish behave like animals, not pickups.** A new
+  data-driven `skittish` mob flag lets a calm critter *bolt out of the world* (it
+  slips out of sight rather than fleeing room-to-room, freeing its spawn slot to
+  repop on the normal timer). It bolts readily once alarmed — and because grubs and
+  blind cave-fish are now `helper` mobs with no `attack`, striking one spooks the
+  whole cluster into scattering instead of fighting, so a delver must be quick to
+  catch more than the one they hit. A faint *ambient* bolt chance while a delver is
+  watching makes a populated fungus bed or pool visibly breathe (the count drifts
+  under its cap as critters slip away and respawn). Both gained rare reactive
+  emotes. Harvest yield is unchanged — they still drop bait/meat when caught.
+
 ### Added
 - **A second witchglow source — Behind the Paqcha.** The hidden Umbral shrine behind
   the falls (`lake.shrine`, depth 4) now grows a **witchglow-cluster** in its lamp-lit,

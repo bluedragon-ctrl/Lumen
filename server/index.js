@@ -509,6 +509,17 @@ function dispatchEvent(ev) {
     return;
   }
 
+  if (ev.type === "mob-flee") {
+    // A skittish critter slipped out of sight (no corpse/loot) — narrate the
+    // vanish to onlookers and refresh the room so the count updates.
+    for (const o of state.playersIn(ev.roomId)) {
+      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "Something";
+      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.verb}.` });
+      sendToPlayer(o.id, buildRoomView(state, o));
+    }
+    return;
+  }
+
   if (ev.type === "mob-spawn") {
     for (const o of state.playersIn(ev.roomId)) {
       const text = canSeeMob(o, ev.light, ev.emitsLight) ? `${cap(ev.mobName)} appears.` : "Something stirs in the dark.";

@@ -495,6 +495,21 @@ class GameState {
     }
   }
 
+  /** A skittish prey mob slips out of the world — no corpse, loot, or XP, just a
+   *  `mob-flee` tell. Unlike a summon's dismissal this frees its spawner slot
+   *  (`_adjustOwned(-1)`) so the bed repops on the normal timer. Called from the
+   *  skittish branch in `_mobAct`. */
+  _bolt(m, t, roomId, events, verb) {
+    const rt = this.rooms[roomId];
+    const idx = rt.mobs.indexOf(m);
+    if (idx < 0) return;
+    rt.mobs.splice(idx, 1);
+    m.hp = 0; // mark gone for any lingering reference
+    this._adjustOwned(m, -1); // free the spawn slot — it repops on the room's timer
+    rt.light = this.computeRoomLight(roomId);
+    events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, verb: verb || "slips out of sight" });
+  }
+
   /** Dismiss every summon owned by `ownerId` (owner death/disconnect). */
   _dismissOwnedSummons(ownerId, reason, events = []) {
     const owned = [];
@@ -1632,6 +1647,23 @@ class GameState {
     const allDirs = Object.keys(this.world.rooms[roomId].exits || {});
     const roamDirs = this._zoneExits(roomId);
     const wanderDirs = (a) => (a.scope === "any" ? allDirs : roamDirs);
+
+    // Skittish prey (grubs, cave-fish): a calm critter that loses its nerve and
+    // bolts out of the world entirely — no room-to-room flight, it simply slips
+    // out of sight, freeing its spawn slot to repop on the room's timer. It bolts
+    // readily once *alarmed* (`chance`) — struck, or spooked by a `helper` ally's
+    // fight nearby (see _assistPass); these mobs carry no `attack`, so a cluster
+    // that catches the alarm scatters rather than fights, and a delver must be
+    // quick to take more than the one they struck. While merely *watched* by a
+    // delver it also carries a faint ambient chance (`idle`) to vanish, so a
+    // populated bed visibly breathes — a count that drifts under its cap as
+    // critters slip away and respawn. Living scenery that won't sit still to farm.
+    if (t.skittish) {
+      const watched = this.playersIn(roomId).length > 0;
+      const p = inCombat ? (t.skittish.chance != null ? t.skittish.chance : 0.4)
+              : watched ? (t.skittish.idle || 0) : 0;
+      if (p > 0 && Math.random() < p) return this._bolt(m, t, roomId, events, t.skittish.verb);
+    }
 
     // Light-driven flight: a mob with a `flee` action bolts for a random exit the
     // instant the room light rises above its tolerance. This overrides its normal

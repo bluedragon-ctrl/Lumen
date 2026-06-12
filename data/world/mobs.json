@@ -535,10 +535,13 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
+    "helper": true,
+    "skittish": { "chance": 0.4, "idle": 0.03, "verb": "burrows out of sight" },
     "xp": 1,
     "actions": [
       { "type": "idle", "weight": 8 },
-      { "type": "emote", "weight": 2, "messages": ["chews a slow trail through the fungus", "inches blindly over the stone"] }
+      { "type": "emote", "weight": 2, "messages": ["chews a slow trail through the fungus", "inches blindly over the stone"] },
+      { "type": "emote", "weight": 1, "messages": ["recoils from the disturbance", "curls tight against the stone"] }
     ],
     "loot": [{ "template": "grub", "chance": 1 }]
   },
@@ -666,10 +669,13 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
+    "helper": true,
+    "skittish": { "chance": 0.4, "idle": 0.03, "verb": "slips away into the black water" },
     "xp": 2,
     "actions": [
       { "type": "idle", "weight": 7 },
-      { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] }
+      { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] },
+      { "type": "emote", "weight": 1, "messages": ["flicks away into the black water", "shies from the ripples"] }
     ],
     "loot": [
       { "template": "cave-fish", "chance": 1 }
