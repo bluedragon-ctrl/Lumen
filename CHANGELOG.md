@@ -102,6 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   watching makes a populated fungus bed or pool visibly breathe (the count drifts
   under its cap as critters slip away and respawn). Both gained rare reactive
   emotes. Harvest yield is unchanged — they still drop bait/meat when caught.
+  Each grub bed's spawn cap is raised by one (the three grub rooms now hold 3, 3,
+  and 4) so the new flee/respawn flux leaves enough on the beds to gather.
 
 ### Added
 - **A second witchglow source — Behind the Paqcha.** The hidden Umbral shrine behind
