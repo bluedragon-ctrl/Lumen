@@ -150,5 +150,14 @@
     "hostile": true,
     "target": "creature",
     "effect": { "type": "douse", "name": "Snuff" }
+  },
+  "gloom-bolt": {
+    "id": "gloom-bolt",
+    "name": "Gloom Bolt",
+    "description": "Not a weave a delver could learn, but a thing the deep does to what lingers too long against it: the crawler gathers the cold dark to its blind front and flings it like spat venom, a clot of hungry black that bites where it lands and seems, for a heartbeat, to drink the warmth it tears loose. It is the Starving Dark's appetite gone small and portable, carried in a beast that was never meant to hold it. Only Ward turns it aside.",
+    "manaCost": 0,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
   }
 }
