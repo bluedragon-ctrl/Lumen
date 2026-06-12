@@ -640,7 +640,7 @@
     "id": "pale-crayfish",
     "name": "a pale crayfish",
     "description": "A translucent, eyeless crayfish picking through the silt of the deep pools, claws raised at anything that nears its water.",
-    "maxHp": 11,
+    "maxHp": 17,
     "speed": 9,
     "armour": 2,
     "ward": 0,
@@ -648,7 +648,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "guard",
     "hostile": true,
-    "attack": { "damage": "1d4", "actionCost": 12 },
+    "attack": { "damage": "1d6", "actionCost": 12 },
     "xp": 6,
     "actions": [
       { "type": "attack", "weight": 6 },

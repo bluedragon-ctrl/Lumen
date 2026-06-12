@@ -109,7 +109,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Combat tuning.** **The Old Grinder** is sturdier and hits harder — `maxHp`
-  60→90, `armour` 5→6, melee `1d6`→`2d4`. **The Pale Shallows** now spawns up to two
+  60→90, `armour` 5→6, melee `1d6`→`2d4`. The **pale crayfish** is tougher too —
+  `maxHp` 11→17, melee `1d4`→`1d6`. **The Pale Shallows** now spawns up to two
   cave-lurkers (was one). **Yana, the lost apprentice** is reworked from a pushover
   into a real mini-boss: `maxHp` 30→70, `armour` 2→3, `ward` 2→4, melee `1d6`→`1d8`,
   and her action table leans harder into Glimmer Spike (fewer idle/emote turns).
