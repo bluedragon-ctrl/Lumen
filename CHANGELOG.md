@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Gloom-touched crawlers — the warren's first magical threat.** A new depth-7
+  mob (`gloom-touched-crawler`), a gloom-crawler mutated by lingering too long
+  against the Starving Dark, now flings a **Gloom Bolt** — magical damage scaled
+  by Intellect and resisted by **Ward** (both the wholesale cast-negation roll and
+  the percentage damage cut). Gives Ward real work at depth and seeds magical enemy
+  attacks for the deeper tiers. They replace the elder gloom-crawler in **The Long
+  Gallery** and **The Brood-Heart**, the two warren rooms nearest the Drowned Black;
+  the elders still hold the upper warren.
 - **Glimmersteel armour.** Two new rare pieces forged from glimmersteel bars at the
   smithing station: a **glimmersteel cuirass** (`armour 3, ward 1`, 3 bars) and a
   **glimmersteel helm** (`armour 2, ward 1`, 2 bars). Their niche is protection

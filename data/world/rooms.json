@@ -888,7 +888,7 @@
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
-      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+      { "mob": "gloom-touched-crawler", "max": 1, "respawn": 240 }
     ]
   },
   "warren.brood": {
@@ -903,7 +903,7 @@
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 5, "respawn": 20 },
-      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 200 }
+      { "mob": "gloom-touched-crawler", "max": 1, "respawn": 200 }
     ]
   },
   "warren.chasm": {

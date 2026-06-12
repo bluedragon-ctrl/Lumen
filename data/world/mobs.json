@@ -857,6 +857,36 @@
     ],
     "loot": [{ "template": "crystal", "chance": 0.4 }]
   },
+  "gloom-touched-crawler": {
+    "id": "gloom-touched-crawler",
+    "name": "a gloom-touched crawler",
+    "keywords": ["gloom-touched", "touched", "crawler"],
+    "description": "One of the warren's pale mass, but wrong. Its flesh has gone the grey of a snuffed coal, and a thread of the deeper dark clings to it the way oil clings to water, never quite settling. This one crawled too long against the thing in the drowned hollow that drinks the light, and the appetite has gotten into it — where its kin only hunger, this one has learned to reach. It gathers the cold dark to its blind front and flings it, and the warmth it tears out of you it seems, for a moment, to feed on. A torch still burns its hide raw, but the dark in it does not care to be seen.",
+    "maxHp": 48,
+    "speed": 11,
+    "armour": 2,
+    "ward": 1,
+    "attributes": { "might": 7, "vitality": 14, "intellect": 7, "wits": 4, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "hunt",
+    "hostile": false,
+    "lightAggro": { "above": 0 },
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
+    },
+    "xp": 30,
+    "shards": "2d4",
+    "actions": [
+      { "type": "cast", "weight": 4, "spell": "gloom-bolt" },
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["draws the dark in close about its blind front, and the cold deepens", "heaves itself forward, a thread of black trailing from its grey flesh", "fans its feelers wide, tasting for warmth", "lets out a low, wet rattle, and for a moment your light seems to gutter"] }
+    ],
+    "loot": [{ "template": "crystal", "chance": 0.4 }]
+  },
   "the-starving-dark": {
     "id": "the-starving-dark",
     "name": "the Starving Dark",
