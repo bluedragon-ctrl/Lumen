@@ -52,6 +52,17 @@ Rule of thumb for authored spells: a spell that **consumes shards** (`shardCost`
 glimmer-craft; one that costs **mana only** is the human tradition — keep its flavour
 text clear of glimmer-as-medium.
 
+Both traditions are **learnable** — a delver studies them, pays a cost, and casts at
+will. There is a **third kind of magic that is not a tradition at all**: the things of
+the deep simply *do* it. A living shadow drinks a room dark; a beast steeped too long in
+that dark learns to fling a little of it back. These are **the deep's own workings** —
+innate, never taught, never paid for in mana or shards (mob-only spells carry
+`manaCost 0` and no `shardCost`: *Snuff*, *Drink the Light*, *Gloom Bolt*). They are not
+a school a delver could enrol in but a property of the deep itself, and the further down
+you go the more of them you meet. Author them as something a creature *is*, not something
+it *knows*; their flavour may **gesture** at the dark as their source but must never
+explain it (see *Deliberately unknown*).
+
 ## The Glimmer Rush
 
 A gold-rush, in everything but the metal. Word of glimmer has drawn
