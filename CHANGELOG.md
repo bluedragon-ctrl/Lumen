@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
+  (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
+  the warren tunnels, with a zone-`wander` action so it drifts room to room. Same
+  stats as a base gloom-crawler (it *is* one, just nomadic) — goaded to fury by faint
+  light, scorched into flight by a bright one. Two roam from **The Crawling Hall**.
+  Unlike the room-bound swarms, these wander into corridors, so the dark itself feels
+  like it moves. Distinct template from `gloom-crawler`, so the cull quest does not
+  count them.
+- **Mobs recover out of combat — no more flee-heal-return.** A wounded mob that
+  nothing is fighting or watching, in a room clear of living delvers, now knits its
+  wounds shut. It must stay out of combat for a short grace (`OOC_REGEN_DELAY`, 5
+  ticks) so darting out and back barely helps, then mends to full over ~20 ticks
+  (`ceil(maxHp/20)` HP/tick by default). A genuine heal-trip to town now finds the
+  mob whole again instead of still at the sliver you left it. Reuses the existing
+  `mob-regen` narration ("*its wounds close over*"). New optional per-mob
+  `regen: { delay, perTick }` field overrides either knob (e.g. a slow-mending boss).
 - **Gloom-touched crawlers — the warren's first magical threat.** A new depth-7
   mob (`gloom-touched-crawler`), a gloom-crawler mutated by lingering too long
   against the Starving Dark, now flings a **Gloom Bolt** — magical damage scaled
@@ -100,6 +116,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Depth-7 is deadlier in the light.** Doubled the warren's no-flee elites — the
+  **elder gloom-crawler** in The Crawling Hall and The Moulting Drift, and the
+  **gloom-touched crawler** in The Long Gallery and The Brood-Heart, all go from
+  `max 1` to `max 2`. Where base gloom-crawlers scatter from a delver's lamp, these
+  stand and fight — so a lit player no longer empties the room, and the dark becomes
+  a death trap as the swarms and the elites pile on together.
+- **Combat tuning.** **The Old Grinder** is sturdier and hits harder — `maxHp`
+  60→90, `armour` 5→6, melee `1d6`→`2d4`. The **pale crayfish** is tougher too —
+  `maxHp` 11→17, melee `1d4`→`1d6`. **The Pale Shallows** now spawns up to two
+  cave-lurkers (was one). **Yana, the lost apprentice** is reworked from a pushover
+  into a real mini-boss: `maxHp` 30→70, `armour` 2→3, `ward` 2→4, melee `1d6`→`1d8`,
+  and her action table leans harder into Glimmer Spike (fewer idle/emote turns).
+  Crucially her light thresholds moved from 2 to **5/6**: a single carried lamp no
+  longer sears her or wrecks her aim, so she fights at full strength solo — a player
+  must burn a **searing flare** (light 10) for a timed glare-and-burn window, while
+  any two delvers stacking light clear the threshold together. Her `lightBane` was
+  also softened to `1d2` so two-player light pressures the fight without instakilling
+  her.
 - **Skittish prey — grubs and cave-fish behave like animals, not pickups.** A new
   data-driven `skittish` mob flag lets a calm critter *bolt out of the world* (it
   slips out of sight rather than fleeing room-to-room, freeing its spawn slot to
