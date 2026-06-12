@@ -101,7 +101,7 @@
       { "template": "palecap-mushroom", "qty": 2, "respawn": 120 }
     ],
     "spawns": [
-      { "mob": "grub", "max": 2, "respawn": 120 }
+      { "mob": "grub", "max": 3, "respawn": 120 }
     ]
   },
   "rim.mageshed": {
@@ -617,7 +617,7 @@
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
     ],
     "spawns": [
-      { "mob": "grub", "max": 2, "respawn": 120 }
+      { "mob": "grub", "max": 3, "respawn": 120 }
     ]
   },
   "third.grazing": {
@@ -932,7 +932,7 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "grub", "max": 3, "respawn": 90 }
+      { "mob": "grub", "max": 4, "respawn": 90 }
     ]
   },
   "warren.relict": {
