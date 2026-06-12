@@ -45,6 +45,33 @@
     ],
     "loot": []
   },
+  "gloom-creeper": {
+    "id": "gloom-creeper",
+    "name": "a gloom-creeper",
+    "keywords": ["gloom-creeper", "creeper", "crawler", "gloom"],
+    "description": "A gloom-crawler that has left the nesting-press of the chambers to range the warren's tunnels alone, flowing tireless over the stone from one dark to the next. Eyeless like all its kin, it reads the passages by tremor and scent, and follows whatever it finds. The least light still goads it to blind fury and a bright one still scorches it into flight — but in the wandering dark between the chambers it answers to nothing, and it is rarely where it was.",
+    "maxHp": 14,
+    "speed": 11,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 6, "intellect": 0, "wits": 4, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
+    "behavior": "wander",
+    "hostile": false,
+    "lightAggro": { "above": 0 },
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 8,
+    "shards": "1d4",
+    "actions": [
+      { "type": "flee", "lightAbove": 3, "verb": "recoils from the light and flees into the dark", "scope": "zone" },
+      { "type": "attack", "weight": 6 },
+      { "type": "wander", "weight": 3, "verb": "flows off into the dark", "scope": "zone" },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["lets out a wet rattle", "scrapes over the stone", "tastes the air for warmth"] }
+    ],
+    "loot": []
+  },
   "wisp": {
     "id": "wisp",
     "name": "a Wisp",

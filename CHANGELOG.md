@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
+  (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
+  the warren tunnels, with a zone-`wander` action so it drifts room to room. Same
+  stats as a base gloom-crawler (it *is* one, just nomadic) — goaded to fury by faint
+  light, scorched into flight by a bright one. Two roam from **The Crawling Hall**.
+  Unlike the room-bound swarms, these wander into corridors, so the dark itself feels
+  like it moves. Distinct template from `gloom-crawler`, so the cull quest does not
+  count them.
 - **Mobs recover out of combat — no more flee-heal-return.** A wounded mob that
   nothing is fighting or watching, in a room clear of living delvers, now knits its
   wounds shut. It must stay out of combat for a short grace (`OOC_REGEN_DELAY`, 5
@@ -108,6 +116,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Depth-7 is deadlier in the light.** Doubled the warren's no-flee elites — the
+  **elder gloom-crawler** in The Crawling Hall and The Moulting Drift, and the
+  **gloom-touched crawler** in The Long Gallery and The Brood-Heart, all go from
+  `max 1` to `max 2`. Where base gloom-crawlers scatter from a delver's lamp, these
+  stand and fight — so a lit player no longer empties the room, and the dark becomes
+  a death trap as the swarms and the elites pile on together.
 - **Combat tuning.** **The Old Grinder** is sturdier and hits harder — `maxHp`
   60→90, `armour` 5→6, melee `1d6`→`2d4`. The **pale crayfish** is tougher too —
   `maxHp` 11→17, melee `1d4`→`1d6`. **The Pale Shallows** now spawns up to two

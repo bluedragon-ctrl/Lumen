@@ -837,7 +837,8 @@
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
-      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 240 },
+      { "mob": "gloom-creeper", "max": 2, "respawn": 120 }
     ]
   },
   "warren.drift": {
@@ -855,7 +856,7 @@
     ],
     "spawns": [
       { "mob": "gloom-crawler", "max": 2, "respawn": 30 },
-      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 240 }
+      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 240 }
     ]
   },
   "warren.midden": {
@@ -888,7 +889,7 @@
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
-      { "mob": "gloom-touched-crawler", "max": 1, "respawn": 240 }
+      { "mob": "gloom-touched-crawler", "max": 2, "respawn": 240 }
     ]
   },
   "warren.brood": {
@@ -903,7 +904,7 @@
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-crawler", "max": 5, "respawn": 20 },
-      { "mob": "gloom-touched-crawler", "max": 1, "respawn": 200 }
+      { "mob": "gloom-touched-crawler", "max": 2, "respawn": 200 }
     ]
   },
   "warren.chasm": {
