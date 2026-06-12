@@ -546,7 +546,7 @@
     "groundItems": [],
     "spawns": [
       { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
-      { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
+      { "mob": "cave-lurker", "max": 2, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
   "third.pools": {

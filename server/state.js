@@ -108,6 +108,14 @@ const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimB
 const AGGRO_RATE = 1; // detection gained per action at clear sight
 const AGGRO_ENGAGE = 2; // detection threshold at which a mob commits to attack
 const AGGRO_GRACE = 3; // actions a target stays unperceived before detection decays
+// Out-of-combat recovery (see GameState._recoverMobsTick): a wounded mob that
+// nothing is fighting or watching, in a room clear of living foes, knits its
+// wounds shut. It must hold OOC_REGEN_DELAY ticks past its last combat first (so
+// a brief retreat barely helps), then mends maxHp/OOC_REGEN_TICKS per tick to
+// full. The counter to flee-heal-return: a real heal-trip finds the mob whole.
+// A per-mob `regen: { delay, perTick }` overrides either knob.
+const OOC_REGEN_DELAY = 5; // ticks out of combat before recovery starts
+const OOC_REGEN_TICKS = 20; // ticks to mend from empty to full (sets the default rate)
 
 /** A player's effective attributes: base attributes plus any flat modifiers
  *  from equipped gear (`armour.attrMod`, e.g. heavy iron that dulls Wits).
@@ -790,6 +798,33 @@ class GameState {
     }
   }
 
+  /** Out-of-combat recovery: a wounded mob that nothing is fighting or watching,
+   *  in a room with no living foe, knits its wounds shut. It must stay out of
+   *  combat for `delay` ticks first — so darting out and back barely helps — then
+   *  mends `perTick` HP toward full each tick, defaulting to maxHp/OOC_REGEN_TICKS
+   *  so any mob recovers fully in ~OOC_REGEN_TICKS ticks regardless of size. This
+   *  is the counter to flee-heal-return: a genuine heal-trip finds the mob whole
+   *  again. `m.lastCombatTick` is stamped every tick the mob is alerted; a per-mob
+   *  `regen: { delay, perTick }` overrides either knob (e.g. a slow-mending boss). */
+  _recoverMobsTick(events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      const foePresent = this.playersIn(roomId).some((p) => p.hp > 0);
+      for (const m of rt.mobs) {
+        if (m.hp <= 0 || m.hp >= m.maxHp) continue;
+        if (this._alerted(m)) { m.lastCombatTick = this.tick; continue; } // still in a fight
+        if (foePresent) continue; // never mend in front of a living delver
+        const reg = this.world.mobs[m.template].regen || {};
+        const delay = reg.delay != null ? reg.delay : OOC_REGEN_DELAY;
+        if (this.tick - (m.lastCombatTick != null ? m.lastCombatTick : -Infinity) < delay) continue;
+        const perTick = reg.perTick != null ? reg.perTick : Math.max(1, Math.ceil(m.maxHp / OOC_REGEN_TICKS));
+        const healed = this._heal(m, perTick);
+        if (!healed) continue;
+        const t = this.world.mobs[m.template];
+        events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: "recovery", emitsLight: !!t.emitsLight, light: rt.light });
+      }
+    }
+  }
+
   /** Advance a periodic state's pulse counter; true on the tick its `interval`
    *  comes due (default every tick). Used by heal-over-time (and future pulses). */
   _pulseReady(s) {
@@ -1148,6 +1183,7 @@ class GameState {
     this._environmentTick(events); // light-bane and other room hazards, on fresh light
     this.resolvePlayerAttacks(events);
     this.resolveMobAI(events);
+    this._recoverMobsTick(events); // wounded, disengaged mobs knit their wounds (post-AI: aggro is freshly pruned)
     this._respawnTick(events);
     this._harvestTick(events);
     this._summonTick(events);

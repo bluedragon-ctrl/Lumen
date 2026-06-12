@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Mobs recover out of combat — no more flee-heal-return.** A wounded mob that
+  nothing is fighting or watching, in a room clear of living delvers, now knits its
+  wounds shut. It must stay out of combat for a short grace (`OOC_REGEN_DELAY`, 5
+  ticks) so darting out and back barely helps, then mends to full over ~20 ticks
+  (`ceil(maxHp/20)` HP/tick by default). A genuine heal-trip to town now finds the
+  mob whole again instead of still at the sliver you left it. Reuses the existing
+  `mob-regen` narration ("*its wounds close over*"). New optional per-mob
+  `regen: { delay, perTick }` field overrides either knob (e.g. a slow-mending boss).
 - **Gloom-touched crawlers — the warren's first magical threat.** A new depth-7
   mob (`gloom-touched-crawler`), a gloom-crawler mutated by lingering too long
   against the Starving Dark, now flings a **Gloom Bolt** — magical damage scaled
@@ -100,6 +108,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Combat tuning.** **The Old Grinder** is sturdier and hits harder — `maxHp`
+  60→90, `armour` 5→6, melee `1d6`→`2d4`. **The Pale Shallows** now spawns up to two
+  cave-lurkers (was one). **Yana, the lost apprentice** is reworked from a pushover
+  into a real mini-boss: `maxHp` 30→70, `armour` 2→3, `ward` 2→4, melee `1d6`→`1d8`,
+  and her action table leans harder into Glimmer Spike (fewer idle/emote turns).
+  Crucially her light thresholds moved from 2 to **5/6**: a single carried lamp no
+  longer sears her or wrecks her aim, so she fights at full strength solo — a player
+  must burn a **searing flare** (light 10) for a timed glare-and-burn window, while
+  any two delvers stacking light clear the threshold together. Her `lightBane` was
+  also softened to `1d2` so two-player light pressures the fight without instakilling
+  her.
 - **Skittish prey — grubs and cave-fish behave like animals, not pickups.** A new
   data-driven `skittish` mob flag lets a calm critter *bolt out of the world* (it
   slips out of sight rather than fleeing room-to-room, freeing its spawn slot to
