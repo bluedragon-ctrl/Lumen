@@ -38,6 +38,10 @@ function main() {
   for (const [id, r] of Object.entries(rooms)) {
     if (r.id !== id) errs.push(`room ${id}: id field mismatch (${r.id})`);
     if (r.zone != null && typeof r.zone !== "string") errs.push(`room ${id}: zone must be a string`);
+    // Free-form room tags (e.g. "water", "outdoor") — gate tag-aware wander/flee
+    // destinations (a mob's requireTags/forbidTags). Must be an array of strings.
+    if (r.tags != null && (!Array.isArray(r.tags) || !r.tags.every((g) => typeof g === "string")))
+      errs.push(`room ${id}: tags must be an array of strings`);
     for (const [dir, dest] of Object.entries(r.exits || {}))
       if (!has(rooms, dest)) errs.push(`room ${id}: exit ${dir} -> missing room ${dest}`);
     // Hidden exits are a parallel map of { to, perception } — gated, but still edges.
@@ -292,6 +296,17 @@ function main() {
       }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))
         errs.push(`mob ${id}: ${a.type} scope must be "zone" or "any"`);
+      // Tag-gated destinations: requireTags admits only rooms carrying *all* listed
+      // tags; forbidTags rejects any room carrying one. Both are string arrays and
+      // apply on wander/flee (untagged rooms satisfy neither, so they're excluded
+      // by requireTags and allowed by forbidTags).
+      for (const key of ["requireTags", "forbidTags"]) {
+        if (a[key] == null) continue;
+        if (a.type !== "wander" && a.type !== "flee")
+          errs.push(`mob ${id}: ${key} only applies to wander/flee actions`);
+        if (!Array.isArray(a[key]) || !a[key].every((g) => typeof g === "string"))
+          errs.push(`mob ${id}: ${a.type} ${key} must be an array of strings`);
+      }
       if (a.type === "flee" && a.lightAbove != null && typeof a.lightAbove !== "number")
         errs.push(`mob ${id}: flee lightAbove must be a number`);
       if (a.weight != null && typeof a.weight !== "number")

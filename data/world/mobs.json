@@ -702,7 +702,8 @@
     "actions": [
       { "type": "idle", "weight": 7 },
       { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] },
-      { "type": "emote", "weight": 1, "messages": ["flicks away into the black water", "shies from the ripples"] }
+      { "type": "emote", "weight": 1, "messages": ["flicks away into the black water", "shies from the ripples"] },
+      { "type": "wander", "weight": 1, "verb": "drifts off down the current", "requireTags": ["water"] }
     ],
     "loot": [
       { "template": "cave-fish", "chance": 1 }

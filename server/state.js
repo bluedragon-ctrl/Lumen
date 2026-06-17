@@ -1680,9 +1680,27 @@ class GameState {
 
     // Wander destinations: "zone" scope confines a mob to its current zone (the
     // village stays in the village, the abyss below); "any" lets it cross zones.
-    const allDirs = Object.keys(this.world.rooms[roomId].exits || {});
+    // On top of scope, an action may gate destinations by room `tags`:
+    // `requireTags` admits only rooms carrying *all* listed tags (a cave-fish that
+    // keeps to "water" rooms), `forbidTags` rejects any room carrying one (a
+    // surface beast that won't enter the "deep-dark"). An untagged room satisfies
+    // no requirement and trips no prohibition, so an action with neither field
+    // roams exactly as before — tags only ever constrain mobs that ask for them.
+    const exits = this.world.rooms[roomId].exits || {};
+    const allDirs = Object.keys(exits);
     const roamDirs = this._zoneExits(roomId);
-    const wanderDirs = (a) => (a.scope === "any" ? allDirs : roamDirs);
+    const tagOk = (dir, a) => {
+      const dest = this.world.rooms[exits[dir]];
+      if (!dest) return false;
+      const tags = dest.tags || [];
+      if (a.requireTags && !a.requireTags.every((g) => tags.includes(g))) return false;
+      if (a.forbidTags && a.forbidTags.some((g) => tags.includes(g))) return false;
+      return true;
+    };
+    const wanderDirs = (a) => {
+      const base = a.scope === "any" ? allDirs : roamDirs;
+      return a.requireTags || a.forbidTags ? base.filter((d) => tagOk(d, a)) : base;
+    };
 
     // Skittish prey (grubs, cave-fish): a calm critter that loses its nerve and
     // bolts out of the world entirely — no room-to-room flight, it simply slips
