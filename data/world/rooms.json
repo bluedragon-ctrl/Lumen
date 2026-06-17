@@ -246,6 +246,7 @@
   "abyss.tunnel": {
     "id": "abyss.tunnel",
     "zone": "abyss",
+    "tags": ["water"],
     "name": "The Dripping Tunnel",
     "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. A thin fringe of moss clings to the wet stone above it, glowing the faintest blue-white — too dim to truly light the place, where the dark is otherwise absolute and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
     "depth": 1,
@@ -493,6 +494,7 @@
   "second.mine5": {
     "id": "second.mine5",
     "zone": "second-mine",
+    "tags": ["water"],
     "name": "The Sump",
     "depth": 2,
     "ambientLight": 0,
@@ -509,6 +511,7 @@
   "second.grotto": {
     "id": "second.grotto",
     "zone": "second-mine",
+    "tags": ["water"],
     "name": "The Drowned Hollow",
     "depth": 2,
     "ambientLight": 0,
@@ -525,6 +528,7 @@
   "third.landing": {
     "id": "third.landing",
     "zone": "third",
+    "tags": ["water"],
     "name": "The River Stair",
     "depth": 3,
     "ambientLight": 0,
@@ -537,6 +541,7 @@
   "third.shallows": {
     "id": "third.shallows",
     "zone": "third",
+    "tags": ["water"],
     "name": "The Pale Shallows",
     "depth": 3,
     "ambientLight": 0,
@@ -552,6 +557,7 @@
   "third.pools": {
     "id": "third.pools",
     "zone": "third",
+    "tags": ["water"],
     "name": "The Still Pools",
     "depth": 3,
     "ambientLight": 1,
@@ -566,6 +572,7 @@
   "third.falls": {
     "id": "third.falls",
     "zone": "third",
+    "tags": ["water"],
     "name": "The Sunless Falls",
     "depth": 3,
     "ambientLight": 1,
@@ -578,6 +585,7 @@
   "third.cave": {
     "id": "third.cave",
     "zone": "third",
+    "tags": ["water"],
     "name": "The Plunge Cave",
     "depth": 3,
     "ambientLight": 0,
@@ -637,6 +645,7 @@
   "lake.strand": {
     "id": "lake.strand",
     "zone": "fourth-lake",
+    "tags": ["water"],
     "name": "The Drowned Strand",
     "depth": 4,
     "ambientLight": 1,
@@ -654,6 +663,7 @@
   "lake.shallows": {
     "id": "lake.shallows",
     "zone": "fourth-lake",
+    "tags": ["water"],
     "name": "The Black Shallows",
     "depth": 4,
     "ambientLight": 1,
@@ -669,6 +679,7 @@
   "lake.narrows": {
     "id": "lake.narrows",
     "zone": "fourth-lake",
+    "tags": ["water"],
     "name": "The Shorewalk Narrows",
     "depth": 4,
     "ambientLight": 1,
@@ -683,6 +694,7 @@
   "lake.farshore": {
     "id": "lake.farshore",
     "zone": "fourth-lake",
+    "tags": ["water"],
     "name": "The Far Bank",
     "depth": 4,
     "ambientLight": 1,
