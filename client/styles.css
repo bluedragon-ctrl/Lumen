@@ -24,6 +24,14 @@
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
+
+/* Thin dark scrollbars — Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--edge) var(--panel-2); }
+/* Thin dark scrollbars — Chromium/Safari */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--panel-2); }
+::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 body {
   background: var(--bg);
   color: var(--text);
@@ -245,6 +253,16 @@ body {
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .state-chip { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--hostile); color: var(--hostile); }
 .state-chip.good { border-color: var(--accent); color: var(--accent); }
+
+/* Inventory filter bar */
+.inv-filter-bar { display: flex; gap: 3px; margin-bottom: 4px; }
+.inv-filter {
+  flex: 1; padding: 2px 0;
+  background: var(--panel-2); border: 1px solid var(--edge); border-radius: 4px;
+  color: var(--muted); font: inherit; font-size: 11px; cursor: pointer;
+}
+.inv-filter:hover { border-color: var(--accent); color: var(--text); }
+.inv-filter.active { border-color: var(--accent); color: var(--accent); }
 
 @media (max-width: 720px) {
   #app { grid-template-columns: 1fr; grid-template-areas: "console" "inspect" "player" "status" "command"; grid-template-rows: 1fr auto auto auto auto; }
