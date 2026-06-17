@@ -362,18 +362,9 @@ function renderPlayer(p) {
   const inv = $("p-inv");
   inv.innerHTML = "";
 
-  // Count items per group, then update filter-bar badges.
-  const groupCounts = {};
-  for (const item of p.inventory) {
-    const g = filterGroupFor(item);
-    groupCounts[g] = (groupCounts[g] || 0) + 1;
-  }
+  // Update filter bar active state.
   document.querySelectorAll(".inv-filter").forEach(btn => {
-    const g = btn.dataset.group;
-    const count = g === "all" ? p.inventory.length : (groupCounts[g] || 0);
-    btn.querySelector(".inv-count").textContent = count ? ` ${count}` : "";
-    btn.classList.toggle("empty", count === 0 && g !== "all");
-    btn.classList.toggle("active", g === invFilter);
+    btn.classList.toggle("active", btn.dataset.group === invFilter);
   });
 
   const visible = invFilter === "all"

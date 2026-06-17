@@ -255,8 +255,6 @@ body {
 }
 .inv-filter:hover { border-color: var(--accent); color: var(--text); }
 .inv-filter.active { border-color: var(--accent); color: var(--accent); }
-.inv-filter.empty { opacity: .4; }
-.inv-count { font-size: 10px; }
 
 @media (max-width: 720px) {
   #app { grid-template-columns: 1fr; grid-template-areas: "console" "inspect" "player" "status" "command"; grid-template-rows: 1fr auto auto auto auto; }
