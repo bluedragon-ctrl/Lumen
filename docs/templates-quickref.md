@@ -103,7 +103,7 @@ common fields + `stackable`.
     { "type": "attack", "weight": 7 },
     { "type": "idle", "weight": 3 },
     { "type": "emote", "weight": 2, "messages": ["rears, antennae testing the air"] },
-    { "type": "wander", "weight": 2, "verb": "skitters off", "scope": "zone" },  // scope: zone|any
+    { "type": "wander", "weight": 2, "verb": "skitters off", "scope": "zone", "requireTags": ["water"] },  // scope: zone|any; requireTags/forbidTags filter dests by room `tags`
     { "type": "flee", "lightAbove": 3, "verb": "recoils and flees", "scope": "zone" },
     { "type": "cast", "weight": 5, "spell": "spark" },        // spell must exist AND be hostile
     { "type": "summon", "weight": 2, "mob": "giant-rat", "count": 2, "max": 4, "verb": "shrieks" }
@@ -268,6 +268,7 @@ A fixture can be hidden behind `search` when referenced from a room as
 "rim.inn": {                           // key === id; convention: area.name
   "id": "rim.inn",
   "zone": "rim",                       // string; bounds `wander`/`flee` scope:"zone"
+  "tags": ["water"],                   // optional terrain tags (free-form); gate wander/flee requireTags/forbidTags. untagged = neutral
   "name": "The Lantern's Rest",
   "description": "Warmth and low talk spill from a long common room...",
   "depth": 0,                          // 0 at the rim, increases downward
