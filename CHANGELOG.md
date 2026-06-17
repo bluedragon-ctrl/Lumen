@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Your own summons read friendly.** Mobs you own (faction `player`, owned by
+  you — e.g. an `@spawn …​ player` test summon, and future pet summons) now show
+  as a blue **ally** pill in the room/inspect view instead of the enemy-red
+  `hostile` tint. The friendly tint takes precedence over `hostile`, so a combat
+  pet built on an otherwise-hostile template still reads as yours; other players'
+  summons and every non-owned mob are unaffected.
+- **Filter `list` and `recipes` by a word.** Both commands now take an optional
+  search term: `list glimmer` shows only the trader's wares whose name matches
+  "glimmer". `recipes <word>` matches a recipe's name, its output item, **or any
+  input material** — so `recipes glimmer` finds glimmer craft and `recipes chitin`
+  answers "what can I make with chitin?". Matching is case-insensitive substring,
+  the same way `buy` resolves a ware; an empty result says so plainly. The bare
+  `list` / `recipes` behave exactly as before.
 - **Factions: guards that defend you.** Mobs now belong to one of five sides —
   `player` (PCs + summons), `rim` (village NPCs & guards), `fauna` (peaceful
   wildlife), `umbral` (the deep-dwelling Umbrals — Mallki the trader and kin), and
@@ -83,8 +96,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2–4 are tagged `"water"`, and the **blind cave-fish** now drifts between them on a
   low-weight water-only wander, so calm fish swim the shallows but never flop onto
   dry stone. Reusable groundwork for patrol/biome behaviour to come.
-- **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
-  sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
 - **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
   (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
   the warren tunnels, with a zone-`wander` action so it drifts room to room. Same
