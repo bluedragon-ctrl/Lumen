@@ -796,7 +796,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
+      "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
     }
   },
   "pale-king": {

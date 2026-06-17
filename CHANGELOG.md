@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2–4 are tagged `"water"`, and the **blind cave-fish** now drifts between them on a
   low-weight water-only wander, so calm fish swim the shallows but never flop onto
   dry stone. Reusable groundwork for patrol/biome behaviour to come.
+- **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
+  sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
 - **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
   (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
   the warren tunnels, with a zone-`wander` action so it drifts room to room. Same
