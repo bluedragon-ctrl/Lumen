@@ -22,4 +22,11 @@ module.exports = {
   // each room pays once, tracked per player in `visitedRooms`). Crafting XP is
   // not a constant — it equals the output's sale value (see commands.js craft).
   EXPLORE_XP: 5,
+
+  // The sides a creature can fight FOR (a mob's instance `faction`, default
+  // "wild"). The *vocabulary* lives here so the data validator and the game
+  // share one whitelist; how the sides regard one another (ally/enemy/neutral)
+  // is game logic and lives in state.js `FACTION_RELATIONS`.
+  FACTIONS: ["player", "rim", "fauna", "wild", "umbral"],
+  DEFAULT_FACTION: "wild", // a mob with no authored faction fights for the wild
 };

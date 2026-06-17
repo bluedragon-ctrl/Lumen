@@ -9,6 +9,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
+const { FACTIONS } = require("../server/config");
 
 const ROOT = path.resolve(__dirname, "..");
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
@@ -239,8 +240,9 @@ function main() {
     if (m.posture != null && !["standing", "sitting", "sleeping"].includes(m.posture))
       errs.push(`mob ${id}: posture must be "standing", "sitting", or "sleeping"`);
     // Instance faction (the side this creature fights for); defaults to "wild".
-    if (m.faction != null && !["player", "rim", "fauna", "wild", "umbral"].includes(m.faction))
-      errs.push(`mob ${id}: faction must be one of "player", "rim", "fauna", "wild", "umbral"`);
+    // Whitelist is shared with the game via server/config.js (single source).
+    if (m.faction != null && !FACTIONS.includes(m.faction))
+      errs.push(`mob ${id}: faction must be one of ${FACTIONS.map((f) => `"${f}"`).join(", ")}`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")

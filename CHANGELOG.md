@@ -39,7 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   them never pulls a guard onto you. `fauna`↔`wild` is neutral for now (predators
   don't yet prey on livestock) — a one-cell flip away from switching that
   ecosystem on. The admin `@spawn` testing aid takes the new
-  factions (`@spawn <mob> [n] [wild|player|rim|fauna|umbral]`).
+  factions (`@spawn <mob> [n] [wild|player|rim|fauna|umbral]`). The faction
+  whitelist now lives once in `server/config.js` (shared by the game and the data
+  validator), the default faction is a single named constant, and the
+  ally/enemy/neutral table is asserted symmetric at load — a one-sided edit fails
+  fast instead of causing one-way aggression.
 - **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
   (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter
   its destinations by them: `requireTags` enters only rooms carrying **all** the
@@ -206,6 +210,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Light-maddened mobs strike indiscriminately.** A creature roused by light
+  (`lightAggro`) now treats *every* delver in the room as a valid target, not just
+  one it had already noticed — a single spotted target no longer shields the rest
+  from a light-enraged beast.
+- **Mob targeting is now tiered, not additive.** A mob always fixates on whatever
+  it has actually traded blows with over anyone it has merely noticed, regardless
+  of how long it has been watching — so its quarry no longer depends on the exact
+  size of the detection cap. No change to current behaviour; it removes a latent
+  trap where retuning the detection threshold could silently flip target priority.
 - **Spawn rules** — Mob respawn rate review (rim.inn, rim.market, rim.claims, rim.corral, rim.mageshed, rim.training, rim.workshop, abyss.first, abyss.gallery, abyss.warren, abyss.drift, abyss.fissure, abyss.roost, abyss.tunnel, abyss.grotto, abyss.hollow, abyss.cut, abyss.den, second.descent, second.graze1, second.graze3, second.graze4, second.mine1, second.mine2, second.mine4, second.mine5, third.shallows, third.pools, third.cave, third.dwelling, third.grazing, lake.shallows, lake.islet, warren.throat, warren.hall, warren.drift, warren.midden, warren.gallery, warren.brood, warren.chasm, warren.relict, warren.lair).
 - **NPC stats** — Minor mobs update (cave-lurker, stonebug, thornbug, yana).
 - **Depth-7 is deadlier in the light.** Doubled the warren's no-flee elites — the
