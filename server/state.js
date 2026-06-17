@@ -359,22 +359,27 @@ function combatantFaction(actor, kind) {
   return kind === "player" ? "player" : (actor.faction || "wild");
 }
 
-// The four factions and how they regard one another. A relation is "ally"
-// (assist each other, never targeted), "enemy" (eligible to fight), or "neutral"
-// (ignore — neither defend nor hunt). The table is symmetric and lists only the
-// off-diagonal pairs; a faction is always its own ally, and any pairing not named
-// here falls back to "enemy" so an unrecognised faction still behaves safely (the
-// old "different = enemy" binary).
-//   player — PCs and their summons        rim   — village NPCs and their guards
-//   fauna  — peaceful wildlife/livestock   wild  — the deep's predators (default)
+// The factions and how they regard one another. A relation is "ally" (assist each
+// other, never targeted), "enemy" (eligible to fight), or "neutral" (ignore —
+// neither defend nor hunt). The table is symmetric and lists only the off-diagonal
+// pairs; a faction is always its own ally, and any pairing not named here falls
+// back to "enemy" so an unrecognised faction still behaves safely (the old
+// "different = enemy" binary).
+//   player — PCs and their summons         rim    — village NPCs and their guards
+//   fauna  — peaceful wildlife/livestock    wild   — the deep's predators (default)
+//   umbral — the deep-dwelling Umbrals (Mallki & kin; hostile members gated by
+//            `hostile`, peaceful ones like the trader simply never act on it)
 // fauna↔wild is "neutral" for now (predators don't prey on livestock yet); flip
-// both halves to "enemy" to switch the predation ecosystem on.
-const FACTIONS = ["player", "rim", "fauna", "wild"];
+// both halves to "enemy" to switch the predation ecosystem on. umbral↔player is
+// "enemy" so hostile Umbrals can engage delvers; non-hostile Umbrals (the trader)
+// stay inert and a peaceful enclave is just `hostile: false`.
+const FACTIONS = ["player", "rim", "fauna", "wild", "umbral"];
 const FACTION_RELATIONS = {
-  player: { rim: "ally", fauna: "neutral", wild: "enemy" },
-  rim: { player: "ally", fauna: "ally", wild: "enemy" },
-  fauna: { player: "neutral", rim: "ally", wild: "neutral" },
-  wild: { player: "enemy", rim: "enemy", fauna: "neutral" },
+  player: { rim: "ally", fauna: "neutral", wild: "enemy", umbral: "enemy" },
+  rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral" },
+  fauna: { player: "neutral", rim: "ally", wild: "neutral", umbral: "neutral" },
+  wild: { player: "enemy", rim: "enemy", fauna: "neutral", umbral: "neutral" },
+  umbral: { player: "enemy", rim: "neutral", fauna: "neutral", wild: "neutral" },
 };
 /** How faction `a` regards faction `b`: "ally" | "enemy" | "neutral". */
 function factionRelation(a, b) {
@@ -1972,8 +1977,11 @@ class GameState {
         (a.kind === "player" && a.actor.pending && a.actor.pending.targetId === e.id));
       // ...or when the enemy is the aggressor against an ally who hasn't (or can't)
       // fight back — a guard steps in for a passive victim (penned fauna, a delver
-      // not yet retaliating). Only mob enemies carry an aggro table to read.
-      const enemyTargetsAlly = e.kind === "mob" && e.actor.aggro && allies.some((a) => e.actor.aggro[a.id] > 0);
+      // not yet retaliating, an Umbral trader being robbed). A mob aggressor names
+      // its target in its aggro table; a player aggressor in `pending.targetId`.
+      const enemyTargetsAlly = allies.some((a) =>
+        (e.kind === "mob" && e.actor.aggro && e.actor.aggro[a.id] > 0) ||
+        (e.kind === "player" && e.actor.pending && e.actor.pending.targetId === a.id));
       if (!allyFighting && !enemyTargetsAlly) continue;
       this._addThreat(mob, e.id, AGGRO_ENGAGE); // join the fight — committed like a full notice
       events.push({

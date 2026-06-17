@@ -208,7 +208,7 @@ provoked, while attack-less NPCs (shopkeepers) stay passive.
 
 **Factions & mob-vs-mob.** Allegiance is **instance-level**: every mob carries a
 `faction` (defaults to its template's, else `"wild"`; players are `"player"`) and an
-optional `ownerId`. There are four — `player`, `rim`, `fauna`, `wild` — related by a
+optional `ownerId`. There are five — `player`, `rim`, `fauna`, `wild`, `umbral` — related by a
 symmetric ally/enemy/neutral table (`factionRelation`), replacing the old
 "differing = enemy" binary. `_areEnemies` (enemy) and the `helper` assist pass (ally)
 both read it, so the same combat path resolves player↔mob *and* mob↔mob and a `rim`
@@ -216,7 +216,7 @@ guard defends players, NPCs, and fauna against `wild` predators while ignoring t
 livestock. A `helper` now joins a fight an ally is in **or** steps in when an enemy is
 the aggressor against an ally (covering a passive victim). A `"player"`-faction mob
 fights enemies on sight (no `hostile` flag needed) and credits its `ownerId` on a
-kill — the groundwork **summons** sit on; `@spawn <mobId> [count] [wild|player|rim|fauna]`
+kill — the groundwork **summons** sit on; `@spawn <mobId> [count] [wild|player|rim|fauna|umbral]`
 overrides faction for live testing. Beneficial spells (heal/buff) draw the caster
 threat on whatever is fighting the mended ally, mirroring damage→threat.
 
