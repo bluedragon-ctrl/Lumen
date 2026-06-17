@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Mobs that remember you.** A mob marked `remembers` no longer forgets a delver
+  the instant they leave the room. Once it has traded blows with you, it holds a
+  grudge: step out and back within ~1 minute and it **re-engages on sight** ("it
+  remembers you, and its old hate rekindles") instead of having to notice you
+  afresh. The grudge doesn't pin it in combat — between encounters it wanders and
+  mends as normal — and it lapses on the timer, or the moment you die or log out.
+  **Mallki's chitin warden** is the first to bear one: pick a fight with the
+  trader's guardian and slipping next door won't wipe the slate. (DikuMUD-style mob
+  memory; cross-room *pursuit* is a planned follow-up.)
 - **Your own summons read friendly.** Mobs you own (faction `player`, owned by
   you — e.g. an `@spawn …​ player` test summon, and future pet summons) now show
   as a blue **ally** pill in the room/inspect view instead of the enemy-red

@@ -839,6 +839,7 @@
     "behavior": "wander",
     "hostile": false,
     "helper": true,
+    "remembers": true,
     "xp": 18,
     "attack": { "damage": "1d6", "actionCost": 11 },
     "spikes": { "damage": "1d4", "chance": 1 },
