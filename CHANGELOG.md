@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dry stone. Reusable groundwork for patrol/biome behaviour to come.
 - **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
   sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
+- **Inventory filter bar.** Five switchable tabs (All / Gear / Use / Mats / Other)
+  appear above the inventory list in the player panel. Each tab shows a live count
+  badge; empty tabs are dimmed. The active filter persists in `localStorage` across
+  page refreshes. Filtering is purely client-side — the server sends the full
+  inventory as usual.
+- **`filterGroup` item field.** Optional override on item records that controls
+  which filter tab the item appears under, independent of its mechanical `type`.
+  `lamp-oil` and `bug-tallow` are tagged `consumable` (fuel you use up);
+  `delver-claim-tag` is tagged `other` (story item, not a crafting material).
+  New item types fall through to the client-side `type → group` mapping and land
+  in Other if unrecognised.
 - **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
   (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
   the warren tunnels, with a zone-`wander` action so it drifts room to room. Same

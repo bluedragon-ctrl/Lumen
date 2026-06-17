@@ -11,6 +11,17 @@ const cmdEl = $("cmd");
 let lastRoom = null;
 let lastPlayer = null;
 
+// Inventory filter — persisted across page refreshes.
+let invFilter = localStorage.getItem("inv-filter") || "all";
+const INV_GROUP = {
+  weapon: "gear", armour: "gear", light: "gear",
+  consumable: "consumable", scroll: "consumable", recipe: "consumable",
+  material: "material", currency: "material", treasure: "material",
+};
+function filterGroupFor(item) {
+  return item.filterGroup ?? INV_GROUP[item.type] ?? "other";
+}
+
 // Until authenticated, the command line captures the player's NAME, not commands.
 let authed = false;
 
@@ -347,15 +358,26 @@ function renderPlayer(p) {
   }
 
   // Inventory
+  lastPlayer = p;
   const inv = $("p-inv");
   inv.innerHTML = "";
-  if (!p.inventory.length) {
+
+  // Update filter bar active state.
+  document.querySelectorAll(".inv-filter").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.group === invFilter);
+  });
+
+  const visible = invFilter === "all"
+    ? p.inventory
+    : p.inventory.filter(item => filterGroupFor(item) === invFilter);
+
+  if (!visible.length) {
     const li = document.createElement("li");
     li.className = "empty";
-    li.textContent = "(empty)";
+    li.textContent = p.inventory.length ? "(none in this category)" : "(empty)";
     inv.appendChild(li);
   }
-  for (const item of p.inventory) {
+  for (const item of visible) {
     const li = document.createElement("li");
     const qty = item.qty != null ? ` ×${item.qty}` : "";
     const fuel = item.type === "light" ? ` <span class="sub">fuel ${Math.floor(item.fuel)}/${item.fuelMax}</span>` : "";
@@ -428,6 +450,15 @@ cmdEl.addEventListener("keydown", (ev) => {
     if (histIdx < history.length - 1) cmdEl.value = history[++histIdx];
     else { histIdx = history.length; cmdEl.value = ""; }
   }
+});
+
+// Inventory filter button clicks.
+$("inv-filters").addEventListener("click", e => {
+  const btn = e.target.closest(".inv-filter");
+  if (!btn) return;
+  invFilter = btn.dataset.group;
+  localStorage.setItem("inv-filter", invFilter);
+  if (lastPlayer) renderPlayer(lastPlayer);
 });
 
 setPrompt();
