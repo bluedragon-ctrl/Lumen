@@ -127,6 +127,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Spawn rules** — Mob respawn rate review (rim.inn, rim.market, rim.claims, rim.corral, rim.mageshed, rim.training, rim.workshop, abyss.first, abyss.gallery, abyss.warren, abyss.drift, abyss.fissure, abyss.roost, abyss.tunnel, abyss.grotto, abyss.hollow, abyss.cut, abyss.den, second.descent, second.graze1, second.graze3, second.graze4, second.mine1, second.mine2, second.mine4, second.mine5, third.shallows, third.pools, third.cave, third.dwelling, third.grazing, lake.shallows, lake.islet, warren.throat, warren.hall, warren.drift, warren.midden, warren.gallery, warren.brood, warren.chasm, warren.relict, warren.lair).
 - **NPC stats** — Minor mobs update (cave-lurker, stonebug, thornbug, yana).
 - **Depth-7 is deadlier in the light.** Doubled the warren's no-flee elites — the
   **elder gloom-crawler** in The Crawling Hall and The Moulting Drift, and the
