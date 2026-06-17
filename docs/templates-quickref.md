@@ -88,7 +88,8 @@ common fields + `stackable`.
   "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },  // see light scale below
   "behavior": "hunt",                  // passive|wander|hunt|guard|lurk (flavour/AI posture)
   "hostile": true,
-  "helper": true,                      // optional: piles into an ally's fight
+  "faction": "wild",                   // optional: wild(default)|rim|fauna|umbral|player. Sets sides; rim guards defend players/NPCs/fauna vs wild. See data-model
+  "helper": true,                      // optional: joins an ally's fight / defends an ally under attack
   "ambush": true,                      // optional: drops on prey (with behavior "lurk")
   "posture": "sleeping",               // optional authored start: standing|sitting|sleeping (inert until struck)
   "attack": { "damage": "1d4", "actionCost": 11,

@@ -1756,20 +1756,23 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
     }
     case "@spawn": {
       // Drop a mob (by template id) into the admin's current room — a testing aid
-      // for mobs not yet placed in any room's spawn list. An optional trailing
-      // faction (`wild` default, or `player`) marks the spawned instance as a
-      // player-allied creature (faction "player" + ownerId = admin) so mob-vs-mob
-      // combat can be exercised live; this is a dev affordance, not authored content.
+      // for mobs not yet placed in any room's spawn list. By default the instance
+      // takes its template faction; an optional trailing faction
+      // (wild|player|rim|fauna) overrides it so any side can be exercised live (a
+      // "player" override also stamps ownerId = admin). A dev affordance, not
+      // authored content.
+      const FACTION_OVERRIDES = ["wild", "player", "rim", "fauna", "umbral"];
       const [mobId, rawN, rawFaction] = arg.split(/\s+/);
       if (!mobId || !state.world.mobs[mobId])
-        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [wild|player]. Unknown mob "${mobId || ""}".` }];
-      const faction = (rawFaction || "wild").toLowerCase();
-      if (faction !== "wild" && faction !== "player")
-        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [wild|player]. Unknown faction "${rawFaction}".` }];
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [${FACTION_OVERRIDES.join("|")}]. Unknown mob "${mobId || ""}".` }];
+      const faction = rawFaction ? rawFaction.toLowerCase() : null;
+      if (faction && !FACTION_OVERRIDES.includes(faction))
+        return [{ type: "error", text: `Usage: @spawn <mobId> [count] [${FACTION_OVERRIDES.join("|")}]. Unknown faction "${rawFaction}".` }];
       const n = Math.max(1, Math.min(10, parseInt(rawN, 10) || 1));
       for (let i = 0; i < n; i++) {
         const m = state._spawnMob(player.location, mobId);
-        if (faction === "player") { m.faction = "player"; m.ownerId = player.id; }
+        if (faction) m.faction = faction;
+        if (faction === "player") m.ownerId = player.id;
       }
       state.rooms[player.location].light = state.computeRoomLight(player.location); // a luminous mob lights the room
       const t = state.world.mobs[mobId];

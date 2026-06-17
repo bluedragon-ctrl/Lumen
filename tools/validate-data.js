@@ -238,6 +238,9 @@ function main() {
     // Authored starting posture — a dozing/resting mob is inert until struck.
     if (m.posture != null && !["standing", "sitting", "sleeping"].includes(m.posture))
       errs.push(`mob ${id}: posture must be "standing", "sitting", or "sleeping"`);
+    // Instance faction (the side this creature fights for); defaults to "wild".
+    if (m.faction != null && !["player", "rim", "fauna", "wild", "umbral"].includes(m.faction))
+      errs.push(`mob ${id}: faction must be one of "player", "rim", "fauna", "wild", "umbral"`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")

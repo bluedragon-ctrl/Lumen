@@ -47,6 +47,11 @@ yes. Do not write to `data/world/*` or `data/templates/*`.
    - References must resolve: loot/scroll.spell/recipe/fuelItem/spawn.mob etc.
      must point at ids that exist (or that you note must be created too).
    - Mob `cast` actions need a `hostile` spell; `summon` needs an existing mob.
+   - Mob `faction` (optional; default `wild`): tag village NPCs `rim`, peaceful
+     wildlife `fauna`, Umbrals `umbral`. `faction` sets *sides* (who may fight whom)
+     while `hostile` sets *temperament* (does it start fights) — they're
+     independent; see the relations table in `docs/data-model.md`. Flag the chosen
+     faction as an authored choice.
    - Spell effects: one of damage / emit-light / heal-over-time / protect / summon.
 3. **Place it on the threat ladder / zone** consistent with lore — and flag that
    placement as an authored choice to approve.

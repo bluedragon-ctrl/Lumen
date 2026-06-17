@@ -337,12 +337,13 @@ function makeMobInstance(mobId, world) {
     maxHp: tmpl.maxHp,
     energy: 0, // accumulated action points
     aggro: {}, // combatantId -> threat; key is any combatant (player OR mob) id, see _addThreat()
-    // Instance-level faction (the side this creature fights FOR). Default "wild";
-    // a summon/ally spawns as "player". Faction defines sides — `_areEnemies` makes
-    // differing factions hostile — while `hostile`/provocation still gate active
+    // Instance-level faction (the side this creature fights FOR). Defaults to the
+    // template's `faction` (else "wild"); a summon overrides it ("player" for a
+    // player's, "wild" for a mob's — see _summon). Sides are resolved by
+    // `factionRelation`/`_areEnemies`, while `hostile`/provocation still gate active
     // aggression. `ownerId` names the player a "player"-faction mob belongs to
     // (kill credit, future pet upkeep); null for wild creatures.
-    faction: "wild",
+    faction: tmpl.faction || "wild",
     ownerId: null,
     summonerId: null, // who conjured it (player or mob id); null if not summoned
     summonGroup: null, // per-owner recast-cap key (defaults to the source spell id)
@@ -353,9 +354,40 @@ function makeMobInstance(mobId, world) {
 }
 
 /** The faction a combatant fights for. Players are always "player"; a mob carries
- *  its instance `faction` (default "wild"). Differing factions are enemies. */
+ *  its instance `faction` (default "wild"). Sides are resolved by `factionRelation`. */
 function combatantFaction(actor, kind) {
   return kind === "player" ? "player" : (actor.faction || "wild");
+}
+
+// The factions and how they regard one another. A relation is "ally" (assist each
+// other, never targeted), "enemy" (eligible to fight), or "neutral" (ignore —
+// neither defend nor hunt). The table is symmetric and lists only the off-diagonal
+// pairs; a faction is always its own ally, and any pairing not named here falls
+// back to "enemy" so an unrecognised faction still behaves safely (the old
+// "different = enemy" binary).
+//   player — PCs and their summons         rim    — village NPCs and their guards
+//   fauna  — peaceful wildlife/livestock    wild   — the deep's predators (default)
+//   umbral — the deep-dwelling Umbrals (Mallki & kin; hostile members gated by
+//            `hostile`, peaceful ones like the trader simply never act on it)
+// `enemy` only marks who *may* fight; whether a creature *starts* one is the
+// separate `hostile` flag. So fauna are `enemy` to `player` — non-hostile (they
+// never initiate and aren't hunted) but they fight back when farmed (a struck Old
+// Grinder still has teeth). fauna↔wild is "neutral" for now (predators don't prey
+// on livestock yet); flip both halves to "enemy" to switch the predation ecosystem
+// on. umbral↔player is "enemy" so hostile Umbrals can engage delvers; non-hostile
+// Umbrals (the trader) stay inert and a peaceful enclave is just `hostile: false`.
+const FACTIONS = ["player", "rim", "fauna", "wild", "umbral"];
+const FACTION_RELATIONS = {
+  player: { rim: "ally", fauna: "enemy", wild: "enemy", umbral: "enemy" },
+  rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral" },
+  fauna: { player: "enemy", rim: "ally", wild: "neutral", umbral: "neutral" },
+  wild: { player: "enemy", rim: "enemy", fauna: "neutral", umbral: "neutral" },
+  umbral: { player: "enemy", rim: "neutral", fauna: "neutral", wild: "neutral" },
+};
+/** How faction `a` regards faction `b`: "ally" | "enemy" | "neutral". */
+function factionRelation(a, b) {
+  if (a === b) return "ally";
+  return (FACTION_RELATIONS[a] && FACTION_RELATIONS[a][b]) || "enemy";
 }
 
 /** Total light an actor radiates from active `emit-light` status effects. */
@@ -1672,8 +1704,9 @@ class GameState {
     // nobody worth rising for this action — stay at rest (no wander/emote).
     if (m.posture === "sitting") return;
     // A `helper` (and every player-summon — it backs its owner) piles into any
-    // fight a same-faction ally is already in. This is how a defensive summon
-    // joins the master's fight without ever starting one of its own.
+    // fight an allied combatant is in, or steps in when an enemy attacks an ally
+    // (see _assistPass). This is how a defensive summon joins the master's fight
+    // without ever starting one of its own, and how a rim guard defends a delver.
     if (t.helper || self.faction === "player") this._assistPass(m, t, enemies, rt.light, roomId, events);
     const engagedTargets = enemies.filter((c) => this._isEngaged(m, t, c));
     const inCombat = this._alerted(m); // alerted (combat threat or live detection) → won't wander
@@ -1878,7 +1911,7 @@ class GameState {
 
   /** Two combatants are enemies iff their factions differ. */
   _areEnemies(a, b) {
-    return a.faction !== b.faction;
+    return factionRelation(a.faction, b.faction) === "enemy";
   }
 
   /** Living opposing-faction combatants of `self` in `roomId`. For a wild mob this
@@ -1937,14 +1970,22 @@ class GameState {
   _assistPass(mob, t, enemies, light, roomId, events) {
     if (mob.posture === "sleeping" || noticeChance(t.perception, light) <= 0) return;
     const myFaction = combatantFaction(mob, "mob");
-    const allies = this._combatantsIn(roomId).filter((c) => c.id !== mob.id && c.faction === myFaction);
+    const allies = this._combatantsIn(roomId).filter((c) => c.id !== mob.id && factionRelation(myFaction, c.faction) === "ally");
     if (!allies.length) return;
     for (const e of enemies) {
       if (mob.aggro && mob.aggro[e.id] > 0) continue; // already in this fight — no re-announce
+      // Pile in when an ally is already trading blows with this enemy...
       const allyFighting = allies.some((a) =>
         (a.kind === "mob" && a.actor.aggro && a.actor.aggro[e.id] > 0) ||
         (a.kind === "player" && a.actor.pending && a.actor.pending.targetId === e.id));
-      if (!allyFighting) continue;
+      // ...or when the enemy is the aggressor against an ally who hasn't (or can't)
+      // fight back — a guard steps in for a passive victim (penned fauna, a delver
+      // not yet retaliating, an Umbral trader being robbed). A mob aggressor names
+      // its target in its aggro table; a player aggressor in `pending.targetId`.
+      const enemyTargetsAlly = allies.some((a) =>
+        (e.kind === "mob" && e.actor.aggro && e.actor.aggro[a.id] > 0) ||
+        (e.kind === "player" && e.actor.pending && e.actor.pending.targetId === a.id));
+      if (!allyFighting && !enemyTargetsAlly) continue;
       this._addThreat(mob, e.id, AGGRO_ENGAGE); // join the fight — committed like a full notice
       events.push({
         type: "mob-assist", roomId, mobId: mob.id, mobName: t.name,

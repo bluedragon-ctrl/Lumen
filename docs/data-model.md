@@ -235,8 +235,9 @@ A map of `mobId → template`.
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
 | `behavior`   | enum    | `wander` \| `guard` \| `hunt` \| `passive` (flavour tag). |
 | `hostile`    | bool    | May attack players when able (proactively *hunts* — builds detection; see Aggro / threat). |
+| `faction`    | enum?   | The side this creature fights *for*: `wild` (default — the deep's predators) \| `rim` (village NPCs & guards) \| `fauna` (peaceful wildlife) \| `umbral` (the deep-dwelling Umbrals) \| `player` (reserved for summons). Sets *sides* (see [Faction & ownership](#faction--ownership-runtime)); a summon overrides it at spawn. Tag village NPCs `rim`, peaceful creatures `fauna`, Umbrals `umbral`. |
 | `ambush`     | bool?   | Predator that lies in wait. It still hunts (tracks perceivable enemies) but holds its **proactive** strike until a target is **sleeping**, then attacks; if `hidden`, that first strike **reveals** it to the victim (no `search` needed) and fires a `mob-ambush` appearance line. It emits no "spotted" tell, and once blows are traded it fights on normally (combat threat) regardless of posture. Requires `hostile: true`. |
-| `helper`     | bool?   | Pack defender. On its action it **joins any fight a same-faction ally is already in** — for each present enemy that an ally it can **perceive** holds combat threat on, it engages that enemy too (fires a one-shot `mob-assist` "rushes to join" line). Perception-gated (won't join in the dark it can't see). Turns "pick them off one at a time" into a swarm. |
+| `helper`     | bool?   | Defender. On its action it **joins any fight an allied combatant is in** (ally = its faction *or* a faction it allies with, per the relations table) — it engages a present enemy that such an ally holds combat threat on, **or** one that is itself attacking an ally (so a guard steps in for a victim who hasn't fought back). Fires a one-shot `mob-assist` "rushes to join" line; perception-gated (won't join in the dark it can't see). Turns a pack into a swarm — and is how a `rim` guard defends a delver. |
 | `attack`     | block?  | Melee profile: `{ damage (dice), actionCost, type?, bonus?, crit?, hitBonus?, onHit? }`. `onHit` (see below) lands effects on a struck defender. |
 | `onDamage`   | block?  | General **when-struck** triggers (see below): a list of effect specs that fire when this mob is hit — reflect damage, retaliate with a DoT, or buff itself. Same shape on an item's `armour.onDamage`. |
 | `spikes`     | block?  | Terse sugar for the commonest `onDamage` entry — a flat melee **reflect** ("thorns"): `{ damage (dice), chance? }`. Anyone who lands a melee hit takes the damage back. Fires even if the mob has no `attack` of its own. Equivalent to `onDamage: [{ type: "damage", damage, target: "attacker" }]`. |
@@ -322,19 +323,43 @@ future `onDeath` lifecycle trigger) slots in without reshaping the data.
 
 ### Faction & ownership (runtime)
 
-Allegiance is **instance-level**, not a template property, so the same template can
-spawn as an enemy or as a player-allied creature. Every mob instance carries:
+Allegiance is **instance-level** (an instance defaults to its template's `faction`,
+else `"wild"`), so the same template can spawn on different sides. Every mob instance
+carries:
 
 | Field      | Default  | Meaning |
 |------------|----------|---------|
-| `faction`  | `"wild"` | The side this creature fights *for*. Players are always faction `"player"`. Two combatants are **enemies** iff their factions differ. |
+| `faction`  | template's, else `"wild"` | The side this creature fights *for* — one of `player`, `rim`, `fauna`, `wild`, `umbral`. Players are always faction `"player"`. |
 | `ownerId`  | `null`   | The player a `"player"`-faction creature belongs to (kill credit; future pet upkeep). |
 
-Faction defines *sides*; `hostile`/provocation still gate whether a creature
-actually engages. A `"wild"` mob's enemies are players + `"player"`-faction mobs; a
-`"player"` mob's enemies are `"wild"` mobs. This is the substrate **summons** sit on
-(an allied mob spawned `faction:"player"` + `ownerId`). The admin
-`@spawn <mobId> [count] [wild|player]` sets it for live testing.
+Faction sets *sides*; `hostile`/provocation still gate whether a creature actually
+engages. Two combatants relate as **ally** (assist each other, never targeted),
+**enemy** (eligible to fight), or **neutral** (ignored — neither defended nor
+hunted), by this symmetric table (a faction is always its own ally; any unlisted
+pair falls back to enemy):
+
+|         | player  | rim    | fauna   | wild    | umbral  |
+|---------|---------|--------|---------|---------|---------|
+| **player** | ally | ally   | enemy   | enemy   | enemy   |
+| **rim**    | ally | ally   | ally    | enemy   | neutral |
+| **fauna**  | enemy | ally   | ally    | neutral | neutral |
+| **wild**   | enemy | enemy  | neutral | ally    | neutral |
+| **umbral** | enemy | neutral | neutral | neutral | ally    |
+
+`enemy` only marks who *may* fight — whether a creature *starts* one is the separate
+`hostile` flag. So a `rim` guard counts predators (`wild`) as enemies and defends
+players, NPCs, and fauna; `wild` predators war on players, guards, and player-summons.
+**`fauna` are `enemy` to `player`** but `hostile: false`: they never initiate and are
+never hunted, yet they fight back when farmed (a struck Old Grinder still has teeth) —
+and because the player is the guard's *ally*, hunting livestock never pulls a `rim`
+guard onto you. `fauna`↔`wild` is **neutral for now** (predators don't yet prey on
+livestock) — flip both halves to `enemy` to switch that ecosystem on. `umbral` (the deep-dwellers — Mallki and kin) is
+**enemy to `player`** so hostile Umbrals can engage delvers; a peaceful Umbral like the
+trader is simply `hostile: false` and never acts on it, and an Umbral guard
+(`umbral` + `helper`) defends its kin against anyone who strikes them. This is also the
+substrate **summons** sit on (an allied mob spawned `faction:"player"` + `ownerId`).
+The admin `@spawn <mobId> [count] [wild|player|rim|fauna|umbral]` overrides it for live
+testing.
 
 **Summon instance fields.** Summoned instances also carry `summonerId` (the
 conjurer's id — player or mob), `summonGroup` (the recast-cap key), `expiresIn`

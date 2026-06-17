@@ -207,15 +207,18 @@ gains), provided it has an `attack` block — so a neutral lurker fights back wh
 provoked, while attack-less NPCs (shopkeepers) stay passive.
 
 **Factions & mob-vs-mob.** Allegiance is **instance-level**: every mob carries a
-`faction` (default `"wild"`; players are `"player"`) and an optional `ownerId`.
-Combatants of differing factions are enemies, so the same combat path resolves
-player↔mob *and* mob↔mob — an enemy (`"wild"`) creature targets and damages a
-player-allied (`"player"`) one and vice versa, reusing the shared `strike` /
-`applyHitOutcome` pipeline and the combatant-keyed threat table. A `"player"`-faction
-mob fights enemies on sight (no `hostile` flag needed) and credits its `ownerId` on a
-kill. This is the groundwork for a later **summon**; `@spawn <mobId> [count] player`
-marks an instance allied for live testing. Beneficial spells (heal/buff) draw the
-caster threat on whatever is fighting the mended ally, mirroring damage→threat.
+`faction` (defaults to its template's, else `"wild"`; players are `"player"`) and an
+optional `ownerId`. There are five — `player`, `rim`, `fauna`, `wild`, `umbral` — related by a
+symmetric ally/enemy/neutral table (`factionRelation`), replacing the old
+"differing = enemy" binary. `_areEnemies` (enemy) and the `helper` assist pass (ally)
+both read it, so the same combat path resolves player↔mob *and* mob↔mob and a `rim`
+guard defends players, NPCs, and fauna against `wild` predators while ignoring the
+livestock. A `helper` now joins a fight an ally is in **or** steps in when an enemy is
+the aggressor against an ally (covering a passive victim). A `"player"`-faction mob
+fights enemies on sight (no `hostile` flag needed) and credits its `ownerId` on a
+kill — the groundwork **summons** sit on; `@spawn <mobId> [count] [wild|player|rim|fauna|umbral]`
+overrides faction for live testing. Beneficial spells (heal/buff) draw the caster
+threat on whatever is fighting the mended ally, mirroring damage→threat.
 
 ### Posture — sit, sleep & rest recovery
 
