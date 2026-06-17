@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `delver-claim-tag` is tagged `other` (story item, not a crafting material).
   New item types fall through to the client-side `type → group` mapping and land
   in Other if unrecognised.
+- **Grazing mobs confined to grazing rooms.** Stonebugs and thornbugs gain a
+  low-weight wander action (`requireTags: ["grazing"]`); the Old Grinder's
+  existing wander is similarly gated. Seven rooms across depths 0–3 are tagged
+  `"grazing"`: `rim.corral`, `abyss.drift`, `second.graze1–4`, and
+  `third.grazing`. Bugs now drift between their feeding grounds and stay put
+  rather than wandering into mine tunnels or unrelated corridors.
 - **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
   (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter
   its destinations by them: `requireTags` enters only rooms carrying **all** the

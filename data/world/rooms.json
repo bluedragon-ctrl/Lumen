@@ -77,6 +77,7 @@
   "rim.corral": {
     "id": "rim.corral",
     "zone": "rim",
+    "tags": ["grazing"],
     "name": "The Stockpens",
     "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
     "depth": 0,
@@ -205,6 +206,7 @@
   "abyss.drift": {
     "id": "abyss.drift",
     "zone": "abyss",
+    "tags": ["grazing"],
     "name": "The Ore Drift",
     "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of pale mushrooms has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
     "depth": 1,
@@ -377,6 +379,7 @@
   "second.graze1": {
     "id": "second.graze1",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Grazing Galleries",
     "depth": 2,
     "ambientLight": 1,
@@ -392,6 +395,7 @@
   "second.graze2": {
     "id": "second.graze2",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Spine-Thicket",
     "depth": 2,
     "ambientLight": 1,
@@ -408,6 +412,7 @@
   "second.graze3": {
     "id": "second.graze3",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Grinder's Hollow",
     "depth": 2,
     "ambientLight": 1,
@@ -422,6 +427,7 @@
   "second.graze4": {
     "id": "second.graze4",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Skitter-Crack",
     "depth": 2,
     "ambientLight": 0,
@@ -631,6 +637,7 @@
   "third.grazing": {
     "id": "third.grazing",
     "zone": "third-umbral",
+    "tags": ["grazing"],
     "name": "The Grazing Hollow",
     "depth": 3,
     "ambientLight": 0,

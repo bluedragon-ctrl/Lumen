@@ -524,7 +524,8 @@
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 5 },
-      { "type": "emote", "weight": 2, "messages": ["grazes at the moss with slow mandibles", "trundles a slow half-circle", "tucks its plates tighter, then relaxes"] }
+      { "type": "emote", "weight": 2, "messages": ["grazes at the moss with slow mandibles", "trundles a slow half-circle", "tucks its plates tighter, then relaxes"] },
+      { "type": "wander", "weight": 2, "verb": "trundles off grazing", "scope": "zone", "requireTags": ["grazing"] }
     ],
     "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "bug-meat", "chance": 1 }, { "template": "bug-tallow", "chance": 0.5 }]
   },
@@ -546,7 +547,8 @@
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 5 },
-      { "type": "emote", "weight": 2, "messages": ["bristles its spines", "rasps at a glowing cap", "rolls half-shut, then unfurls"] }
+      { "type": "emote", "weight": 2, "messages": ["bristles its spines", "rasps at a glowing cap", "rolls half-shut, then unfurls"] },
+      { "type": "wander", "weight": 2, "verb": "trundles along the caps", "scope": "zone", "requireTags": ["grazing"] }
     ],
     "loot": [{ "template": "chitin-spike", "chance": 1 }, { "template": "bug-meat", "chance": 0.5 }]
   },
@@ -727,7 +729,7 @@
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 6 },
       { "type": "emote", "weight": 2, "messages": ["grazes along the worn hollow, mandibles working in a slow, ancient rhythm", "trundles a deliberate half-circle, plates grinding over smooth stone", "pauses, tucks its legs, and sits completely still — indistinguishable from a boulder"] },
-      { "type": "wander", "weight": 1, "verb": "grinds slowly forward", "scope": "zone" }
+      { "type": "wander", "weight": 1, "verb": "grinds slowly forward", "scope": "zone", "requireTags": ["grazing"] }
     ],
     "loot": [
       { "template": "chitin-plate", "chance": 1 },
