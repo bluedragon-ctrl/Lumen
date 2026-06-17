@@ -2,6 +2,7 @@
   "rim.plaza": {
     "id": "rim.plaza",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Rim Plaza",
     "description": "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss, all green timber and oiled canvas crowded onto bare rock. Prospectors from a dozen distant lands jostle and haggle here, every other voice talking glimmer: who struck a rich seam, who went down and never came up. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering. Lanes lead off to the inn in the north, the market east, and the craftsmen's row to the west. Southward the cobbles give way to the descent.",
     "depth": 0,
@@ -14,6 +15,7 @@
   "rim.inn": {
     "id": "rim.inn",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Lantern's Rest",
     "description": "Warmth and low talk spill from a long common room. A great hearth throws orange light across crowded benches, and the smell of broth and tallow hangs thick. Delvers nurse their drinks here between descents, trading rumours of what waits below. The plaza lies back through the door to the south.",
     "depth": 0,
@@ -38,6 +40,7 @@
   "rim.market": {
     "id": "rim.market",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Rim Market",
     "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
@@ -50,6 +53,7 @@
   "rim.claims": {
     "id": "rim.claims",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Claims Office",
     "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and claims — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
     "depth": 0,
@@ -132,6 +136,7 @@
   "rim.workshop": {
     "id": "rim.workshop",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Craftsmen's Row",
     "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
     "depth": 0,
@@ -144,6 +149,7 @@
   "rim.gate": {
     "id": "rim.gate",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Descent Gate",
     "description": "The lanterns thin out here, at the edge of the settlement. A low stone arch frames the path south, and beyond it the ground falls away into shadow. A weathered sign warns delvers to count their light before they go down. The plaza is north.",
     "depth": 0,

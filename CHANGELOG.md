@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `delver-claim-tag` is tagged `other` (story item, not a crafting material).
   New item types fall through to the client-side `type → group` mapping and land
   in Other if unrecognised.
+- **Watchman keeps to his beat.** Hale the watchman's wander now carries
+  `requireTags: ["patrol"]`, and the six public rooms that make up his round —
+  `rim.plaza`, `rim.inn`, `rim.market`, `rim.claims`, `rim.workshop`, and
+  `rim.gate` — are tagged `"patrol"`. He no longer drifts into the farm sheds,
+  the mage's shed, or out to the lip of the descent shaft; he walks the lanes
+  he's paid to be seen on. (The two cellars were already beyond his reach.)
 - **Grazing mobs confined to grazing rooms.** Stonebugs and thornbugs gain a
   low-weight wander action (`requireTags: ["grazing"]`); the Old Grinder's
   existing wander is similarly gated. Seven rooms across depths 0–3 are tagged

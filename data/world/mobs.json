@@ -446,7 +446,7 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 9 },
-      { "type": "wander", "weight": 2, "verb": "moves on along his round", "scope": "zone" },
+      { "type": "wander", "weight": 2, "verb": "moves on along his round", "scope": "zone", "requireTags": ["patrol"] },
       { "type": "emote", "weight": 1, "messages": ["rests a hand on his cudgel and scans the lane", "rolls a shard across his knuckles, watching the street", "checks a shutter's latch with one big thumb", "stifles a yawn that goes on a while", "nods to a passing delver without breaking stride"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "hpBelow": 0.4 }, "messages": [
