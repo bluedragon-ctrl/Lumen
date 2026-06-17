@@ -366,20 +366,31 @@ function dispatchEvent(ev) {
   }
 
   if (ev.type === "aggro-engage") {
-    // A mob proactively noticed a delver and committed to attack (see
-    // state._engageTell). One tell at the moment of engagement, light-gated like
-    // other mob lines; `rose` when a seated creature stood to do it.
+    // A mob committed to attack (see state._engageTell): either it proactively
+    // noticed a delver, or — `remembered` — a `remembers` mob recognised a foe it
+    // bears a grudge against stepping back in. One tell at the moment of engagement,
+    // light-gated like other mob lines; `rose` when a seated creature stood to do it.
     const target = state.players.get(ev.targetId);
     const seen = target && canSeeMob(target, ev.light, ev.emitsLight);
     const who = seen ? ev.mobName : "something";
-    const youLine = seen
-      ? `${cap(who)} ${ev.rose ? "stirs, its gaze locking" : "fixes its gaze"} onto you.`
-      : "Something stirs in the dark, fixing on you.";
+    let youLine;
+    if (ev.remembered) {
+      youLine = seen
+        ? `${cap(who)} ${ev.rose ? "stirs — it remembers you" : "remembers you"}, and its old hate rekindles.`
+        : "Something in the dark remembers you, and stirs with old hate.";
+    } else {
+      youLine = seen
+        ? `${cap(who)} ${ev.rose ? "stirs, its gaze locking" : "fixes its gaze"} onto you.`
+        : "Something stirs in the dark, fixing on you.";
+    }
     sendToPlayer(ev.targetId, { type: "combat", text: youLine });
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "combat", text: `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.` });
+      const otherLine = ev.remembered
+        ? `${cap(n)} ${ev.rose ? "stirs, remembering" : "remembers"} ${ev.targetName}.`
+        : `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.`;
+      sendToPlayer(o.id, { type: "combat", text: otherLine });
     }
     return;
   }

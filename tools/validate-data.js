@@ -243,6 +243,8 @@ function main() {
     // Whitelist is shared with the game via server/config.js (single source).
     if (m.faction != null && !FACTIONS.includes(m.faction))
       errs.push(`mob ${id}: faction must be one of ${FACTIONS.map((f) => `"${f}"`).join(", ")}`);
+    if (m.remembers != null && typeof m.remembers !== "boolean")
+      errs.push(`mob ${id}: remembers must be a boolean`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")

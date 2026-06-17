@@ -108,6 +108,15 @@ const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimB
 const AGGRO_RATE = 1; // detection gained per action at clear sight
 const AGGRO_ENGAGE = 2; // detection threshold at which a mob commits to attack
 const AGGRO_GRACE = 3; // actions a target stays unperceived before detection decays
+// Mob memory (see GameState._pruneAggro / _restoreGrudges): a `remembers` mob does
+// not forgive combat threat the way it forgets detection. When a player it has
+// traded blows with LEAVES the room, that threat is parked in `mob.grudge` rather
+// than dropped; if they return within GRUDGE_TICKS the old ire is restored and the
+// mob re-engages on sight. A grudge does NOT keep the mob "alerted" (see _alerted):
+// between leaving and returning it wanders and mends as normal — it just won't
+// forget the face. The grudge lapses on a timer, or the instant the player dies or
+// logs out (a clean slate either way).
+const GRUDGE_TICKS = 60; // ticks (~1 min at TICK_MS=1000) a remembered foe is held before forgiven
 // Out-of-combat recovery (see GameState._recoverMobsTick): a wounded mob that
 // nothing is fighting or watching, in a room clear of living foes, knits its
 // wounds shut. It must hold OOC_REGEN_DELAY ticks past its last combat first (so
@@ -1684,6 +1693,7 @@ class GameState {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
         if (m.hp <= 0) continue; // slain earlier this tick (e.g. mob-vs-mob) but still in the snapshot
+        this._decayGrudges(m); // a remembered foe is forgiven on a timer — even while the mob sleeps or rests
         if (m.posture === "sleeping") continue; // a sleeping mob perceives nothing — inert until struck (see _rouse)
         // A *sitting* mob is alert-at-rest: it still runs _mobAct to detect enemies
         // and stands as it engages (it just won't wander/emote — see _mobAct).
@@ -1717,7 +1727,11 @@ class GameState {
     // hostile wild mob, or a player-faction ally) builds a decaying notice meter
     // on each enemy it can perceive. A mob it has actually traded blows with (a
     // live combat-threat entry) is engaged outright — being hit bypasses the ramp.
-    this._pruneAggro(m, enemies);
+    this._pruneAggro(m, t, enemies);
+    // A `remembers` mob that parked a grudge on a player who left re-engages them
+    // the instant they step back in — the old ire returns as live combat threat, so
+    // it attacks on sight rather than re-earning the notice from scratch.
+    this._restoreGrudges(m, t, enemies, roomId, events);
     // A player's summon is a *defensive guard*, not an independent aggressor: it
     // never proactively hunts (even if its template is `hostile`, as a combat
     // summon is). It engages only what it has traded blows with or what its owner
@@ -2025,7 +2039,10 @@ class GameState {
   }
 
   /** Alerted = holds any combat threat or any live detection. An alerted mob is
-   *  "in combat" and won't wander; an un-alerted hostile roams normally. */
+   *  "in combat" and won't wander; an un-alerted hostile roams normally. A parked
+   *  `grudge` is deliberately NOT counted: a mob that remembers an absent foe still
+   *  wanders and mends between encounters (see GRUDGE_TICKS) — it only re-commits
+   *  when that foe is back in the room and the grudge is restored to live `aggro`. */
   _alerted(mob) {
     if (mob.aggro && Object.keys(mob.aggro).length) return true;
     if (mob.detect) for (const v of Object.values(mob.detect)) if (v > 0) return true;
@@ -2074,13 +2091,15 @@ class GameState {
 
   /** The Diku-style "spotted you" tell, fired once as a player target crosses the
    *  detection threshold. A seated mob stands as it commits (`rose`). Light-gated
-   *  by the renderer like other mob events. */
-  _engageTell(mob, t, target, roomId, events) {
+   *  by the renderer like other mob events. `remembered` marks a grudge re-engage
+   *  (the mob recognises a returning foe rather than noticing a fresh one), so the
+   *  renderer can word it accordingly. */
+  _engageTell(mob, t, target, roomId, events, remembered = false) {
     let rose = false;
     if (mob.posture === "sitting") { mob.posture = "standing"; rose = true; }
     events.push({
       type: "aggro-engage", roomId, mobId: mob.id, mobName: t.name,
-      targetId: target.id, targetName: target.actor.name, rose,
+      targetId: target.id, targetName: target.actor.name, rose, remembered,
       light: this.rooms[roomId].light, emitsLight: !!t.emitsLight,
     });
   }
@@ -2115,17 +2134,60 @@ class GameState {
     return out;
   }
 
-  /** Forget combatants no longer present/alive across every per-enemy table
-   *  (combat threat, detection meter, unseen counters). `present` is the current
-   *  candidate list ({ id } descriptors). In-room decay is handled separately by
-   *  `_detectAndDecay`; this is the hard drop for those who left. */
-  _pruneAggro(mob, present) {
+  /** Forget combatants no longer present across every per-enemy table. `present`
+   *  is the current candidate list ({ id } descriptors). Detection and its unseen
+   *  counters are pure room-local perception — an enemy who leaves is no longer
+   *  noticed, full stop. Combat threat normally drops the same way, EXCEPT for a
+   *  `remembers` mob (template flag): the grudge of a PLAYER who merely left (still
+   *  online and alive) is parked in `mob.grudge` so the mob re-engages on sight if
+   *  they return within GRUDGE_TICKS (see _restoreGrudges / _decayGrudges). Allied
+   *  summon (mob-id) keys and dead/offline players still drop outright. In-room
+   *  decay of detection is handled separately by `_detectAndDecay`. */
+  _pruneAggro(mob, t, present) {
     const ids = new Set(present.map((c) => c.id));
-    for (const map of [mob.aggro, mob.detect, mob._unseen]) {
+    for (const map of [mob.detect, mob._unseen]) {
       if (!map) continue;
       for (const cid of Object.keys(map)) if (!ids.has(cid)) delete map[cid];
     }
-    if (!mob.aggro) mob.aggro = {};
+    if (!mob.aggro) { mob.aggro = {}; return; }
+    for (const cid of Object.keys(mob.aggro)) {
+      if (ids.has(cid)) continue; // still here — leave the live threat intact
+      if (t.remembers && mob.aggro[cid] > 0) {
+        const pl = this.players.get(cid); // grudges are held only against players
+        if (pl && pl.hp > 0) {
+          if (!mob.grudge) mob.grudge = {};
+          mob.grudge[cid] = { threat: mob.aggro[cid], ttl: GRUDGE_TICKS };
+        }
+      }
+      delete mob.aggro[cid];
+    }
+  }
+
+  /** Restore a parked grudge when its quarry re-enters: any present enemy the mob
+   *  still bears a grudge against gets that combat threat re-seeded (engaged on
+   *  sight — `_isEngaged` treats any `aggro > 0` as committed), and a "remembers
+   *  you" tell fires for a player target, mirroring the detection-commit tell. */
+  _restoreGrudges(mob, t, enemies, roomId, events) {
+    if (!mob.grudge) return;
+    for (const c of enemies) {
+      const g = mob.grudge[c.id];
+      if (!g) continue;
+      const fresh = !(mob.aggro && mob.aggro[c.id] > 0);
+      this._addThreat(mob, c.id, g.threat);
+      delete mob.grudge[c.id];
+      if (fresh && c.kind === "player" && !t.ambush) this._engageTell(mob, t, c, roomId, events, true);
+    }
+  }
+
+  /** Age every grudge one tick (runs for all mobs each tick, see resolveMobAI):
+   *  forgive the timed-out, and the gone — a quarry that died or logged out is
+   *  dropped at once, a clean slate either way. */
+  _decayGrudges(mob) {
+    if (!mob.grudge) return;
+    for (const id of Object.keys(mob.grudge)) {
+      const pl = this.players.get(id);
+      if (!pl || pl.hp <= 0 || --mob.grudge[id].ttl <= 0) delete mob.grudge[id];
+    }
   }
 
   /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),
