@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
+  (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter
+  its destinations by them: `requireTags` enters only rooms carrying **all** the
+  listed tags, `forbidTags` shuns any room carrying one. Untagged rooms are the
+  neutral default — excluded by `requireTags`, allowed by `forbidTags` — so a
+  tagless world and every existing mob roam exactly as before; tags only constrain
+  mobs that ask for them. First use: the dozen river/lake/sump rooms across depths
+  2–4 are tagged `"water"`, and the **blind cave-fish** now drifts between them on a
+  low-weight water-only wander, so calm fish swim the shallows but never flop onto
+  dry stone. Reusable groundwork for patrol/biome behaviour to come.
+- **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
+  sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
 - **Inventory filter bar.** Five switchable tabs (All / Gear / Use / Mats / Other)
   appear above the inventory list in the player panel. Each tab shows a live count
   badge; empty tabs are dimmed. The active filter persists in `localStorage` across
