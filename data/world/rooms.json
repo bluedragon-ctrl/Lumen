@@ -2,6 +2,7 @@
   "rim.plaza": {
     "id": "rim.plaza",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Rim Plaza",
     "description": "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss, all green timber and oiled canvas crowded onto bare rock. Prospectors from a dozen distant lands jostle and haggle here, every other voice talking glimmer: who struck a rich seam, who went down and never came up. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering. Lanes lead off to the inn in the north, the market east, and the craftsmen's row to the west. Southward the cobbles give way to the descent.",
     "depth": 0,
@@ -14,6 +15,7 @@
   "rim.inn": {
     "id": "rim.inn",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Lantern's Rest",
     "description": "Warmth and low talk spill from a long common room. A great hearth throws orange light across crowded benches, and the smell of broth and tallow hangs thick. Delvers nurse their drinks here between descents, trading rumours of what waits below. The plaza lies back through the door to the south.",
     "depth": 0,
@@ -38,6 +40,7 @@
   "rim.market": {
     "id": "rim.market",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Rim Market",
     "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
@@ -50,6 +53,7 @@
   "rim.claims": {
     "id": "rim.claims",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Claims Office",
     "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and claims — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
     "depth": 0,
@@ -77,6 +81,7 @@
   "rim.corral": {
     "id": "rim.corral",
     "zone": "rim",
+    "tags": ["grazing"],
     "name": "The Stockpens",
     "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
     "depth": 0,
@@ -129,6 +134,7 @@
   "rim.workshop": {
     "id": "rim.workshop",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Craftsmen's Row",
     "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
     "depth": 0,
@@ -141,6 +147,7 @@
   "rim.gate": {
     "id": "rim.gate",
     "zone": "rim",
+    "tags": ["patrol"],
     "name": "The Descent Gate",
     "description": "The lanterns thin out here, at the edge of the settlement. A low stone arch frames the path south, and beyond it the ground falls away into shadow. A weathered sign warns delvers to count their light before they go down. The plaza is north.",
     "depth": 0,
@@ -201,6 +208,7 @@
   "abyss.drift": {
     "id": "abyss.drift",
     "zone": "abyss",
+    "tags": ["grazing"],
     "name": "The Ore Drift",
     "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of pale mushrooms has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
     "depth": 1,
@@ -371,6 +379,7 @@
   "second.graze1": {
     "id": "second.graze1",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Grazing Galleries",
     "depth": 2,
     "ambientLight": 1,
@@ -386,6 +395,7 @@
   "second.graze2": {
     "id": "second.graze2",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Spine-Thicket",
     "depth": 2,
     "ambientLight": 1,
@@ -402,6 +412,7 @@
   "second.graze3": {
     "id": "second.graze3",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Grinder's Hollow",
     "depth": 2,
     "ambientLight": 1,
@@ -414,6 +425,7 @@
   "second.graze4": {
     "id": "second.graze4",
     "zone": "second-graze",
+    "tags": ["grazing"],
     "name": "The Skitter-Crack",
     "depth": 2,
     "ambientLight": 0,
@@ -613,6 +625,7 @@
   "third.grazing": {
     "id": "third.grazing",
     "zone": "third-umbral",
+    "tags": ["grazing"],
     "name": "The Grazing Hollow",
     "depth": 3,
     "ambientLight": 0,

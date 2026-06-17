@@ -50,6 +50,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `delver-claim-tag` is tagged `other` (story item, not a crafting material).
   New item types fall through to the client-side `type → group` mapping and land
   in Other if unrecognised.
+- **Watchman keeps to his beat.** Hale the watchman's wander now carries
+  `requireTags: ["patrol"]`, and the six public rooms that make up his round —
+  `rim.plaza`, `rim.inn`, `rim.market`, `rim.claims`, `rim.workshop`, and
+  `rim.gate` — are tagged `"patrol"`. He no longer drifts into the farm sheds,
+  the mage's shed, or out to the lip of the descent shaft; he walks the lanes
+  he's paid to be seen on. (The two cellars were already beyond his reach.)
+- **Grazing mobs confined to grazing rooms.** Stonebugs and thornbugs gain a
+  low-weight wander action (`requireTags: ["grazing"]`); the Old Grinder's
+  existing wander is similarly gated. Seven rooms across depths 0–3 are tagged
+  `"grazing"`: `rim.corral`, `abyss.drift`, `second.graze1–4`, and
+  `third.grazing`. Bugs now drift between their feeding grounds and stay put
+  rather than wandering into mine tunnels or unrelated corridors.
+- **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
+  (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter
+  its destinations by them: `requireTags` enters only rooms carrying **all** the
+  listed tags, `forbidTags` shuns any room carrying one. Untagged rooms are the
+  neutral default — excluded by `requireTags`, allowed by `forbidTags` — so a
+  tagless world and every existing mob roam exactly as before; tags only constrain
+  mobs that ask for them. First use: the dozen river/lake/sump rooms across depths
+  2–4 are tagged `"water"`, and the **blind cave-fish** now drifts between them on a
+  low-weight water-only wander, so calm fish swim the shallows but never flop onto
+  dry stone. Reusable groundwork for patrol/biome behaviour to come.
+- **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
+  sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
 - **Gloom-creepers — the warren's moving dark.** A new depth-7 mob
   (`gloom-creeper`): a lone gloom-crawler that has left the chamber swarms to range
   the warren tunnels, with a zone-`wander` action so it drifts room to room. Same
