@@ -117,6 +117,14 @@ const AGGRO_GRACE = 3; // actions a target stays unperceived before detection de
 // forget the face. The grudge lapses on a timer, or the instant the player dies or
 // logs out (a clean slate either way).
 const GRUDGE_TICKS = 60; // ticks (~1 min at TICK_MS=1000) a remembered foe is held before forgiven
+// Cross-room pursuit (see GameState._pursue): a `pursues` mob with a parked grudge
+// against a player who fled goes after them — BFS one room per action toward the
+// quarry's current room (DikuMUD `hunt_victim`). The chase is leashed by distance
+// from the mob's spawn room (`m.origin.roomId`): it never steps into a room more
+// than `pursueRange` rooms (BFS depth) from home. When the grudge is gone (quarry
+// dead, logged out, lapsed, or driven past the leash) a stray pursuer heads home —
+// for v1, a quiet relocate to its spawn room the moment no one is watching it leave.
+const PURSUE_RANGE = 4; // default rooms-from-spawn leash when a `pursues` mob sets no `pursueRange`
 // Out-of-combat recovery (see GameState._recoverMobsTick): a wounded mob that
 // nothing is fighting or watching, in a room clear of living foes, knits its
 // wounds shut. It must hold OOC_REGEN_DELAY ticks past its last combat first (so
@@ -1799,6 +1807,15 @@ class GameState {
       if (dirs.length) return this._mobMove(m, t, roomId, events, flee.verb || "flees into the dark", dirs);
     }
 
+    // Cross-room pursuit (DikuMUD `hunt_victim`). With no enemy present here to
+    // fight, a `pursues` mob bearing a grudge stalks the fled quarry one room per
+    // action toward where they now stand, leashed to `pursueRange` rooms from its
+    // spawn (see _pursue). A stray pursuer with nothing left to chase heads home.
+    // It only fires when the room is otherwise empty of foes — a present enemy is
+    // always dealt with first (detect/engage/attack below), and survival actions
+    // (skittish, flee) have already had their say above.
+    if (t.pursues && enemies.length === 0 && this._pursue(m, t, roomId, events)) return;
+
     // A mob attacks if it has *engaged* a present enemy — either a target whose
     // detection meter reached `AGGRO_ENGAGE` (proactively noticed it; clear sight
     // commits in ~AGGRO_ENGAGE actions, impaired ~2×, dark never), or one it has
@@ -2138,11 +2155,12 @@ class GameState {
    *  is the current candidate list ({ id } descriptors). Detection and its unseen
    *  counters are pure room-local perception — an enemy who leaves is no longer
    *  noticed, full stop. Combat threat normally drops the same way, EXCEPT for a
-   *  `remembers` mob (template flag): the grudge of a PLAYER who merely left (still
-   *  online and alive) is parked in `mob.grudge` so the mob re-engages on sight if
-   *  they return within GRUDGE_TICKS (see _restoreGrudges / _decayGrudges). Allied
-   *  summon (mob-id) keys and dead/offline players still drop outright. In-room
-   *  decay of detection is handled separately by `_detectAndDecay`. */
+   *  `remembers` OR `pursues` mob (template flags): the grudge of a PLAYER who
+   *  merely left (still online and alive) is parked in `mob.grudge`. A `remembers`
+   *  mob re-engages on sight if they return within GRUDGE_TICKS; a `pursues` mob
+   *  reads the same grudge to go after them (see _pursue / _restoreGrudges /
+   *  _decayGrudges). Allied summon (mob-id) keys and dead/offline players still drop
+   *  outright. In-room decay of detection is handled separately by `_detectAndDecay`. */
   _pruneAggro(mob, t, present) {
     const ids = new Set(present.map((c) => c.id));
     for (const map of [mob.detect, mob._unseen]) {
@@ -2152,7 +2170,7 @@ class GameState {
     if (!mob.aggro) { mob.aggro = {}; return; }
     for (const cid of Object.keys(mob.aggro)) {
       if (ids.has(cid)) continue; // still here — leave the live threat intact
-      if (t.remembers && mob.aggro[cid] > 0) {
+      if ((t.remembers || t.pursues) && mob.aggro[cid] > 0) {
         const pl = this.players.get(cid); // grudges are held only against players
         if (pl && pl.hp > 0) {
           if (!mob.grudge) mob.grudge = {};
@@ -2188,6 +2206,118 @@ class GameState {
       const pl = this.players.get(id);
       if (!pl || pl.hp <= 0 || --mob.grudge[id].ttl <= 0) delete mob.grudge[id];
     }
+  }
+
+  /** Cross-room pursuit step for a `pursues` mob with no enemy present (called from
+   *  _mobAct). Picks the grudge target it most wants — highest parked threat, player
+   *  online, alive, and in another room — and steps one room along the shortest path
+   *  toward them, PROVIDED that step keeps it within `pursueRange` rooms (BFS depth)
+   *  of its spawn room (the leash). If the next step would slip the leash, or the
+   *  quarry is unreachable, it abandons that grudge. With nothing left to chase and
+   *  itself away from home, a stray pursuer slips back to its spawn room (v1 give-up:
+   *  a quiet relocate, not a room-by-room walk-back). Returns true if it acted. */
+  _pursue(mob, t, roomId, events) {
+    const range = t.pursueRange != null ? t.pursueRange : PURSUE_RANGE;
+    if (mob.grudge) {
+      const quarry = this._pursuitQuarry(mob, roomId);
+      if (quarry) {
+        const dir = this._bfsNextDir(roomId, quarry.room);
+        const dest = dir && this.world.rooms[roomId].exits[dir];
+        if (dest && this._bfsDist(mob.origin ? mob.origin.roomId : roomId, dest) <= range) {
+          this._mobMove(mob, t, roomId, events, t.pursueVerb || "stalks off, hunting", [dir]);
+          return true;
+        }
+        delete mob.grudge[quarry.playerId]; // unreachable, or the next step breaks the leash — let it go
+      }
+    }
+    return this._returnHome(mob, t, roomId, events); // nothing to chase: drift home if astray
+  }
+
+  /** The grudge target a pursuer most wants right now: highest parked threat whose
+   *  player is online, alive, and in another (valid) room. Returns { playerId, room }
+   *  or null. A grudge whose player is dead/offline is left for _decayGrudges; one
+   *  whose player is back in this room is ignored (already re-seeded as live aggro by
+   *  _restoreGrudges this same action). */
+  _pursuitQuarry(mob, roomId) {
+    let best = null, bestThreat = -1;
+    for (const id of Object.keys(mob.grudge)) {
+      const pl = this.players.get(id);
+      if (!pl || pl.hp <= 0 || pl.location === roomId || !this.rooms[pl.location]) continue;
+      if (mob.grudge[id].threat > bestThreat) { bestThreat = mob.grudge[id].threat; best = { playerId: id, room: pl.location }; }
+    }
+    return best;
+  }
+
+  /** Slip a stray pursuer back to its spawn room (v1 give-up). Only when the mob is
+   *  away from home AND no living player is in its current room — so no one witnesses
+   *  it vanish; any watchers in the home room just see it "slink in", lights recomputed
+   *  both ends. A spawner-less mob (no `origin`), one already home, or one being watched
+   *  does nothing (it stays put and tries again once the room empties). Returns true if
+   *  it relocated. */
+  _returnHome(mob, t, roomId, events) {
+    const home = mob.origin && mob.origin.roomId;
+    if (!home || home === roomId || !this.rooms[home]) return false;
+    if (this.playersIn(roomId).some((p) => p.hp > 0)) return false; // watched — wait for an empty room
+    const rt = this.rooms[roomId];
+    const idx = rt.mobs.indexOf(mob);
+    if (idx < 0) return false;
+    rt.mobs.splice(idx, 1);
+    this.rooms[home].mobs.push(mob);
+    rt.light = this.computeRoomLight(roomId);
+    this.rooms[home].light = this.computeRoomLight(home);
+    events.push({
+      type: "mob-move", mobId: mob.id, mobName: t.name, from: roomId, to: home, dir: null,
+      verb: "slips away into the dark", emitsLight: !!t.emitsLight,
+      lightFrom: rt.light, lightTo: this.rooms[home].light,
+    });
+    return true;
+  }
+
+  /** First step (exit direction) along a shortest path from `from` to `to` over the
+   *  room exit graph, or null if `to` is unreachable or equals `from`. Directed —
+   *  follows exits as laid, so a pursuer paths the way a delver actually walked. */
+  _bfsNextDir(from, to) {
+    if (from === to) return null;
+    const seen = new Set([from]);
+    const queue = [];
+    for (const [dir, dest] of Object.entries(this.world.rooms[from].exits || {})) {
+      if (!this.world.rooms[dest] || seen.has(dest)) continue;
+      seen.add(dest);
+      if (dest === to) return dir;
+      queue.push({ room: dest, first: dir });
+    }
+    while (queue.length) {
+      const { room, first } = queue.shift();
+      for (const dest of Object.values(this.world.rooms[room].exits || {})) {
+        if (!this.world.rooms[dest] || seen.has(dest)) continue;
+        seen.add(dest);
+        if (dest === to) return first;
+        queue.push({ room: dest, first });
+      }
+    }
+    return null;
+  }
+
+  /** Shortest-path room count from `from` to `to` over the exit graph (0 if equal,
+   *  Infinity if unreachable). Leashes pursuit to `pursueRange` rooms of home. */
+  _bfsDist(from, to) {
+    if (from === to) return 0;
+    const seen = new Set([from]);
+    let frontier = [from], dist = 0;
+    while (frontier.length) {
+      dist++;
+      const next = [];
+      for (const room of frontier) {
+        for (const dest of Object.values(this.world.rooms[room].exits || {})) {
+          if (!this.world.rooms[dest] || seen.has(dest)) continue;
+          if (dest === to) return dist;
+          seen.add(dest);
+          next.push(dest);
+        }
+      }
+      frontier = next;
+    }
+    return Infinity;
   }
 
   /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),

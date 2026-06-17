@@ -768,6 +768,8 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
     "behavior": "hunt",
     "hostile": true,
+    "pursues": true,
+    "pursueRange": 4,
     "attack": { "damage": "1d6", "actionCost": 13 },
     "lightBane": { "above": 2, "damage": "1d3" },
     "xp": 18,

@@ -245,6 +245,10 @@ function main() {
       errs.push(`mob ${id}: faction must be one of ${FACTIONS.map((f) => `"${f}"`).join(", ")}`);
     if (m.remembers != null && typeof m.remembers !== "boolean")
       errs.push(`mob ${id}: remembers must be a boolean`);
+    if (m.pursues != null && typeof m.pursues !== "boolean")
+      errs.push(`mob ${id}: pursues must be a boolean`);
+    if (m.pursueRange != null && (!Number.isInteger(m.pursueRange) || m.pursueRange < 1))
+      errs.push(`mob ${id}: pursueRange must be a positive integer`);
     if (m.armour != null && typeof m.armour !== "number")
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")

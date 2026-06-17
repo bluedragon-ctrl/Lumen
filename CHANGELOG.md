@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Predators that hunt you down.** A mob marked `pursues` no longer loses you at
+  the room line. Once you've traded blows and fled, it **follows** — stepping one
+  room per action along the shortest path toward wherever you now stand
+  ("...stalks off, hunting"), until it catches you, you die, you log out, or you
+  outrun its **leash** (`pursueRange` rooms from its lair, default 4). Give it the
+  slip for good and the stray hunter slinks back home. The **pallid hunter** — the
+  eyeless, scent-tracking deep-predator — is the first to do it. (DikuMUD-style
+  `hunt_victim`, built on the `remembers` grudge from the previous release.)
 - **Mobs that remember you.** A mob marked `remembers` no longer forgets a delver
   the instant they leave the room. Once it has traded blows with you, it holds a
   grudge: step out and back within ~1 minute and it **re-engages on sight** ("it
