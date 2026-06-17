@@ -24,6 +24,14 @@
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
+
+/* Thin dark scrollbars — Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--edge) var(--panel-2); }
+/* Thin dark scrollbars — Chromium/Safari */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--panel-2); }
+::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 body {
   background: var(--bg);
   color: var(--text);
