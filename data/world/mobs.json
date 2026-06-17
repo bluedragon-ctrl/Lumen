@@ -788,16 +788,18 @@
     "name": "Mallki the qhatuq",
     "keywords": ["mallki", "umbral", "trader", "qhatuq"],
     "description": "Tall and spare, grey-skinned and unhurried, with the wide, lightless eyes of a thing born well below the reach of any sun. A faint blue-green light moves under his skin where the dark presses closest — not glimmer's work, only the deep's own glow. He is the first of the Umbrals a delver meets on the way down: a qhatuq, a trader, who keeps a lamp-lit hollow by the river and a tended garden behind it. He watches the surface-folk with neither warmth nor malice — only the patience of someone who was here long before the Rush, and expects to be here long after.",
-    "maxHp": 26,
+    "maxHp": 44,
     "speed": 12,
-    "armour": 1,
-    "ward": 1,
+    "armour": 2,
+    "ward": 2,
     "attributes": { "might": 5, "vitality": 6, "intellect": 6, "wits": 5, "perception": 6 },
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
     "emitsLight": 1,
     "behavior": "passive",
     "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
     "actions": [
+      { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
@@ -816,9 +818,37 @@
         ] }
       ] }
     ],
+    "shards": "2d6",
+    "loot": [{ "template": "lamp-oil", "chance": 0.5 }, { "template": "palecap-mushroom", "chance": 0.5 }],
     "shop": {
       "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "schematic-dense-chitin-cuirass" }]
     }
+  },
+  "umbral-chitin-warden": {
+    "id": "umbral-chitin-warden",
+    "faction": "umbral",
+    "name": "a chitin warden",
+    "keywords": ["warden", "chitin", "crawler", "bound"],
+    "description": "A low, broad arthropod — big as one of the old stonebugs Mallki herds — its overlapping plates worked and scored with the same glimmer-glyphs he cuts into stone, marks of craft and not of any deeper change. A thread of woven gut-line runs from a ring set in its carapace to a peg by the forge, long enough to let it walk the hollow. It carries itself between the trader and the dark with the flat, unbothered patience of something that has done this a long time, and bristles its spines at anything that comes at its keeper wrong.",
+    "maxHp": 34,
+    "speed": 14,
+    "armour": 2,
+    "ward": 1,
+    "attributes": { "might": 6, "vitality": 7, "intellect": 0, "wits": 6, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "helper": true,
+    "xp": 18,
+    "attack": { "damage": "1d6", "actionCost": 11 },
+    "spikes": { "damage": "1d4", "chance": 1 },
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 4 },
+      { "type": "wander", "weight": 2, "verb": "scuttles off over the worked stone", "scope": "zone" },
+      { "type": "emote", "weight": 2, "messages": ["bristles its glyph-scored spines and settles again", "drags its gut-line taut, testing the peg", "rasps its plates against the worked floor", "swivels toward the dark, then loses interest"] }
+    ],
+    "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "chitin-spike", "chance": 0.5 }]
   },
   "pale-king": {
     "id": "pale-king",

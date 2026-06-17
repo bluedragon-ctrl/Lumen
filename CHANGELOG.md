@@ -39,6 +39,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dry stone. Reusable groundwork for patrol/biome behaviour to come.
 - **Mallki stocks lamp oil.** The depth-3 umbral trader (Mallki the qhatuq) now
   sells `lamp-oil`, so delvers can refuel deep without the long climb back to the Rim.
+- **Mallki has a guardian — and teeth of his own.** A new **chitin warden**
+  (`umbral`, `helper: true`) — a low, plated arthropod Mallki keeps on a gut-line —
+  now walks his three-room hollow and piles into any fight against the trader, the
+  first live test of an Umbral guard defending its kin. Rob the trader and you
+  answer to the warden; it ignores the stonebugs and grubs sharing the zone
+  (`fauna` is neutral to `umbral`). Mallki himself is no longer a free kill: he
+  fights back with a slow glimmer-touched strike (`1d6`), is sturdier (`44` HP,
+  `armour 2`/`ward 2`), and drops only a trader's odds and ends (`2d6` shards, a
+  chance at lamp-oil or a palecap) — never his rare wares, so killing him stays a
+  net loss. The warden is confined to the `third-umbral` zone by its zone-scoped
+  wander, so it never strays up the river.
 - **Inventory filter bar.** Five switchable tabs (All / Gear / Use / Mats / Other)
   appear above the inventory list in the player panel. Each tab shows a live count
   badge; empty tabs are dimmed. The active filter persists in `localStorage` across
