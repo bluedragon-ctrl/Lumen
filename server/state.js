@@ -1,7 +1,7 @@
 "use strict";
 const { effectiveLight, canSee, hitChance, noticeChance } = require("./light");
 const { rollDice } = require("./dice");
-const { XP_BASE, XP_GROWTH, POINTS_PER_LEVEL } = require("./config");
+const { XP_BASE, XP_GROWTH, POINTS_PER_LEVEL, FACTIONS, DEFAULT_FACTION } = require("./config");
 
 /** Cumulative lifetime XP required to *reach* `level` (level 1 = 0). The
  *  increment for each step is XP_BASE * XP_GROWTH^(step-1), so successive levels
@@ -343,7 +343,7 @@ function makeMobInstance(mobId, world) {
     // `factionRelation`/`_areEnemies`, while `hostile`/provocation still gate active
     // aggression. `ownerId` names the player a "player"-faction mob belongs to
     // (kill credit, future pet upkeep); null for wild creatures.
-    faction: tmpl.faction || "wild",
+    faction: tmpl.faction || DEFAULT_FACTION,
     ownerId: null,
     summonerId: null, // who conjured it (player or mob id); null if not summoned
     summonGroup: null, // per-owner recast-cap key (defaults to the source spell id)
@@ -356,7 +356,7 @@ function makeMobInstance(mobId, world) {
 /** The faction a combatant fights for. Players are always "player"; a mob carries
  *  its instance `faction` (default "wild"). Sides are resolved by `factionRelation`. */
 function combatantFaction(actor, kind) {
-  return kind === "player" ? "player" : (actor.faction || "wild");
+  return kind === "player" ? "player" : (actor.faction || DEFAULT_FACTION);
 }
 
 // The factions and how they regard one another. A relation is "ally" (assist each
@@ -376,7 +376,7 @@ function combatantFaction(actor, kind) {
 // on livestock yet); flip both halves to "enemy" to switch the predation ecosystem
 // on. umbral↔player is "enemy" so hostile Umbrals can engage delvers; non-hostile
 // Umbrals (the trader) stay inert and a peaceful enclave is just `hostile: false`.
-const FACTIONS = ["player", "rim", "fauna", "wild", "umbral"];
+// The faction *vocabulary* (FACTIONS) lives in config.js so the validator shares it.
 const FACTION_RELATIONS = {
   player: { rim: "ally", fauna: "enemy", wild: "enemy", umbral: "enemy" },
   rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral" },
@@ -388,6 +388,21 @@ const FACTION_RELATIONS = {
 function factionRelation(a, b) {
   if (a === b) return "ally";
   return (FACTION_RELATIONS[a] && FACTION_RELATIONS[a][b]) || "enemy";
+}
+// Invariant: the relation table is symmetric — `a` regards `b` exactly as `b`
+// regards `a`. Both halves are hand-maintained, so a one-sided edit (e.g.
+// setting player→umbral "neutral" but leaving umbral→player "enemy") would
+// produce baffling one-way aggression. Assert it at load so the typo is a loud
+// crash, not a field bug. Uses the shared FACTIONS vocabulary as the key set.
+for (const a of FACTIONS) {
+  for (const b of FACTIONS) {
+    if (factionRelation(a, b) !== factionRelation(b, a)) {
+      throw new Error(
+        `FACTION_RELATIONS asymmetry: ${a}->${b} is "${factionRelation(a, b)}" ` +
+        `but ${b}->${a} is "${factionRelation(b, a)}"`
+      );
+    }
+  }
 }
 
 /** Total light an actor radiates from active `emit-light` status effects. */
@@ -496,7 +511,7 @@ class GameState {
    * mob `summon` action (faction "wild", a summonerId, permanent). Pushes one
    * `summon` event for narration. Returns the new instances.
    */
-  _summon({ roomId, mobId, count = 1, faction = "wild", ownerId = null, summonerId = null, group = null, lifetime = null, by = "mob", byName = null, verb = null }, events = []) {
+  _summon({ roomId, mobId, count = 1, faction = DEFAULT_FACTION, ownerId = null, summonerId = null, group = null, lifetime = null, by = "mob", byName = null, verb = null }, events = []) {
     const t = this.world.mobs[mobId];
     if (!t) throw new Error(`summon: unknown mob template ${mobId}`);
     const made = [];
@@ -837,7 +852,13 @@ class GameState {
    *  so any mob recovers fully in ~OOC_REGEN_TICKS ticks regardless of size. This
    *  is the counter to flee-heal-return: a genuine heal-trip finds the mob whole
    *  again. `m.lastCombatTick` is stamped every tick the mob is alerted; a per-mob
-   *  `regen: { delay, perTick }` overrides either knob (e.g. a slow-mending boss). */
+   *  `regen: { delay, perTick }` overrides either knob (e.g. a slow-mending boss).
+   *
+   *  ORDERING (load-bearing): must run AFTER `resolveMobAI` in the tick. The
+   *  alerted check below reads `mob.aggro`/`mob.detect`, which `_mobAct` freshly
+   *  prunes (drops combatants who left) each AI pass — so a mob whose foes have
+   *  gone is correctly seen as disengaged here. Run before the AI and a just-
+   *  departed enemy would still read as alerted, blocking recovery for a tick. */
   _recoverMobsTick(events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       const foePresent = this.playersIn(roomId).some((p) => p.hp > 0);
@@ -1655,7 +1676,10 @@ class GameState {
     }
   }
 
-  /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle). */
+  /** Each mob takes at most one weighted action per tick (attack/emote/flee/idle).
+   *  Each `_mobAct` pass freshly prunes that mob's threat/detection tables (drops
+   *  combatants who left), so `_recoverMobsTick` MUST run after this in the tick —
+   *  it reads the just-pruned `_alerted` state to decide who may mend. */
   resolveMobAI(events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
@@ -1772,9 +1796,13 @@ class GameState {
     // flight wins (it returned earlier); lightAggro bites between calm and flight.
     const lightProvoked = t.lightAggro && rt.light > (t.lightAggro.above || 0);
     const aggressive = engagedTargets.length > 0 || lightProvoked;
-    // Whom to swing at: a committed target if there is one, else (light-rage only)
-    // anyone present. _mobAttack/_mobCast weigh combined threat among these.
-    const candidates = engagedTargets.length ? engagedTargets : enemies;
+    // Whom to swing at. Light-rage is indiscriminate — it lashes at *anyone*
+    // present, so every enemy is a candidate even if the mob already has one
+    // engaged (otherwise a single noticed target would shield the rest from a
+    // light-maddened creature). Normally a mob swings only at what it has
+    // committed to, falling back to anyone present (the light-rage-with-no-threat
+    // case). _topThreat still focuses whatever it has actually traded blows with.
+    const candidates = lightProvoked ? enemies : (engagedTargets.length ? engagedTargets : enemies);
 
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
@@ -2101,13 +2129,25 @@ class GameState {
   }
 
   /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),
-   *  or null. Weighs combined combat threat + detection so a proactively-noticed
-   *  enemy is a valid quarry. `candidates` are the valid targets to weigh among. */
+   *  or null. Targeting is *tiered*, not additive: anyone the mob has actually
+   *  traded blows with (combat threat > 0) outranks anyone it has merely noticed,
+   *  regardless of magnitude — within each tier the higher score wins (combat
+   *  threat among the engaged, detection among the rest). This keeps "focus who's
+   *  hitting me" a property of the code rather than an accident of `AGGRO_ENGAGE`
+   *  being small (an additive sum would let a freshly-noticed target outweigh one
+   *  struck once if that cap were ever raised). `candidates` are the targets to
+   *  weigh among. */
   _topThreat(mob, candidates) {
-    let best = null, bestT = 0;
+    let best = null, bestScore = 0, bestEngaged = false;
     for (const c of candidates) {
-      const th = (mob.aggro && mob.aggro[c.id] || 0) + (mob.detect && mob.detect[c.id] || 0);
-      if (th > bestT) { bestT = th; best = c; }
+      const combat = (mob.aggro && mob.aggro[c.id]) || 0;
+      const engaged = combat > 0; // traded blows → hard priority tier over mere detection
+      const score = engaged ? combat : ((mob.detect && mob.detect[c.id]) || 0);
+      if (score <= 0) continue;
+      // An engaged target beats any merely-detected one; otherwise higher score wins.
+      if ((engaged && !bestEngaged) || (engaged === bestEngaged && score > bestScore)) {
+        best = c; bestScore = score; bestEngaged = engaged;
+      }
     }
     return best;
   }
@@ -2228,7 +2268,7 @@ class GameState {
     const count = Math.min(action.count || 1, max - room);
     if (count <= 0) return;
     this._summon({
-      roomId, mobId: action.mob, count, faction: m.faction || "wild",
+      roomId, mobId: action.mob, count, faction: m.faction || DEFAULT_FACTION,
       ownerId: null, summonerId: m.id, group: null, lifetime: null,
       by: "mob", byName: t.name, verb: action.verb || null,
     }, events);
