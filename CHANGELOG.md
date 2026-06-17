@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Factions: guards that defend you.** Mobs now belong to one of four sides —
+  `player` (PCs + summons), `rim` (village NPCs & guards), `fauna` (peaceful
+  wildlife), and `wild` (the deep's predators, the default) — related by a
+  symmetric ally/enemy/neutral table instead of the old "any different faction is
+  an enemy" binary. A `helper` mob now joins a fight an **ally** is in *or* steps
+  in when an enemy is attacking an ally who hasn't fought back. **Hale the
+  watchman** is now `rim`, carries a cudgel (`1d6`), and piles in to defend a
+  delver (or a fellow Rim NPC) the moment a predator attacks on his beat — no
+  more decorative guard. Village NPCs are tagged `rim`, peaceful creatures
+  (stonebugs, grubs, lightbugs, salamanders, moles, cave-fish, the Old Grinder)
+  `fauna`. `fauna`↔`wild` is neutral for now (predators don't yet prey on
+  livestock) — a one-cell flip away from switching that ecosystem on. The admin
+  `@spawn` testing aid takes the new factions (`@spawn <mob> [n] [wild|player|rim|fauna]`).
 - **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
   (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter
   its destinations by them: `requireTags` enters only rooms carrying **all** the
