@@ -340,16 +340,20 @@ pair falls back to enemy):
 
 |         | player  | rim    | fauna   | wild    | umbral  |
 |---------|---------|--------|---------|---------|---------|
-| **player** | ally | ally   | neutral | enemy   | enemy   |
+| **player** | ally | ally   | enemy   | enemy   | enemy   |
 | **rim**    | ally | ally   | ally    | enemy   | neutral |
-| **fauna**  | neutral | ally | ally    | neutral | neutral |
+| **fauna**  | enemy | ally   | ally    | neutral | neutral |
 | **wild**   | enemy | enemy  | neutral | ally    | neutral |
 | **umbral** | enemy | neutral | neutral | neutral | ally    |
 
-So a `rim` guard counts predators (`wild`) as enemies and defends players, NPCs, and
-fauna; `wild` predators war on players, guards, and player-summons. `fauna`↔`wild` is
-**neutral for now** (predators don't yet prey on livestock) — flip both halves to
-`enemy` to switch that ecosystem on. `umbral` (the deep-dwellers — Mallki and kin) is
+`enemy` only marks who *may* fight — whether a creature *starts* one is the separate
+`hostile` flag. So a `rim` guard counts predators (`wild`) as enemies and defends
+players, NPCs, and fauna; `wild` predators war on players, guards, and player-summons.
+**`fauna` are `enemy` to `player`** but `hostile: false`: they never initiate and are
+never hunted, yet they fight back when farmed (a struck Old Grinder still has teeth) —
+and because the player is the guard's *ally*, hunting livestock never pulls a `rim`
+guard onto you. `fauna`↔`wild` is **neutral for now** (predators don't yet prey on
+livestock) — flip both halves to `enemy` to switch that ecosystem on. `umbral` (the deep-dwellers — Mallki and kin) is
 **enemy to `player`** so hostile Umbrals can engage delvers; a peaceful Umbral like the
 trader is simply `hostile: false` and never acts on it, and an Umbral guard
 (`umbral` + `helper`) defends its kin against anyone who strikes them. This is also the

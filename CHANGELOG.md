@@ -20,9 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `fauna`, and **Mallki the qhatuq** `umbral` — the seed of the coming Umbral
   content. `umbral` is enemy to `player` so future hostile Umbrals engage on
   sight, while a peaceful one like the trader is simply non-hostile (and an Umbral
-  guard would defend its kin from anyone who strikes them). `fauna`↔`wild` is
-  neutral for now (predators don't yet prey on livestock) — a one-cell flip away
-  from switching that ecosystem on. The admin `@spawn` testing aid takes the new
+  guard would defend its kin from anyone who strikes them). `fauna` are enemy to
+  `player` but `hostile: false`: they never start a fight or get hunted, yet they
+  still fight back when farmed (a struck Old Grinder keeps its teeth), and hunting
+  them never pulls a guard onto you. `fauna`↔`wild` is neutral for now (predators
+  don't yet prey on livestock) — a one-cell flip away from switching that
+  ecosystem on. The admin `@spawn` testing aid takes the new
   factions (`@spawn <mob> [n] [wild|player|rim|fauna|umbral]`).
 - **Room tags gate where mobs roam.** Rooms may carry free-form terrain `tags`
   (e.g. `"water"`) that cut across zones, and a `wander`/`flee` action may filter

@@ -369,15 +369,18 @@ function combatantFaction(actor, kind) {
 //   fauna  — peaceful wildlife/livestock    wild   — the deep's predators (default)
 //   umbral — the deep-dwelling Umbrals (Mallki & kin; hostile members gated by
 //            `hostile`, peaceful ones like the trader simply never act on it)
-// fauna↔wild is "neutral" for now (predators don't prey on livestock yet); flip
-// both halves to "enemy" to switch the predation ecosystem on. umbral↔player is
-// "enemy" so hostile Umbrals can engage delvers; non-hostile Umbrals (the trader)
-// stay inert and a peaceful enclave is just `hostile: false`.
+// `enemy` only marks who *may* fight; whether a creature *starts* one is the
+// separate `hostile` flag. So fauna are `enemy` to `player` — non-hostile (they
+// never initiate and aren't hunted) but they fight back when farmed (a struck Old
+// Grinder still has teeth). fauna↔wild is "neutral" for now (predators don't prey
+// on livestock yet); flip both halves to "enemy" to switch the predation ecosystem
+// on. umbral↔player is "enemy" so hostile Umbrals can engage delvers; non-hostile
+// Umbrals (the trader) stay inert and a peaceful enclave is just `hostile: false`.
 const FACTIONS = ["player", "rim", "fauna", "wild", "umbral"];
 const FACTION_RELATIONS = {
-  player: { rim: "ally", fauna: "neutral", wild: "enemy", umbral: "enemy" },
+  player: { rim: "ally", fauna: "enemy", wild: "enemy", umbral: "enemy" },
   rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral" },
-  fauna: { player: "neutral", rim: "ally", wild: "neutral", umbral: "neutral" },
+  fauna: { player: "enemy", rim: "ally", wild: "neutral", umbral: "neutral" },
   wild: { player: "enemy", rim: "enemy", fauna: "neutral", umbral: "neutral" },
   umbral: { player: "enemy", rim: "neutral", fauna: "neutral", wild: "neutral" },
 };
