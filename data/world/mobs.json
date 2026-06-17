@@ -475,9 +475,9 @@
     "behavior": "lurk",
     "hostile": true,
     "ambush": true,
-    "attack": { "damage": "1d4", "actionCost": 12 },
     "xp": 10,
     "shards": "1d4",
+    "attack": { "damage": "1d6", "actionCost": 12 },
     "actions": [
       { "type": "attack", "weight": 7 },
       { "type": "idle", "weight": 4 },
@@ -519,8 +519,8 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
-    "attack": { "damage": "1d3", "actionCost": 14 },
     "xp": 10,
+    "attack": { "damage": "1d4", "actionCost": 14 },
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 5 },
@@ -540,9 +540,9 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
-    "attack": { "damage": "1d3", "actionCost": 13 },
-    "spikes": { "damage": "1d3", "chance": 1 },
     "xp": 7,
+    "attack": { "damage": "1d4", "actionCost": 13 },
+    "spikes": { "damage": "1d3", "chance": 1 },
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 5 },
@@ -836,7 +836,7 @@
     "speed": 12,
     "armour": 3,
     "ward": 4,
-    "attributes": { "might": 7, "vitality": 7, "intellect": 4, "wits": 5, "perception": 6 },
+    "attributes": { "might": 7, "vitality": 7, "wits": 5, "perception": 6, "intellect": 3 },
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
     "emitsLight": 1,
     "behavior": "guard",
@@ -844,7 +844,7 @@
     "attack": { "damage": "1d8", "actionCost": 13 },
     "lightBane": { "above": 6, "damage": "1d2" },
     "xp": 22,
-    "shards": "2d4",
+    "shards": "4d4",
     "actions": [
       { "type": "cast", "weight": 3, "spell": "glimmerskin" },
       { "type": "cast", "weight": 6, "spell": "glimmer-spike" },
@@ -852,9 +852,7 @@
       { "type": "idle", "weight": 1 },
       { "type": "emote", "weight": 1, "messages": ["shields its eyes and hisses, though there is no light to hurt it", "mouths a soft, rounded word in the Umbral tongue, then loses it", "claws at the swept-bare shelves as if looking for something", "drags a fingertip through the air in the start of a half-remembered glyph, then forgets the rest"] }
     ],
-    "loot": [
-      { "template": "glimmer-singer-circlet", "chance": 1 }
-    ]
+    "loot": [{ "template": "glimmer-singer-circlet", "chance": 1 }]
   },
   "elder-gloom-crawler": {
     "id": "elder-gloom-crawler",

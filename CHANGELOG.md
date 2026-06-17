@@ -139,6 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **NPC stats** — Minor mobs update (cave-lurker, stonebug, thornbug, yana).
 - **Depth-7 is deadlier in the light.** Doubled the warren's no-flee elites — the
   **elder gloom-crawler** in The Crawling Hall and The Moulting Drift, and the
   **gloom-touched crawler** in The Long Gallery and The Brood-Heart, all go from
