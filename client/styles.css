@@ -12,6 +12,7 @@
   --energy: #c9a14a;
   --mana: #5b86c4;
   --hostile: #d07f7f;
+  --ally: #6fa8dc;
   --lumin: #d8c873;
   --gold: #f2c14e;
   /* Item rarity ladder. Common is intentionally neutral (no colour) — colour
@@ -133,6 +134,7 @@ body {
 .chip.exit { color: var(--accent); cursor: pointer; }
 .chip.mob { border-color: #3a4750; }
 .chip.mob.hostile { border-color: var(--hostile); color: var(--hostile); }
+.chip.mob.owned { border-color: var(--ally); color: var(--ally); }
 /* Any light-emitting entity (lightbug, glowing NPCs/mobs) glows in the room view. */
 .chip.luminous {
   border-color: var(--lumin); color: var(--lumin);

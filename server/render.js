@@ -89,7 +89,9 @@ function buildRoomView(state, p) {
     if (see || luminous) {
       // A trader exposes the names of its wares so the client can Tab-complete `buy`.
       const sells = t.shop && t.shop.sells ? t.shop.sells.map((o) => w.items[o.template].name) : undefined;
-      mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, luminous, posture: POSTURE_LABEL[m.posture] || undefined, sells });
+      // A mob the viewer summoned/owns reads as friendly (blue), never as an enemy.
+      const owned = m.faction === "player" && m.ownerId === p.id;
+      mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, owned, luminous, posture: POSTURE_LABEL[m.posture] || undefined, sells });
     }
   }
   const items = see

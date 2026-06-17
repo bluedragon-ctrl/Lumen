@@ -219,7 +219,8 @@ function renderRoom(room) {
   const posture = (e) => (e.posture ? ` (${e.posture})` : "");
   for (const p of players) c.appendChild(chip(p.name + posture(p), "player" + (p.luminous ? " luminous" : ""), () => sendCommand("look " + p.id)));
   for (const m of mobs) {
-    const cls = "mob" + (m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
+    // Your own summons read friendly (blue), overriding the enemy-red tint.
+    const cls = "mob" + (m.owned ? " owned" : m.hostile ? " hostile" : "") + (m.luminous ? " luminous" : "");
     c.appendChild(chip(m.name + posture(m), cls, () => sendCommand("look " + m.id)));
   }
   for (const it of items) {

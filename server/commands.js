@@ -85,12 +85,12 @@ const HELP_SECTIONS = [
     "gather | pick | forage [cluster] — pick moss, mushrooms and crops by hand",
     "fish | angle [water] — work a baited line (spends a grub as bait)",
     "craft | make <recipe> — craft at the matching station here",
-    "recipes — list the recipes you know",
+    "recipes [word] — list the recipes you know (optionally filtered, e.g. `recipes glimmer`)",
   ]],
   ["People & trade", [
     "talk <npc> — speak with someone (take quests, hear what they need)",
     "give <item> <npc> — hand something over (deliver quest goods)",
-    "list | shop — see what a trader here buys and sells",
+    "list | shop [word] — see what a trader sells (optionally filtered, e.g. `list glimmer`)",
     "buy <item> — buy from a trader here",
     "sell <item> | all — sell to a trader here",
     "say <text> — speak to everyone in the room",
@@ -586,13 +586,22 @@ function offerUnlocked(player, offer) {
   return !!(player.quests && player.quests.done && player.quests.done.includes(offer.requiresQuest));
 }
 
-function shopList(state, player) {
+function shopList(state, player, filter) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
   const w = state.world;
-  const lines = [`${sh.t.name} trades:`];
   // Quest-gated stock stays out of the list entirely until earned (offerUnlocked).
-  const sells = (sh.t.shop.sells || []).filter((o) => offerUnlocked(player, o));
+  let sells = (sh.t.shop.sells || []).filter((o) => offerUnlocked(player, o));
+  // Optional filter word: substring match on item name or template id, mirroring
+  // how `buy` resolves a ware — `list glimmer` narrows to glimmer goods.
+  const q = (filter || "").trim().toLowerCase();
+  if (q) {
+    sells = sells.filter(
+      (o) => o.template.toLowerCase().includes(q) || w.items[o.template].name.toLowerCase().includes(q)
+    );
+    if (!sells.length) return [{ type: "log", text: `${sh.t.name} has nothing for sale matching "${filter.trim()}".` }];
+  }
+  const lines = [q ? `${sh.t.name} trades (matching "${filter.trim()}"):` : `${sh.t.name} trades:`];
   const purse = player.shards || 0;
   if (sells.length) {
     lines.push("Sells (you buy):");
@@ -602,7 +611,9 @@ function shopList(state, player) {
       lines.push(price > purse ? `<#gray>${line}` : line);
     }
   }
-  lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
+  // The generic sell-rate blurb is about selling, not the filtered view — skip it
+  // when the player has narrowed the list to specific wares.
+  if (!q) lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
   lines.push(`You have ${player.shards || 0} shards.`);
   return [{ type: "log", text: lines.join("\n") }];
 }
@@ -958,12 +969,26 @@ function canAfford(player, r) {
   return (player.shards || 0) >= (r.shards || 0);
 }
 
-function recipes(state, player) {
+function recipes(state, player, filter) {
   const w = state.world;
   const known = player.knownRecipes || [];
   if (!known.length) return [{ type: "log", text: "You know no recipes." }];
   const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
-  const recs = known.map((rid) => w.recipes[rid]).filter(Boolean);
+  let recs = known.map((rid) => w.recipes[rid]).filter(Boolean);
+  // Optional filter word: substring match on the recipe name, its output item's
+  // name, OR any input material's name — so `recipes glimmer` finds glimmer craft
+  // and `recipes chitin` answers "what uses chitin?". (Shards is a numeric recipe
+  // field, not an input item, so it never broadens the match.)
+  const q = (filter || "").trim().toLowerCase();
+  if (q) {
+    const itemName = (tpl) => (w.items[tpl] && w.items[tpl].name) || "";
+    recs = recs.filter((r) =>
+      (r.name || r.id).toLowerCase().includes(q) ||
+      itemName(r.output.template).toLowerCase().includes(q) ||
+      (r.inputs || []).some((i) => i.template.toLowerCase().includes(q) || itemName(i.template).toLowerCase().includes(q))
+    );
+    if (!recs.length) return [{ type: "log", text: `You know no recipes matching "${filter.trim()}".` }];
+  }
   // Plain code-unit compare for the name tiebreak — `localeCompare` pulls in the
   // host locale's collation, which on some machines sorts the "ch" digraph after
   // "h" (Czech-style) and scrambles names like Chitin vs Glimmersteel.
@@ -989,7 +1014,7 @@ function recipes(state, player) {
   };
   const hereRecs = recs.filter((r) => here.has(r.station));
   const awayRecs = recs.filter((r) => !here.has(r.station));
-  const lines = ["<#gold>Recipes<#reset>"];
+  const lines = [q ? `<#gold>Recipes<#reset> (matching "${filter.trim()}")` : "<#gold>Recipes<#reset>"];
   if (hereRecs.length) lines.push("", "<#cyan>Here<#reset>", ...hereRecs.map((r) => fmt(r, false)));
   if (awayRecs.length) lines.push("", "<#cyan>Elsewhere<#reset>", ...awayRecs.map((r) => fmt(r, true)));
   return [{ type: "log", text: lines.join("\n") }];
@@ -1894,7 +1919,7 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "list":
     case "shop":
     case "wares":
-      return shopList(state, player);
+      return shopList(state, player, arg);
     case "buy":
       return buy(state, player, arg, ctx);
     case "sell":
@@ -1936,7 +1961,7 @@ function execute(state, player, input, ctx = NOOP_CTX) {
     case "angle":
       return fish(state, player, arg, ctx);
     case "recipes":
-      return recipes(state, player);
+      return recipes(state, player, arg);
     case "talk":
     case "greet":
     case "ask":
