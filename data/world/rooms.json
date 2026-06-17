@@ -21,7 +21,7 @@
     "exits": { "south": "rim.plaza" },
     "fixtures": ["hearth", "cellar-hatch"],
     "groundItems": [],
-    "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }]
   },
   "rim.cellar": {
     "id": "rim.cellar",
@@ -45,7 +45,7 @@
     "exits": { "west": "rim.plaza", "north": "rim.hatchery", "east": "rim.mageshed", "south": "rim.claims" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 120 }]
   },
   "rim.claims": {
     "id": "rim.claims",
@@ -57,7 +57,7 @@
     "exits": { "north": "rim.market" },
     "fixtures": ["notice-board", "claims-ledger"],
     "groundItems": [],
-    "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 120 }]
   },
   "rim.hatchery": {
     "id": "rim.hatchery",
@@ -84,9 +84,7 @@
     "exits": { "south": "rim.hatchery" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [
-      { "mob": "stonebug", "max": 3, "respawn": 30 }
-    ]
+    "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
   },
   "rim.mushroomfarm": {
     "id": "rim.mushroomfarm",
@@ -114,7 +112,7 @@
     "exits": { "west": "rim.market" },
     "fixtures": ["alchemist-bench", "trapdoor"],
     "groundItems": [],
-    "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 120 }]
   },
   "rim.training": {
     "id": "rim.training",
@@ -126,7 +124,7 @@
     "exits": { "up": "rim.mageshed" },
     "fixtures": ["ward-ring", "vesper-field-journal"],
     "groundItems": [],
-    "spawns": [{ "mob": "wisp", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "wisp", "max": 1, "respawn": 120 }]
   },
   "rim.workshop": {
     "id": "rim.workshop",
@@ -138,7 +136,7 @@
     "exits": { "east": "rim.plaza" },
     "fixtures": ["forge", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
-    "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 60 }]
+    "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 120 }]
   },
   "rim.gate": {
     "id": "rim.gate",
@@ -174,9 +172,7 @@
     "exits": { "up": "rim.descent", "east": "abyss.gallery", "north": "abyss.roost", "west": "abyss.tunnel", "south": "abyss.hollow" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [
-      { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
-    ]
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 120 }]
   },
   "abyss.gallery": {
     "id": "abyss.gallery",
@@ -188,7 +184,7 @@
     "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren", "south": "abyss.drift" },
     "fixtures": ["iron-vein", "umbral-relief"],
     "groundItems": [{ "template": "shards", "qty": 15, "hidden": { "perception": 3 } }],
-    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 40 }]
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
   },
   "abyss.warren": {
     "id": "abyss.warren",
@@ -200,7 +196,7 @@
     "exits": { "west": "abyss.gallery" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 35 }]
+    "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 120 }]
   },
   "abyss.drift": {
     "id": "abyss.drift",
@@ -213,8 +209,8 @@
     "fixtures": ["iron-vein", "pale-cluster"],
     "groundItems": [],
     "spawns": [
-      { "mob": "stonebug", "max": 2, "respawn": 60 },
-      { "mob": "thornbug", "max": 1, "respawn": 60 },
+      { "mob": "stonebug", "max": 2, "respawn": 120 },
+      { "mob": "thornbug", "max": 1, "respawn": 120 },
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
@@ -229,7 +225,7 @@
     "hiddenExits": { "east": { "to": "abyss.vault", "perception": 3, "name": "a concealed crawlway" } },
     "fixtures": ["narrow-fissure"],
     "groundItems": [],
-    "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 40 }]
+    "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 120 }]
   },
   "abyss.roost": {
     "id": "abyss.roost",
@@ -241,7 +237,7 @@
     "exits": { "south": "abyss.first", "east": "abyss.fissure" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 35 }]
+    "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 90 }]
   },
   "abyss.tunnel": {
     "id": "abyss.tunnel",
@@ -254,7 +250,7 @@
     "exits": { "east": "abyss.first", "west": "abyss.grotto" },
     "fixtures": ["dripping-pool", "weeping-moss-fringe"],
     "groundItems": [],
-    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 45 }]
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
   "abyss.grotto": {
     "id": "abyss.grotto",
@@ -266,7 +262,7 @@
     "exits": { "east": "abyss.tunnel", "south": "abyss.vault" },
     "fixtures": [],
     "groundItems": [{ "template": "palecap-mushroom", "qty": 1, "respawn": 120 }],
-    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 50 }]
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
   "abyss.vault": {
     "id": "abyss.vault",
@@ -291,7 +287,7 @@
     "exits": { "north": "abyss.first", "south": "abyss.cut" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 25 }]
+    "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 50 }]
   },
   "abyss.cut": {
     "id": "abyss.cut",
@@ -304,8 +300,8 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "giant-rat", "max": 2, "respawn": 40 },
-      { "mob": "cave-bat", "max": 1, "respawn": 45 },
+      { "mob": "giant-rat", "max": 2, "respawn": 90 },
+      { "mob": "cave-bat", "max": 1, "respawn": 90 },
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
@@ -319,7 +315,7 @@
     "exits": { "north": "abyss.cut" },
     "fixtures": ["bone-pile"],
     "groundItems": [],
-    "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 120 }]
+    "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 600 }]
   },
   "second.descent": {
     "id": "second.descent",
@@ -331,9 +327,7 @@
     "exits": { "up": "abyss.drift", "west": "second.road" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [
-      { "mob": "lightbug", "max": 2, "respawn": 25 }
-    ]
+    "spawns": [{ "mob": "lightbug", "max": 2, "respawn": 50 }]
   },
   "second.road": {
     "id": "second.road",
@@ -385,8 +379,8 @@
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
-      { "mob": "stonebug", "max": 2, "respawn": 60 },
-      { "mob": "thornbug", "max": 1, "respawn": 60 }
+      { "mob": "stonebug", "max": 2, "respawn": 120 },
+      { "mob": "thornbug", "max": 1, "respawn": 120 }
     ]
   },
   "second.graze2": {
@@ -415,9 +409,7 @@
     "exits": { "north": "second.graze2" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "old-grinder", "max": 1, "respawn": 300 }
-    ]
+    "spawns": [{ "mob": "old-grinder", "max": 1, "respawn": 600 }]
   },
   "second.graze4": {
     "id": "second.graze4",
@@ -430,8 +422,8 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "cave-centipede", "max": 1, "respawn": 60 },
-      { "mob": "thornbug", "max": 1, "respawn": 60 }
+      { "mob": "cave-centipede", "max": 1, "respawn": 240 },
+      { "mob": "thornbug", "max": 1, "respawn": 120 }
     ]
   },
   "second.mine1": {
@@ -445,8 +437,8 @@
     "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
-      { "mob": "tremor-mole", "max": 1, "respawn": 50 },
-      { "mob": "scour-slug", "max": 1, "respawn": 60 }
+      { "mob": "tremor-mole", "max": 1, "respawn": 120 },
+      { "mob": "scour-slug", "max": 1, "respawn": 120 }
     ]
   },
   "second.mine2": {
@@ -459,9 +451,7 @@
     "exits": { "south": "second.mine1", "west": "second.mine4" },
     "fixtures": ["iron-vein", { "template": "silver-vein", "hidden": { "perception": 4 } }],
     "groundItems": [],
-    "spawns": [
-      { "mob": "giant-rat", "max": 2, "respawn": 40 }
-    ]
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
   },
   "second.mine3": {
     "id": "second.mine3",
@@ -487,9 +477,7 @@
     "exits": { "south": "second.mine3", "east": "second.mine2", "north": "second.mine5" },
     "fixtures": ["umbral-pillar"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "gloom-crawler", "max": 1, "respawn": 45 }
-    ]
+    "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
   "second.mine5": {
     "id": "second.mine5",
@@ -504,7 +492,7 @@
     "fixtures": ["dripping-pool"],
     "groundItems": [],
     "spawns": [
-      { "mob": "cave-bat", "max": 2, "respawn": 35 },
+      { "mob": "cave-bat", "max": 2, "respawn": 90 },
       { "mob": "pallid-hunter", "max": 1, "respawn": 200 }
     ]
   },
@@ -550,7 +538,7 @@
     "fixtures": ["river-shallows", "weeping-moss-curtain"],
     "groundItems": [],
     "spawns": [
-      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 90 },
       { "mob": "cave-lurker", "max": 2, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
@@ -565,9 +553,7 @@
     "exits": { "east": "third.shallows", "west": "third.falls", "south": "third.dwelling" },
     "fixtures": ["still-pool"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 }
-    ]
+    "spawns": [{ "mob": "blind-cave-fish", "max": 3, "respawn": 90 }]
   },
   "third.falls": {
     "id": "third.falls",
@@ -594,9 +580,7 @@
     "hiddenExits": { "down": { "to": "warren.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
     "fixtures": ["still-pool"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "pale-crayfish", "max": 2, "respawn": 90 }
-    ]
+    "spawns": [{ "mob": "pale-crayfish", "max": 2, "respawn": 120 }]
   },
   "third.dwelling": {
     "id": "third.dwelling",
@@ -608,9 +592,7 @@
     "exits": { "north": "third.pools", "south": "third.garden" },
     "fixtures": ["umbral-coldlamp", "umbral-forge"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "umbral-trader", "max": 1, "respawn": 90 }
-    ]
+    "spawns": [{ "mob": "umbral-trader", "max": 1, "respawn": 600 }]
   },
   "third.garden": {
     "id": "third.garden",
@@ -638,9 +620,7 @@
     "exits": { "north": "third.garden" },
     "fixtures": ["umbral-stonebug-grounds"],
     "groundItems": [],
-    "spawns": [
-      { "mob": "stonebug", "max": 3, "respawn": 90 }
-    ]
+    "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
   },
   "lake.strand": {
     "id": "lake.strand",
@@ -672,7 +652,7 @@
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [
-      { "mob": "blind-cave-fish", "max": 3, "respawn": 40 },
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 90 },
       { "mob": "pale-crayfish", "max": 1, "respawn": 120 }
     ]
   },
@@ -735,9 +715,7 @@
       { "template": "leather-jerkin", "hidden": { "perception": 3 } },
       { "template": "delver-claim-tag", "respawn": 600 }
     ],
-    "spawns": [
-      { "mob": "pale-king", "max": 1, "respawn": 1200 }
-    ]
+    "spawns": [{ "mob": "pale-king", "max": 1, "respawn": 900 }]
   },
   "lake.fissure": {
     "id": "lake.fissure",
@@ -833,9 +811,7 @@
     "exits": { "north": "deep.camp", "south": "warren.hall" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [
-      { "mob": "gloom-crawler", "max": 3, "respawn": 30 }
-    ]
+    "spawns": [{ "mob": "gloom-crawler", "max": 3, "respawn": 90 }]
   },
   "warren.hall": {
     "id": "warren.hall",
@@ -848,8 +824,8 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
-      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 240 },
+      { "mob": "gloom-crawler", "max": 4, "respawn": 90 },
+      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 200 },
       { "mob": "gloom-creeper", "max": 2, "respawn": 120 }
     ]
   },
@@ -867,8 +843,8 @@
       { "template": "shards", "qty": 6, "respawn": 1200 }
     ],
     "spawns": [
-      { "mob": "gloom-crawler", "max": 2, "respawn": 30 },
-      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 240 }
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 },
+      { "mob": "elder-gloom-crawler", "max": 2, "respawn": 200 }
     ]
   },
   "warren.midden": {
@@ -885,7 +861,7 @@
       { "template": "lamp-oil", "qty": 1, "respawn": 1800, "hidden": { "perception": 4 } }
     ],
     "spawns": [
-      { "mob": "gloom-crawler", "max": 2, "respawn": 30 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 },
       { "mob": "scour-slug", "max": 2, "respawn": 120 }
     ]
   },
@@ -900,8 +876,8 @@
     "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
-      { "mob": "gloom-crawler", "max": 4, "respawn": 25 },
-      { "mob": "gloom-touched-crawler", "max": 2, "respawn": 240 }
+      { "mob": "gloom-crawler", "max": 4, "respawn": 90 },
+      { "mob": "gloom-touched-crawler", "max": 2, "respawn": 200 }
     ]
   },
   "warren.brood": {
@@ -915,7 +891,7 @@
     "fixtures": ["glimmer-vein"],
     "groundItems": [],
     "spawns": [
-      { "mob": "gloom-crawler", "max": 5, "respawn": 20 },
+      { "mob": "gloom-crawler", "max": 5, "respawn": 90 },
       { "mob": "gloom-touched-crawler", "max": 2, "respawn": 200 }
     ]
   },
@@ -930,9 +906,7 @@
     "hiddenExits": { "west": { "to": "third.cave", "perception": 4, "name": "the prospectors' rigged climbing-flue" } },
     "fixtures": ["silver-vein", { "template": "prospectors-rigging", "hidden": { "perception": 4 } }],
     "groundItems": [],
-    "spawns": [
-      { "mob": "gloom-crawler", "max": 2, "respawn": 40 }
-    ]
+    "spawns": [{ "mob": "gloom-crawler", "max": 2, "respawn": 90 }]
   },
   "warren.hush": {
     "id": "warren.hush",
@@ -961,9 +935,7 @@
       { "template": "shards", "qty": 15, "respawn": 1800 },
       { "template": "crystal", "qty": 1, "respawn": 1800 }
     ],
-    "spawns": [
-      { "mob": "gloom-crawler", "max": 2, "respawn": 45 }
-    ]
+    "spawns": [{ "mob": "gloom-crawler", "max": 2, "respawn": 90 }]
   },
   "warren.lair": {
     "id": "warren.lair",
@@ -976,8 +948,8 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [
-      { "mob": "the-starving-dark", "max": 1, "respawn": 1800 },
-      { "mob": "gloom-crawler", "max": 2, "respawn": 40 }
+      { "mob": "the-starving-dark", "max": 1, "respawn": 1200 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
     ]
   }
 }
