@@ -11,9 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   room per action along the shortest path toward wherever you now stand
   ("...stalks off, hunting"), until it catches you, you die, you log out, or you
   outrun its **leash** (`pursueRange` rooms from its lair, default 4). Give it the
-  slip for good and the stray hunter slinks back home. The **pallid hunter** — the
-  eyeless, scent-tracking deep-predator — is the first to do it. (DikuMUD-style
-  `hunt_victim`, built on the `remembers` grudge from the previous release.)
+  slip for good and the stray hunter slinks back home. (DikuMUD-style `hunt_victim`,
+  built on the `remembers` grudge from the previous release.) Pursuers, by leash:
+  the **pallid hunter** and the **feral mongrel** run you down across the shallows
+  (4 rooms); the **elder** and **gloom-touched crawlers** drag themselves after you
+  through the warren (3); **Yana** and the **Starving Dark** stalk warmth a room or
+  two out of the deep before the light turns them back (2); and the **Pale King**
+  lunges only to the water's edge to haul a fleeing delver back, never leaving his
+  lake (1). The deep's set-piece dread no longer ends at the doorway.
 - **Mobs that remember you.** A mob marked `remembers` no longer forgets a delver
   the instant they leave the room. Once it has traded blows with you, it holds a
   grudge: step out and back within ~1 minute and it **re-engages on sight** ("it
