@@ -78,6 +78,25 @@ then read the OTHER tabs to confirm the state propagated.
 - PASS: damage/heal broadcasts, shared mob/target health stays consistent, kill
   credit and aggro behave as designed.
 
+### 5. Faction guard assist (a `rim` guard defends a delver)
+Verifies a `helper` guard joins a fight against a faction-enemy on behalf of an
+ally — the watchman defends a delver from a predator. Both players should see the
+guard's "rushes to join" broadcast.
+1. Gather both players in **The Rim Plaza** (where `rim-watchman` Hale spawns; if
+   he's not there, move to him or wait for respawn).
+2. As `admin`, drop a predator in that room: `@spawn cave-centipede 1` (it spawns
+   `wild` — enemy to both player and `rim`).
+3. Player A `attack cave centipede` → within a tick or two, **both tabs** show a
+   `mob-assist` line (Hale "rushes to join" / moves to defend) and the watchman
+   dealing damage to the centipede.
+- PASS: the guard engages the centipede (not the player) unprompted once the fight
+  starts, the assist line broadcasts to every tab, and the centipede's health is
+  consistent across tabs. NOTE the guard must be able to *see* the target (Plaza
+  light is ~2; fine) — in a dark room a perception-gated guard won't join.
+- NEGATIVE check: have a player `attack` a **`fauna`** creature (e.g. `@spawn
+  stonebug 1`, then attack it) → the watchman must **NOT** turn on the player (the
+  player is the guard's ally), though the stonebug itself fights back.
+
 ## Reporting
 
 Return a table: scenario → ✅/⚠️/❌ → one line of evidence (the actual console
