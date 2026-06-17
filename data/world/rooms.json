@@ -604,7 +604,7 @@
     "exits": { "north": "third.pools", "south": "third.garden" },
     "fixtures": ["umbral-coldlamp", "umbral-forge"],
     "groundItems": [],
-    "spawns": [{ "mob": "umbral-trader", "max": 1, "respawn": 600 }]
+    "spawns": [{ "mob": "umbral-trader", "max": 1, "respawn": 600 }, { "mob": "umbral-chitin-warden", "max": 1, "respawn": 300 }]
   },
   "third.garden": {
     "id": "third.garden",
