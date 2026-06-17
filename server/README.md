@@ -177,8 +177,14 @@ Each tick a mob takes **one weighted action** from its `actions` table
 fight, mutter flavour lines, wander, or lurk with distinct personalities. Mob
 actions you can't see read as "Something …". Mobs act in their own room only (no
 cross-room pursuit yet); `wander` lets them roam between rooms, bounded by its
-`scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones). A
-`flee` action (also `scope`-bounded) is a light trigger, not a weighted choice:
+`scope` (`"zone"` keeps a mob in its current zone, `"any"` crosses zones).
+Destinations can also be gated by room **`tags`** (free-form terrain labels like
+`"water"`): an action's `requireTags` admits only rooms carrying *all* the listed
+tags (a cave-fish that keeps to water), `forbidTags` rejects any room carrying one
+(a surface beast that won't enter the deep dark). Untagged rooms are neutral —
+excluded by `requireTags`, allowed by `forbidTags` — so a tagless world roams
+exactly as before; tags only ever constrain mobs that ask for them. A
+`flee` action (also `scope`- and tag-bounded) is a light trigger, not a weighted choice:
 the instant room light rises above its `lightAbove`, the mob bolts for a random
 exit, overriding everything else (even combat) — used by the dark-dwelling
 gloom-crawler, which flees light above 3.
