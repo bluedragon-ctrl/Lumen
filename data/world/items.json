@@ -225,6 +225,7 @@
     "name": "a flask of oil",
     "description": "A stoppered clay flask of thick, slow-burning oil — fuel to refill a lantern.",
     "type": "material",
+    "filterGroup": "consumable",
     "weight": 1,
     "value": 6,
     "stackable": true
@@ -234,6 +235,7 @@
     "name": "a lump of bug-tallow",
     "description": "A fistful of pale, waxy fat rendered from under a stonebug's plates. It keeps for weeks and burns clean — the Rim's cheapest source of lamp-oil, and good frying fat for the broth-pots besides.",
     "type": "material",
+    "filterGroup": "consumable",
     "weight": 1,
     "value": 3,
     "stackable": true
@@ -243,6 +245,7 @@
     "name": "a delver's claim-tag",
     "description": "A thumb-length tag of stamped lead on a rotted cord, the kind every registered delver wears below — claim number on one face, the holder's mark on the other. This one reads WENDER, M., the stamp still crisp under a crust of lake-silt. Its owner has no further use for it; Fenn's ledger does.",
     "type": "material",
+    "filterGroup": "other",
     "weight": 0,
     "value": 0,
     "stackable": false

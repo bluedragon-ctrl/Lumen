@@ -246,6 +246,18 @@ body {
 .state-chip { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--hostile); color: var(--hostile); }
 .state-chip.good { border-color: var(--accent); color: var(--accent); }
 
+/* Inventory filter bar */
+.inv-filter-bar { display: flex; gap: 3px; margin-bottom: 4px; }
+.inv-filter {
+  flex: 1; padding: 2px 0;
+  background: var(--panel-2); border: 1px solid var(--edge); border-radius: 4px;
+  color: var(--muted); font: inherit; font-size: 11px; cursor: pointer;
+}
+.inv-filter:hover { border-color: var(--accent); color: var(--text); }
+.inv-filter.active { border-color: var(--accent); color: var(--accent); }
+.inv-filter.empty { opacity: .4; }
+.inv-count { font-size: 10px; }
+
 @media (max-width: 720px) {
   #app { grid-template-columns: 1fr; grid-template-areas: "console" "inspect" "player" "status" "command"; grid-template-rows: 1fr auto auto auto auto; }
 }
