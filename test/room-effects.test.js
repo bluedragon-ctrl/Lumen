@@ -58,4 +58,32 @@ test("roomEffectFires: lightAbove fires only over the threshold", () => {
   assert.equal(roomEffectFires({ when: { lightAbove: 9 } }, 9), false);
 });
 
+test("_douse extinguishes every lit source the player carries", () => {
+  const { state, player } = gsWithPlayer();
+  // Equip and light a torch; also carry a second lit torch in the pack.
+  const { makeItemInstance } = require("../server/state");
+  player.equipment.light = makeItemInstance({ template: "torch", fuel: 200 }, state.world);
+  player.equipment.light.lit = true;
+  player.inventory[0].lit = true; // the starting torch
+  const n = state._douse(player);
+  assert.equal(n, 2);
+  assert.equal(player.equipment.light.lit, false);
+  assert.equal(player.inventory[0].lit, false);
+});
+
+test("_douse returns 0 when nothing is lit", () => {
+  const { state, player } = gsWithPlayer();
+  assert.equal(state._douse(player), 0);
+});
+
+test("_drainMana clamps at zero and reports the amount drained", () => {
+  const { state, player } = gsWithPlayer();
+  player.mana = 3;
+  assert.equal(state._drainMana(player, 2), 2);
+  assert.equal(player.mana, 1);
+  assert.equal(state._drainMana(player, 5), 1); // only 1 left to take
+  assert.equal(player.mana, 0);
+  assert.equal(state._drainMana(player, 0), 0); // no-op
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };

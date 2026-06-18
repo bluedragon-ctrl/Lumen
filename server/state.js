@@ -925,6 +925,26 @@ class GameState {
     return actor.hp - before;
   }
 
+  /** Snuff every lit light source a player carries (equipped or in the pack) —
+   *  the waterfall douse. Mirrors the death-snuff loop in _respawn. Returns the
+   *  count extinguished; the caller recomputes room light when it's > 0. A spent
+   *  husk is left in place (not consumed — unlike burning out). */
+  _douse(player) {
+    let n = 0;
+    for (const inst of [...Object.values(player.equipment || {}), ...(player.inventory || [])])
+      if (inst && inst.lit) { inst.lit = false; n++; }
+    return n;
+  }
+
+  /** Drain up to `amount` mana from an actor, clamped at 0 (the mana mirror of
+   *  _heal / the mana side of applyRestore). Returns the mana actually taken. */
+  _drainMana(actor, amount) {
+    if (!amount) return 0;
+    const before = actor.mana || 0;
+    actor.mana = Math.max(0, before - amount);
+    return before - actor.mana;
+  }
+
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
    *  any that reach zero. Permanent states (remaining == null) persist. */
   _expireStates(actor, events, mkEvent) {
