@@ -245,6 +245,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Room-graph pathfinding extracted to a pure, tested module.** The two BFS walks
+  that drove mob cross-room pursuit (`_bfsNextDir`/`_bfsDist` in `state-mobai.js`)
+  are now pure functions in `server/pathfinding.js` — `bfsNextDir(rooms, from, to)`
+  and `bfsDist(rooms, from, to)` — taking the room map explicitly rather than reading
+  `this`. `_pursue` calls them directly; the instance-method wrappers are gone. Adds
+  `test/pathfinding.test.js` (directedness, unreachable targets, missing-exit
+  tolerance). Pure relocation, no behaviour change.
 - **Mob hostile actions (melee + cast) unified behind one pipeline — and a death
   bug fixed.** `_mobAttack` and `_mobCast` were parallel implementations of the
   same concept (a mob acts against its top-threat enemy) that had drifted. They now

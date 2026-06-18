@@ -20,6 +20,7 @@ const {
 const { factionRelation, combatantFaction } = require("./factions");
 const { makeItemInstance, addToFloor } = require("./instances");
 const { canPerceive, mobVisibleTo } = require("./perception");
+const { bfsNextDir, bfsDist } = require("./pathfinding");
 
 // Global damper on ambient `emote` frequency: each emote action's authored
 // weight is scaled by this before the per-tick action roll, thinning idle
@@ -583,9 +584,9 @@ class MobAIMixin {
     if (mob.grudge) {
       const quarry = this._pursuitQuarry(mob, roomId);
       if (quarry) {
-        const dir = this._bfsNextDir(roomId, quarry.room);
+        const dir = bfsNextDir(this.world.rooms, roomId, quarry.room);
         const dest = dir && this.world.rooms[roomId].exits[dir];
-        if (dest && this._bfsDist(mob.origin ? mob.origin.roomId : roomId, dest) <= range) {
+        if (dest && bfsDist(this.world.rooms, mob.origin ? mob.origin.roomId : roomId, dest) <= range) {
           this._mobMove(mob, t, roomId, events, t.pursueVerb || "stalks off, hunting", [dir]);
           return true;
         }
@@ -633,53 +634,6 @@ class MobAIMixin {
       lightFrom: rt.light, lightTo: this.rooms[home].light,
     });
     return true;
-  }
-
-  /** First step (exit direction) along a shortest path from `from` to `to` over the
-   *  room exit graph, or null if `to` is unreachable or equals `from`. Directed —
-   *  follows exits as laid, so a pursuer paths the way a delver actually walked. */
-  _bfsNextDir(from, to) {
-    if (from === to) return null;
-    const seen = new Set([from]);
-    const queue = [];
-    for (const [dir, dest] of Object.entries(this.world.rooms[from].exits || {})) {
-      if (!this.world.rooms[dest] || seen.has(dest)) continue;
-      seen.add(dest);
-      if (dest === to) return dir;
-      queue.push({ room: dest, first: dir });
-    }
-    while (queue.length) {
-      const { room, first } = queue.shift();
-      for (const dest of Object.values(this.world.rooms[room].exits || {})) {
-        if (!this.world.rooms[dest] || seen.has(dest)) continue;
-        seen.add(dest);
-        if (dest === to) return first;
-        queue.push({ room: dest, first });
-      }
-    }
-    return null;
-  }
-
-  /** Shortest-path room count from `from` to `to` over the exit graph (0 if equal,
-   *  Infinity if unreachable). Leashes pursuit to `pursueRange` rooms of home. */
-  _bfsDist(from, to) {
-    if (from === to) return 0;
-    const seen = new Set([from]);
-    let frontier = [from], dist = 0;
-    while (frontier.length) {
-      dist++;
-      const next = [];
-      for (const room of frontier) {
-        for (const dest of Object.values(this.world.rooms[room].exits || {})) {
-          if (!this.world.rooms[dest] || seen.has(dest)) continue;
-          if (dest === to) return dist;
-          seen.add(dest);
-          next.push(dest);
-        }
-      }
-      frontier = next;
-    }
-    return Infinity;
   }
 
   /** The present combatant a mob is most angry at (a { id, actor, kind } descriptor),
