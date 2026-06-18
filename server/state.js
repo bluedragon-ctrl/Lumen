@@ -945,6 +945,30 @@ class GameState {
     return before - actor.mana;
   }
 
+  /** Run one room effect against a player standing in `roomId`, if its light
+   *  condition is met. Performs the single action and pushes the MECHANICAL
+   *  events (`vitals`, and via _hurtPlayer the `player-hurt`/`death` events);
+   *  the caller renders the effect's flavour (`message`/`roomMessage`). Returns
+   *  `{ fired, doused, died }` — see the plan's contract. Shared by the tick
+   *  driver (_roomEffectsTick) and the enter driver (move() in commands.js). */
+  applyRoomEffect(player, roomId, effect, events) {
+    if (!roomEffectFires(effect, this.rooms[roomId].light)) return { fired: false, doused: 0, died: false };
+    const a = effect.action || {};
+    let doused = 0;
+    let died = false;
+    if (a.douse) {
+      doused = this._douse(player);
+      if (doused) this.rooms[roomId].light = this.computeRoomLight(roomId);
+    } else if (a.restore) {
+      const got = this.applyRestore(player, a.restore);
+      if (got.hp || got.mana) events.push({ type: "vitals", playerId: player.id });
+    } else if (a.damage) {
+      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause: "darkness" })) died = true;
+      if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
+    }
+    return { fired: true, doused, died };
+  }
+
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
    *  any that reach zero. Permanent states (remaining == null) persist. */
   _expireStates(actor, events, mkEvent) {

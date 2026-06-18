@@ -86,4 +86,58 @@ test("_drainMana clamps at zero and reports the amount drained", () => {
   assert.equal(state._drainMana(player, 0), 0); // no-op
 });
 
+test("applyRoomEffect: restore mends hp/mana and pushes vitals", () => {
+  const { state, player } = gsWithPlayer();
+  player.hp = 1; player.mana = 0;
+  const events = [];
+  const r = state.applyRoomEffect(player, "test.bright", { trigger: "tick", action: { restore: { hp: 1, mana: 2 } } }, events);
+  assert.deepEqual(r, { fired: true, doused: 0, died: false });
+  assert.equal(player.hp, 2);
+  assert.equal(player.mana, 2);
+  assert.ok(events.some((e) => e.type === "vitals" && e.playerId === player.id));
+});
+
+test("applyRoomEffect: damage hurts hp (player-hurt) and drains mana", () => {
+  const { state, player } = gsWithPlayer();
+  player.hp = 20; player.mana = 10;
+  const events = [];
+  const r = state.applyRoomEffect(player, "test.bright", { trigger: "tick", action: { damage: { hp: "2", mana: "3" } } }, events);
+  assert.equal(r.fired, true);
+  assert.equal(r.died, false);
+  assert.equal(player.hp, 18);
+  assert.equal(player.mana, 7);
+  assert.ok(events.some((e) => e.type === "player-hurt" && e.cause === "darkness"));
+});
+
+test("applyRoomEffect: a killing hp blow returns died and skips mana drain", () => {
+  const { state, player } = gsWithPlayer("test.dark");
+  player.hp = 1; player.mana = 10;
+  const events = [];
+  const r = state.applyRoomEffect(player, "test.dark", { trigger: "tick", action: { damage: { hp: "50", mana: "5" } } }, events);
+  assert.equal(r.died, true);
+  assert.equal(player.mana, 10); // mana drain skipped once dead
+  assert.ok(events.some((e) => e.type === "death"));
+});
+
+test("applyRoomEffect: douse extinguishes and reports the dim, recomputes light", () => {
+  const { state, player } = gsWithPlayer("test.dark");
+  const { makeItemInstance } = require("../server/state");
+  player.equipment.light = makeItemInstance({ template: "torch", fuel: 200 }, state.world);
+  player.equipment.light.lit = true;
+  state.rooms["test.dark"].light = state.computeRoomLight("test.dark"); // bright from the torch
+  assert.ok(state.rooms["test.dark"].light > 0);
+  const r = state.applyRoomEffect(player, "test.dark", { trigger: "enter", action: { douse: true } }, []);
+  assert.equal(r.doused, 1);
+  assert.equal(player.equipment.light.lit, false);
+  assert.equal(state.rooms["test.dark"].light, 0); // ambient 0, torch out
+});
+
+test("applyRoomEffect: a failed condition fires nothing", () => {
+  const { state, player } = gsWithPlayer("test.bright"); // light 5
+  player.hp = 1;
+  const r = state.applyRoomEffect(player, "test.bright", { trigger: "tick", when: { lightBelow: 1 }, action: { damage: { hp: "5" } } }, []);
+  assert.equal(r.fired, false);
+  assert.equal(player.hp, 1); // untouched
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };
