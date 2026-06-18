@@ -1,0 +1,171 @@
+"use strict";
+/**
+ * Resource gathering: `mine`, `gather`, and `fish`.
+ *
+ * All three pull a resource from a charged fixture and differ only in flavour and
+ * which flag the fixture carries (`mine`, `harvest`, `fish`). They share one
+ * worker, `workResource`, driven by a per-kind spec of flavour strings; the three
+ * exported verbs are thin wrappers over it. Players don't know the flag — they
+ * reach for the verb the *thing* suggests (`gather moss`, though moss is a `mine`
+ * fixture; `mine` a mushroom bed). So when a resource verb has nothing of its own
+ * kind to work, it hands the room off to the sibling verb that does (see
+ * resourceRedirect). Veins/beds/water hold a few charges and refill on a timer
+ * (see state._mineTick). Each action spends energy, so a seam can't be stripped
+ * in a single tick.
+ */
+const { makeItemInstance, fixtureVisibleTo } = require("../state");
+const { canSee } = require("../light");
+const quests = require("../quests");
+const { selfAndViews, countItem, removeItem, addToInventory } = require("./shared");
+
+const RESOURCE_KINDS = ["mine", "harvest", "fish"];
+const resourceHandlers = {}; // { mine, harvest: gather, fish } — wired up below.
+
+// Per-kind flavour. `flag` is the fixture flag / `ft` sub-object key; the rest
+// are the strings each verb differs by. `verb`-bearing kinds (harvest) read it
+// from the fixture spec, falling back to a default.
+const RESOURCE_SPECS = {
+  mine: {
+    flag: "mine",
+    dark: "It is too dark to find anything worth mining.",
+    none: "There is nothing to mine here.",
+    notFound: (arg) => `There is no "${arg}" to mine here.`,
+    which: (names) => `Mine what? ${names}.`,
+    depleted: () => "The seam is worked out for now — nothing more will come loose until it recovers.",
+    spent: "You are too spent to swing again just yet.",
+    roomLine: (name, item, fx) => `${name} works ${item} from ${fx}.`,
+    success: (item) => `You work ${item} loose.`,
+    last: " The seam runs thin and gives no more.",
+  },
+  harvest: {
+    flag: "harvest",
+    dark: "It is too dark to find anything worth gathering.",
+    none: "There is nothing here to gather.",
+    notFound: (arg) => `There is no "${arg}" to gather here.`,
+    which: (names) => `Gather what? ${names}.`,
+    depleted: (ft) => `${ft.name} has been picked clean — give it time to grow back.`,
+    spent: "You are too spent to forage just now.",
+    roomLine: (name, item, fx, spec) => `${name} ${spec.verb || "gather"}s ${item} from ${fx}.`,
+    success: (item, spec) => `You ${spec.verb || "gather"} ${item}.`,
+    last: " That is the last of them — the cluster is bare.",
+  },
+  fish: {
+    flag: "fish",
+    bait: true,
+    dark: "It is too dark to find the water, let alone fish it.",
+    none: "There is no water to fish here.",
+    notFound: (arg) => `There is no "${arg}" to fish here.`,
+    which: (names) => `Fish where? ${names}.`,
+    depleted: () => "The water is fished out for now — nothing is biting until it recovers.",
+    spent: "You are too spent to work the line just yet.",
+    roomLine: (name, item, fx) => `${name} hauls ${item} from ${fx}.`,
+    success: (item) => `You hook ${item} and swing it ashore.`,
+    last: " The water goes still; nothing more is biting for now.",
+  },
+};
+
+// Visible fixtures in the player's room that carry the given resource flag.
+function resourceFixtures(state, player, flag) {
+  const w = state.world;
+  return state.rooms[player.location].fixtures.filter(
+    (f) => w.fixtures[f.template] && w.fixtures[f.template][flag] && fixtureVisibleTo(player, f)
+  );
+}
+
+// Does `arg` (lower-cased) name this fixture, by template id or display name?
+function fixtureMatchesArg(state, f, ql) {
+  const ft = state.world.fixtures[f.template];
+  return f.template.toLowerCase().includes(ql) || ft.name.toLowerCase().includes(ql);
+}
+
+// When a resource verb can't satisfy `arg` (or has none of its own kind here),
+// pick the sibling handler that should run instead — or null to let the caller
+// proceed with its own logic / error. The caller checks its own kind first, so
+// this only ever delegates work the player's verb wouldn't otherwise do.
+function resourceRedirect(state, player, arg, selfKind) {
+  const ql = arg ? arg.toLowerCase() : null;
+  const others = RESOURCE_KINDS.filter((k) => k !== selfKind)
+    .map((k) => ({ kind: k, fixtures: resourceFixtures(state, player, k) }))
+    .filter((o) => o.fixtures.length);
+  if (!others.length) return null;
+  if (ql) {
+    // With an arg, redirect only when it actually names a sibling-kind fixture.
+    const hit = others.find((o) => o.fixtures.some((f) => fixtureMatchesArg(state, f, ql)));
+    return hit ? resourceHandlers[hit.kind] : null;
+  }
+  // No arg: redirect only when exactly one sibling kind is present, so e.g.
+  // bare `gather` in a room that holds only an ore vein is unambiguous.
+  return others.length === 1 ? resourceHandlers[others[0].kind] : null;
+}
+
+// The shared worker behind mine/gather/fish. `kind` is the fixture flag; flavour
+// comes from RESOURCE_SPECS[kind]. Fishing alone consumes bait and may miss.
+function workResource(state, player, arg, ctx, kind) {
+  const w = state.world;
+  const rt = state.rooms[player.location];
+  const R = RESOURCE_SPECS[kind];
+  if (!canSee(player.perception, rt.light)) return [{ type: "error", text: R.dark }];
+  const fixtures = resourceFixtures(state, player, R.flag);
+  // Hand off to a sibling verb when the player named something that isn't our
+  // kind, or there's nothing of our kind here at all, so the wrong-verb instinct lands.
+  const ownMatch = arg && fixtures.some((f) => fixtureMatchesArg(state, f, arg.toLowerCase()));
+  if (!ownMatch && (!fixtures.length || arg)) {
+    const redirect = resourceRedirect(state, player, arg, kind);
+    if (redirect) return redirect(state, player, arg, ctx);
+  }
+  if (!fixtures.length) return [{ type: "error", text: R.none }];
+  let f;
+  if (arg) {
+    const ql = arg.toLowerCase();
+    f = fixtures.find((v) => v.template.toLowerCase().includes(ql) || w.fixtures[v.template].name.toLowerCase().includes(ql));
+    if (!f) return [{ type: "error", text: R.notFound(arg) }];
+  } else if (fixtures.length === 1) {
+    f = fixtures[0];
+  } else {
+    return [{ type: "error", text: R.which(fixtures.map((v) => w.fixtures[v.template].name).join(", ")) }];
+  }
+  const ft = w.fixtures[f.template];
+  const spec = ft[R.flag];
+  if (f.charges <= 0) return [{ type: "error", text: R.depleted(ft) }];
+  // Fishing needs bait in the pack before anything else is spent.
+  if (R.bait) {
+    const bait = spec.bait || "grub";
+    if (countItem(player, bait) < 1)
+      return [{ type: "error", text: `You have no bait — you need ${w.items[bait].name} to work the line.` }];
+  }
+  const cost = spec.energy || player.speed; // ~one tick's worth of effort per action
+  if (player.energy < cost) return [{ type: "error", text: R.spent }];
+  player.energy -= cost;
+  // Fishing: bait is lost to the water, catch or no — then a chance to miss.
+  if (R.bait) {
+    removeItem(player, spec.bait || "grub", 1);
+    const chance = spec.catchChance != null ? spec.catchChance : 1;
+    if (Math.random() >= chance) {
+      ctx.refreshRoom(player.location, player.id);
+      return selfAndViews(state, player, "Something worries the bait off your line and is gone before you can pull. The line comes up bare.");
+    }
+  }
+  f.charges -= 1;
+  const qty = spec.yield || 1;
+  addToInventory(player, makeItemInstance({ template: spec.template, qty }, w), w);
+  const qmsgs = quests.noteAcquire(state, player, spec.template);
+  const itemName = w.items[spec.template].name;
+  ctx.toRoom(player.location, { type: "log", text: R.roomLine(player.name, itemName, ft.name, spec) }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  const tail = f.charges <= 0 ? R.last : "";
+  const out = selfAndViews(state, player, `${R.success(itemName, spec)}${tail}`);
+  out.push(...qmsgs);
+  return out;
+}
+
+const mine = (state, player, arg, ctx) => workResource(state, player, arg, ctx, "mine");
+const gather = (state, player, arg, ctx) => workResource(state, player, arg, ctx, "harvest");
+const fish = (state, player, arg, ctx) => workResource(state, player, arg, ctx, "fish");
+
+// Wire the resource verbs to their fixture flags now that all three exist, so
+// resourceRedirect can hand off between them.
+resourceHandlers.mine = mine;
+resourceHandlers.harvest = gather;
+resourceHandlers.fish = fish;
+
+module.exports = { mine, gather, fish };
