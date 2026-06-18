@@ -52,6 +52,7 @@ const roomCtx = {
   refreshRoom(roomId, exceptId) {
     for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, buildRoomView(state, p));
   },
+  emit(ev) { dispatchEvent(ev); },
 };
 
 // ---------------------------------------------------------------------------
@@ -212,6 +213,26 @@ function dispatchEvent(ev) {
     if (!player) return;
     sendToPlayer(ev.playerId, { type: "log", text: `The ${ev.name} takes hold.` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    return;
+  }
+
+  if (ev.type === "room-effect") {
+    // A room acted on a player (douse / regen / drain). Show the flavour line and
+    // refresh their views; if the room dimmed (a douse), refresh it for others too.
+    const player = state.players.get(ev.playerId);
+    if (!player) return;
+    if (ev.text) sendToPlayer(ev.playerId, { type: "log", text: ev.text });
+    sendToPlayer(ev.playerId, buildRoomView(state, player));
+    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    if (ev.dimsRoom) roomCtx.refreshRoom(player.location, ev.playerId);
+    return;
+  }
+
+  if (ev.type === "room-effect-room") {
+    // The bystander side of a room effect: an optional line to the others present,
+    // plus a room refresh when the effect dimmed the room.
+    if (ev.text) roomCtx.toRoom(ev.roomId, { type: "log", text: ev.text }, ev.exceptId);
+    if (ev.dimsRoom) roomCtx.refreshRoom(ev.roomId, ev.exceptId);
     return;
   }
 
@@ -582,7 +603,7 @@ function dispatchEvent(ev) {
   if (ev.type === "player-hurt") {
     const player = state.players.get(ev.playerId);
     if (!player) return;
-    const src = { light: "the searing light", spikes: "the spines", venom: "venom", bleed: "your wounds" }[ev.cause] || ev.cause || "an unseen hurt";
+    const src = { light: "the searing light", spikes: "the spines", venom: "venom", bleed: "your wounds", darkness: "the creeping dark" }[ev.cause] || ev.cause || "an unseen hurt";
     sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
     return;

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Room effects** — rooms can act on players on enter or each tick: a light-condition
+  gate plus a `douse` / `restore` / `damage` action, authored as `effects` in
+  `rooms.json`. Seeded on the Plunge Cave (spray douses your flame), the Lantern's Rest
+  (the hearth mends you), and Where the Dark Goes Bad (the dark drains you unless lit).
 - **Item editor.** A browser-based form for editing `data/world/items.json`,
   mirroring the mob editor (`npm run edit-items` or `tools/item-editor/start.bat`,
   port 3941). Edit each item's common fields (name, description, type, slot,

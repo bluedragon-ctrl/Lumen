@@ -260,6 +260,18 @@ function pickWeighted(options) {
   return options[options.length - 1];
 }
 
+/** Whether a room effect's optional light condition is met at `light`. The only
+ *  v1 condition axis: `when.lightBelow` (fires when room light < N; lightBelow:1
+ *  means total darkness) or `when.lightAbove` (fires when light > N, mirroring
+ *  lightBane.above). No `when` → always fires. */
+function roomEffectFires(effect, light) {
+  const w = effect.when;
+  if (!w) return true;
+  if (w.lightBelow != null) return light < w.lightBelow;
+  if (w.lightAbove != null) return light > w.lightAbove;
+  return true;
+}
+
 // A hit can never be rarer than this, even against heavy evasion — there is
 // always a sliver of a chance to land a blow (matches the can't-see floor).
 const MIN_HIT = 0.05;
@@ -913,6 +925,50 @@ class GameState {
     return actor.hp - before;
   }
 
+  /** Snuff every lit light source a player carries (equipped or in the pack) —
+   *  the waterfall douse. Mirrors the death-snuff loop in _respawn. Returns the
+   *  count extinguished; the caller recomputes room light when it's > 0. A spent
+   *  husk is left in place (not consumed — unlike burning out). */
+  _douse(player) {
+    let n = 0;
+    for (const inst of [...Object.values(player.equipment || {}), ...(player.inventory || [])])
+      if (inst && inst.lit) { inst.lit = false; n++; }
+    return n;
+  }
+
+  /** Drain up to `amount` mana from an actor, clamped at 0 (the mana mirror of
+   *  _heal / the mana side of applyRestore). Returns the mana actually taken. */
+  _drainMana(actor, amount) {
+    if (!amount) return 0;
+    const before = actor.mana || 0;
+    actor.mana = Math.max(0, before - amount);
+    return before - actor.mana;
+  }
+
+  /** Run one room effect against a player standing in `roomId`, if its light
+   *  condition is met. Performs the single action and pushes the MECHANICAL
+   *  events (`vitals`, and via _hurtPlayer the `player-hurt`/`death` events);
+   *  the caller renders the effect's flavour (`message`/`roomMessage`). Returns
+   *  `{ fired, doused, died }` — see the plan's contract. Shared by the tick
+   *  driver (_roomEffectsTick) and the enter driver (move() in commands.js). */
+  applyRoomEffect(player, roomId, effect, events) {
+    if (!roomEffectFires(effect, this.rooms[roomId].light)) return { fired: false, doused: 0, died: false };
+    const a = effect.action || {};
+    let doused = 0;
+    let died = false;
+    if (a.douse) {
+      doused = this._douse(player);
+      if (doused) this.rooms[roomId].light = this.computeRoomLight(roomId);
+    } else if (a.restore) {
+      const got = this.applyRestore(player, a.restore);
+      if (got.hp || got.mana) events.push({ type: "vitals", playerId: player.id });
+    } else if (a.damage) {
+      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause: "darkness" })) died = true;
+      if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
+    }
+    return { fired: true, doused, died };
+  }
+
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
    *  any that reach zero. Permanent states (remaining == null) persist. */
   _expireStates(actor, events, mkEvent) {
@@ -1251,6 +1307,7 @@ class GameState {
     }
 
     this._environmentTick(events); // light-bane and other room hazards, on fresh light
+    this._roomEffectsTick(events); // per-tick room effects (regen, darkness drain), same fresh light
     this.resolvePlayerAttacks(events);
     this.resolveMobAI(events);
     this._recoverMobsTick(events); // wounded, disengaged mobs knit their wounds (post-AI: aggro is freshly pruned)
@@ -2698,6 +2755,36 @@ class GameState {
     }
   }
 
+  /** Per-tick room effects: for every room that authors `trigger:"tick"` effects,
+   *  run each due effect against every living player present. `interval` gates the
+   *  cadence via the global tick counter (no per-player state). Runs AFTER
+   *  _environmentTick so it reads freshly recomputed light (a dark-room drain bites
+   *  the same tick lightBane would). Pushes a `room-effect`/`room-effect-room`
+   *  flavour event when the effect authored a message or dimmed the room. */
+  _roomEffectsTick(events) {
+    for (const [roomId, room] of Object.entries(this.world.rooms)) {
+      const effects = room.effects;
+      if (!effects || !effects.length) continue;
+      const tickEffects = effects.filter((e) => e.trigger === "tick");
+      if (!tickEffects.length) continue;
+      const players = this.playersIn(roomId).filter((p) => p.hp > 0);
+      if (!players.length) continue;
+      const died = new Set(); // players a fatal effect respawned away this tick — skip in later effects
+      for (const eff of tickEffects) {
+        if (eff.interval && eff.interval > 1 && this.tick % eff.interval !== 0) continue;
+        for (const p of players) {
+          if (died.has(p)) continue; // already killed + respawned by an earlier effect this tick
+          const r = this.applyRoomEffect(p, roomId, eff, events);
+          if (!r.fired) continue;
+          if (r.died) { died.add(p); continue; } // respawned at the rim — don't act on the stale snapshot
+          if (eff.message) events.push({ type: "room-effect", playerId: p.id, text: eff.message, dimsRoom: r.doused > 0 });
+          else if (r.doused) events.push({ type: "room-effect", playerId: p.id, text: "Your light is snuffed out.", dimsRoom: true });
+          if (eff.roomMessage || r.doused) events.push({ type: "room-effect-room", roomId, exceptId: p.id, text: eff.roomMessage || "", dimsRoom: r.doused > 0 });
+        }
+      }
+    }
+  }
+
   /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */
   _respawn(player, deathRoom, events = []) {
     const start = this.world.playerTemplate.startLocation;
@@ -2719,4 +2806,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE, roomEffectFires };

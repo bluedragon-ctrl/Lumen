@@ -107,6 +107,7 @@ A map of `roomId → room`.
 | `fixtures`     | string[]          | Fixture ids present in the room (crafting stations, etc.). |
 | `groundItems`  | ItemRef[]         | Initial items on the floor (instantiated at world load). |
 | `spawns`       | SpawnRule[]       | Mob spawn rules. `{ "mob": id, "max": n, "respawn": ticks? }`. `respawn` (ticks) refills the population back to `max`, one mob per interval, once a kill or a wandered-off mob drops the count; omit it for a static one-time spawn. The cap counts a spawner's mobs **wherever they have wandered**, so wandering doesn't multiply them. |
+| `effects`      | RoomEffect[]?     | Effects the room applies to players: each `{ trigger: "enter"|"tick", when?: { lightBelow|lightAbove: N }, interval?, action, message?, roomMessage? }`. `action` is exactly one of `douse: true` (snuff carried lights), `restore: { hp?, mana? }` (flat ints), or `damage: { hp?, mana? }` (dice). `enter` fires on arrival; `tick` fires every `interval` ticks while present (default 1), gated by the optional light `when`. Players only. |
 
 `groundItems`/`fixtures`/`spawns` are optional (default empty).
 
