@@ -1307,6 +1307,7 @@ class GameState {
     }
 
     this._environmentTick(events); // light-bane and other room hazards, on fresh light
+    this._roomEffectsTick(events); // per-tick room effects (regen, darkness drain), same fresh light
     this.resolvePlayerAttacks(events);
     this.resolveMobAI(events);
     this._recoverMobsTick(events); // wounded, disengaged mobs knit their wounds (post-AI: aggro is freshly pruned)
@@ -2750,6 +2751,33 @@ class GameState {
         if (!lb || rt.light <= (lb.above || 0)) continue;
         const dmg = Math.max(1, rollDice(lb.damage));
         this._hurtMob(m, roomId, dmg, events, { cause: "light", killer: this._topThreat(m, playersHere) });
+      }
+    }
+  }
+
+  /** Per-tick room effects: for every room that authors `trigger:"tick"` effects,
+   *  run each due effect against every living player present. `interval` gates the
+   *  cadence via the global tick counter (no per-player state). Runs AFTER
+   *  _environmentTick so it reads freshly recomputed light (a dark-room drain bites
+   *  the same tick lightBane would). Pushes a `room-effect`/`room-effect-room`
+   *  flavour event when the effect authored a message or dimmed the room. */
+  _roomEffectsTick(events) {
+    for (const [roomId, room] of Object.entries(this.world.rooms)) {
+      const effects = room.effects;
+      if (!effects || !effects.length) continue;
+      const tickEffects = effects.filter((e) => e.trigger === "tick");
+      if (!tickEffects.length) continue;
+      const players = this.playersIn(roomId).filter((p) => p.hp > 0);
+      if (!players.length) continue;
+      for (const eff of tickEffects) {
+        if (eff.interval && eff.interval > 1 && this.tick % eff.interval !== 0) continue;
+        for (const p of players) {
+          const r = this.applyRoomEffect(p, roomId, eff, events);
+          if (!r.fired) continue;
+          if (eff.message) events.push({ type: "room-effect", playerId: p.id, text: eff.message, dimsRoom: r.doused > 0 });
+          else if (r.doused) events.push({ type: "room-effect", playerId: p.id, text: "Your light is snuffed out.", dimsRoom: true });
+          if (eff.roomMessage || r.doused) events.push({ type: "room-effect-room", roomId, exceptId: p.id, text: eff.roomMessage || "", dimsRoom: r.doused > 0 });
+        }
       }
     }
   }

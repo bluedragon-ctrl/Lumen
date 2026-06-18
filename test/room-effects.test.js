@@ -140,4 +140,50 @@ test("applyRoomEffect: a failed condition fires nothing", () => {
   assert.equal(player.hp, 1); // untouched
 });
 
+test("_roomEffectsTick: tick restore heals a present player and emits room-effect", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].effects = [
+    { trigger: "tick", action: { restore: { mana: 2 } }, message: "The air hums with power." },
+  ];
+  player.mana = 0;
+  const events = [];
+  state._roomEffectsTick(events);
+  assert.equal(player.mana, 2);
+  assert.ok(events.some((e) => e.type === "room-effect" && e.playerId === player.id && e.text === "The air hums with power."));
+});
+
+test("_roomEffectsTick: interval gates how often a tick effect fires", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].effects = [{ trigger: "tick", interval: 3, action: { restore: { mana: 1 } } }];
+  player.mana = 0;
+  for (state.tick = 1; state.tick <= 6; state.tick++) state._roomEffectsTick([]);
+  // tick % 3 === 0 at ticks 3 and 6 → fires twice.
+  assert.equal(player.mana, 2);
+});
+
+test("_roomEffectsTick: light-gated damage only fires in the dark", () => {
+  const { state, player } = gsWithPlayer("test.dark"); // ambient 0
+  state.rooms["test.dark"].light = state.computeRoomLight("test.dark"); // 0
+  state.world.rooms["test.dark"].effects = [
+    { trigger: "tick", when: { lightBelow: 1 }, action: { damage: { hp: "1" } } },
+  ];
+  state.world.rooms["test.bright"].effects = [
+    { trigger: "tick", when: { lightBelow: 1 }, action: { damage: { hp: "1" } } },
+  ];
+  player.hp = 10;
+  state._roomEffectsTick([]);
+  assert.equal(player.hp, 9); // dark room bites
+  state.setPlayerLocation(player, "test.bright");
+  state._roomEffectsTick([]);
+  assert.equal(player.hp, 9); // bright room (light 5) does not
+});
+
+test("_roomEffectsTick: enter effects are ignored by the tick driver", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].effects = [{ trigger: "enter", action: { restore: { mana: 5 } } }];
+  player.mana = 0;
+  state._roomEffectsTick([]);
+  assert.equal(player.mana, 0);
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };
