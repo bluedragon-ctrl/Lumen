@@ -245,6 +245,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **`state.js` slimmed by extracting its pure helpers.** The stateless math and
+  lookup helpers that opened `server/state.js` now live in focused modules —
+  `combat-math.js` (attribute/defence math, scaling, `strike`, weighted picks),
+  `factions.js` (the relation table + readers), `economy.js` (buy/sell values),
+  `instances.js` (entity-id source + item/mob factories), and `perception.js`
+  (sight, light-emission, hidden-feature visibility). `state.js` re-imports and
+  re-exports them, so the module's public surface is unchanged; this is a pure
+  refactor with no behaviour change (~400 lines lighter). First of a staged split
+  to keep per-feature context smaller.
 - **Mob-stat editor surfaces the behaviour fields.** `tools/mob-editor/` now has a
   dedicated **Behaviour & AI** section: `behavior` and `posture` are dropdowns, and
   `faction`, `hostile`, `helper` (assist), `ambush`, `remembers`, `pursues`,
