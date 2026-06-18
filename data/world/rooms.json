@@ -23,7 +23,11 @@
     "exits": { "south": "rim.plaza" },
     "fixtures": ["hearth", "cellar-hatch"],
     "groundItems": [],
-    "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }]
+    "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }],
+    "effects": [
+      { "trigger": "tick", "interval": 3, "action": { "restore": { "hp": 1, "mana": 1 } },
+        "message": "The hearth's warmth eases your hurts." }
+    ]
   },
   "rim.cellar": {
     "id": "rim.cellar",
@@ -592,7 +596,11 @@
     "hiddenExits": { "down": { "to": "warren.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
     "fixtures": ["still-pool"],
     "groundItems": [],
-    "spawns": [{ "mob": "pale-crayfish", "max": 2, "respawn": 120 }]
+    "spawns": [{ "mob": "pale-crayfish", "max": 2, "respawn": 120 }],
+    "effects": [
+      { "trigger": "enter", "action": { "douse": true },
+        "message": "Cold spray off the plunge-pool drowns your flame in a hiss of steam." }
+    ]
   },
   "third.dwelling": {
     "id": "third.dwelling",
@@ -824,7 +832,12 @@
     "exits": { "north": "deep.camp", "south": "warren.hall" },
     "fixtures": [],
     "groundItems": [],
-    "spawns": [{ "mob": "gloom-crawler", "max": 3, "respawn": 90 }]
+    "spawns": [{ "mob": "gloom-crawler", "max": 3, "respawn": 90 }],
+    "effects": [
+      { "trigger": "tick", "when": { "lightBelow": 1 },
+        "action": { "damage": { "hp": "1d2", "mana": "1d2" } },
+        "message": "The dark presses close and drinks the warmth from you." }
+    ]
   },
   "warren.hall": {
     "id": "warren.hall",
