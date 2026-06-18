@@ -2774,6 +2774,7 @@ class GameState {
         for (const p of players) {
           const r = this.applyRoomEffect(p, roomId, eff, events);
           if (!r.fired) continue;
+          if (r.died) continue; // a fatal effect respawned them at the rim — don't act on the stale snapshot
           if (eff.message) events.push({ type: "room-effect", playerId: p.id, text: eff.message, dimsRoom: r.doused > 0 });
           else if (r.doused) events.push({ type: "room-effect", playerId: p.id, text: "Your light is snuffed out.", dimsRoom: true });
           if (eff.roomMessage || r.doused) events.push({ type: "room-effect-room", roomId, exceptId: p.id, text: eff.roomMessage || "", dimsRoom: r.doused > 0 });
