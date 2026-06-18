@@ -260,6 +260,18 @@ function pickWeighted(options) {
   return options[options.length - 1];
 }
 
+/** Whether a room effect's optional light condition is met at `light`. The only
+ *  v1 condition axis: `when.lightBelow` (fires when room light < N; lightBelow:1
+ *  means total darkness) or `when.lightAbove` (fires when light > N, mirroring
+ *  lightBane.above). No `when` → always fires. */
+function roomEffectFires(effect, light) {
+  const w = effect.when;
+  if (!w) return true;
+  if (w.lightBelow != null) return light < w.lightBelow;
+  if (w.lightAbove != null) return light > w.lightAbove;
+  return true;
+}
+
 // A hit can never be rarer than this, even against heavy evasion — there is
 // always a sliver of a chance to land a blow (matches the can't-see floor).
 const MIN_HIT = 0.05;
@@ -2719,4 +2731,4 @@ class GameState {
   }
 }
 
-module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE };
+module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE, roomEffectFires };
