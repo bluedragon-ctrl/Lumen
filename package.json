@@ -8,6 +8,7 @@
     "start": "node server/index.js",
     "validate": "node tools/validate-data.js",
     "edit-mobs": "node tools/mob-editor/mob-editor.js",
+    "edit-items": "node tools/item-editor/item-editor.js",
     "edit-spawns": "node tools/spawn-editor/spawn-editor.js"
   },
   "engines": {

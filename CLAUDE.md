@@ -46,6 +46,9 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
 - `tools/mob-editor/` — browser-based NPC stat editor (`npm run edit-mobs` or
   double-click `tools/mob-editor/start.bat`, port 3939). Edits
   `data/world/mobs.json`; validates and can open a PR via `gh`.
+- `tools/item-editor/` — browser-based item editor (`npm run edit-items` or
+  double-click `tools/item-editor/start.bat`, port 3941). Edits
+  `data/world/items.json`; validates and can open a PR via `gh`.
 - `tools/spawn-editor/` — browser-based room spawn-rule editor (`npm run
   edit-spawns` or `tools/spawn-editor/start.bat`, port 3940). Edits the
   per-room `spawns` (mob / max / respawn) in `data/world/rooms.json`; validates
