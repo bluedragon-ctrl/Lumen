@@ -245,6 +245,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Mob AI carved out of `state.js` into a mixin.** The mob-AI subsystem — decision
+  loop (`resolveMobAI`/`_mobAct`), faction targeting, the threat/detection/grudge
+  model, cross-room pursuit + BFS pathing, and the mob-side combat actions
+  (attack/cast/summon/move) and kill resolution — now lives in `server/state-mobai.js`
+  (~37 methods). `state.js` copies its prototype methods onto `GameState.prototype`
+  via a small `mixin()` helper, so they remain ordinary `GameState` methods at
+  runtime. The aggro/grudge/pursuit/emote tuning constants moved with them. Pure
+  relocation, no behaviour change; `state.js` drops to ~1440 lines. Second of the
+  staged split (after the pure-helper extraction).
 - **`state.js` slimmed by extracting its pure helpers.** The stateless math and
   lookup helpers that opened `server/state.js` now live in focused modules —
   `combat-math.js` (attribute/defence math, scaling, `strike`, weighted picks),
