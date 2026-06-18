@@ -745,17 +745,62 @@ class MobAIMixin {
     };
   }
 
-  /** A mob makes one melee attack against its highest-threat enemy — a player OR
-   *  an opposing-faction mob (an allied summon, etc.). `enemies` is the candidate
-   *  set from `_mobAct`. Reuses `strike`/`applyHitOutcome` via the shared defender
-   *  builders, so contact triggers (onHit/onDamage/spikes) fire identically in both
-   *  directions. Player targets also rouse from rest and auto-retaliate. */
-  _mobAttack(m, t, roomId, events, enemies) {
-    const rt = this.rooms[roomId];
+  /** Shared pipeline for a mob's hostile action against its highest-threat enemy —
+   *  a player OR an opposing-faction mob. Melee and casting are one concept that
+   *  differs only in payload: this orchestrator owns the parts they share — pick
+   *  the target, stoke a point of aggro, then (for a surviving player target) rouse
+   *  from rest and auto-retaliate — and delegates the actual hit/cast to a payload
+   *  resolver. `action` is `{ kind: "melee" }` or `{ kind: "spell", spell }`.
+   *  Each resolver returns `{ targetDied, attackerDied }`: the player is roused +
+   *  turned on the mob only if it survived (`!targetDied`) AND there is still a
+   *  living attacker to fight back at (`!attackerDied` — a reflect can kill the mob
+   *  mid-blow). This mirrors the player-attack path's own attacker-death guard. */
+  _mobHostileAction(m, t, roomId, events, enemies, action) {
     const target = this._topThreat(m, enemies) || enemies[Math.floor(Math.random() * enemies.length)];
     if (!target) return;
-    this._addThreat(m, target.id, 1); // attacking sticks the mob to its quarry
-    const isPlayer = target.kind === "player";
+    this._addThreat(m, target.id, 1); // the action sticks the mob to its quarry
+    const ctx = {
+      m, t, roomId, rt: this.rooms[roomId], events, target,
+      isPlayer: target.kind === "player",
+      tmt: target.kind === "player" ? null : this.world.mobs[target.actor.template],
+    };
+    const { targetDied, attackerDied } = action.kind === "spell"
+      ? this._resolveSpellPayload(ctx, action.spell)
+      : this._resolveMeleePayload(ctx);
+    if (ctx.isPlayer && !targetDied) {
+      this._rouseAndRetaliate(target.actor, m, t, events, { attackerAlive: !attackerDied });
+    }
+  }
+
+  /** A surviving player target rouses and turns on the mob. Rousing and retaliating
+   *  are separate: a struck delver always wakes — you can't sleep through a blow,
+   *  even one whose reflect killed the attacker — but auto-retaliate only fires when
+   *  there is still a living attacker (`attackerAlive`) and the player isn't already
+   *  swinging at something. Only called when the player target is alive, so no
+   *  `hp > 0` guards are needed (the old melee `p.hp > 0` check was a no-op anyway,
+   *  since `_respawn` restores HP). */
+  _rouseAndRetaliate(player, mob, t, events, { attackerAlive }) {
+    if (this._rouse(player)) events.push({ type: "player-woke", playerId: player.id });
+    if (attackerAlive && !player.pending) {
+      player.pending = { type: "attack", targetId: mob.id };
+      events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
+    }
+  }
+
+  /** A mob makes one melee attack (the `attack` action). Thin entry over the shared
+   *  hostile-action pipeline. */
+  _mobAttack(m, t, roomId, events, enemies) {
+    return this._mobHostileAction(m, t, roomId, events, enemies, { kind: "melee" });
+  }
+
+  /** Melee payload: resolve one swing against `ctx.target` via `strike` /
+   *  `applyHitOutcome`, so contact triggers (onHit/onDamage/spikes) fire identically
+   *  in both directions. Returns `{ targetDied, attackerDied }` read straight from
+   *  `applyHitOutcome` — `defenderDeath` is the struck target (authoritative even
+   *  for a self-`onDamage` that kills the player after the blow), `attackerDeath`
+   *  the mob dying to a reflect mid-exchange. */
+  _resolveMeleePayload(ctx) {
+    const { m, t, roomId, rt, events, target, isPlayer, tmt } = ctx;
     // Ambush: a hidden mob striking a delver who never found it bursts from
     // concealment — reveal it to that player (ephemerally, like `search`) and
     // announce the appearance just before the blow lands.
@@ -766,7 +811,6 @@ class MobAIMixin {
       events.push({ type: "mob-ambush", roomId, mobId: m.id, mobName: t.name,
         targetId: target.id, light: rt.light, emitsLight: !!t.emitsLight });
     }
-    const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const targetEmitsLight = isPlayer ? false : !!tmt.emitsLight;
     const defence = isPlayer
@@ -788,7 +832,7 @@ class MobAIMixin {
     const defender = isPlayer
       ? this._playerDefender(target.actor, roomId, events)
       : this._mobDefender(target.actor, tmt, roomId, { id: m.id, kind: "mob", actor: m }, events);
-    this.applyHitOutcome({
+    const { defenderDeath, attackerDeath } = this.applyHitOutcome({
       r, events, attackEvent,
       attacker: {
         actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: !!t.emitsLight, roomId,
@@ -800,17 +844,7 @@ class MobAIMixin {
       },
       defender,
     });
-
-    if (!isPlayer) return; // mob-vs-mob: no rouse-from-rest or player auto-retaliate
-    const p = target.actor;
-    // A blow rouses a resting target — you can't sleep through being hit. (A
-    // sleeping delver is blind, so the first they know of a threat is this strike.)
-    if (p.hp > 0 && this._rouse(p)) events.push({ type: "player-woke", playerId: p.id });
-    // Auto-retaliate: if the player isn't already attacking something, target this mob
-    if (!p.pending && p.hp > 0) {
-      p.pending = { type: "attack", targetId: m.id };
-      events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
-    }
+    return { targetDied: !!defenderDeath, attackerDied: !!attackerDeath };
   }
 
   /** A mob summons reinforcements (the `summon` action). Conjures up to its
@@ -828,25 +862,28 @@ class MobAIMixin {
     }, events);
   }
 
-  /** A mob casts a hostile spell at its highest-threat enemy — a player OR an
-   *  opposing-faction mob (mirror of _mobAttack for the `cast` action). The target's
-   *  Ward gets a wholesale negation roll (see wardNegates); a spell that lands deals
-   *  magical damage scaled by the mob's own attributes, or applies a hostile status
-   *  effect. No mana bookkeeping for mobs — cadence is gated by action energy. Pushes
-   *  a `mob-cast` event the server narrates; a player target also rouses/retaliates. */
+  /** A mob casts a spell (the `cast` action). A beneficial weave lands on the
+   *  caster (`_mobCastSelf`); a hostile one runs the shared hostile-action pipeline
+   *  with a spell payload. Thin entry — the hostile resolution lives in
+   *  `_resolveSpellPayload`. */
   _mobCast(m, t, roomId, events, enemies, spellId) {
-    const rt = this.rooms[roomId];
     const spell = this.world.spells[spellId];
     if (!spell) return;
     if (!spell.hostile) return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
-    const eff = spell.effect || {};
-    const target = this._topThreat(m, enemies) || enemies[Math.floor(Math.random() * enemies.length)];
-    if (!target) return;
-    this._addThreat(m, target.id, 1); // casting sticks the mob to its quarry
-    const isPlayer = target.kind === "player";
-    const tmt = isPlayer ? null : this.world.mobs[target.actor.template];
-    const targetName = isPlayer ? target.actor.name : tmt.name;
+    return this._mobHostileAction(m, t, roomId, events, enemies, { kind: "spell", spell });
+  }
 
+  /** Spell payload: the target's Ward gets a wholesale negation roll (see
+   *  wardNegates); a spell that lands deals magical damage scaled by the mob's own
+   *  attributes, snuffs the target's light, or applies a hostile status effect. No
+   *  mana bookkeeping for mobs — cadence is gated by action energy. Pushes the
+   *  `mob-cast` event the server narrates. Returns `{ targetDied, attackerDied }`:
+   *  a hostile cast triggers no defender `onDamage` in this pass, so the caster
+   *  cannot die from casting (`attackerDied` is always false). */
+  _resolveSpellPayload(ctx, spell) {
+    const { m, t, roomId, rt, events, target, isPlayer, tmt } = ctx;
+    const eff = spell.effect || {};
+    const targetName = isPlayer ? target.actor.name : tmt.name;
     const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (mobDefence(tmt, target.actor).ward || 0);
     const resisted = wardNegates(ward);
     let damage = 0, killed = false, death = null, effectName = null, doused = false;
@@ -885,14 +922,7 @@ class MobAIMixin {
       targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
     });
     if (death) events.push(death);
-
-    if (!isPlayer || killed || target.actor.hp <= 0) return;
-    const p = target.actor;
-    if (this._rouse(p)) events.push({ type: "player-woke", playerId: p.id });
-    if (!p.pending) {
-      p.pending = { type: "attack", targetId: m.id };
-      events.push({ type: "combat-auto-start", playerId: p.id, targetId: m.id, targetName: t.name });
-    }
+    return { targetDied: killed, attackerDied: false };
   }
 
   /** A mob casts a beneficial spell on *itself* — the support side of mob casting

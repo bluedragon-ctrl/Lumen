@@ -245,6 +245,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Mob hostile actions (melee + cast) unified behind one pipeline — and a death
+  bug fixed.** `_mobAttack` and `_mobCast` were parallel implementations of the
+  same concept (a mob acts against its top-threat enemy) that had drifted. They now
+  share `_mobHostileAction` — target selection, aggro, and a single correct
+  rouse/auto-retaliate tail — and delegate to payload resolvers
+  (`_resolveMeleePayload` / `_resolveSpellPayload`); the public `_mobAttack`/`_mobCast`
+  become thin entry points. **Two player-facing fixes fall out of the shared gate:**
+  (1) a mob's *killing* melee blow no longer makes the freshly-respawned delver
+  "auto-attack" their killer (the old `hp > 0` guard was a no-op after `_respawn`
+  restores HP); (2) when a delver's reflect (`spikes`/`onDamage`) kills the attacker
+  mid-blow, the delver still wakes but no longer retaliates against the corpse —
+  matching the spell and player-attack paths. No combat-math change (ward/armour,
+  onHit untouched); adds `test/mob-combat.test.js`.
 - **Mob AI carved out of `state.js` into a mixin.** The mob-AI subsystem — decision
   loop (`resolveMobAI`/`_mobAct`), faction targeting, the threat/detection/grudge
   model, cross-room pursuit + BFS pathing, and the mob-side combat actions
