@@ -245,6 +245,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **`server/commands.js` split into a `commands/` folder and made table-driven.**
+  The 2019-line monolith is now an ~830-line core (dispatcher + movement, posture,
+  items, fixtures, social, combat) plus focused modules under `server/commands/`:
+  `shared` (targeting/inventory/view helpers), `help`, `trade`, `craft`,
+  `resource`, `magic`, and `admin`. The hand-maintained dispatch `switch` is
+  replaced by a `COMMANDS` table (verb → handler), with a load-time check that
+  every abbreviation/alias has a handler — retiring the "keep VERBS in sync with
+  the switch" hazard. `mine`/`gather`/`fish` collapse into one `workResource`
+  worker driven by a per-kind flavour spec, and repeated narration/targeting
+  snippets (`restoreGain`, `roomHostiles`, `stickToSurvivor`, `findFixture`,
+  `TRAINABLE`) are deduplicated into `shared`. Pure reorganization — no behaviour,
+  wording, or data changes; all 42 tests and `validate` still pass.
 - **Room-graph pathfinding extracted to a pure, tested module.** The two BFS walks
   that drove mob cross-room pursuit (`_bfsNextDir`/`_bfsDist` in `state-mobai.js`)
   are now pure functions in `server/pathfinding.js` — `bfsNextDir(rooms, from, to)`
