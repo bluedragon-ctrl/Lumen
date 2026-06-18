@@ -227,4 +227,56 @@ test("move(): a room without enter effects is unaffected", () => {
   assert.equal(player.hp, 5);
 });
 
+test("_roomEffectsTick: a second effect does not act on a player a prior effect killed", () => {
+  const { state, player } = gsWithPlayer("test.dark");
+  state.rooms["test.dark"].light = state.computeRoomLight("test.dark"); // 0
+  state.world.rooms["test.dark"].effects = [
+    { trigger: "tick", action: { damage: { hp: "50" } } }, // fatal — respawns to test.bright
+    { trigger: "tick", action: { restore: { mana: 5 } } }, // must NOT touch the respawned player
+  ];
+  player.hp = 1; player.mana = 0;
+  state._roomEffectsTick([]);
+  assert.equal(player.location, "test.bright"); // respawned (startLocation)
+  assert.equal(player.hp, player.maxHp); // full after respawn
+  assert.equal(player.mana, 0); // the second effect was skipped
+});
+
+test("_roomEffectsTick: emits room-effect-room when roomMessage is set", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].effects = [
+    { trigger: "tick", action: { restore: { mana: 1 } }, message: "A warmth fills you.", roomMessage: "A glow gathers about them." },
+  ];
+  player.mana = 0;
+  const events = [];
+  state._roomEffectsTick(events);
+  assert.ok(events.some((e) => e.type === "room-effect" && e.playerId === player.id && e.text === "A warmth fills you."));
+  assert.ok(events.some((e) => e.type === "room-effect-room" && e.roomId === "test.bright" && e.exceptId === player.id && e.text === "A glow gathers about them."));
+});
+
+test("_roomEffectsTick: no room-effect-room when neither roomMessage nor douse", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].effects = [
+    { trigger: "tick", action: { restore: { mana: 1 } }, message: "A warmth fills you." },
+  ];
+  player.mana = 0;
+  const events = [];
+  state._roomEffectsTick(events);
+  assert.ok(events.some((e) => e.type === "room-effect"));
+  assert.ok(!events.some((e) => e.type === "room-effect-room"));
+});
+
+test("move(): a fatal enter effect respawns the player and suppresses the arrival output", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.dark"].effects = [
+    { trigger: "enter", action: { damage: { hp: "50" } }, message: "The dark swallows you whole." },
+  ];
+  player.hp = 1;
+  const ctx = recordingCtx();
+  const msgs = execute(state, player, "north", ctx);
+  assert.deepEqual(msgs, []); // arrival output suppressed
+  assert.equal(player.location, "test.bright"); // respawned to startLocation
+  assert.equal(player.hp, player.maxHp);
+  assert.ok(ctx.emitted.some((e) => e.type === "death")); // death dispatched via ctx.emit
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };
