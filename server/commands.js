@@ -31,7 +31,7 @@ const accounts = require("./accounts");
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
 const DIR_ALIAS = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
-const NOOP_CTX = { toRoom() {}, refreshRoom() {} };
+const NOOP_CTX = { toRoom() {}, refreshRoom() {}, emit() {} };
 
 // Every command word the dispatcher understands, in PRIORITY order. A typed verb
 // that isn't an exact match resolves to the FIRST entry it is a prefix of
@@ -397,7 +397,26 @@ function move(state, player, dir, ctx) {
     qmsgs = quests.noteEnter(state, player, dest); // a quest may begin on first arrival
   }
   const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
-  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}`);
+  // Room effects that fire on entering (a waterfall douses your flame, a ward
+  // mends or saps you). Mutate before building the view so it reflects the result
+  // (e.g. a doused room reads dark). Mechanical events go out via ctx.emit; the
+  // flavour line is folded into the arrival message; bystanders see roomMessage
+  // and any dimming.
+  let effectTail = "";
+  let enterDied = false;
+  for (const eff of state.world.rooms[dest].effects || []) {
+    if (eff.trigger !== "enter") continue;
+    const evs = [];
+    const r = state.applyRoomEffect(player, dest, eff, evs);
+    evs.forEach(ctx.emit);
+    if (!r.fired) continue;
+    if (eff.message) effectTail += ` ${eff.message}`;
+    if (eff.roomMessage) ctx.toRoom(dest, { type: "log", text: eff.roomMessage }, player.id);
+    if (r.doused) ctx.refreshRoom(dest, player.id); // others see the room dim
+    if (r.died) { enterDied = true; break; } // _respawn already moved + re-rendered them
+  }
+  if (enterDied) return []; // death views were emitted; suppress the normal arrival output
+  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}${effectTail}`);
   announceLevelUps(player, ups, ctx, msgs);
   msgs.push(...qmsgs);
   return msgs;

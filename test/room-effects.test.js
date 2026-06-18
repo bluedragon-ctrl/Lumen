@@ -186,4 +186,45 @@ test("_roomEffectsTick: enter effects are ignored by the tick driver", () => {
   assert.equal(player.mana, 0);
 });
 
+const { execute } = require("../server/commands");
+
+// A ctx that records bystander sends and dispatched events (the server's roomCtx
+// shape: toRoom / refreshRoom / emit).
+function recordingCtx() {
+  const emitted = [];
+  return { emitted, toRoom() {}, refreshRoom() {}, emit(ev) { emitted.push(ev); } };
+}
+
+test("move(): an enter douse snuffs the player's light and folds in the message", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  player.equipment.light = require("../server/state").makeItemInstance({ template: "torch", fuel: 200 }, state.world);
+  player.equipment.light.lit = true;
+  state.world.rooms["test.dark"].effects = [
+    { trigger: "enter", action: { douse: true }, message: "Cold spray drowns your flame." },
+  ];
+  const ctx = recordingCtx();
+  const msgs = execute(state, player, "north", ctx);
+  assert.equal(player.location, "test.dark");
+  assert.equal(player.equipment.light.lit, false); // doused on arrival
+  assert.ok(msgs.some((m) => m.text && m.text.includes("Cold spray drowns your flame.")));
+});
+
+test("move(): an enter restore mends the arriving player and emits vitals", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.dark"].effects = [{ trigger: "enter", action: { restore: { hp: 3 } } }];
+  player.hp = 1;
+  const ctx = recordingCtx();
+  execute(state, player, "north", ctx);
+  assert.equal(player.hp, 4);
+  assert.ok(ctx.emitted.some((e) => e.type === "vitals" && e.playerId === player.id));
+});
+
+test("move(): a room without enter effects is unaffected", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  player.hp = 5;
+  const ctx = recordingCtx();
+  execute(state, player, "north", ctx);
+  assert.equal(player.hp, 5);
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };
