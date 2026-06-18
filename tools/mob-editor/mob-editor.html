@@ -32,6 +32,7 @@
   textarea { width:100%; min-height:200px; resize:vertical; white-space:pre; }
   textarea#desc { min-height:64px; white-space:pre-wrap; }
   .full { grid-column:1/-1; }
+  p.hint { color:var(--dim); font-size:11px; margin:.6rem 0 .2rem; line-height:1.4; }
   .bar { position:sticky; bottom:0; background:var(--panel); border-top:1px solid var(--line); padding:.75rem 1rem; margin:1rem -1.25rem -1rem; display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
   .bar input.summary { flex:1; min-width:200px; }
   button { background:var(--accent); color:#1a1206; border:0; border-radius:5px; padding:.45rem .9rem; font:inherit; font-weight:600; cursor:pointer; }
@@ -61,11 +62,19 @@
   <main id="main"><p class="empty">Loading mobs&hellip;</p></main>
 </div>
 <script>
-const KNOWN = ["id","name","description","maxHp","speed","armour","ward","xp","emitsLight","shards","hostile","helper","ambush","behavior","attributes","perception"];
+const KNOWN = ["id","name","description","maxHp","speed","armour","ward","xp","emitsLight","shards","faction","hostile","behavior","posture","helper","ambush","remembers","pursues","pursueRange","pursueVerb","attributes","perception"];
 const NUMS = ["maxHp","speed","armour","ward","xp","emitsLight"];
 const ATTRS = ["might","vitality","intellect","wits","perception"];
 const PERC = ["blindBelow","dimBelow","harmedAbove"];
-const FLAGS = ["helper","ambush"]; // present-only-when-true flags
+const BEHAVIOR_OPTS = ["wander","guard","hunt","passive"];
+const POSTURE_OPTS = ["standing","sitting","sleeping"];
+// present-only-when-true behaviour flags, with editor labels
+const BEHAVIOR_FLAGS = [
+  ["helper",    "helper — assists allied fighters (the “assist” pass)"],
+  ["ambush",    "ambush — lies in wait, strikes sleeping prey"],
+  ["remembers", "remembers — holds a grudge, re-engages a returning foe"],
+  ["pursues",   "pursues — chases a fled foe across rooms (implies remembers)"],
+];
 
 let original = {};   // pristine, parsed from disk
 let mobs = {};       // working copy (mutated as you edit)
@@ -132,13 +141,26 @@ function renderForm() {
   const cg = el("div", { className:"grid" });
   for (const k of NUMS) cg.append(field(k, numInput(m, k)));
   cg.append(field("shards (dice)", textInput(m, "shards")));
-  cg.append(field("behavior", textInput(m, "behavior")));
+  cg.append(field("faction", textInput(m, "faction")));
   core.append(cg);
-  const flags = el("div", { className:"grid", style:"margin-top:.6rem" });
-  flags.append(boolField(m, "hostile", true));
-  for (const f of FLAGS) flags.append(boolField(m, f, false));
-  core.append(flags);
   main.append(core);
+
+  // --- behaviour / AI (wander · assist · memory · pursuit) ---
+  const beh = el("fieldset"); beh.append(el("legend", {}, "Behaviour & AI"));
+  const bg = el("div", { className:"grid" });
+  bg.append(field("behavior", selectInput(m, "behavior", BEHAVIOR_OPTS)));
+  bg.append(field("posture", selectInput(m, "posture", POSTURE_OPTS)));
+  beh.append(bg);
+  const flags = el("div", { className:"grid", style:"margin-top:.6rem" });
+  flags.append(boolField(m, "hostile", true, "hostile — attacks perceived foes on sight"));
+  for (const [k, label] of BEHAVIOR_FLAGS) flags.append(boolField(m, k, false, label));
+  beh.append(flags);
+  beh.append(el("p", { className:"hint", textContent:"Pursuit tuning below applies only when “pursues” is on. The wander action itself (verb, scope, requireTags/forbidTags) lives in the actions array in the raw-JSON block at the bottom." }));
+  const purse = el("div", { className:"grid" });
+  purse.append(field("pursueRange (rooms from spawn, default 4)", numInput(m, "pursueRange")));
+  purse.append(field("pursueVerb (e.g. “stalks off, hunting”)", textInput(m, "pursueVerb")));
+  beh.append(purse);
+  main.append(beh);
 
   // --- attributes ---
   const attrs = el("fieldset"); attrs.append(el("legend", {}, "Attributes"));
@@ -184,14 +206,27 @@ function textInput(obj, key) {
   i.oninput = () => { if (i.value === "") delete obj[key]; else obj[key] = i.value; touch(); };
   return i;
 }
-function boolField(obj, key, keepFalse) {
+// A dropdown over `options`. An empty pick deletes the key; an out-of-list
+// existing value is preserved (kept selectable) so the editor never silently
+// drops a value it doesn't recognise.
+function selectInput(obj, key, options) {
+  const cur = obj[key];
+  const opts = options.slice();
+  if (cur != null && cur !== "" && !opts.includes(cur)) opts.unshift(cur);
+  const s = el("select");
+  s.append(el("option", { value:"", textContent:"— none —" }));
+  for (const o of opts) s.append(el("option", { value:o, textContent:o, selected:o === cur }));
+  s.onchange = () => { if (s.value === "") delete obj[key]; else obj[key] = s.value; touch(); };
+  return s;
+}
+function boolField(obj, key, keepFalse, label) {
   const c = el("input", { type:"checkbox", checked: !!obj[key] });
   c.onchange = () => {
     if (c.checked) obj[key] = true;
     else if (keepFalse) obj[key] = false; else delete obj[key];
     touch();
   };
-  const l = el("label", { className:"row" }); l.append(c, el("span", {}, key)); return l;
+  const l = el("label", { className:"row" }); l.append(c, el("span", {}, label || key)); return l;
 }
 
 function actionBar() {
