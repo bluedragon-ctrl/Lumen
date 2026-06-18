@@ -408,9 +408,10 @@ function move(state, player, dir, ctx) {
     if (eff.trigger !== "enter") continue;
     const evs = [];
     const r = state.applyRoomEffect(player, dest, eff, evs);
-    evs.forEach(ctx.emit);
+    evs.forEach((e) => ctx.emit(e));
     if (!r.fired) continue;
     if (eff.message) effectTail += ` ${eff.message}`;
+    else if (r.doused) effectTail += " Your light is snuffed out."; // parity with the tick-path default
     if (eff.roomMessage) ctx.toRoom(dest, { type: "log", text: eff.roomMessage }, player.id);
     if (r.doused) ctx.refreshRoom(dest, player.id); // others see the room dim
     if (r.died) { enterDied = true; break; } // _respawn already moved + re-rendered them
