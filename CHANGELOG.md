@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Item editor.** A browser-based form for editing `data/world/items.json`,
+  mirroring the mob editor (`npm run edit-items` or `tools/item-editor/start.bat`,
+  port 3941). Edit each item's common fields (name, description, type, slot,
+  rarity, weight, value, sellValue, stackable, keywords) with a raw-JSON escape
+  hatch for the type-specific blocks (light, weapon, armour, consumable, scroll,
+  …). "Validate & preview" writes, runs the validator, shows the `git diff`, then
+  restores the tree; "Create pull request" branches, commits, pushes, and opens a
+  PR via `gh`. Source-preserving splice keeps the diff to only the items you
+  touched.
 - **Predators that hunt you down.** A mob marked `pursues` no longer loses you at
   the room line. Once you've traded blows and fled, it **follows** — stepping one
   room per action along the shortest path toward wherever you now stand
