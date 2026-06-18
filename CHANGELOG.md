@@ -232,6 +232,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Mob-stat editor surfaces the behaviour fields.** `tools/mob-editor/` now has a
+  dedicated **Behaviour & AI** section: `behavior` and `posture` are dropdowns, and
+  `faction`, `hostile`, `helper` (assist), `ambush`, `remembers`, `pursues`,
+  `pursueRange`, and `pursueVerb` are proper form fields instead of hand-edited raw
+  JSON. The wander action's own knobs (verb/scope/tags) still live in the raw-JSON
+  block, with a pointer to them.
 - **Light-maddened mobs strike indiscriminately.** A creature roused by light
   (`lightAggro`) now treats *every* delver in the room as a valid target, not just
   one it had already noticed — a single spotted target no longer shields the rest
