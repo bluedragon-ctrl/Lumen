@@ -72,49 +72,65 @@ const ctx = {
   isPlayer: target.kind === "player",
   tmt: target.kind === "player" ? null : this.world.mobs[target.actor.template],
 };
-const died = action.kind === "spell"
+const result = action.kind === "spell"
   ? this._resolveSpellPayload(ctx, action.spell)
   : this._resolveMeleePayload(ctx);
-if (ctx.isPlayer && !died) this._rouseAndRetaliate(target.actor, m, t, events);
+// result = { targetDied, attackerDied }
+if (ctx.isPlayer && !result.targetDied) {
+  this._rouseAndRetaliate(target.actor, m, t, events, { attackerAlive: !result.attackerDied });
+}
 ```
 
-### 2. `_resolveMeleePayload(ctx)` → `died` (boolean)
+### 2. `_resolveMeleePayload(ctx)` → `{ targetDied, attackerDied }`
 
 The current `_mobAttack` body from the ambush-reveal through `applyHitOutcome`,
 verbatim, with two changes:
 
-- capture the return: `const { defenderDeath } = this.applyHitOutcome({ ... });`
-- `return !!defenderDeath;`
+- capture the return: `const { defenderDeath, attackerDeath } = this.applyHitOutcome({ ... });`
+- `return { targetDied: !!defenderDeath, attackerDied: !!attackerDeath };`
 
 The rouse/retaliate tail is removed (moved to the orchestrator). `defenderDeath`
-is authoritative: it also reflects a self-targeted `onDamage` that kills the
-player after the initial blow, so it is strictly more correct than the old
-`p.hp > 0` check.
+is authoritative for the *target* (player) — it also reflects a self-targeted
+`onDamage` that kills the player after the initial blow, so it is strictly more
+correct than the old `p.hp > 0` check. `attackerDeath` is the *mob* (caster of
+the blow) dying mid-exchange — almost always a player's reflect/`spikes`
+(`onDamage`) killing it.
 
-### 3. `_resolveSpellPayload(ctx, spell)` → `died` (boolean)
+### 3. `_resolveSpellPayload(ctx, spell)` → `{ targetDied, attackerDied }`
 
 The current `_mobCast` body from the ward roll through the `mob-cast` event
-(and the `if (death) events.push(death)`), verbatim. Returns its existing
-`killed` flag. The `!spell.hostile → _mobCastSelf` redirect and the `if (!spell)
+(and the `if (death) events.push(death)`), verbatim. Returns
+`{ targetDied: killed, attackerDied: false }` — a hostile cast triggers no
+defender `onDamage` in this pass (see non-goals), so the caster cannot die from
+casting. The `!spell.hostile → _mobCastSelf` redirect and the `if (!spell)
 return` guard stay in the `_mobCast` entry point (they run before target
 selection).
 
 Note: the old guard `|| target.actor.hp <= 0` is subsumed by returning `killed`
 — after a damage payload `killed === (hp <= 0)`, and douse/effect payloads never
-drop HP, so `died = killed` is equivalent.
+drop HP, so `targetDied = killed` is equivalent.
 
-### 4. `_rouseAndRetaliate(player, mob, t, events)`
+### 4. `_rouseAndRetaliate(player, mob, t, events, { attackerAlive })`
 
 The shared tail, with **no `hp > 0` guards** (the orchestrator only calls it when
-the player is alive):
+the player target is alive). Rousing and retaliating are split: a struck player
+always wakes (they took the blow), but auto-retaliate only fires when there is a
+living attacker left to turn on — so a reflect that kills the mob doesn't leave
+the player `pending` against a corpse:
 
 ```
+// A blow always rouses a resting target — even if the attacker died this exchange.
 if (this._rouse(player)) events.push({ type: "player-woke", playerId: player.id });
-if (!player.pending) {
+// Auto-retaliate only when there is still a living attacker to fight back at.
+if (attackerAlive && !player.pending) {
   player.pending = { type: "attack", targetId: mob.id };
   events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
 }
 ```
+
+This mirrors the player-attacking-mob path, which already aborts the player's
+follow-through when a reflect kills *them* (`resolvePlayerAttacks`: `if
+(attackerDeath) break;`).
 
 ### Entry points (thin; preserve current call sites)
 
@@ -131,21 +147,22 @@ _mobCast(m, t, roomId, events, enemies, spellId) {
 }
 ```
 
-## Behavior changes (exactly two, both from the single fix)
+## Behavior changes (three, all from correctly gating the tail)
 
-1. A melee blow that **kills** a player no longer mis-fires
-   `combat-auto-start` / `pending` against the killer post-respawn.
-2. Rouse + auto-retaliate is now **identical** for hits and casts.
+1. **Target death (the original bug).** A melee blow that **kills** a player no
+   longer mis-fires `combat-auto-start` / `pending` against the killer
+   post-respawn. Gated on real death (`defenderDeath`) instead of the
+   respawn-fooled `p.hp > 0`.
+2. **Attacker death (added per review).** When a defender's reflect / `spikes`
+   (`onDamage`) **kills the mob** mid-exchange, the struck player still wakes but
+   no longer "retaliates" against the now-dead mob (no bogus `pending` /
+   `combat-auto-start`). Gated on `attackerDeath`, mirroring the existing
+   player-side `resolvePlayerAttacks` behavior.
+3. **Parity.** Rouse + auto-retaliate is now **identical** for hits and casts.
 
 Everything else is byte-identical: ward/armour math, `onHit`, the distinct
 `attack` vs `mob-cast` event shapes, mob-vs-mob (no rouse/retaliate), aggro
 stoking, target selection.
-
-### Known pre-existing quirk left as-is
-
-If a defender's reflect/`onDamage` kills the *mob* mid-exchange (attacker death),
-the player still gets `pending` set against the now-dead mob. Both methods do
-this today; the unification preserves it. Out of scope.
 
 ## Testing
 
@@ -154,9 +171,14 @@ carrying a mob template that has both an `attack` block and a hostile damage
 spell, plus a douse/effect spell. Cases:
 
 - **melee kills player** → a `death` event fires and **no** `combat-auto-start`
-  event is emitted *(pins the bugfix)*.
+  event is emitted *(pins the target-death fix)*.
 - **melee non-fatal** → `combat-auto-start` fires exactly once, `player.pending`
   targets the mob, and a resting player is roused (`player-woke`).
+- **reflect kills the mob** → a player in spiked armour is struck (non-fatally to
+  them), their reflect kills the mob: the mob is removed, the player **wakes** if
+  it was resting, but **no** `combat-auto-start` fires and `pending` is not set
+  against the dead mob *(pins the attacker-death fix)*. Set up with a test player
+  carrying an `armour.spikes` item whose reflect exceeds the test mob's HP.
 - **cast (damage) kills player** → no `combat-auto-start` *(parity)*.
 - **cast (damage) non-fatal** → rouse + retaliate fire.
 - **cast (effect / douse) non-fatal** → effect applied, retaliate fires once.
@@ -168,9 +190,10 @@ a multi-tick smoke run advances cleanly.
 
 ## Risk & mitigation
 
-- **Hot combat path.** The `defenderDeath` capture in the melee resolver is new
-  wiring; a mistake could mis-credit kills or break auto-retaliate. Mitigated by
-  the test matrix above (kill vs survive for both payloads) and the smoke run.
+- **Hot combat path.** The `defenderDeath` / `attackerDeath` capture in the melee
+  resolver is new wiring; a mistake could mis-credit kills, break auto-retaliate,
+  or skip a deserved retaliate. Mitigated by the test matrix above (target-death,
+  attacker-death, and survive cases across both payloads) and the smoke run.
 - **Not a pure no-op.** This is a deliberate bugfix, so it is framed as
   `fix:` (with the unification as the vehicle), reviewed with the behavior-change
   list above stated explicitly, rather than as a behavior-preserving refactor.
