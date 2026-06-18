@@ -71,6 +71,36 @@ function main() {
         errs.push(`room ${id}: groundItem respawn must be a positive number (ticks)`);
       checkHidden(g.hidden, `room ${id} groundItem ${g.template}`);
     }
+    if (r.effects !== undefined) {
+      if (!Array.isArray(r.effects)) {
+        errs.push(`room ${id}: "effects" must be an array`);
+      } else {
+        r.effects.forEach((eff, i) => {
+          const where = `room ${id} effects[${i}]`;
+          if (eff.trigger !== "enter" && eff.trigger !== "tick")
+            errs.push(`${where}: "trigger" must be "enter" or "tick"`);
+          if (eff.when !== undefined) {
+            const keys = ["lightBelow", "lightAbove"].filter((k) => eff.when[k] !== undefined);
+            if (keys.length !== 1) errs.push(`${where}: "when" needs exactly one of lightBelow/lightAbove`);
+            else if (!Number.isInteger(eff.when[keys[0]])) errs.push(`${where}: when.${keys[0]} must be an integer`);
+          }
+          if (eff.interval !== undefined && (!Number.isInteger(eff.interval) || eff.interval < 1))
+            errs.push(`${where}: "interval" must be a positive integer`);
+          const a = eff.action;
+          if (!a || typeof a !== "object") { errs.push(`${where}: missing "action"`); return; }
+          const actionKeys = ["douse", "restore", "damage"].filter((k) => a[k] !== undefined);
+          if (actionKeys.length !== 1) { errs.push(`${where}: "action" needs exactly one of douse/restore/damage`); return; }
+          if (a.restore) {
+            for (const k of ["hp", "mana"]) if (a.restore[k] !== undefined && !Number.isInteger(a.restore[k]))
+              errs.push(`${where}: restore.${k} must be an integer`);
+          }
+          if (a.damage) {
+            for (const k of ["hp", "mana"]) if (a.damage[k] !== undefined && !(typeof a.damage[k] === "string" && DICE_RE.test(a.damage[k])))
+              errs.push(`${where}: damage.${k} must be dice notation (e.g. "1d2")`);
+          }
+        });
+      }
+    }
   }
 
   const EFFECT_TYPES = ["emit-light", "restore", "damage-over-time"];
