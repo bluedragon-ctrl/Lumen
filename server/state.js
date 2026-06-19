@@ -516,7 +516,7 @@ class GameState {
 
   /** Run one room effect against a player standing in `roomId`, if its light
    *  condition is met. Performs the single action and pushes the MECHANICAL
-   *  events (`vitals`, and via _hurtPlayer the `player-hurt`/`death` events);
+   *  events (`vitals`, and via _hurtPlayer the `player-hurt`/`death-begin` events);
    *  the caller renders the effect's flavour (`message`/`roomMessage`). Returns
    *  `{ fired, doused, died }` — see the plan's contract. Shared by the tick
    *  driver (_roomEffectsTick) and the enter driver (move() in commands.js). */

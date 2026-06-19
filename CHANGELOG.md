@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Combat and room-effect death tests updated for paced death.** Pacing player
+  death (`#121`) split the instant respawn into a `death-begin` + dying beat with
+  the `death`/respawn deferred to the tick loop, but five tests still asserted the
+  old immediate-death contract (an instant `death` event and same-tick respawn to
+  the rim). They now assert the paced behaviour — `death-begin` on the lethal blow,
+  the felled delver lying dying where they fell — so the suite passes again. No
+  runtime behaviour changed; a stale `applyRoomEffect` doc comment was corrected too.
 - **A delver leaving the game now darkens the room for those left behind.** On
   disconnect (a dropped tab *or* `quit`), the vacated room's light was never
   recomputed and co-located players were never refreshed or told — so if the
