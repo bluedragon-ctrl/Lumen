@@ -44,13 +44,39 @@ function sendToPlayer(playerId, msg) {
   send(connections.get(playerId), msg);
 }
 
+// --- Per-burst view coalescing ---------------------------------------------
+// Room and vitals views are idempotent snapshots, and a single tick (or command)
+// often fires several events touching the same room — each previously rebuilt and
+// resent every onlooker's full view. Instead, reactive refreshes mark a view dirty
+// and `flushViews` rebuilds each dirty view exactly once, after the dispatch burst,
+// so it reflects end-of-burst state. Direct command responses are unaffected; only
+// event/effect-driven refreshes (handlers + roomCtx.refreshRoom) route through here.
+const dirtyRoomViews = new Set(); // playerIds needing a fresh room view
+const dirtyPlayerViews = new Set(); // playerIds needing a fresh vitals view
+const markRoomView = (playerId) => dirtyRoomViews.add(playerId);
+const markPlayerView = (playerId) => dirtyPlayerViews.add(playerId);
+const markViews = (playerId) => { dirtyRoomViews.add(playerId); dirtyPlayerViews.add(playerId); };
+
+function flushViews() {
+  for (const id of dirtyRoomViews) {
+    const p = state.players.get(id);
+    if (p) sendToPlayer(id, buildRoomView(state, p));
+  }
+  for (const id of dirtyPlayerViews) {
+    const p = state.players.get(id);
+    if (p) sendToPlayer(id, buildPlayerView(state, p));
+  }
+  dirtyRoomViews.clear();
+  dirtyPlayerViews.clear();
+}
+
 // Broadcast context handed to commands so effects reach OTHER players in a room.
 const roomCtx = {
   toRoom(roomId, msg, exceptId) {
     for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, msg);
   },
   refreshRoom(roomId, exceptId) {
-    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, buildRoomView(state, p));
+    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) markRoomView(p.id);
   },
   emit(ev) { dispatchEvent(ev); },
 };
@@ -130,6 +156,7 @@ wss.on("connection", (ws) => {
     const player = state.players.get(ws.playerId);
     if (msg.type === "command" && typeof msg.text === "string") {
       sendAll(ws, execute(state, player, msg.text, roomCtx));
+      flushViews(); // a command may have marked bystanders' rooms dirty via roomCtx
     } else {
       send(ws, { type: "error", text: `unhandled message type: ${msg.type}` });
     }
@@ -147,6 +174,7 @@ wss.on("connection", (ws) => {
         console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
       }
       for (const ev of state.removePlayer(ws.playerId)) dispatchEvent(ev);
+      flushViews(); // the departing player may have left bystanders' rooms dirty
       connections.delete(ws.playerId);
     }
   });
@@ -169,20 +197,19 @@ function withPlayer(id, fn) {
   if (p) fn(p);
 }
 
-// Push the room + vitals panels to one player.
+// Mark the room + vitals panels of one player dirty (flushed once per burst).
 function refreshViews(p) {
-  sendToPlayer(p.id, buildRoomView(state, p));
-  sendToPlayer(p.id, buildPlayerView(state, p));
+  markViews(p.id);
 }
 
 // Narrate one line to everyone in a room, light-gating the mob's name per
-// observer (`lineFor(name, observer)`), and optionally refresh each onlooker's
-// room view. A null/undefined line for an observer sends nothing to them.
+// observer (`lineFor(name, observer)`), and optionally mark each onlooker's
+// room view dirty. A null/undefined line for an observer sends nothing to them.
 function broadcastRoom(roomId, ev, lineFor, { type = "log", refreshRoom = false } = {}) {
   for (const o of state.playersIn(roomId)) {
     const text = lineFor(mobNameFor(o, ev), o);
     if (text != null) sendToPlayer(o.id, { type, text });
-    if (refreshRoom) sendToPlayer(o.id, buildRoomView(state, o));
+    if (refreshRoom) markRoomView(o.id);
   }
 }
 
@@ -222,7 +249,7 @@ function handleMobDeath(ev) {
   withPlayer(ev.killerId, (killer) => {
     const slayVerb = verbs ? verbs.slay : "You slay";
     sendToPlayer(ev.killerId, { type: "combat", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
-    sendToPlayer(ev.killerId, buildRoomView(state, killer));
+    markRoomView(ev.killerId);
   });
   // The finisher already saw their xp in the slay line; co-fighters get an assist
   // note. A kill may push anyone over a level threshold — hail them and the room.
@@ -237,7 +264,7 @@ function handleMobDeath(ev) {
     // Quest progress for this kill (melee / DoT path). A spell or bomb kill is
     // credited inline in commands.js instead, so a kill never counts twice.
     for (const m of quests.noteKill(state, pl, ev.victimTemplate)) sendToPlayer(a.playerId, m);
-    sendToPlayer(a.playerId, buildPlayerView(state, pl));
+    markPlayerView(a.playerId);
   }
   roomCtx.refreshRoom(ev.roomId, ev.killerId);
 }
@@ -262,13 +289,13 @@ const EVENT_HANDLERS = {
     refreshViews(player);
   }),
 
-  "vitals": (ev) => withPlayer(ev.playerId, (player) => sendToPlayer(ev.playerId, buildPlayerView(state, player))),
+  "vitals": (ev) => markPlayerView(ev.playerId),
 
-  "regen-tick": (ev) => withPlayer(ev.playerId, (player) => {
+  "regen-tick": (ev) => {
     // A heal-over-time pulse mended a player — climb the bar and note the gain.
     sendToPlayer(ev.playerId, { type: "log", text: `${ev.name} knits your wounds. (+${ev.amount})` });
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
-  }),
+    markPlayerView(ev.playerId);
+  },
 
   "mob-regen": (ev) =>
     // A heal-over-time pulse mended a mob (e.g. a regenerating troll) — onlookers
@@ -286,7 +313,7 @@ const EVENT_HANDLERS = {
   "effect-applied": (ev) => withPlayer(ev.playerId, (player) => {
     // A trigger (e.g. a venomous bite) just landed a status effect on a player.
     sendToPlayer(ev.playerId, { type: "log", text: `The ${ev.name} takes hold.` });
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    markPlayerView(ev.playerId);
   }),
 
   "room-effect": (ev) => withPlayer(ev.playerId, (player) => {
@@ -311,7 +338,7 @@ const EVENT_HANDLERS = {
     if (ev.mana) parts.push(`${ev.mana} mana`);
     if (parts.length) {
       sendToPlayer(ev.playerId, { type: "log", text: `The blow feeds you ${parts.join(" and ")}.` });
-      sendToPlayer(ev.playerId, buildPlayerView(state, player));
+      markPlayerView(ev.playerId);
     }
   }),
 
@@ -370,7 +397,7 @@ const EVENT_HANDLERS = {
           ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
           : "Something lunges out of the dark and misses.";
       sendToPlayer(ev.targetId, { type: "combat", text: youLine });
-      if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
+      if (target) markPlayerView(ev.targetId);
       for (const o of state.playersIn(ev.roomId)) {
         if (o.id === ev.targetId) continue;
         const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
@@ -404,7 +431,7 @@ const EVENT_HANDLERS = {
     else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
     else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
     sendToPlayer(ev.targetId, { type: "combat", text: youLine });
-    if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
+    if (target) markPlayerView(ev.targetId);
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
       const an = mobNameFor(o, ev);
@@ -426,7 +453,7 @@ const EVENT_HANDLERS = {
         ? `${cap(an)} swells, and the light is drawn out of the air — the dark closes over everything.`
         : `${cap(an)} draws ${ev.spellName} about itself.`;
       sendToPlayer(o.id, { type: "combat", text: line });
-      if (ev.darkened) sendToPlayer(o.id, buildPlayerView(state, o));
+      if (ev.darkened) markPlayerView(o.id);
     }
   },
 
@@ -526,12 +553,12 @@ const EVENT_HANDLERS = {
     for (const o of state.playersIn(ev.from)) {
       const n = canSeeMob(o, ev.lightFrom, ev.emitsLight) ? ev.mobName : "something";
       sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.verb}.` });
-      sendToPlayer(o.id, buildRoomView(state, o));
+      markRoomView(o.id);
     }
     for (const o of state.playersIn(ev.to)) {
       const n = canSeeMob(o, ev.lightTo, ev.emitsLight) ? ev.mobName : "something";
       sendToPlayer(o.id, { type: "log", text: `${cap(n)} slinks in.` });
-      sendToPlayer(o.id, buildRoomView(state, o));
+      markRoomView(o.id);
     }
   },
 
@@ -561,7 +588,7 @@ const EVENT_HANDLERS = {
     for (const o of state.playersIn(ev.roomId)) {
       if (canSee(o.perception, state.rooms[ev.roomId].light)) {
         sendToPlayer(o.id, { type: "log", text: `${cap(ev.itemName)} has grown here.` });
-        sendToPlayer(o.id, buildRoomView(state, o));
+        markRoomView(o.id);
       }
     }
   },
@@ -584,11 +611,11 @@ const EVENT_HANDLERS = {
     broadcastRoom(ev.roomId, ev, (n) => line(n, ev.damage));
   },
 
-  "player-hurt": (ev) => withPlayer(ev.playerId, (player) => {
+  "player-hurt": (ev) => {
     const src = HURT_SRC[ev.cause] || ev.cause || "an unseen hurt";
     sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
-  }),
+    markPlayerView(ev.playerId);
+  },
 
   "death": (ev) => {
     if (ev.victimKind === "mob") handleMobDeath(ev);
@@ -600,7 +627,7 @@ const EVENT_HANDLERS = {
   "death-begin": (ev) => {
     if (ev.victimKind !== "player") return;
     sendToPlayer(ev.victimId, { type: "combat", text: "<#red>The dark closes over you. You are dying…<#reset>" });
-    withPlayer(ev.victimId, (victim) => sendToPlayer(ev.victimId, buildPlayerView(state, victim))); // HP bar to zero
+    markPlayerView(ev.victimId); // HP bar to zero
     roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} falls.` }, ev.victimId);
   },
 
@@ -619,6 +646,7 @@ function dispatchEvent(ev) {
 // ---------------------------------------------------------------------------
 const tickTimer = setInterval(() => {
   for (const ev of state.advance()) dispatchEvent(ev);
+  flushViews(); // coalesce a tick's worth of view refreshes into one send per player
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
     for (const player of state.players.values()) {
       try {
