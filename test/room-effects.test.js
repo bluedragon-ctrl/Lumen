@@ -116,7 +116,8 @@ test("applyRoomEffect: a killing hp blow returns died and skips mana drain", () 
   const r = state.applyRoomEffect(player, "test.dark", { trigger: "tick", action: { damage: { hp: "50", mana: "5" } } }, events);
   assert.equal(r.died, true);
   assert.equal(player.mana, 10); // mana drain skipped once dead
-  assert.ok(events.some((e) => e.type === "death"));
+  // Paced death (#121): the lethal hp blow emits death-begin; respawn comes later.
+  assert.ok(events.some((e) => e.type === "death-begin"));
 });
 
 test("applyRoomEffect: douse extinguishes and reports the dim, recomputes light", () => {
@@ -236,8 +237,12 @@ test("_roomEffectsTick: a second effect does not act on a player a prior effect 
   ];
   player.hp = 1; player.mana = 0;
   state._roomEffectsTick([]);
-  assert.equal(player.location, "test.bright"); // respawned (startLocation)
-  assert.equal(player.hp, player.maxHp); // full after respawn
+  // Paced death (#121): the fatal effect fells the player into a dying state where
+  // they stood — respawn to the rim is deferred to the tick loop. The invariant
+  // under test still holds: the second effect must not touch the felled player.
+  assert.equal(player.location, "test.dark"); // lies dying where the dark took them
+  assert.ok(player.dying != null); // in the dying countdown, not yet respawned
+  assert.ok(player.hp <= 0); // down, not yet restored
   assert.equal(player.mana, 0); // the second effect was skipped
 });
 
@@ -265,7 +270,7 @@ test("_roomEffectsTick: no room-effect-room when neither roomMessage nor douse",
   assert.ok(!events.some((e) => e.type === "room-effect-room"));
 });
 
-test("move(): a fatal enter effect respawns the player and suppresses the arrival output", () => {
+test("move(): a fatal enter effect fells the player and suppresses the arrival output", () => {
   const { state, player } = gsWithPlayer("test.bright");
   state.world.rooms["test.dark"].effects = [
     { trigger: "enter", action: { damage: { hp: "50" } }, message: "The dark swallows you whole." },
@@ -274,9 +279,12 @@ test("move(): a fatal enter effect respawns the player and suppresses the arriva
   const ctx = recordingCtx();
   const msgs = execute(state, player, "north", ctx);
   assert.deepEqual(msgs, []); // arrival output suppressed
-  assert.equal(player.location, "test.bright"); // respawned to startLocation
-  assert.equal(player.hp, player.maxHp);
-  assert.ok(ctx.emitted.some((e) => e.type === "death")); // death dispatched via ctx.emit
+  // Paced death (#121): the fatal enter effect fells the player in the room they
+  // entered; respawn to the rim is deferred to the tick loop.
+  assert.equal(player.location, "test.dark"); // lies dying where the dark swallowed them
+  assert.ok(player.dying != null); // in the dying countdown, not yet respawned
+  assert.ok(player.hp <= 0);
+  assert.ok(ctx.emitted.some((e) => e.type === "death-begin")); // death-begin dispatched via ctx.emit
 });
 
 module.exports = { makeTestWorld, gsWithPlayer };

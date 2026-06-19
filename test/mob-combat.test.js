@@ -70,8 +70,10 @@ test("melee: a blow that KILLS the player fires no auto-retaliate (target-death 
   p.hp = 1; p.posture = "standing"; // 1 dmg is lethal
   const events = [];
   state._mobAttack(mob, state.world.mobs.biter, "arena", events, [pdesc(p)]);
-  assert.ok(events.some((e) => e.type === "death" && e.victimId === p.id), "player death event fired");
-  assert.ok(!has(events, "combat-auto-start"), "no auto-retaliate against the killer after respawn");
+  // Death is paced (#121): the lethal blow fells the player into a dying state and
+  // emits death-begin; the death/respawn comes later via the tick loop.
+  assert.ok(events.some((e) => e.type === "death-begin" && e.victimId === p.id), "player death-begin event fired");
+  assert.ok(!has(events, "combat-auto-start"), "no auto-retaliate against the killer after they fall");
 });
 
 test("melee: a survived blow rouses a resting player and auto-retaliates once", () => {
@@ -123,7 +125,8 @@ test("cast: a killing damage spell fires no auto-retaliate", () => {
   p.hp = 1; p.posture = "standing"; // bolt deals 5
   const events = [];
   state._mobCast(caster, state.world.mobs.caster, "arena", events, [pdesc(p)], "bolt");
-  assert.ok(events.some((e) => e.type === "death" && e.victimId === p.id));
+  // Paced death (#121): a lethal spell emits death-begin and fells the player.
+  assert.ok(events.some((e) => e.type === "death-begin" && e.victimId === p.id));
   assert.ok(!has(events, "combat-auto-start"));
 });
 
