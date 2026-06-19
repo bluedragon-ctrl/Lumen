@@ -639,15 +639,29 @@ function dispatchEvent(ev) {
     return;
   }
 
+  // Death phase 1 — the fall. The delver drops where they died and lies dying for a
+  // few ticks (see _beginDeath/_dyingTick). A loud, coloured beat so it registers.
+  if (ev.type === "death-begin" && ev.victimKind === "player") {
+    const victim = state.players.get(ev.victimId);
+    sendToPlayer(ev.victimId, { type: "combat", text: "<#red>The dark closes over you. You are dying…<#reset>" });
+    if (victim) sendToPlayer(ev.victimId, buildPlayerView(state, victim)); // HP bar to zero
+    roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} falls.` }, ev.victimId);
+  }
+
+  // The dying countdown — one line per tick while the dark draws in.
+  if (ev.type === "dying") {
+    sendToPlayer(ev.victimId, { type: "combat", text: `<#red>The dark presses closer… (${ev.remaining})<#reset>` });
+  }
+
+  // Death phase 2 — the wake. _wakeAtRim has relocated them; tell them where they are.
   if (ev.type === "death" && ev.victimKind === "player") {
     const victim = state.players.get(ev.victimId);
-    sendToPlayer(ev.victimId, { type: "system", text: "You have fallen in the dark. You awaken at the rim." });
+    sendToPlayer(ev.victimId, { type: "system", text: "You wake at the rim, whole again but in the dark. A light source would help — `equip` one." });
     if (victim) {
       sendToPlayer(ev.victimId, buildRoomView(state, victim));
       sendToPlayer(ev.victimId, buildPlayerView(state, victim));
     }
-    roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} falls.` }, ev.victimId);
-    roomCtx.refreshRoom(ev.roomId, ev.victimId);
+    roomCtx.refreshRoom(ev.roomId, ev.victimId); // the body is gone from the death room
     roomCtx.refreshRoom(ev.respawnRoom, ev.victimId);
   }
 }

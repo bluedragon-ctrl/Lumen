@@ -148,8 +148,12 @@ carries a damage type (physical today; Ward is groundwork for spells). A
 roll before mitigation. Players sum Armour/Ward from gear plus innate Ward from
 **Wits** (`×2`); mobs have innate `armour`/`ward`. Mob HP≤0 → death, loot
 dropped to the room, **shards dropped as a floor pile anyone can `get`**, XP to the
-killer. Player HP≤0 → respawn at the rim, full HP, no penalty beyond lost progress
-(DESIGN v1).
+killer. Player HP≤0 → the delver **falls and lies dying where they died** for
+`DEATH_DELAY_TICKS` (a beat so the death registers, not an instant teleport), then
+**wakes at the rim**, full HP, no penalty beyond lost progress (DESIGN v1). The fall
+is `_beginDeath` (sets `player.dying`); `_dyingTick` counts it down each tick and
+`_wakeAtRim` relocates and restores at zero. A delver who disconnects mid-fall wakes
+whole on next login (see `admit`).
 
 **Damage isn't only direct hits.** All HP loss flows through shared sinks
 (`_hurtMob` / `_hurtPlayer`) so a death can come from the room or an effect, not

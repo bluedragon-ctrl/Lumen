@@ -1,7 +1,7 @@
 "use strict";
 const { effectiveLight } = require("./light");
 const { rollDice } = require("./dice");
-const { POINTS_PER_LEVEL, DEFAULT_FACTION } = require("./config");
+const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS } = require("./config");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
 const {
@@ -702,6 +702,17 @@ class GameState {
     // reconnect, so a save can't strand them blind and asleep.
     player.posture = "standing";
     player.restTicks = 0;
+    // A delver who disconnected mid-fall finishes dying on login: they wake whole at
+    // the rim rather than loading back into the dark, frozen at zero HP.
+    if (player.dying != null || player.hp <= 0) {
+      player.dying = null;
+      player.deathRoom = null;
+      player.hp = player.maxHp;
+      player.location = this.world.playerTemplate.startLocation;
+      player.states = (player.states || []).filter((s) => s.source === "item");
+      for (const inst of [...Object.values(player.equipment || {}), ...(player.inventory || [])])
+        if (inst && inst.lit) inst.lit = false;
+    }
     if (player.maxMana == null) player.maxMana = this.world.playerTemplate.maxMana;
     if (player.mana == null) player.mana = player.maxMana;
     player.hp = Math.min(player.hp, player.maxHp);
@@ -828,6 +839,8 @@ class GameState {
   advance() {
     this.tick++;
     const events = [];
+
+    this._dyingTick(events); // fallen delvers count down to waking at the rim (death pacing)
 
     for (const p of this.players.values()) {
       const sp = effectiveSpeed(this.world, p); // heavy gear (speedPenalty) slows action-energy gain
@@ -1354,7 +1367,7 @@ class GameState {
     player.hp -= amount;
     events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
     if (player.hp <= 0) {
-      const death = this._respawn(player, player.location, events);
+      const death = this._beginDeath(player, player.location, events);
       events.push(death);
       return death;
     }
@@ -1406,9 +1419,45 @@ class GameState {
     }
   }
 
-  /** Player death (v1): respawn at the rim, full HP, no penalty beyond progress. */
-  _respawn(player, deathRoom, events = []) {
+  /**
+   * Player death (v1), phase 1 — the fall. The delver drops where they died and
+   * lies dying (`player.dying` ticks) instead of teleporting away instantly: a
+   * beat so the death registers rather than reading as a confusing room-swap.
+   * `_dyingTick` counts the timer down each tick and runs `_wakeAtRim` at zero.
+   * The hp is left at/below zero — combat and recovery already skip the dead, so a
+   * dying delver lies inert and untargeted. Returns a `death-begin` event; callers
+   * use its truthiness as the "this combatant is down, stop swinging" sentinel.
+   */
+  _beginDeath(player, deathRoom, events = []) {
+    player.dying = DEATH_DELAY_TICKS;
+    player.deathRoom = deathRoom;
+    player.pending = null;
+    player.energy = 0;
+    this._dismissOwnedSummons(player.id, "owner-gone", events); // a falling delver's summons unravel
+    return { type: "death-begin", victimKind: "player", victimId: player.id, victimName: player.name, roomId: deathRoom };
+  }
+
+  /** Tick fallen delvers' dying timers; wake each at the rim when its dark runs out. */
+  _dyingTick(events) {
+    for (const player of this.players.values()) {
+      if (player.dying == null) continue;
+      player.dying -= 1;
+      if (player.dying <= 0) events.push(this._wakeAtRim(player, events));
+      else events.push({ type: "dying", victimId: player.id, victimName: player.name, remaining: player.dying });
+    }
+  }
+
+  /**
+   * Player death phase 2 — the wake. Respawn at the rim, full HP, no penalty beyond
+   * progress. Snuffs carried lights (you wake in the dark), ends transient effects,
+   * and relocates. Returns the `death` event the server turns into the wake message
+   * and view refreshes.
+   */
+  _wakeAtRim(player, events = []) {
     const start = this.world.playerTemplate.startLocation;
+    const deathRoom = player.deathRoom;
+    player.dying = null;
+    player.deathRoom = null;
     player.hp = player.maxHp;
     // Death snuffs every carried light source — you wake at the rim in the dark.
     for (const inst of [...Object.values(player.equipment || {}), ...(player.inventory || [])])
@@ -1421,8 +1470,7 @@ class GameState {
     player.pending = null;
     player.energy = 0;
     this.rooms[start].light = this.computeRoomLight(start);
-    this.rooms[deathRoom].light = this.computeRoomLight(deathRoom);
-    this._dismissOwnedSummons(player.id, "owner-gone", events); // a falling delver's summons unravel
+    if (this.rooms[deathRoom]) this.rooms[deathRoom].light = this.computeRoomLight(deathRoom);
     return { type: "death", victimKind: "player", victimId: player.id, victimName: player.name, roomId: deathRoom, respawnRoom: start };
   }
 }

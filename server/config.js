@@ -6,6 +6,10 @@ module.exports = {
   PORT: Number(process.env.PORT) || 3737,
   TICK_MS: 1000, // world tick interval (see DESIGN.md §3.4)
   SNAPSHOT_EVERY_TICKS: 60, // persist runtime state roughly once a minute
+  // Death pacing: a fallen delver lies dying in the death room for this many ticks
+  // (≈ seconds, at TICK_MS) before waking at the rim — a beat to register the fall
+  // rather than being teleported mid-swing. See _beginDeath / _dyingTick in state.js.
+  DEATH_DELAY_TICKS: 3,
   DATA_DIR: path.resolve(__dirname, "..", "data"),
   RUNTIME_DIR: path.resolve(__dirname, "..", "data", "runtime"),
   CLIENT_DIR: path.resolve(__dirname, "..", "client"),

@@ -692,7 +692,7 @@ class MobAIMixin {
       sourceId: player.id, // a player's reflected DoT credits them
       deal: (dmg) => {
         player.hp -= dmg;
-        if (player.hp <= 0) { const d = this._respawn(player, roomId, events); events.push(d); return d; }
+        if (player.hp <= 0) { const d = this._beginDeath(player, roomId, events); events.push(d); return d; }
         return null;
       },
       hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
@@ -849,7 +849,7 @@ class MobAIMixin {
         if (target.actor.hp <= 0) {
           killed = true;
           death = isPlayer
-            ? this._respawn(target.actor, roomId, events)
+            ? this._beginDeath(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
       } else if (eff.type === "douse") {
