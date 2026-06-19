@@ -73,6 +73,7 @@ const ADMIN_HELP_SECTION = ["Admin", [
   "@attr <attribute> <value> — set one of your attributes",
   "@spawn <mobId> [count] [wild|player] — spawn mobs in this room",
   "@give <itemId> [count] — conjure an item into your pack",
+  "@teleport <roomId> — jump straight to any room by id",
 ]];
 
 // Colour one "signature — description" entry: green signature, default rest.
