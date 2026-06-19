@@ -173,11 +173,7 @@ wss.on("connection", (ws) => {
     if (ws.playerId) {
       const player = state.players.get(ws.playerId);
       if (player) {
-        try {
-          accounts.save(player);
-        } catch (e) {
-          console.error("[lumen] account save failed:", e.message);
-        }
+        accounts.saveAsync(player).catch((e) => console.error("[lumen] account save failed:", e.message));
         console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
       }
       for (const ev of state.removePlayer(ws.playerId)) dispatchEvent(ev);
@@ -660,12 +656,10 @@ const tickTimer = setInterval(() => {
   for (const ev of state.advance()) dispatchEvent(ev);
   flushViews(); // coalesce a tick's worth of view refreshes into one send per player
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
+    // Periodic snapshot — fire async writes off the event loop, skipping players
+    // whose data is unchanged, so disk I/O never stalls the tick.
     for (const player of state.players.values()) {
-      try {
-        accounts.save(player);
-      } catch (e) {
-        console.error("[lumen] account save failed:", e.message);
-      }
+      accounts.saveAsync(player).catch((e) => console.error("[lumen] account save failed:", e.message));
     }
   }
 }, TICK_MS);

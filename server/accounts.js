@@ -34,9 +34,39 @@ function load(name) {
   return JSON.parse(fs.readFileSync(fileOf(name), "utf8"));
 }
 
+// The players dir is created once, lazily, rather than on every save.
+let dirEnsured = false;
+function ensureDir() {
+  if (!dirEnsured) { fs.mkdirSync(PLAYERS_DIR, { recursive: true }); dirEnsured = true; }
+}
+
+// Last payload written per character, so periodic snapshots can skip a disk
+// write when nothing has changed. Updated only after a write succeeds, so a
+// failed write is retried on the next save rather than silently dropped.
+const lastSaved = new Map();
+
+// Synchronous, unconditional write. Use for must-complete paths (shutdown) and
+// one-off writes (account creation) — NOT the per-tick snapshot.
 function save(playerData) {
-  fs.mkdirSync(PLAYERS_DIR, { recursive: true });
-  fs.writeFileSync(fileOf(playerData.name), JSON.stringify(playerData, null, 2));
+  ensureDir();
+  const data = JSON.stringify(playerData, null, 2);
+  fs.writeFileSync(fileOf(playerData.name), data);
+  lastSaved.set(keyOf(playerData.name), data);
+}
+
+// Non-blocking write for hot/event paths (tick snapshots, disconnect). The
+// snapshot is serialized synchronously at call time, so the write reflects
+// state as of the call even though the disk I/O happens off the event loop.
+// Resolves false (no write) when the payload is unchanged since the last save.
+function saveAsync(playerData) {
+  const key = keyOf(playerData.name);
+  const data = JSON.stringify(playerData, null, 2);
+  if (lastSaved.get(key) === data) return Promise.resolve(false);
+  ensureDir();
+  return fs.promises.writeFile(fileOf(playerData.name), data).then(() => {
+    lastSaved.set(key, data);
+    return true;
+  });
 }
 
 function listNames() {
@@ -44,4 +74,4 @@ function listNames() {
   return fs.readdirSync(PLAYERS_DIR).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5));
 }
 
-module.exports = { validateName, exists, load, save, listNames, PLAYERS_DIR };
+module.exports = { validateName, exists, load, save, saveAsync, listNames, PLAYERS_DIR };
