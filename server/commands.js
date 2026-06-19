@@ -822,6 +822,8 @@ for (const v of VERB_SET) {
 }
 
 function execute(state, player, input, ctx = NOOP_CTX) {
+  // A fallen delver can do nothing but wait out the dark until they wake at the rim.
+  if (player && player.dying != null) return [{ type: "error", text: "You have fallen. There is only the dark — wait." }];
   const parts = (input || "").trim().split(/\s+/);
   let verb = (parts[0] || "").toLowerCase();
   const arg = parts.slice(1).join(" ");
