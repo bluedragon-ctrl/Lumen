@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`quit` / `logout` command.** A discoverable way to leave the game. There was
+  never any danger in just closing the tab — the account already saves on
+  disconnect and periodically — but nothing told players that. `quit` (aliases
+  `logout` / `logoff`) prints a farewell that says so explicitly, tells the room
+  the delver has slipped away, and closes the connection without the client
+  auto-reconnecting. (`q`/`qu` still abbreviate to `quaff`; quitting needs `qui`+.)
 - **Room effects** — rooms can act on players on enter or each tick: a light-condition
   gate plus a `douse` / `restore` / `damage` action, authored as `effects` in
   `rooms.json`. Seeded on the Plunge Cave (spray douses your flame), the Lantern's Rest

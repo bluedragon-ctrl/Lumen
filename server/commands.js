@@ -55,6 +55,8 @@ const VERBS = [
   "talk", "give", "deliver", "quest", "quests", "journal",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
   "unequip", "remove", "rest", "help",
+  // `quit`/`logout` sit after `quaff` so `q`/`qu` still mean quaff; quitting needs `qui`+.
+  "quit", "logout", "logoff",
 ];
 const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-letter aliases
 
@@ -752,6 +754,16 @@ function closestVerb(verb) {
   return bestD <= 2 ? best : null;
 }
 
+// `quit`/`logout`: leave the game cleanly. There's no danger in disconnecting —
+// the account is saved on socket close (and periodically) — so this is purely a
+// discoverable way to do what closing the tab already does. We tell the room the
+// delver has gone, then hand the actor a `goodbye` the client uses to close its
+// socket without auto-reconnecting.
+function quit(state, player, arg, ctx) {
+  ctx.toRoom(player.location, { type: "log", text: `${cap(player.name)} slips away into the dark.` }, player.id);
+  return [{ type: "goodbye", text: "You slip away into the dark. Your progress is saved — you can safely close this tab. (Closing the tab at any time saves too.)" }];
+}
+
 // The verb→handler table. Each row lists the verbs/aliases that share a handler;
 // `run(state, player, arg, ctx)` returns the actor's messages. This replaces the
 // old dispatch `switch` — VERBS (above) stays the curated abbreviation list, and
@@ -796,6 +808,7 @@ const COMMANDS = [
   { verbs: ["equip", "wield", "wear"], run: equip },
   { verbs: ["unequip", "remove"], run: unequip },
   { verbs: ["help", "?"], run: (s, p) => [{ type: "log", text: buildHelp(p) }] },
+  { verbs: ["quit", "logout", "logoff"], run: quit },
 ];
 
 // verb/alias -> handler. Built once from COMMANDS; this is the dispatch table.
