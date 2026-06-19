@@ -27,12 +27,18 @@ let authed = false;
 
 // --- WebSocket -------------------------------------------------------------
 let ws;
+// Set when the player `quit`s: a deliberate close, so we don't auto-reconnect.
+let loggedOff = false;
 function connect() {
   ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host);
   ws.onopen = () => addLine("[connected]", "system");
   ws.onclose = () => {
     authed = false;
     setPrompt();
+    if (loggedOff) {
+      addLine("[logged off — you may close this tab, or reload the page to return]", "system");
+      return; // a deliberate quit: don't auto-retry the connection.
+    }
     addLine("[disconnected — retrying in 2s]", "error");
     setTimeout(connect, 2000);
   };
@@ -61,6 +67,7 @@ function handle(msg) {
     case "system": addLine(msg.text, "system"); break;
     case "error": addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
+    case "goodbye": addLine(msg.text, "system"); loggedOff = true; if (ws) ws.close(); break;
     case "combat": addLine(msg.text, "combat"); break;
     case "gold": addLine(msg.text, "gold"); break;
     case "room":
