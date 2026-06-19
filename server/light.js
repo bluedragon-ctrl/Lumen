@@ -10,7 +10,7 @@ const LIGHT_MAX = 20;
 /** Map an integer light value to its band name. */
 function bandOf(value) {
   if (value < 0) return "void";        // sub-zero: deep dark, the mirror of "searing"
-  if (value <= 0) return "darkness";
+  if (value === 0) return "darkness";
   if (value <= 2) return "dim";
   if (value <= 9) return "bright";
   return "searing"; // exceptional — a torch + a few lightbugs stays "bright"
