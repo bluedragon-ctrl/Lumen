@@ -6,14 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- **Death has a beat now.** Falling no longer teleports you to the rim mid-swing.
-  Instead the delver **lies dying where they fell** for `DEATH_DELAY_TICKS` (3s at
-  the current tick), with a coloured countdown in the console — *"The dark closes
-  over you. You are dying…"* → *"The dark presses closer… (2)"* → *"(1)"* → *"You
-  wake at the rim…"*. Input is refused while dying; others see you `fall` and your
-  body lingers until you wake. A delver who disconnects mid-fall wakes whole on next
-  login. Split the old instant `_respawn` into `_beginDeath` (the fall) and
-  `_wakeAtRim` (the wake), driven by `_dyingTick` in the tick loop.
+- **`quit` / `logout` command.** A discoverable way to leave the game. There was
+  never any danger in just closing the tab — the account already saves on
+  disconnect and periodically — but nothing told players that. `quit` (aliases
+  `logout` / `logoff`) prints a farewell that says so explicitly, tells the room
+  the delver has slipped away, and closes the connection without the client
+  auto-reconnecting. (`q`/`qu` still abbreviate to `quaff`; quitting needs `qui`+.)
 - **Room effects** — rooms can act on players on enter or each tick: a light-condition
   gate plus a `douse` / `restore` / `damage` action, authored as `effects` in
   `rooms.json`. Seeded on the Plunge Cave (spray douses your flame), the Lantern's Rest

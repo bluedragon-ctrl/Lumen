@@ -54,6 +54,7 @@ const HELP_SECTIONS = [
     "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
     "train [attribute] — spend a level-up point (no arg: show progress)",
     "quest | journal — your quest log (in progress / finished)",
+    "quit | logout — leave the game (progress is saved; closing the tab is just as safe)",
     "help | ? — this list",
   ]],
 ];
