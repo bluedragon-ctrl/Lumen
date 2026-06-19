@@ -756,11 +756,11 @@ function closestVerb(verb) {
 
 // `quit`/`logout`: leave the game cleanly. There's no danger in disconnecting —
 // the account is saved on socket close (and periodically) — so this is purely a
-// discoverable way to do what closing the tab already does. We tell the room the
-// delver has gone, then hand the actor a `goodbye` the client uses to close its
-// socket without auto-reconnecting.
+// discoverable way to do what closing the tab already does. The room is told the
+// delver has gone (and darkened/refreshed) by the socket-close teardown in
+// index.js, which fires for both `quit` and a dropped tab so they read alike; here
+// we just hand the actor a `goodbye` the client uses to close without reconnecting.
 function quit(state, player, arg, ctx) {
-  ctx.toRoom(player.location, { type: "log", text: `${cap(player.name)} slips away into the dark.` }, player.id);
   return [{ type: "goodbye", text: "You slip away into the dark. Your progress is saved — you can safely close this tab. (Closing the tab at any time saves too.)" }];
 }
 

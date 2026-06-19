@@ -172,12 +172,24 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     if (ws.playerId) {
       const player = state.players.get(ws.playerId);
+      // Remember where they stood before removal so we can darken/announce the
+      // room for whoever is left — a departing delver may have been its only light.
+      let leftRoom = null, leftName = null;
       if (player) {
+        leftRoom = player.location;
+        leftName = player.name;
         accounts.saveAsync(player).catch((e) => console.error("[lumen] account save failed:", e.message));
         console.log(`[lumen] ${player.name} disconnected (${state.players.size - 1} online).`);
       }
       for (const ev of state.removePlayer(ws.playerId)) dispatchEvent(ev);
-      flushViews(); // the departing player may have left bystanders' rooms dirty
+      if (leftRoom) {
+        // Recompute now that they (and their light) are gone, then tell and refresh
+        // the room — both quit and a dropped tab land here, so they read alike.
+        state.rooms[leftRoom].light = state.computeRoomLight(leftRoom);
+        roomCtx.toRoom(leftRoom, { type: "log", text: `${cap(leftName)} slips away into the dark.` });
+        roomCtx.refreshRoom(leftRoom);
+      }
+      flushViews(); // flush the departing player's room refresh (and any from removePlayer events)
       connections.delete(ws.playerId);
     }
   });
