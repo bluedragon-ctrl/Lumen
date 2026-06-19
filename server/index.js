@@ -153,93 +153,159 @@ wss.on("connection", (ws) => {
 });
 
 // ---------------------------------------------------------------------------
-// Tick loop — the heartbeat of the living world (DESIGN.md §3.4, §4).
+// Event dispatch — render tick/command events into client messages.
 // ---------------------------------------------------------------------------
-function dispatchEvent(ev) {
-  if (ev.type === "light-out") {
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
+// Small helpers shared by the handlers below. Together they absorb the three
+// patterns that recur across nearly every event: the light-gated mob name, the
+// "get the live player or bail" guard, the room + vitals view refresh, and the
+// "narrate one line to everyone in the room" broadcast.
+
+// Light-gated name of an event's mob from one observer's point of view.
+const mobNameFor = (o, ev) => (canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something");
+
+// Run fn with the live player record, or do nothing if they've already gone.
+function withPlayer(id, fn) {
+  const p = state.players.get(id);
+  if (p) fn(p);
+}
+
+// Push the room + vitals panels to one player.
+function refreshViews(p) {
+  sendToPlayer(p.id, buildRoomView(state, p));
+  sendToPlayer(p.id, buildPlayerView(state, p));
+}
+
+// Narrate one line to everyone in a room, light-gating the mob's name per
+// observer (`lineFor(name, observer)`), and optionally refresh each onlooker's
+// room view. A null/undefined line for an observer sends nothing to them.
+function broadcastRoom(roomId, ev, lineFor, { type = "log", refreshRoom = false } = {}) {
+  for (const o of state.playersIn(roomId)) {
+    const text = lineFor(mobNameFor(o, ev), o);
+    if (text != null) sendToPlayer(o.id, { type, text });
+    if (refreshRoom) sendToPlayer(o.id, buildRoomView(state, o));
+  }
+}
+
+// Constant flavour tables, hoisted out of the per-event handlers.
+const HURT_SRC = {
+  light: "the searing light",
+  spikes: "the spines",
+  venom: "venom",
+  bleed: "your wounds",
+  darkness: "the creeping dark",
+};
+const MOB_HURT_FLAVOUR = {
+  light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,
+  bleed: (n, d) => `${cap(n)} bleeds. (-${d})`,
+  venom: (n, d) => `${cap(n)} shudders as the venom bites. (-${d})`,
+  spikes: (n, d) => `The spines bite back at ${n} for ${d}. (-${d})`,
+};
+const MOB_EFFECT_EXPIRED_FLAVOUR = {
+  venom: (n) => `The venom drains from ${n}.`,
+  bleed: (n) => `${cap(n)}'s wounds close.`,
+};
+// Both the room line and the killer's slay line are keyed by the kill's cause.
+const MOB_DEATH_VERB = {
+  light: { room: "shrivels and dies in the light", slay: "The light destroys" },
+  bleed: { room: "bleeds out and dies", slay: "Your wounds finish off" },
+  venom: { room: "succumbs to the venom and dies", slay: "Your venom finishes off" },
+  spikes: { room: "is impaled on its own spines and dies", slay: "Your thorns finish off" },
+};
+
+// A mob died: narrate to the room, reward the killer, then share XP / level-ups /
+// quest progress with every participant (Model A — full value to all).
+function handleMobDeath(ev) {
+  const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
+  const verbs = MOB_DEATH_VERB[ev.cause];
+  const deathVerb = verbs ? verbs.room : "dies";
+  roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
+  withPlayer(ev.killerId, (killer) => {
+    const slayVerb = verbs ? verbs.slay : "You slay";
+    sendToPlayer(ev.killerId, { type: "combat", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
+    sendToPlayer(ev.killerId, buildRoomView(state, killer));
+  });
+  // The finisher already saw their xp in the slay line; co-fighters get an assist
+  // note. A kill may push anyone over a level threshold — hail them and the room.
+  for (const a of ev.participants || []) {
+    const pl = state.players.get(a.playerId);
+    if (!pl) continue;
+    if (a.playerId !== ev.killerId && ev.xp) sendToPlayer(a.playerId, { type: "combat", text: `You help bring down ${ev.victimName}. (+${ev.xp} xp)` });
+    for (const up of a.levelUps || []) {
+      sendToPlayer(a.playerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
+      roomCtx.toRoom(ev.roomId, { type: "gold", text: `${pl.name} reaches level ${up.level}!` }, a.playerId);
+    }
+    // Quest progress for this kill (melee / DoT path). A spell or bomb kill is
+    // credited inline in commands.js instead, so a kill never counts twice.
+    for (const m of quests.noteKill(state, pl, ev.victimTemplate)) sendToPlayer(a.playerId, m);
+    sendToPlayer(a.playerId, buildPlayerView(state, pl));
+  }
+  roomCtx.refreshRoom(ev.roomId, ev.killerId);
+}
+
+// Death phase 2 — the wake. _wakeAtRim has relocated them; tell them where they are.
+function handlePlayerDeath(ev) {
+  sendToPlayer(ev.victimId, { type: "system", text: "You wake at the rim, whole again but in the dark. A light source would help — `equip` one." });
+  withPlayer(ev.victimId, refreshViews);
+  roomCtx.refreshRoom(ev.roomId, ev.victimId); // the body is gone from the death room
+  roomCtx.refreshRoom(ev.respawnRoom, ev.victimId);
+}
+
+// One handler per event type. Each is invoked with the raw event; the dispatcher
+// below looks it up in O(1). Unknown types are silently ignored, as before.
+const EVENT_HANDLERS = {
+  "light-out": (ev) => withPlayer(ev.playerId, (player) => {
     const itemName = world.items[ev.item].name;
     const text = ev.consumed
       ? `${itemName} gutters out, burns to ash, and crumbles away. Darkness closes in.`
       : `${itemName} gutters out. Darkness closes in.`;
     sendToPlayer(ev.playerId, { type: "log", text });
-    sendToPlayer(ev.playerId, buildRoomView(state, player));
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+    refreshViews(player);
+  }),
 
-  if (ev.type === "vitals") {
-    const player = state.players.get(ev.playerId);
-    if (player) sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+  "vitals": (ev) => withPlayer(ev.playerId, (player) => sendToPlayer(ev.playerId, buildPlayerView(state, player))),
 
-  if (ev.type === "regen-tick") {
+  "regen-tick": (ev) => withPlayer(ev.playerId, (player) => {
     // A heal-over-time pulse mended a player — climb the bar and note the gain.
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
     sendToPlayer(ev.playerId, { type: "log", text: `${ev.name} knits your wounds. (+${ev.amount})` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+  }),
 
-  if (ev.type === "mob-regen") {
+  "mob-regen": (ev) =>
     // A heal-over-time pulse mended a mob (e.g. a regenerating troll) — onlookers
     // see its wounds close; refresh the room so its HP bar climbs.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)}'s wounds close over. (+${ev.amount})` });
-      sendToPlayer(o.id, buildRoomView(state, o));
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => `${cap(n)}'s wounds close over. (+${ev.amount})`, { refreshRoom: true }),
 
-  if (ev.type === "effect-expired") {
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
+  "effect-expired": (ev) => withPlayer(ev.playerId, (player) => {
     const msg = ev.effectType === "emit-light" ? "The light beneath your skin fades." : `Your ${ev.name} fades.`;
     sendToPlayer(ev.playerId, { type: "log", text: msg });
-    sendToPlayer(ev.playerId, buildRoomView(state, player));
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    refreshViews(player);
     // Others in the room may notice a glow going out / the room dimming.
     roomCtx.refreshRoom(player.location, ev.playerId);
-    return;
-  }
+  }),
 
-  if (ev.type === "effect-applied") {
+  "effect-applied": (ev) => withPlayer(ev.playerId, (player) => {
     // A trigger (e.g. a venomous bite) just landed a status effect on a player.
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
     sendToPlayer(ev.playerId, { type: "log", text: `The ${ev.name} takes hold.` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+  }),
 
-  if (ev.type === "room-effect") {
+  "room-effect": (ev) => withPlayer(ev.playerId, (player) => {
     // A room acted on a player (douse / regen / drain). Show the flavour line and
     // refresh their views; if the room dimmed (a douse), refresh it for others too.
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
     if (ev.text) sendToPlayer(ev.playerId, { type: "log", text: ev.text });
-    sendToPlayer(ev.playerId, buildRoomView(state, player));
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
+    refreshViews(player);
     if (ev.dimsRoom) roomCtx.refreshRoom(player.location, ev.playerId);
-    return;
-  }
+  }),
 
-  if (ev.type === "room-effect-room") {
+  "room-effect-room": (ev) => {
     // The bystander side of a room effect: an optional line to the others present,
     // plus a room refresh when the effect dimmed the room.
     if (ev.text) roomCtx.toRoom(ev.roomId, { type: "log", text: ev.text }, ev.exceptId);
     if (ev.dimsRoom) roomCtx.refreshRoom(ev.roomId, ev.exceptId);
-    return;
-  }
+  },
 
-  if (ev.type === "trigger-restore") {
+  "trigger-restore": (ev) => withPlayer(ev.playerId, (player) => {
     // A defender-side onDamage `restore` (e.g. armour that draws mana off a blow).
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
     const parts = [];
     if (ev.hp) parts.push(`${ev.hp} health`);
     if (ev.mana) parts.push(`${ev.mana} mana`);
@@ -247,35 +313,21 @@ function dispatchEvent(ev) {
       sendToPlayer(ev.playerId, { type: "log", text: `The blow feeds you ${parts.join(" and ")}.` });
       sendToPlayer(ev.playerId, buildPlayerView(state, player));
     }
-    return;
-  }
+  }),
 
-  if (ev.type === "mob-effect-applied") {
+  "mob-effect-applied": (ev) =>
     // A player's on-hit effect (e.g. a venom-coated weapon) took hold on a mob.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `The ${ev.name} takes hold of ${n}.` });
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => `The ${ev.name} takes hold of ${n}.`),
 
-  if (ev.type === "mob-effect-expired") {
+  "mob-effect-expired": (ev) => {
     // A status effect (venom/bleed/glow) wore off a mob — mirror of player effect-expired.
-    const flavour = {
-      venom: (n) => `The venom drains from ${n}.`,
-      bleed: (n) => `${cap(n)}'s wounds close.`,
-    };
     const line = ev.effectType === "emit-light"
       ? (n) => `The glow fades from ${n}.`
-      : (flavour[ev.name] || ((n) => `The ${ev.name} fades from ${n}.`));
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: line(n) });
-    }
-    return;
-  }
+      : (MOB_EFFECT_EXPIRED_FLAVOUR[ev.name] || ((n) => `The ${ev.name} fades from ${n}.`));
+    broadcastRoom(ev.roomId, ev, line);
+  },
 
-  if (ev.type === "attack") {
+  "attack": (ev) => {
     if (ev.by === "player") {
       // The attacker targeted it, so they always know what it is.
       const verb = ev.hit
@@ -325,16 +377,15 @@ function dispatchEvent(ev) {
         sendToPlayer(o.id, { type: "combat", text: `${cap(an)} attacks ${ev.targetName}.` });
       }
     }
-    return;
-  }
+  },
 
-  if (ev.type === "mob-cast") {
+  "mob-cast": (ev) => {
     // A mob threw a hostile spell at a player (see state._mobCast). The damage/
     // death is already applied; this just narrates and refreshes views.
     if (ev.targetKind === "mob") {
       // Mob-vs-mob spell: narrate to onlookers only, light-gating both names.
       for (const o of state.playersIn(ev.roomId)) {
-        const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+        const an = mobNameFor(o, ev);
         const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
         let line;
         if (ev.resisted) line = `${cap(an)} hurls ${ev.spellName} at ${tn}, but its ward turns it aside.`;
@@ -356,37 +407,32 @@ function dispatchEvent(ev) {
     if (target) sendToPlayer(ev.targetId, buildPlayerView(state, target));
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
-      const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const an = mobNameFor(o, ev);
       const line = ev.doused
         ? `${cap(an)} reaches for ${ev.targetName} and snuffs their light.`
         : `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.`;
       sendToPlayer(o.id, { type: "combat", text: line });
     }
-    return;
-  }
+  },
 
-  if (ev.type === "mob-cast-self") {
+  "mob-cast-self": (ev) => {
     // A mob wove a beneficial spell over itself (e.g. Yana's Glimmerskin), or — when
     // `darkened` — drank the room's light into a darkness aura. The effect is already
     // applied; narrate to everyone present, light-gating the name, and on a darkening
     // refresh each onlooker's view so the room visibly goes black.
     for (const o of state.playersIn(ev.roomId)) {
-      const an = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const an = mobNameFor(o, ev);
       const line = ev.darkened
         ? `${cap(an)} swells, and the light is drawn out of the air — the dark closes over everything.`
         : `${cap(an)} draws ${ev.spellName} about itself.`;
       sendToPlayer(o.id, { type: "combat", text: line });
       if (ev.darkened) sendToPlayer(o.id, buildPlayerView(state, o));
     }
-    return;
-  }
+  },
 
-  if (ev.type === "combat-stop") {
-    sendToPlayer(ev.playerId, { type: "log", text: ev.reason });
-    return;
-  }
+  "combat-stop": (ev) => sendToPlayer(ev.playerId, { type: "log", text: ev.reason }),
 
-  if (ev.type === "aggro-engage") {
+  "aggro-engage": (ev) => {
     // A mob committed to attack (see state._engageTell): either it proactively
     // noticed a delver, or — `remembered` — a `remembers` mob recognised a foe it
     // bears a grudge against stepping back in. One tell at the moment of engagement,
@@ -407,16 +453,15 @@ function dispatchEvent(ev) {
     sendToPlayer(ev.targetId, { type: "combat", text: youLine });
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const n = mobNameFor(o, ev);
       const otherLine = ev.remembered
         ? `${cap(n)} ${ev.rose ? "stirs, remembering" : "remembers"} ${ev.targetName}.`
         : `${cap(n)} ${ev.rose ? "stirs and fixes" : "fixes"} its gaze on ${ev.targetName}.`;
       sendToPlayer(o.id, { type: "combat", text: otherLine });
     }
-    return;
-  }
+  },
 
-  if (ev.type === "mob-ambush") {
+  "mob-ambush": (ev) => {
     // A hidden ambusher burst from concealment onto a (sleeping) delver — see
     // state._mobAttack. Pushed just before the strike, so this appearance line
     // reads first, then the attack/wake lines follow. Light-gated like other mobs.
@@ -427,13 +472,12 @@ function dispatchEvent(ev) {
       : "Something drops from the dark onto you!" });
     for (const o of state.playersIn(ev.roomId)) {
       if (o.id === ev.targetId) continue;
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const n = mobNameFor(o, ev);
       sendToPlayer(o.id, { type: "combat", text: `${cap(n)} bursts from hiding onto ${ev.targetName}!` });
     }
-    return;
-  }
+  },
 
-  if (ev.type === "mob-assist") {
+  "mob-assist": (ev) => {
     // A `helper` mob piled into a fight to defend a same-faction ally (see
     // state._assistPass). One heads-up the moment it joins, light-gated.
     const target = ev.targetKind === "player" ? state.players.get(ev.targetId) : null;
@@ -445,64 +489,40 @@ function dispatchEvent(ev) {
     }
     for (const o of state.playersIn(ev.roomId)) {
       if (target && o.id === ev.targetId) continue;
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
+      const n = mobNameFor(o, ev);
       sendToPlayer(o.id, { type: "combat", text: `${cap(n)} rushes to join the attack on ${ev.targetName}.` });
     }
-    return;
-  }
+  },
 
-  if (ev.type === "combat-auto-start") {
+  "combat-auto-start": (ev) =>
     // Auto-retaliation kicked in (struck, or hit by a hostile spell) — tell the
     // player they've engaged, so the swings on following ticks aren't a mystery.
-    sendToPlayer(ev.playerId, { type: "combat", text: `You turn on ${ev.targetName} and fight back!` });
-    return;
-  }
+    sendToPlayer(ev.playerId, { type: "combat", text: `You turn on ${ev.targetName} and fight back!` }),
 
-  if (ev.type === "player-woke") {
+  "player-woke": (ev) => withPlayer(ev.playerId, (player) => {
     // A blow jolted a resting/sleeping delver to their feet (see state._mobAttack).
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
     sendToPlayer(ev.playerId, { type: "log", text: "The blow jolts you awake — you scramble to your feet!" });
-    sendToPlayer(ev.playerId, buildRoomView(state, player)); // sight returns now they're up
-    sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+    refreshViews(player); // sight returns now they're up
+  }),
 
-  if (ev.type === "mob-woke") {
+  "mob-woke": (ev) =>
     // A struck dozing creature rouses; everyone who can see it learns it's awake.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} wakes, roused by the attack!` });
-      sendToPlayer(o.id, buildRoomView(state, o)); // drop the sitting/asleep tag
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} wakes, roused by the attack!`, { refreshRoom: true }),
 
-  if (ev.type === "mob-emote") {
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.text}.` });
-    }
-    return;
-  }
+  "mob-emote": (ev) => broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} ${ev.text}.`),
 
-  if (ev.type === "mob-react") {
+  "mob-react": (ev) => {
     // An NPC singled out one player (the `react` action): the target reads the
     // second-person line, bystanders the third-person one, both light-gated.
     // Reaction lines may carry their own punctuation (quoted speech), so the
     // closing period is only added when missing — unlike bare emote fragments.
     const punct = (s) => (/["!?.]$/.test(s) ? s : `${s}.`);
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      const text = o.id === ev.targetId
-        ? punct(`${cap(n)} ${ev.textTarget}`)
-        : punct(`${cap(n)} ${ev.textRoom.replace(/\{name\}/g, ev.targetName)}`);
-      sendToPlayer(o.id, { type: "log", text });
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n, o) => o.id === ev.targetId
+      ? punct(`${cap(n)} ${ev.textTarget}`)
+      : punct(`${cap(n)} ${ev.textRoom.replace(/\{name\}/g, ev.targetName)}`));
+  },
 
-  if (ev.type === "mob-move") {
+  "mob-move": (ev) => {
     for (const o of state.playersIn(ev.from)) {
       const n = canSeeMob(o, ev.lightFrom, ev.emitsLight) ? ev.mobName : "something";
       sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.verb}.` });
@@ -513,65 +533,40 @@ function dispatchEvent(ev) {
       sendToPlayer(o.id, { type: "log", text: `${cap(n)} slinks in.` });
       sendToPlayer(o.id, buildRoomView(state, o));
     }
-    return;
-  }
+  },
 
-  if (ev.type === "summon") {
+  "summon": (ev) =>
     // A creature was conjured into the room (player Summon spell or a mob's
     // reinforcement action). A mob summoner narrates its `verb`; a player summon
     // is narrated by the cast command, so the tick path here is mainly for mobs.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      const line = ev.verb && ev.byName
-        ? `${cap(ev.byName)} ${ev.verb}.`
-        : `${cap(n)} coalesces from the gloom.`;
-      sendToPlayer(o.id, { type: "log", text: line });
-      sendToPlayer(o.id, buildRoomView(state, o));
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => (ev.verb && ev.byName
+      ? `${cap(ev.byName)} ${ev.verb}.`
+      : `${cap(n)} coalesces from the gloom.`), { refreshRoom: true }),
 
-  if (ev.type === "summon-end") {
+  "summon-end": (ev) =>
     // A summon unravelled (timer expired, recast, or owner gone) — no corpse/loot.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} unravels into motes and is gone.` });
-      sendToPlayer(o.id, buildRoomView(state, o));
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} unravels into motes and is gone.`, { refreshRoom: true }),
 
-  if (ev.type === "mob-flee") {
+  "mob-flee": (ev) =>
     // A skittish critter slipped out of sight (no corpse/loot) — narrate the
     // vanish to onlookers and refresh the room so the count updates.
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "Something";
-      sendToPlayer(o.id, { type: "log", text: `${cap(n)} ${ev.verb}.` });
-      sendToPlayer(o.id, buildRoomView(state, o));
-    }
-    return;
-  }
+    broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} ${ev.verb}.`, { refreshRoom: true }),
 
-  if (ev.type === "mob-spawn") {
-    for (const o of state.playersIn(ev.roomId)) {
-      const text = canSeeMob(o, ev.light, ev.emitsLight) ? `${cap(ev.mobName)} appears.` : "Something stirs in the dark.";
-      sendToPlayer(o.id, { type: "log", text });
-      sendToPlayer(o.id, buildRoomView(state, o));
-    }
-    return;
-  }
+  "mob-spawn": (ev) =>
+    broadcastRoom(ev.roomId, ev, (n) => (n === "something"
+      ? "Something stirs in the dark."
+      : `${cap(ev.mobName)} appears.`), { refreshRoom: true }),
 
-  if (ev.type === "item-regrow") {
+  "item-regrow": (ev) => {
     for (const o of state.playersIn(ev.roomId)) {
       if (canSee(o.perception, state.rooms[ev.roomId].light)) {
         sendToPlayer(o.id, { type: "log", text: `${cap(ev.itemName)} has grown here.` });
         sendToPlayer(o.id, buildRoomView(state, o));
       }
     }
-    return;
-  }
+  },
 
-  if (ev.type === "vein-recover") {
+  "vein-recover": (ev) => {
     const text = ev.kind === "fish"
       ? `The water stirs — the fish are biting at ${ev.fixtureName} again.`
       : ev.kind === "growth"
@@ -582,90 +577,46 @@ function dispatchEvent(ev) {
         sendToPlayer(o.id, { type: "log", text });
       }
     }
-    return;
-  }
+  },
 
-  if (ev.type === "mob-hurt") {
-    const flavour = {
-      light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,
-      bleed: (n, d) => `${cap(n)} bleeds. (-${d})`,
-      venom: (n, d) => `${cap(n)} shudders as the venom bites. (-${d})`,
-      spikes: (n, d) => `The spines bite back at ${n} for ${d}. (-${d})`,
-    };
-    const line = (flavour[ev.cause] || ((n, d) => `${cap(n)} is hurt. (-${d})`));
-    for (const o of state.playersIn(ev.roomId)) {
-      const n = canSeeMob(o, ev.light, ev.emitsLight) ? ev.mobName : "something";
-      sendToPlayer(o.id, { type: "log", text: line(n, ev.damage) });
-    }
-    return;
-  }
+  "mob-hurt": (ev) => {
+    const line = MOB_HURT_FLAVOUR[ev.cause] || ((n, d) => `${cap(n)} is hurt. (-${d})`);
+    broadcastRoom(ev.roomId, ev, (n) => line(n, ev.damage));
+  },
 
-  if (ev.type === "player-hurt") {
-    const player = state.players.get(ev.playerId);
-    if (!player) return;
-    const src = { light: "the searing light", spikes: "the spines", venom: "venom", bleed: "your wounds", darkness: "the creeping dark" }[ev.cause] || ev.cause || "an unseen hurt";
+  "player-hurt": (ev) => withPlayer(ev.playerId, (player) => {
+    const src = HURT_SRC[ev.cause] || ev.cause || "an unseen hurt";
     sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
     sendToPlayer(ev.playerId, buildPlayerView(state, player));
-    return;
-  }
+  }),
 
-  if (ev.type === "death" && ev.victimKind === "mob") {
-    const lootTxt = ev.loot.length ? ` It leaves behind ${ev.loot.join(", ")}.` : "";
-    const deathVerb = { light: "shrivels and dies in the light", bleed: "bleeds out and dies", venom: "succumbs to the venom and dies", spikes: "is impaled on its own spines and dies" }[ev.cause] || "dies";
-    roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} ${deathVerb}.${lootTxt}` }, ev.killerId);
-    const killer = state.players.get(ev.killerId);
-    if (killer) {
-      const slayVerb = { light: "The light destroys", bleed: "Your wounds finish off", venom: "Your venom finishes off", spikes: "Your thorns finish off" }[ev.cause] || "You slay";
-      sendToPlayer(ev.killerId, { type: "combat", text: `${slayVerb} ${ev.victimName}!${ev.xp ? ` (+${ev.xp} xp)` : ""}${lootTxt}` });
-      sendToPlayer(ev.killerId, buildRoomView(state, killer));
-    }
-    // Shared kill XP (Model A): every participant gets the full value. The finisher
-    // already saw their xp in the slay line; co-fighters get an assist note. A kill
-    // may push anyone over a level threshold — hail them in gold and tell the room.
-    for (const a of ev.participants || []) {
-      const pl = state.players.get(a.playerId);
-      if (!pl) continue;
-      if (a.playerId !== ev.killerId && ev.xp) sendToPlayer(a.playerId, { type: "combat", text: `You help bring down ${ev.victimName}. (+${ev.xp} xp)` });
-      for (const up of a.levelUps || []) {
-        sendToPlayer(a.playerId, { type: "gold", text: `You reach level ${up.level}! (+${up.points} attribute points — spend with "train")` });
-        roomCtx.toRoom(ev.roomId, { type: "gold", text: `${pl.name} reaches level ${up.level}!` }, a.playerId);
-      }
-      // Quest progress for this kill (melee / DoT path). A spell or bomb kill is
-      // credited inline in commands.js instead, so a kill never counts twice.
-      for (const m of quests.noteKill(state, pl, ev.victimTemplate)) sendToPlayer(a.playerId, m);
-      sendToPlayer(a.playerId, buildPlayerView(state, pl));
-    }
-    roomCtx.refreshRoom(ev.roomId, ev.killerId);
-    return;
-  }
+  "death": (ev) => {
+    if (ev.victimKind === "mob") handleMobDeath(ev);
+    else if (ev.victimKind === "player") handlePlayerDeath(ev);
+  },
 
   // Death phase 1 — the fall. The delver drops where they died and lies dying for a
   // few ticks (see _beginDeath/_dyingTick). A loud, coloured beat so it registers.
-  if (ev.type === "death-begin" && ev.victimKind === "player") {
-    const victim = state.players.get(ev.victimId);
+  "death-begin": (ev) => {
+    if (ev.victimKind !== "player") return;
     sendToPlayer(ev.victimId, { type: "combat", text: "<#red>The dark closes over you. You are dying…<#reset>" });
-    if (victim) sendToPlayer(ev.victimId, buildPlayerView(state, victim)); // HP bar to zero
+    withPlayer(ev.victimId, (victim) => sendToPlayer(ev.victimId, buildPlayerView(state, victim))); // HP bar to zero
     roomCtx.toRoom(ev.roomId, { type: "combat", text: `${ev.victimName} falls.` }, ev.victimId);
-  }
+  },
 
   // The dying countdown — one line per tick while the dark draws in.
-  if (ev.type === "dying") {
-    sendToPlayer(ev.victimId, { type: "combat", text: `<#red>The dark presses closer… (${ev.remaining})<#reset>` });
-  }
+  "dying": (ev) =>
+    sendToPlayer(ev.victimId, { type: "combat", text: `<#red>The dark presses closer… (${ev.remaining})<#reset>` }),
+};
 
-  // Death phase 2 — the wake. _wakeAtRim has relocated them; tell them where they are.
-  if (ev.type === "death" && ev.victimKind === "player") {
-    const victim = state.players.get(ev.victimId);
-    sendToPlayer(ev.victimId, { type: "system", text: "You wake at the rim, whole again but in the dark. A light source would help — `equip` one." });
-    if (victim) {
-      sendToPlayer(ev.victimId, buildRoomView(state, victim));
-      sendToPlayer(ev.victimId, buildPlayerView(state, victim));
-    }
-    roomCtx.refreshRoom(ev.roomId, ev.victimId); // the body is gone from the death room
-    roomCtx.refreshRoom(ev.respawnRoom, ev.victimId);
-  }
+function dispatchEvent(ev) {
+  const handler = EVENT_HANDLERS[ev.type];
+  if (handler) handler(ev);
 }
 
+// ---------------------------------------------------------------------------
+// Tick loop — the heartbeat of the living world (DESIGN.md §3.4, §4).
+// ---------------------------------------------------------------------------
 const tickTimer = setInterval(() => {
   for (const ev of state.advance()) dispatchEvent(ev);
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {

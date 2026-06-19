@@ -251,6 +251,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **`server/index.js` event dispatch made table-driven.** The ~510-line
+  `dispatchEvent` if-chain (one `if (ev.type === …) { … return; }` per event) is
+  replaced by an `EVENT_HANDLERS` lookup table (event type → handler), mirroring
+  the `commands.js` refactor — O(1) dispatch on the tick hot path instead of a
+  linear scan. The three patterns that recurred across nearly every handler are
+  pulled into shared helpers: `mobNameFor` (light-gated mob name per observer),
+  `withPlayer` (get-the-live-player-or-bail guard), `refreshViews` (room + vitals
+  panels), and `broadcastRoom` (narrate one line to everyone present, optionally
+  refreshing each room view). Per-event flavour maps (`HURT_SRC`,
+  `MOB_HURT_FLAVOUR`, `MOB_DEATH_VERB`, …) are hoisted to module scope instead of
+  being rebuilt each call. Pure refactor — no behaviour or message-text change.
 - **`server/commands.js` split into a `commands/` folder and made table-driven.**
   The 2019-line monolith is now an ~830-line core (dispatcher + movement, posture,
   items, fixtures, social, combat) plus focused modules under `server/commands/`:
