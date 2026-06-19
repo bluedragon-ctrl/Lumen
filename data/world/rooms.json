@@ -827,7 +827,7 @@
     "zone": "gloom-warren",
     "name": "Where the Dark Goes Bad",
     "depth": 7,
-    "ambientLight": 0,
+    "ambientLight": -1,
     "description": "The low passage south of the camp pinches down to a crawl and then lets go all at once into a colder, larger dark. The roar of the lake is gone; there is no glow here, no moss, no growing thing — the stone is dry and dead and the air sits heavy and still, the way air sits in a place that has not been disturbed in a long time. This is where the prospectors' chalk-line ends and their nerve ended with it: the last stake is hammered into the rock just inside the mouth, the line knotted off and cut, going no further. Beyond it the floor is fouled with the litter of old feeding — cracked shell, gnawed bone, pale moulted husks shed by things that grew too big for them — and something low and wet shifts in the black just past the edge of your light. The camp is back to the north. South and down, the warren opens out.",
     "exits": { "north": "deep.camp", "south": "warren.hall" },
     "fixtures": [],
