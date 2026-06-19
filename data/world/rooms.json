@@ -90,10 +90,23 @@
     "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "south": "rim.hatchery" },
+    "exits": { "south": "rim.hatchery", "north": "rim.fault" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
+  },
+  "rim.fault": {
+    "id": "rim.fault",
+    "zone": "rim",
+    "name": "The Riven Yard",
+    "depth": 0,
+    "ambientLight": 2,
+    "description": "Past the stockpens the boomtown simply gives out: the last canvas lean-to falls behind and the made ground ends at a bare shelf of rock the builders never floored over, strewn with broken crates and the grey tailings of someone's abandoned dig. A long crack splits the stone from end to end, wider than a hand at its mouth, and a cold draft breathes steadily up out of it — slow and constant, carrying the smell of deep water and a dark far older than the Rim above it. The pens are back south.",
+    "exits": { "south": "rim.corral" },
+    "hiddenExits": { "down": { "to": "fault.deep", "perception": 8, "name": "a squeeze down through the fault" } },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
   },
   "rim.mushroomfarm": {
     "id": "rim.mushroomfarm",
@@ -195,7 +208,10 @@
     "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren", "south": "abyss.drift" },
     "fixtures": ["iron-vein", "umbral-relief"],
     "groundItems": [{ "template": "shards", "qty": 15, "hidden": { "perception": 3 } }],
-    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
+    "spawns": [
+      { "mob": "giant-rat", "max": 2, "respawn": 120 },
+      { "mob": "feral-mongrel", "max": 1, "respawn": 240 }
+    ]
   },
   "abyss.warren": {
     "id": "abyss.warren",
@@ -977,5 +993,17 @@
       { "mob": "the-starving-dark", "max": 1, "respawn": 1200 },
       { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
     ]
+  },
+  "fault.deep": {
+    "id": "fault.deep",
+    "zone": "deep-fault",
+    "name": "The Fault's Foot",
+    "depth": 5,
+    "ambientLight": -1,
+    "description": "The crack lets you down a long, scraping squeeze through cold rock and opens, all at once, into a chamber with no floor of light at all — the dark here is the deep kind, the kind that drinks a flame and gives nothing back. Dripping water ticks somewhere unseen, and the air is dead and still. The fault you came down by climbs back up; the chamber goes on down, where the rock has split further and the draft rises from somewhere deeper still.",
+    "exits": { "up": "rim.fault" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "cave-lurker", "max": 1, "respawn": 300, "hidden": { "perception": 3 } }]
   }
 }

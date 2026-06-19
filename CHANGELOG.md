@@ -24,6 +24,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **The Riven Yard and the deep fault — a hidden shortcut down.** A new Rim room,
+  *The Riven Yard* (`rim.fault`, north of the Stockpens), where the boomtown's made
+  ground gives out at a bare shelf of split rock. A long crack in the floor breathes
+  a cold draft up from far below; spotting that it's actually passable is a steep
+  `perception: 8` hidden `down` exit — an expert-only shortcut for higher-level
+  delvers. It drops to *The Fault's Foot* (`fault.deep`, depth 5, `ambientLight: -1`
+  void), a quiet transition chamber on the deep way down: not a fight, just a lone
+  `cave-lurker` (slow respawn) so resting here never feels fully safe. The fault
+  foreshadows a further descent — a `down` exit to floor 9 will be wired when that
+  floor exists.
+- **The feral mongrel now spawns.** The authored `feral-mongrel` (a surface dog gone
+  wild, an Outsider of the shallows) had no placement; it now hunts the rat-warren of
+  *The Collapsed Gallery* (`abyss.gallery`, `max: 1`, `respawn: 240`) alongside the
+  giant rats it preys on.
 - **Void light band — deep-dark rooms.** Rooms may now author a *negative*
   `ambientLight`; when the effective light falls below zero the room reads as the
   new `void` band — a distinct deep-dark client treatment (a breathing black
