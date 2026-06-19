@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Void light band — deep-dark rooms.** Rooms may now author a *negative*
+  `ambientLight`; when the effective light falls below zero the room reads as the
+  new `void` band — a distinct deep-dark client treatment (a breathing black
+  vignette that swells inward, a faint shiver on the room text, and a `⚠ blind`
+  meter) that ordinary light can't beat. A delver must carry enough light just to
+  claw back to a visible level. `warren.throat` ("Where the Dark Goes Bad") is the
+  first such room (`ambientLight: -1`), composing with its existing creeping-dark
+  drain. The reduced-motion fallback is a static heavy vignette.
+- **`@teleport <roomId>` admin command.** A dev affordance to jump straight to any
+  room by id (e.g. reaching deep abyss rooms for testing) without walking the whole
+  descent. Seats the player, recomputes light, and refreshes bystanders — no
+  exploration xp, quest triggers, or summon-follow.
 - **`quit` / `logout` command.** A discoverable way to leave the game. There was
   never any danger in just closing the tab — the account already saves on
   disconnect and periodically — but nothing told players that. `quit` (aliases

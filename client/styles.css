@@ -189,12 +189,40 @@ body {
   50%      { text-shadow: 0 0 7px rgba(255, 255, 255, 1),   0 0 18px rgba(205, 228, 255, .75); }
 }
 @keyframes searing-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+/* void: light is below zero — a deep dark that ordinary light can't beat. The
+   mirror of searing: a black vignette that breathes inward (the dark closing in)
+   plus a faint shiver on the room text. */
+.light-void { background: #040506; color: #5a6770; }
+.light-void #room-name { color: #6b7882; }
+.light-void #room-name, .light-void .room-desc {
+  animation: void-shiver .45s steps(2, end) infinite;
+}
+.light-void::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  animation: void-breathe 4.5s ease-in-out infinite;
+}
+@keyframes void-breathe {
+  0%, 100% { background: radial-gradient(ellipse 80% 80% at 50% 45%,
+              rgba(0,0,0,0) 0%, rgba(0,0,0,.45) 58%, rgba(0,0,0,.92) 100%); }
+  50%      { background: radial-gradient(ellipse 44% 50% at 50% 45%,
+              rgba(0,0,0,0) 0%, rgba(0,0,0,.7) 45%, rgba(0,0,0,.99) 90%); }
+}
+@keyframes void-shiver {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-.3px, .4px); }
+}
 @keyframes lumin-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(216, 200, 115, .28), inset 0 0 4px rgba(216, 200, 115, .10); }
   50%      { box-shadow: 0 0 10px rgba(216, 200, 115, .55), inset 0 0 7px rgba(216, 200, 115, .18); }
 }
 @media (prefers-reduced-motion: reduce) {
   .light-searing #room-name, .light-searing .room-desc, .light-searing::after { animation: none; }
+  .light-void #room-name, .light-void .room-desc { animation: none; }
+  .light-void::after {
+    animation: none;
+    background: radial-gradient(ellipse 55% 58% at 50% 45%,
+      rgba(0,0,0,0) 0%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.96) 95%);
+  }
   .chip.luminous { animation: none; }
 }
 .light-unknown { background: var(--panel); }

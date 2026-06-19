@@ -26,21 +26,28 @@ the integer:
 
 | Light value | Band       |
 |------------:|------------|
+| `< 0`       | void       |
 | `0`         | darkness   |
 | `1`–`2`     | dim        |
 | `3`–`9`     | bright     |
 | `10`+       | searing    |
 
 Searing is deliberately hard to reach — a torch plus a few lightbugs stays
-*bright*. Effective light is clamped to `0..20`.
+*bright*. `void` is its dark-side mirror: a sub-zero band only reachable in a
+room authored with negative `ambientLight` (a deep dark that drinks your light),
+shown with a distinct "deep dark" treatment in the client. Effective light is
+clamped to `-20..20`.
 
 **Effective light** of a room each tick:
 
 ```
-effective = clamp( room.ambientLight + Σ(active light-source output in room), 0, 20 )
+effective = clamp( room.ambientLight + Σ(active light-source output in room), -20, 20 )
 ```
 
 - `ambientLight` is the room's authored base (usually falls toward 0 with depth).
+  It may be **negative** for deep-dark rooms: the effective light can then fall
+  below 0, which reads as the `void` band — carried light must first cancel the
+  negative before anything becomes visible.
 - Light sources contribute their `output` (a lit torch, a glowing mob, etc.).
 
 ### Per-actor perception band
@@ -102,7 +109,7 @@ A map of `roomId → room`.
 | `name`         | string            | Short room title. |
 | `description`  | string            | Shown in the Inspect window when visible. |
 | `depth`        | integer           | 0 at the rim; increases downward. Flavour + future scaling. |
-| `ambientLight` | integer           | Base light before sources (see light scale). |
+| `ambientLight` | integer           | Base light before sources (see light scale). May be **negative** for deep-dark rooms: the effective light can fall below 0, which reads as the `void` band (carried light must first cancel the negative before anything is visible). |
 | `exits`        | map dir→roomId    | Directions: `north`,`south`,`east`,`west`,`up`,`down` (extensible). |
 | `fixtures`     | string[]          | Fixture ids present in the room (crafting stations, etc.). |
 | `groundItems`  | ItemRef[]         | Initial items on the floor (instantiated at world load). |

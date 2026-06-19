@@ -93,6 +93,30 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       }
       return selfAndViews(state, player, `Conjured ${n}× ${t.name} into your pack.`);
     }
+    case "@teleport": {
+      // Jump straight to any room by id — a dev affordance for reaching deep or
+      // out-of-the-way rooms without walking the whole descent. Minimal by design:
+      // it seats the player (the same setPlayerLocation used to place a freshly
+      // created delver), recomputes light for both rooms, and refreshes bystanders.
+      // No exploration xp, quest triggers, or summon-follow — that's what walking
+      // is for. A dev affordance, not authored content.
+      const dest = (arg || "").trim();
+      if (!dest || !state.world.rooms[dest])
+        return [{ type: "error", text: `Usage: @teleport <roomId>. Unknown room "${dest || ""}".` }];
+      if (dest === player.location)
+        return [{ type: "log", text: `You are already in ${dest}.` }];
+      const from = player.location;
+      player.pending = null; // a jump breaks off any attack
+      state.clearRevealedMobs(player.id); // leaving re-hides any lurkers you'd spotted
+      ctx.toRoom(from, { type: "log", text: `${player.name} vanishes.` }, player.id);
+      state.setPlayerLocation(player, dest);
+      state.rooms[dest].light = state.computeRoomLight(dest);
+      state.rooms[from].light = state.computeRoomLight(from);
+      ctx.refreshRoom(from, player.id);
+      ctx.toRoom(dest, { type: "log", text: `${player.name} appears out of nowhere.` }, player.id);
+      ctx.refreshRoom(dest, player.id);
+      return selfAndViews(state, player, `You blink to ${dest}.`);
+    }
     case "@help": {
       const lines = ["<#gold>Admin commands<#reset>", ""];
       for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));

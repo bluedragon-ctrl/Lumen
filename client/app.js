@@ -198,7 +198,10 @@ function renderRoom(room) {
   const inspect = $("inspect");
   inspect.className = "pane light-" + room.light.band;
   $("room-name").textContent = room.name;
-  $("light-meter").textContent = `light: ${room.light.band} (${room.light.value})` + (room.harmed ? " ⚠ harsh" : "");
+  $("light-meter").textContent =
+    `light: ${room.light.band} (${room.light.value})` +
+    (room.light.band === "void" ? " ⚠ blind" : "") +
+    (room.harmed ? " ⚠ harsh" : "");
 
   const desc = $("room-desc");
   if (room.canSee) {
