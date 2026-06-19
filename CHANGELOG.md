@@ -251,6 +251,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   new wares as a reward for completed work. Data-driven — no new command.
 
 ### Changed
+- **Server output hot-path performance (`server/index.js`, `server/accounts.js`).**
+  Three changes that cut redundant work as rooms get busy, with no behaviour or
+  message-text change:
+  - **Per-tick view coalescing.** Room/vitals views are idempotent snapshots, but
+    a single tick often fires several events in one room — each previously rebuilt
+    and resent every onlooker's full view. Reactive refreshes now mark a view
+    dirty and `flushViews` rebuilds each dirty view once, after the dispatch burst
+    (flushed at the tick, command, and disconnect entry points). A room of 4 mobs
+    fleeing/re-entering the light dropped from ~13+ room-view sends to ~5 (≈1/tick).
+  - **Serialize broadcasts once.** `send` stringified per recipient; `roomCtx.toRoom`
+    now serializes its identical message once and reuses the frame, and
+    `broadcastRoom` memoizes frames by line text (light-gating yields ~2 distinct
+    lines), instead of once per onlooker.
+  - **Non-blocking account saves.** `accounts.save` was synchronous `mkdirSync` +
+    `writeFileSync` looped over every player inside the tick loop. The dir is now
+    ensured once; the periodic snapshot and disconnect paths use a new `saveAsync`
+    that writes off the event loop and skips players whose data is unchanged.
+    Account creation and the shutdown flush stay synchronous.
 - **`server/index.js` event dispatch made table-driven.** The ~510-line
   `dispatchEvent` if-chain (one `if (ev.type === …) { … return; }` per event) is
   replaced by an `EVENT_HANDLERS` lookup table (event type → handler), mirroring
