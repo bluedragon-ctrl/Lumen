@@ -43,6 +43,12 @@ function sendAll(ws, msgs) {
 function sendToPlayer(playerId, msg) {
   send(connections.get(playerId), msg);
 }
+// Send an already-serialized frame, so a message broadcast to N players is
+// stringified once rather than once per recipient.
+function sendRawToPlayer(playerId, data) {
+  const ws = connections.get(playerId);
+  if (ws && ws.readyState === ws.OPEN) ws.send(data);
+}
 
 // --- Per-burst view coalescing ---------------------------------------------
 // Room and vitals views are idempotent snapshots, and a single tick (or command)
@@ -73,7 +79,8 @@ function flushViews() {
 // Broadcast context handed to commands so effects reach OTHER players in a room.
 const roomCtx = {
   toRoom(roomId, msg, exceptId) {
-    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendToPlayer(p.id, msg);
+    const data = JSON.stringify(msg); // identical for every recipient — serialize once
+    for (const p of state.playersIn(roomId)) if (p.id !== exceptId) sendRawToPlayer(p.id, data);
   },
   refreshRoom(roomId, exceptId) {
     for (const p of state.playersIn(roomId)) if (p.id !== exceptId) markRoomView(p.id);
@@ -206,9 +213,14 @@ function refreshViews(p) {
 // observer (`lineFor(name, observer)`), and optionally mark each onlooker's
 // room view dirty. A null/undefined line for an observer sends nothing to them.
 function broadcastRoom(roomId, ev, lineFor, { type = "log", refreshRoom = false } = {}) {
+  const frames = new Map(); // text -> serialized frame; light-gating yields only a few distinct lines
   for (const o of state.playersIn(roomId)) {
     const text = lineFor(mobNameFor(o, ev), o);
-    if (text != null) sendToPlayer(o.id, { type, text });
+    if (text != null) {
+      let data = frames.get(text);
+      if (data === undefined) { data = JSON.stringify({ type, text }); frames.set(text, data); }
+      sendRawToPlayer(o.id, data);
+    }
     if (refreshRoom) markRoomView(o.id);
   }
 }
