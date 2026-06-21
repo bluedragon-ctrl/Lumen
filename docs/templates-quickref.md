@@ -252,6 +252,7 @@ Other variants:
 // door — a gated exit; open it (use/open <fixture>) to walk `dir` to `to`
 "door": { "dir": "down", "to": "rim.training", "open": false }  // to must exist; open is boolean
 //   counts as a graph edge for reachability — a room reachable only via a door still validates
+//   optional "key": "<item-template>" locks it — only a carrier can open it (key is kept, not consumed)
 // scenery with passive light
 "emitsLight": 1                                 // ≥0
 // resource — a mineable node (single resource)

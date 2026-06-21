@@ -94,6 +94,14 @@
     "type": "door",
     "door": { "dir": "down", "to": "d0.training", "open": false }
   },
+  "sealed-claim-door": {
+    "id": "sealed-claim-door",
+    "name": "a sealed mine-door",
+    "keywords": ["door", "sealed", "claim", "gate", "north"],
+    "description": "The adit north of the road has been shut with a slab door of iron-banded timber, set into the hewn rock and barred with a recorder's lock. A board nailed across it reads, in the careful copy-hand of Fenn's office: CONDEMNED — CLAIM STRUCK FROM THE ROLLS — NO ENTRY BY ORDER. The dark behind it has been left to whatever drove the prospectors out. Only the office key opens this.",
+    "type": "door",
+    "door": { "dir": "north", "to": "d2.claim.adit", "open": false, "key": "quiet-claim-key" }
+  },
   "ward-ring": {
     "id": "ward-ring",
     "name": "a warding ring",

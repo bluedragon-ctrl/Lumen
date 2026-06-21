@@ -317,6 +317,13 @@ function toggleDoor(state, player, f, ctx, want) {
   const ft = state.world.fixtures[f.template];
   const next = want === undefined ? !f.open : want;
   if (next === f.open) return [{ type: "error", text: `It's already ${f.open ? "open" : "shut"}.` }];
+  // A locked door (`door.key`) only opens for someone carrying its key. The key is
+  // kept, not consumed — once you've opened the way it stays open for you. Locking
+  // (closing) is always allowed.
+  if (next && ft.door.key && !player.inventory.some((i) => i.template === ft.door.key)) {
+    const keyName = state.world.items[ft.door.key] ? state.world.items[ft.door.key].name : "the right key";
+    return [{ type: "error", text: `${cap(ft.name)} is locked. You'd need ${keyName} to open it.` }];
+  }
   f.open = next;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} ${f.open ? "opens" : "shuts"} ${ft.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);

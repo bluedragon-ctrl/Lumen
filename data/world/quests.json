@@ -87,7 +87,8 @@
     ],
     "rewards": {
       "xp": 60,
-      "shards": 45
+      "shards": 20,
+      "items": [{ "template": "quiet-claim-key" }]
     }
   },
   "board-crawler-bounty": {
