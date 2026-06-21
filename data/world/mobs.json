@@ -187,7 +187,7 @@
       { "type": "emote", "weight": 2, "messages": ["lets out a shrill, rattling screech", "bares a mouthful of yellowed incisors", "lashes her scaled tail across the bones", "drags a delver's femur closer with one clawed foot"] },
       { "type": "summon", "weight": 2, "mob": "giant-rat", "count": 2, "max": 4, "verb": "throws back her head and shrieks; vermin boil out of the dark" }
     ],
-    "loot": [{ "template": "crystal", "chance": 1 }, { "template": "rat-meat", "chance": 1 }]
+    "loot": [{ "template": "crystal", "chance": 0.5 }, { "template": "rat-meat", "chance": 1 }]
   },
   "deep-dweller": {
     "id": "deep-dweller",
@@ -755,7 +755,7 @@
       { "template": "chitin-plate", "chance": 1 },
       { "template": "bug-meat", "chance": 1 },
       { "template": "dense-chitin-plate", "chance": 1 },
-      { "template": "crystal", "chance": 1 }
+      { "template": "crystal", "chance": 0.5 }
     ]
   },
   "pallid-hunter": {
@@ -783,7 +783,7 @@
       { "type": "emote", "weight": 2, "messages": ["lifts its head, nostrils working at the air", "tilts its skull toward you, listening with its whole body", "flinches from the edge of the light, then stills"] }
     ],
     "loot": [
-      { "template": "crystal", "chance": 0.6 }
+      { "template": "crystal", "chance": 0.3 }
     ]
   },
   "umbral-trader": {
@@ -882,7 +882,7 @@
     ],
     "loot": [
       { "template": "kingshell-plate", "chance": 1 },
-      { "template": "crystal", "chance": 1 }
+      { "template": "crystal", "chance": 0.5 }
     ]
   },
   "yana": {
@@ -943,7 +943,7 @@
       { "type": "idle", "weight": 3 },
       { "type": "emote", "weight": 2, "messages": ["heaves itself forward, flesh dragging over the stone", "fans its feelers wide, tasting for warmth", "lets out a low, wet rattle that fills the dark", "rears its blind front and holds, scenting the air"] }
     ],
-    "loot": [{ "template": "crystal", "chance": 0.4 }]
+    "loot": [{ "template": "crystal", "chance": 0.3 }]
   },
   "gloom-touched-crawler": {
     "id": "gloom-touched-crawler",
@@ -975,7 +975,7 @@
       { "type": "idle", "weight": 2 },
       { "type": "emote", "weight": 2, "messages": ["draws the dark in close about its blind front, and the cold deepens", "heaves itself forward, a thread of black trailing from its grey flesh", "fans its feelers wide, tasting for warmth", "lets out a low, wet rattle, and for a moment your light seems to gutter"] }
     ],
-    "loot": [{ "template": "crystal", "chance": 0.4 }]
+    "loot": [{ "template": "crystal", "chance": 0.3 }]
   },
   "the-starving-dark": {
     "id": "the-starving-dark",
@@ -1005,7 +1005,7 @@
     ],
     "loot": [
       { "template": "shadow-heart", "chance": 1 },
-      { "template": "crystal", "chance": 1 }
+      { "template": "crystal", "chance": 0.5 }
     ]
   }
 }

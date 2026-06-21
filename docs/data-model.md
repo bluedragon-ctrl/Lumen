@@ -445,9 +445,28 @@ Room-anchored objects, primarily crafting stations.
 | `type`   | enum   | `crafting` \| `switch` \| `door` \| `scenery` \| `resource` \| … |
 | `station`| string?| Crafting station tag recipes reference (e.g. `alchemy`, `forge`). |
 | `switch` | block? | Makes the fixture switchable: `{ emitsLight, on }`. `on` is the default state; each instance carries live on/off state. Toggled with `use <fixture>`. When on, `emitsLight` adds to room light (like a torch). |
-| `mine`   | block? | Makes the fixture a mineable **resource vein**: `{ template, yield?, charges, respawn, energy? }`. `mine`/`dig` spends `energy` (defaults to the player's speed) to take `yield` (default 1) of `template`, drawing down `charges`; a worked-out vein refills to full after `respawn` ticks (see `state._mineTick`). Requires light to work. |
-| `fish`   | block? | Makes the fixture **fishing water**, a sibling of `mine`: `{ template, yield?, charges, respawn, energy?, bait?, catchChance? }`. `fish`/`angle` spends `energy` (default speed) **and one `bait` item** (default `grub`, consumed every cast whether or not anything bites), then rolls `catchChance` (0–1, default 1) to land `yield` of `template` and draw down a charge. Misses cost the bait but no charge. Refills like a vein after `respawn` ticks. Requires light. |
+| `mine`   | block? | Makes the fixture a mineable **resource vein**: `{ template, yield?, charges, respawn, energy?, drops? }`. `mine`/`dig` spends `energy` (defaults to the player's speed) to draw down one `charge`; a worked-out vein refills to full after `respawn` ticks (see `state._mineTick`). Requires light. **Yield** is either a single `template` (+`yield`, default 1) **or** a weighted `drops` table (see [Resource drop tables](#resource-drop-tables)) — not both. |
+| `fish`   | block? | Makes the fixture **fishing water**, a sibling of `mine`: `{ template, yield?, charges, respawn, energy?, bait?, catchChance?, drops? }`. `fish`/`angle` spends `energy` (default speed) **and one `bait` item** (default `grub`, consumed every cast whether or not anything bites), then rolls `catchChance` (0–1, default 1) to land a catch and draw down a charge. Misses cost the bait but no charge. The catch is a single `template` (+`yield`) or a `drops` table, as for `mine`. Refills like a vein after `respawn` ticks. Requires light. |
 | `door`   | block? | Makes the fixture a gated exit: `{ dir, to, open }`. While **open**, the room gains an exit `dir → to`; **shut**, that way reads as no exit at all. `open` is the default state; each instance carries live open/shut state, toggled with `use <fixture>` (or `open`/`close <fixture>`). The validator counts a room's door fixture as a graph edge, so a room reachable only through a door still validates. |
+
+#### Resource drop tables
+
+A `mine`/`harvest`/`fish` block yields its resource one of two ways:
+
+- **Single resource** — `template` (+ optional `yield`, default 1). Every successful action gives `yield` of that one item.
+- **Weighted `drops` table** — an array of `{ template, qty?, weight? }`. **One** entry is rolled per successful action, with probability proportional to `weight` (default 1). `qty` is an integer or a dice string (`"2d4"`), default 1. This lets a vein give *one outcome or another* per swing — "usually ore, rarely a few shards" — rather than always the same drop.
+
+`template` and `drops` are mutually exclusive; declare exactly one. A drop whose item is type `currency` (i.e. `shards`) tallies straight to the miner's purse like gathering a floor pile; everything else goes into the pack. Example — an iron vein that mostly gives ore but occasionally a small shard windfall:
+
+```json
+"mine": {
+  "charges": 5, "respawn": 90, "energy": 30,
+  "drops": [
+    { "template": "iron-ore", "qty": 1, "weight": 9 },
+    { "template": "shards", "qty": "1d4", "weight": 1 }
+  ]
+}
+```
 
 ---
 

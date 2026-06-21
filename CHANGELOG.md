@@ -24,6 +24,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Mining can now roll varied drops — and the first glimmer vein comes to the
+  shallows.** Resource veins (`mine`/`harvest`/`fish`) gained an optional weighted
+  `drops` table: instead of always yielding the same item, a fixture can list
+  `{ template, qty?, weight? }` entries and roll **one** per swing — so a vein gives
+  "usually ore, rarely a few shards" rather than a guaranteed drop. A currency drop
+  (shards) tallies to the purse like a gathered floor pile; ore/crystals go to the
+  pack. Iron and silver veins now have a ~10% chance of a small shard windfall in
+  place of ore. A **new shallow glimmer vein** (*a thin glimmer seam*) yields mostly
+  loose shards with a ~10% chance of a whole crystal, and replaces the iron vein in
+  *The Collapsed Gallery* (`abyss.gallery`) — the first glimmer to be worked on
+  Depth 1, near the Rim. The **deep `glimmer-vein`** (Depth 7, The Brood-Heart) was
+  revised onto the same drops model to live up to its "a rich find" flavour: mostly
+  one crystal, often two (~28% of swings), with a rare shard scatter — lifting a
+  cleared 2-charge cycle from ~140 to ~170 shard-equivalent. Single `template`/`yield`
+  veins keep working exactly as before; the validator enforces one of `template` or
+  `drops`. See `docs/data-model.md` → *Resource drop tables*.
+- **Four more glimmer seams across Depths 2–4 — bridging the crystal gap.** The thin
+  glimmer seam now appears in *The Adit* (`second.mine1`, beside the iron) and *The
+  Umbral Stope* (`second.mine4`) on Depth 2, *The River Stair* (`third.landing`) on
+  Depth 3, and *The Failing Reliefs* (`lake.gallery`) on Depth 4 — so glimmer is no
+  longer a Depth-1-trickle / Depth-7-jackpot affair with nothing between. Each room's
+  description gained a line noting the seam.
+- **A second rich glimmer vein — The Last Claim (`warren.relict`, Depth 7).** The dead
+  prospector's chamber now holds the seam they died defending: the rich `glimmer-vein`
+  is staked over the wall beside the corpse, the strike they came all this way for.
+  Mining it means striking a light one room north of the Starving Dark's lair — the
+  very thing the prospector's chalked warning cautions against — a sneak-and-grab
+  counterpart to the Brood-Heart's swarm. (Its loose ground crystal + shards remain.)
+
+### Changed
+- **Glimmer crystal mob-drop chances lowered.** The four named bosses that dropped a
+  guaranteed crystal — Gnaw, the Old Grinder, the Pale King, and the Starving Dark —
+  now drop one at 0.5. The lesser crystal-droppers drop at 0.3: the pallid hunter (was
+  0.6) and the elder / gloom-touched gloom-crawlers (was 0.4).
 - **The Riven Yard and the deep fault — a hidden shortcut down.** A new Rim room,
   *The Riven Yard* (`rim.fault`, north of the Stockpens), where the boomtown's made
   ground gives out at a bare shelf of split rock. A long crack in the floor breathes
