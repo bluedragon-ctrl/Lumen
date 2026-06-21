@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A condemned prospector mine — the Quiet Claim (`d2.claim.*`).** A seven-room
+  working driven north off **The Prospectors' Road**, dug too greedily until the
+  picks broke into older Umbral stone and the gloom-crawler nest behind it came up
+  and overran the camp. The recorder's office struck the claim from the rolls and
+  **barred the adit behind a locked `sealed-claim-door`** — there is no other way
+  in. Deliberately harder than the rest of depth 2: the drifts are thick with
+  `gloom-crawler`s (denser than the road's lone wanderers), and **two**
+  **`elder-gloom-crawler`s** — deep-dwellers that climbed the breach — hold the area,
+  one denned in the blind west cut (**The Far Cut**) and one in **The Crawler-Hold**
+  guarding the way to the prize. The elders do not flee bright light the way the lesser
+  crawlers do, so the claim stays dangerous even for a well-lit delver. The reward for pushing in is the claim's three
+  `glimmer-seam`s (in **The Greedy Drift**, **The Breach**, and the crawler-free
+  **Quiet Pocket**) and, hidden at the dead end (**The Dead Face**, `perception 5`),
+  the dead prospector's kit — including **the Prospector's blaze-lantern**: a unique
+  light that throws a searing `output 7` (the brightest in the game) but burns oil at
+  `5×` a brass lantern's rate, a flare to scatter the crawlers and scorch the elder
+  rather than a torch to walk by. It drinks the very `lamp-oil` the claim drops.
+- **The Quiet Claim's key, won from Fenn's "Quiet Too Long" (`fenn-quiet-claim`).**
+  The office key to the sealed adit is now the headline reward for confirming Marl
+  Wender dead — Fenn trusts the claim to a delver who walks a dead man's ground and
+  comes back honest. The quest's cash reward is trimmed (45 → 20 shards) to suit;
+  the 60 XP stands.
+- **Doors can now be locked with a key** via an optional `door.key` (item template)
+  on a `door` fixture. A locked door refuses to `open` for anyone not carrying the
+  key, and names the key in the refusal; the key is **kept, not consumed**, so the
+  way stays open once unlocked. The validator checks `door.key` resolves to a real
+  item. Existing doors (no `key`) are unchanged.
 - **A hidden witchglow warren below the Spore Vault (`d1.spore.*`).** Four new
   depth-1 rooms reached through a concealed crack south of `d1.vault`, gated behind
   a `perception 3` search: **The Sporechoke** (the choked entrance), **The Mushroom
@@ -31,6 +58,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crit; surfaced in the Inspect window. Existing weapons (no `crit`) are unchanged.
 
 ### Changed
+- **Light is now tiered into "see" vs "repel the dark", and the two premium lamps
+  carry stats.** Output drops: **brass lantern 4 → 3**, **glimmersteel lamp 5 → 4**.
+  Since the whole gloom-crawler family (and the elder) only flees or takes light-burn
+  above light level **3**, a cheap light (torch/brass lantern, output 3) now lets you
+  *see and act* but no longer pushes those creatures back — crossing the threshold
+  takes premium light (glimmersteel 4 / blaze-lantern 7), a consumable (a `light
+  potion` is +3, `minor` +1, a `searing-light` flare +10), the `candlelight` spell
+  (+1), or a second delver's lamp, since room light sums all sources. Creatures keyed
+  at "above 2" (rats, moles, slugs, bats) are unaffected. To give the premium lamps an
+  identity beyond brightness, the **glimmersteel lamp** now grants `ward 3` (the alloy
+  turns aside a little spell-stuff; value 160 → 185) and the **Prospector's
+  blaze-lantern** grants `perception +2` (its searing glare reveals what a dimmer light
+  hides — sharper search/crit while carried). Both surface in the Inspect window.
+- **The Drowned Hollow (`d2.mine.grotto`) now holds a rich glimmer vein instead of
+  a loose crystal.** The single `crystal` ground item has been replaced with a
+  mineable `glimmer-vein` fixture, so the deep pocket's prize is worked out of the
+  seam with a pick (and respawns as a vein) rather than simply picked up off the
+  ledge. Room prose updated to match.
 - **Room ids are now depth-led: `d<depth>.[region.]name`.** The old prefixes were
   an inconsistent mix of theme and ordinal (`abyss.*` at depth 1, `second.*` at
   depth 2, `lake.*` at depth 4) that told you nothing reliable about where a room

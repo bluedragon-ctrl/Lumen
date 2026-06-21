@@ -402,6 +402,8 @@ function main() {
       if (typeof f.door.dir !== "string" || !f.door.dir) errs.push(`fixture ${id}: door.dir must be a non-empty direction string`);
       if (!f.door.to || !has(rooms, f.door.to)) errs.push(`fixture ${id}: door.to references missing room ${f.door.to}`);
       if (f.door.open != null && typeof f.door.open !== "boolean") errs.push(`fixture ${id}: door.open must be a boolean`);
+      // An optional `door.key` locks the door to carriers of that item template.
+      if (f.door.key != null && !has(items, f.door.key)) errs.push(`fixture ${id}: door.key references missing item ${f.door.key}`);
     }
     if (f.mine) {
       checkResourceDrop(f.mine, "mine", id);
