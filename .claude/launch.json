@@ -19,6 +19,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/spawn-editor/spawn-editor.js"],
       "port": 3940
+    },
+    {
+      "name": "depth-viewer",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/depth-viewer/depth-viewer.js"],
+      "port": 3942
     }
   ]
 }

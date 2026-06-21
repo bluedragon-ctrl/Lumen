@@ -24,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Depth viewer — a read-only browser inspector for the world by depth.** New
+  tool `tools/depth-viewer/` (`npm run view-depths` or `start.bat`, port 3942)
+  lists every depth in a sidebar and, for the selected depth, shows each room's
+  description, zone, ambient light, exits (hidden exits flagged with their
+  perception requirement), ground items, fixtures, and **spawns resolved to mob
+  names** with population cap, respawn cadence, and hostility — plus a text
+  filter. It only reads `data/world/*.json` and never writes; editing still lives
+  in the mob / item / spawn editors.
 - **Mining can now roll varied drops — and the first glimmer vein comes to the
   shallows.** Resource veins (`mine`/`harvest`/`fish`) gained an optional weighted
   `drops` table: instead of always yielding the same item, a fixture can list

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lumen — depth viewer</title>
+<style>
+  :root { --bg:#0b0d10; --panel:#12161b; --panel2:#171c23; --ink:#cdd3da; --dim:#8b95a1; --line:#252c35; --accent:#e0b15e; --good:#6fcf97; --bad:#e06f6f; --info:#6fa8cf; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding:.6rem 1rem; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  header h1 { font-size:15px; margin:0; color:var(--accent); font-weight:600; }
+  header .sub { color:var(--dim); font-size:12px; }
+  .wrap { display:grid; grid-template-columns:170px 1fr; height:calc(100vh - 49px); }
+  aside { border-right:1px solid var(--line); overflow:auto; background:var(--panel); }
+  aside .dh { padding:.5rem .75rem; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid var(--line); }
+  ul.depths { list-style:none; margin:0; padding:0; }
+  ul.depths li { padding:.5rem .9rem; cursor:pointer; border-bottom:1px solid #1b2128; display:flex; justify-content:space-between; gap:.5rem; align-items:center; }
+  ul.depths li:hover { background:var(--panel2); }
+  ul.depths li.active { background:#1d2530; color:var(--accent); }
+  ul.depths li .count { color:var(--dim); font-size:11px; }
+  ul.depths li.active .count { color:var(--accent); }
+  main { overflow:auto; padding:1rem 1.25rem; }
+  .empty { color:var(--dim); margin-top:3rem; text-align:center; }
+  .toolbar { display:flex; gap:.75rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap; }
+  .toolbar input.filter { flex:1; min-width:180px; background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:5px; padding:.4rem .6rem; font:inherit; outline:none; }
+  .toolbar input.filter:focus { border-color:var(--accent); }
+  .toolbar label { color:var(--dim); font-size:12px; display:flex; align-items:center; gap:.35rem; cursor:pointer; }
+  .room { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:.85rem 1rem; margin-bottom:1rem; }
+  .room h2 { margin:0; font-size:15px; color:var(--accent); display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; }
+  .room h2 .id { color:var(--dim); font-size:11px; font-weight:400; }
+  .room .meta { color:var(--dim); font-size:12px; margin:.25rem 0 .6rem; display:flex; gap:1rem; flex-wrap:wrap; }
+  .room .meta b { color:var(--ink); font-weight:600; }
+  .room .desc { margin:0 0 .75rem; color:var(--ink); }
+  .sect { margin:.55rem 0; }
+  .sect .lbl { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:.25rem; }
+  table.spawns { width:100%; border-collapse:collapse; }
+  table.spawns th { text-align:left; color:var(--dim); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; padding:.25rem .5rem; border-bottom:1px solid var(--line); font-weight:500; }
+  table.spawns td { padding:.3rem .5rem; border-bottom:1px solid #1b2128; }
+  table.spawns tr:last-child td { border-bottom:0; }
+  .mob-name { color:var(--ink); }
+  .pill { display:inline-block; font-size:10.5px; padding:.05rem .4rem; border-radius:10px; border:1px solid var(--line); color:var(--dim); }
+  .pill.hostile { color:var(--bad); border-color:#422; }
+  .pill.calm { color:var(--good); border-color:#244; }
+  .exits .ex { display:inline-block; margin-right:.9rem; }
+  .exits .dir { color:var(--accent); }
+  .exits .to { color:var(--dim); }
+  .exits .hidden .dir { color:var(--info); }
+  .exits .hidden::after { content:" (hidden)"; color:var(--info); font-size:11px; }
+  .none { color:var(--dim); font-style:italic; }
+  ul.items { list-style:none; margin:0; padding:0; }
+  ul.items li { color:var(--ink); }
+  ul.items li .q { color:var(--dim); }
+  .err { color:var(--bad); padding:1rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lumen &middot; depth viewer</h1>
+  <span class="sub">data/world/rooms.json &mdash; read-only</span>
+</header>
+<div class="wrap">
+  <aside>
+    <div class="dh">Depth</div>
+    <ul class="depths" id="depths"></ul>
+  </aside>
+  <main id="main"><div class="empty">Loading…</div></main>
+</div>
+<script>
+let WORLD = null;
+let activeDepth = null;
+let filter = "";
+let showHidden = true;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+async function load() {
+  try {
+    const r = await fetch("/api/world");
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || "failed to load world");
+    WORLD = data;
+    const depths = [...new Set(Object.values(data.rooms).map((rm) => rm.depth ?? 0))].sort((a, b) => a - b);
+    activeDepth = depths[0] ?? 0;
+    renderDepths(depths);
+    render();
+  } catch (e) {
+    $("main").innerHTML = `<div class="err">${esc(e.message)}</div>`;
+  }
+}
+
+function roomsAtDepth(d) {
+  return Object.values(WORLD.rooms)
+    .filter((rm) => (rm.depth ?? 0) === d)
+    .sort((a, b) => (a.zone || "").localeCompare(b.zone || "") || a.id.localeCompare(b.id));
+}
+
+function renderDepths(depths) {
+  $("depths").innerHTML = depths.map((d) => {
+    const n = roomsAtDepth(d).length;
+    return `<li class="${d === activeDepth ? "active" : ""}" data-d="${d}">
+      <span>Depth ${d}</span><span class="count">${n}</span></li>`;
+  }).join("");
+  $("depths").querySelectorAll("li").forEach((li) => {
+    li.onclick = () => { activeDepth = Number(li.dataset.d); renderDepths(depths); render(); };
+  });
+}
+
+function spawnRows(spawns) {
+  if (!spawns || !spawns.length) return `<div class="none">no spawns</div>`;
+  const rows = spawns.map((s) => {
+    const info = WORLD.mobInfo[s.mob];
+    const name = info ? info.name : s.mob;
+    const missing = info ? "" : ` <span class="pill" style="color:var(--bad);border-color:#422">unknown id</span>`;
+    const hp = info && info.maxHp != null ? `${info.maxHp} hp` : "";
+    const tag = info ? (info.hostile
+      ? `<span class="pill hostile">hostile</span>`
+      : `<span class="pill calm">${esc(info.faction || "passive")}</span>`) : "";
+    return `<tr>
+      <td><span class="mob-name">${esc(name)}</span> ${tag}${missing}<div class="none" style="font-style:normal">${esc(s.mob)}</div></td>
+      <td>${s.max ?? "—"}</td>
+      <td>${s.respawn != null ? s.respawn + "s" : "—"}</td>
+      <td>${esc(hp)}</td>
+    </tr>`;
+  }).join("");
+  return `<table class="spawns">
+    <thead><tr><th>Mob</th><th>Max</th><th>Respawn</th><th>HP</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function exitsHtml(rm) {
+  const parts = [];
+  for (const [dir, to] of Object.entries(rm.exits || {})) {
+    parts.push(`<span class="ex"><span class="dir">${esc(dir)}</span> <span class="to">→ ${esc(to)}</span></span>`);
+  }
+  if (showHidden) {
+    for (const [dir, h] of Object.entries(rm.hiddenExits || {})) {
+      const to = typeof h === "string" ? h : h.to;
+      const perc = h && h.perception != null ? ` perc≥${h.perception}` : "";
+      parts.push(`<span class="ex hidden"><span class="dir">${esc(dir)}</span> <span class="to">→ ${esc(to)}${esc(perc)}</span></span>`);
+    }
+  }
+  return parts.length ? `<div class="exits">${parts.join("")}</div>` : `<div class="none">no exits</div>`;
+}
+
+function groundHtml(rm) {
+  const g = rm.groundItems || [];
+  if (!g.length) return "";
+  const li = g.map((it) => {
+    const info = WORLD.itemInfo[it.template];
+    const name = info ? info.name : it.template;
+    const qty = it.qty != null ? ` <span class="q">×${it.qty}</span>` : "";
+    const hid = it.hidden ? ` <span class="pill" style="color:var(--info);border-color:#234">hidden${it.hidden.perception != null ? " perc≥" + it.hidden.perception : ""}</span>` : "";
+    return `<li>${esc(name)}${qty}${hid} <span class="none" style="font-style:normal">(${esc(it.template)})</span></li>`;
+  }).join("");
+  return `<div class="sect"><span class="lbl">Ground items</span><ul class="items">${li}</ul></div>`;
+}
+
+function render() {
+  const rooms = roomsAtDepth(activeDepth).filter((rm) => {
+    if (!filter) return true;
+    const hay = `${rm.id} ${rm.name} ${rm.zone} ${rm.description}`.toLowerCase();
+    return hay.includes(filter);
+  });
+
+  const toolbar = `<div class="toolbar">
+    <input class="filter" id="filter" placeholder="filter rooms on this depth (name, id, zone, text)…" value="${esc(filter)}" />
+    <label><input type="checkbox" id="hid" ${showHidden ? "checked" : ""}/> hidden exits</label>
+    <span class="sub" style="color:var(--dim)">${rooms.length} room${rooms.length === 1 ? "" : "s"} · depth ${activeDepth}</span>
+  </div>`;
+
+  const body = rooms.length ? rooms.map((rm) => {
+    const fixtures = (rm.fixtures || []).length ? `<div class="sect"><span class="lbl">Fixtures</span>${esc(rm.fixtures.join(", "))}</div>` : "";
+    const effects = (rm.effects || []).length ? `<div class="sect"><span class="lbl">Effects</span>${esc(rm.effects.length)} effect(s)</div>` : "";
+    return `<div class="room">
+      <h2>${esc(rm.name || rm.id)} <span class="id">${esc(rm.id)}</span></h2>
+      <div class="meta">
+        <span>zone <b>${esc(rm.zone || "—")}</b></span>
+        <span>ambient light <b>${rm.ambientLight ?? "—"}</b></span>
+        ${(rm.tags || []).length ? `<span>tags <b>${esc(rm.tags.join(", "))}</b></span>` : ""}
+      </div>
+      <p class="desc">${esc(rm.description || "")}</p>
+      <div class="sect"><span class="lbl">Spawns</span>${spawnRows(rm.spawns)}</div>
+      ${groundHtml(rm)}
+      ${fixtures}
+      ${effects}
+      <div class="sect"><span class="lbl">Exits</span>${exitsHtml(rm)}</div>
+    </div>`;
+  }).join("") : `<div class="empty">No rooms match.</div>`;
+
+  $("main").innerHTML = toolbar + body;
+
+  const f = $("filter");
+  f.oninput = () => { filter = f.value.toLowerCase(); const pos = f.selectionStart; render(); const nf = $("filter"); nf.focus(); nf.setSelectionRange(pos, pos); };
+  $("hid").onchange = (e) => { showHidden = e.target.checked; render(); };
+}
+
+load();
+</script>
+</body>
+</html>
