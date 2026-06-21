@@ -17,18 +17,32 @@
     "slot": "light",
     "weight": 2,
     "value": 30,
-    "light": { "output": 4, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
+    "light": { "output": 3, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
   },
   "glimmersteel-lamp": {
     "id": "glimmersteel-lamp",
     "rarity": "rare",
     "name": "a glimmersteel lamp",
-    "description": "A lamp cased in glimmer-alloyed steel, a thread of captive light wound through the housing so the wick has only to carry the burn, not be it. It throws a clean, cold glare brighter than any brass lantern, and sips its oil so slowly a single flask outlasts three. Dear work, and prized by delvers who mean to stay down a long while.",
+    "description": "A lamp cased in glimmer-alloyed steel, a thread of captive light wound through the housing so the wick has only to carry the burn, not be it. It throws a clean, cold glare steadier and longer-lived than any brass lantern, and sips its oil so slowly a single flask outlasts three. The same glimmer in the casing turns aside a little of any spell-stuff that finds the one who carries it. Dear work, and prized by delvers who mean to stay down a long while.",
     "type": "light",
     "slot": "light",
     "weight": 2,
-    "value": 160,
-    "light": { "output": 5, "fuelMax": 900, "burnPerTick": 0.5, "fuelItem": "lamp-oil", "refuelPerUnit": 450 }
+    "value": 185,
+    "armour": { "armour": 0, "ward": 3, "speedPenalty": 0 },
+    "light": { "output": 4, "fuelMax": 900, "burnPerTick": 0.5, "fuelItem": "lamp-oil", "refuelPerUnit": 450 }
+  },
+  "prospectors-blaze-lantern": {
+    "id": "prospectors-blaze-lantern",
+    "rarity": "uncommon",
+    "name": "the Prospector's blaze-lantern",
+    "keywords": ["lantern", "blaze", "lamp", "prospector", "light"],
+    "description": "A heavy lantern a dead hand built for digging fast and getting out — the shutters thrown wide and the wick doubled, the brass scorched black around the glass. Lit, it does not glow so much as roar, throwing a searing white glare that fills a working end to end and sends the pale things flowing for the dark. In its glare a chamber gives up what a dimmer light lets lie — a seam in the rock, a crack, the glint of a dropped tool — so a delver who carries it learns to see more sharply for it. But it drinks oil the way it throws light: five times a brass lantern's thirst, a full fill gone in the time it takes to clear a chamber. You light it when the dark closes in, and you put it out before it leaves you blind in more ways than one.",
+    "type": "light",
+    "slot": "light",
+    "weight": 2,
+    "value": 75,
+    "armour": { "armour": 0, "ward": 0, "speedPenalty": 0, "attrMod": { "perception": 2 } },
+    "light": { "output": 7, "fuelMax": 600, "burnPerTick": 5, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
   },
   "short-sword": {
     "id": "short-sword",
@@ -272,6 +286,17 @@
     "type": "material",
     "filterGroup": "other",
     "weight": 0,
+    "value": 0,
+    "stackable": false
+  },
+  "quiet-claim-key": {
+    "id": "quiet-claim-key",
+    "name": "the Quiet Claim's key",
+    "keywords": ["key", "claim", "iron"],
+    "description": "A heavy iron key, the office tag still wired to its bow: a claim-number, and below it, in Fenn's lead-pencil, the single word CONDEMNED. It opens the sealed adit north of the Prospectors' Road — the working the recorder's office struck from the active rolls after it was overrun, and has kept barred ever since. Fenn does not give it lightly.",
+    "type": "material",
+    "filterGroup": "other",
+    "weight": 1,
     "value": 0,
     "stackable": false
   },

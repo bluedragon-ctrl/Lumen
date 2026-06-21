@@ -418,9 +418,9 @@
     "name": "The Prospectors' Road",
     "depth": 2,
     "ambientLight": 0,
-    "description": "A passage worn smooth by boots and boot-nails, wider than the wild tunnels around it — this one has been walked. Cairns of stacked stones mark the safe line through the dark, and chalk arrows on the wall point the way back up. Whoever laid the markers knew what they were doing. The winch-head is east; the passage runs on west to the crossing, and a side-way drops south into the grazing galleries.",
+    "description": "A passage worn smooth by boots and boot-nails, wider than the wild tunnels around it — this one has been walked. Cairns of stacked stones mark the safe line through the dark, and chalk arrows on the wall point the way back up. Whoever laid the markers knew what they were doing. To the north a second adit was driven off the road, but its mouth has been shut with a barred slab door and posted over — that working is not walked any more. The winch-head is east; the passage runs on west to the crossing, and a side-way drops south into the grazing galleries.",
     "exits": { "east": "d2.descent", "west": "d2.crossing", "south": "d2.graze.1" },
-    "fixtures": [],
+    "fixtures": ["sealed-claim-door"],
     "groundItems": [],
     "spawns": []
   },
@@ -590,14 +590,121 @@
     "name": "The Drowned Hollow",
     "depth": 2,
     "ambientLight": 0,
-    "description": "The flooded tunnel spits you out into a pocket the workings never found. Half the floor is water — black, perfectly still, cold enough to ache in the joints — and the stone above it is slick and low. Above the waterline a narrow ledge runs the far wall, and a glimmer crystal still juts from the seam that birthed it there — whole, untouched, its captive light pressing faint blue-white against the dark in a slow, almost breathing pulse, waiting for a steady hand to work it free. Pale salamanders lie along the wet stone near the ledge, skin the colour of old candle-wax, eyes sealed over and useless. They do not react to your presence. The air is close and cold and tastes of deep water. The only way back is through the flooded tunnel, up.",
+    "description": "The flooded tunnel spits you out into a pocket the workings never found. Half the floor is water — black, perfectly still, cold enough to ache in the joints — and the stone above it is slick and low. Above the waterline a narrow ledge runs the far wall, and a rich glimmer vein threads the seam there — untouched, its captive light pressing faint blue-white against the dark in a slow, almost breathing pulse, waiting for a steady arm to work it free. Pale salamanders lie along the wet stone near the ledge, skin the colour of old candle-wax, eyes sealed over and useless. They do not react to your presence. The air is close and cold and tastes of deep water. The only way back is through the flooded tunnel, up.",
     "exits": { "up": "d2.mine.5" },
-    "fixtures": ["dripping-pool"],
-    "groundItems": [
-      { "template": "crystal", "qty": 1, "respawn": 900 }
-    ],
+    "fixtures": ["dripping-pool", "glimmer-vein"],
+    "groundItems": [],
     "spawns": [
       { "mob": "pale-salamander", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d2.claim.adit": {
+    "id": "d2.claim.adit",
+    "zone": "second-claim",
+    "name": "The Sealed Adit",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "Past the barred door the air goes stale and close, untouched since the office shut the working. A prospectors' camp was struck here in a hurry and never carried out — a collapsed bedroll, a cold lamp, a tin cup rolled into a corner — and the chalk on the wall has been scratched through and over-written CONDEMNED in a heavier hand. Something has been at the bedding since. Pale tracks run north into the drift, flowing not walking, and the dark beyond drinks the lamplight a stride from its mouth. The barred door is back south, to the road.",
+    "exits": { "south": "d2.road", "north": "d2.claim.drift" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 3 } }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 100 }
+    ]
+  },
+  "d2.claim.drift": {
+    "id": "d2.claim.drift",
+    "zone": "second-claim",
+    "name": "The Greedy Drift",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The drift was driven hard and fast — the pick-work here is rougher than the road's other workings, the seams chased greedily and the timbering skimped. A rust-red iron seam runs the left wall, and beside it a hairline thread of cold blue-white glimmer the prospectors had begun to work before the digging stopped. The floor is churned and slick with the flowing of pale things; they nest deeper in. The adit is back south, a side-cut runs west, and the drift bends on north toward broken stone.",
+    "exits": { "south": "d2.claim.adit", "west": "d2.claim.deep", "north": "d2.claim.breach" },
+    "fixtures": ["iron-vein", "glimmer-seam"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 3, "respawn": 90 },
+      { "mob": "gloom-creeper", "max": 1, "respawn": 140 }
+    ]
+  },
+  "d2.claim.deep": {
+    "id": "d2.claim.deep",
+    "zone": "second-claim",
+    "name": "The Far Cut",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A blind cut chased west off the drift, narrowing until the walls press close enough to scrape both shoulders. Whatever drew the prospectors this way ran out before the cut did, and they left it half-worked. The dead-end stink of the place is thick — old droppings, old dark — and the pale crawlers den here in numbers, away from the drift's draught. Something bigger holds the blind end of the cut, a slow vast weight shifting in the deeper dark where the press of its lesser kin thins; the smell of it is older than the rest. The only way is back east, to the drift.",
+    "exits": { "east": "d2.claim.drift" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 300 },
+      { "mob": "gloom-crawler", "max": 3, "respawn": 90 }
+    ]
+  },
+  "d2.claim.breach": {
+    "id": "d2.claim.breach",
+    "zone": "second-claim",
+    "name": "The Breach",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "Here the digging found what it should have left alone. The prospectors' rough drift breaks through a dressed wall of square-cut Umbral stone — older work, lightless and cold — and a squat pillar scored with shut-eye glyphs leans in the gap, half-toppled where the pick brought it down. A seam of glimmer threads the dressed stone, richer than the drift's, the masons' caught light the prospectors died reaching for. The breach in the old wall opens north into a fouler dark; a low pocket opens east; the drift is back south.",
+    "exits": { "south": "d2.claim.drift", "east": "d2.claim.pocket", "north": "d2.claim.nest" },
+    "fixtures": ["umbral-pillar", "glimmer-seam"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 3, "respawn": 90 }
+    ]
+  },
+  "d2.claim.pocket": {
+    "id": "d2.claim.pocket",
+    "zone": "second-claim",
+    "name": "The Quiet Pocket",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "A small, still pocket the crawlers have not fouled — a fold of rock the breach opened onto, off the line of their flowing. A seam of cold glimmer runs the back wall, untouched, the best of the three the claim ever held, and a delver who reaches it with a steady arm and a watched back will not go up empty. The pocket is a dead end; the breach is back west.",
+    "exits": { "west": "d2.claim.breach" },
+    "fixtures": ["glimmer-seam"],
+    "groundItems": [
+      { "template": "shards", "qty": 14, "hidden": { "perception": 4 } }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 1, "respawn": 120 }
+    ]
+  },
+  "d2.claim.nest": {
+    "id": "d2.claim.nest",
+    "zone": "second-claim",
+    "name": "The Crawler-Hold",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "North of the breach the Umbral chamber opens into a low, reeking hold the pale things have made their own — the floor a litter of shed skin and clean-picked bone, the walls slick where generations have flowed against them. This is the press the crawlers came up out of when the digging broke their dark, and at the heart of it lies the thing that drove the rest: a crawler grown vast and old, hauling itself in slow surges through the press of its lesser kin. It reads you long before your light finds it. The breach is back south; the working dead-ends north.",
+    "exits": { "south": "d2.claim.breach", "north": "d2.claim.end" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "elder-gloom-crawler", "max": 1, "respawn": 300 },
+      { "mob": "gloom-crawler", "max": 3, "respawn": 90 }
+    ]
+  },
+  "d2.claim.end": {
+    "id": "d2.claim.end",
+    "zone": "second-claim",
+    "name": "The Dead Face",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The working ends at a raw face the prospectors never finished — picks still leaned where they were dropped, a tally chalked on the rock and broken off mid-stroke. Whoever held this claim made his last stand with his back to the stone he'd come down to break, and the crawlers left little of him but the kit too hard to eat. A great brass lantern lies scorched black among the scatter, and a delver who searches the dark with a careful eye may yet find what its owner died holding. There is no way on; the hold is back south.",
+    "exits": { "south": "d2.claim.nest" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "prospectors-blaze-lantern", "qty": 1, "respawn": 900, "hidden": { "perception": 5 } },
+      { "template": "shards", "qty": 20, "hidden": { "perception": 4 } },
+      { "template": "lamp-oil", "qty": 2, "hidden": { "perception": 4 } }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 100 }
     ]
   },
   "d3.landing": {
