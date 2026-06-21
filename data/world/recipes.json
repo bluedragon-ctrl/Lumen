@@ -7,7 +7,7 @@
       { "template": "luminescent-gland", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
-    "shards": 5,
+    "shards": 2,
     "output": { "template": "minor-light-potion", "qty": 1 }
   },
   "regeneration-draught": {
@@ -19,7 +19,7 @@
       { "template": "witchglow-cap", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
-    "shards": 6,
+    "shards": 2,
     "output": { "template": "regeneration-draught", "qty": 1 }
   },
   "mana-tonic": {
@@ -30,7 +30,7 @@
       { "template": "weeping-chasm-moss", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
-    "shards": 4,
+    "shards": 1,
     "output": { "template": "mana-tonic", "qty": 1 }
   },
   "acid-bomb": {
@@ -41,7 +41,7 @@
       { "template": "venom-gland", "qty": 1 },
       { "template": "vial", "qty": 1 }
     ],
-    "shards": 4,
+    "shards": 1,
     "output": { "template": "acid-bomb", "qty": 1 }
   },
   "smelt-iron": {
@@ -220,7 +220,7 @@
     "name": "Chitin Cuirass",
     "station": "smithing",
     "inputs": [
-      { "template": "chitin-plate", "qty": 5 },
+      { "template": "chitin-plate", "qty": 6 },
       { "template": "iron-bar", "qty": 2 }
     ],
     "shards": 8,
@@ -232,7 +232,7 @@
     "station": "smithing",
     "inputs": [
       { "template": "kingshell-plate", "qty": 1 },
-      { "template": "crystal", "qty": 1 },
+      { "template": "crystal", "qty": 2 },
       { "template": "silver-bar", "qty": 2 }
     ],
     "shards": 12,
@@ -254,7 +254,7 @@
     "name": "Heavy Chitin Plate",
     "station": "smithing",
     "inputs": [
-      { "template": "chitin-plate", "qty": 6 },
+      { "template": "chitin-plate", "qty": 8 },
       { "template": "iron-bar", "qty": 1 }
     ],
     "shards": 8,
@@ -276,7 +276,7 @@
     "name": "Barbed Flail",
     "station": "smithing",
     "inputs": [
-      { "template": "chitin-spike", "qty": 3 },
+      { "template": "chitin-spike", "qty": 4 },
       { "template": "iron-bar", "qty": 1 }
     ],
     "shards": 5,
@@ -329,7 +329,7 @@
     "name": "Glimmersteel Cuirass",
     "station": "smithing",
     "inputs": [
-      { "template": "glimmersteel-bar", "qty": 3 }
+      { "template": "glimmersteel-bar", "qty": 4 }
     ],
     "shards": 12,
     "output": { "template": "glimmersteel-cuirass", "qty": 1 }
