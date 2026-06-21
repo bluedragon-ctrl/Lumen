@@ -31,10 +31,11 @@ function weaponOf(world, player) {
       dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2",
       actionCost: t.weapon.actionCost || 12,
       scale: t.weapon.scale || MELEE_SCALE,
+      crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
       onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
     };
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, onHit: null }; // unarmed
+  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, crit: 0, onHit: null }; // unarmed
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------

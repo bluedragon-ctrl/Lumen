@@ -184,6 +184,18 @@
     "value": 90,
     "armour": { "attrMod": { "wits": 1 } }
   },
+  "warding-ring": {
+    "id": "warding-ring",
+    "rarity": "uncommon",
+    "name": "a warding ring",
+    "keywords": ["ring", "band", "ward", "silver"],
+    "description": "A slim band of tarnished silver, its face graven with a close ring of overlapping scales. Worked to Vesper's method, the pattern does more than flatter — it sits between the wearer and a hostile weave, turning a little of the magic aside before it bites. Whoever last wore it came down into the dark and never climbed out; it lay among the husks and picked bones of the nest until a luckier hand thought to look.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 100,
+    "armour": { "armour": 0, "ward": 5, "speedPenalty": 0 }
+  },
   "shards": {
     "id": "shards",
     "name": "shards",
@@ -490,6 +502,29 @@
     "weight": 1,
     "value": 24,
     "weapon": { "damage": { "physical": "1d4" }, "actionCost": 10 }
+  },
+  "rusty-hammer": {
+    "id": "rusty-hammer",
+    "name": "a rusty hammer",
+    "keywords": ["hammer", "rusty", "rusted"],
+    "description": "A light cross-pein hammer gone orange with rust, its haft swollen and split, the head pitted and loose on the helve. Under the corrosion, stamped deep into the cheek, a maker's mark is still just legible — the same mark the Rim smith strikes into his work. Someone carried this down into the dark a long time ago, and did not carry it back.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 8,
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
+  },
+  "tobins-hammer": {
+    "id": "tobins-hammer",
+    "rarity": "uncommon",
+    "name": "Tobin's hammer",
+    "keywords": ["hammer", "tobin", "tobins"],
+    "description": "Tobin's first hammer, made whole again by the hand that learned its trade on it — the rust ground back to bright steel, the head re-set true and the haft bound new in oiled leather. It is light and wakes quick in the hand, balanced for a fast, snapping blow, and where the head bites clean it bites deep. The old maker's mark gleams again on the cheek. He gave it back without a word; some debts the deep doesn't get to keep.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 120,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 9, "crit": 0.05 }
   },
   "glimmer-dust": {
     "id": "glimmer-dust",

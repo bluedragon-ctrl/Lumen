@@ -299,9 +299,66 @@
     "depth": 1,
     "ambientLight": 0,
     "exits": { "north": "d1.grotto" },
+    "hiddenExits": { "south": { "to": "d1.spore.mouth", "perception": 3 } },
     "fixtures": ["witchglow-cluster"],
     "groundItems": [{ "template": "witchglow-cap", "qty": 1, "respawn": 150 }],
     "spawns": []
+  },
+  "d1.spore.mouth": {
+    "id": "d1.spore.mouth",
+    "zone": "abyss",
+    "name": "The Sporechoke",
+    "description": "Behind the witchglow's great fans the rock splits into a low crack, and here the cold green growth runs wild and unminded — shelf and bracket and drooping veil of luminous fungus crowding the walls until the passage is half-swallowed, breathing a faint green light into air hung thick and yellow with spores that catch in the throat. Few delvers find the gap, and fewer push through it. The vault's glow is back north; the growth thickens south.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "d1.vault", "south": "d1.spore.beds" },
+    "fixtures": ["witchglow-cluster"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d1.spore.beds": {
+    "id": "d1.spore.beds",
+    "zone": "abyss",
+    "tags": ["grazing"],
+    "name": "The Mushroom Beds",
+    "description": "A broad, soft-floored chamber where the witchglow grows in earnest, luminous caps carpeting the walls and crowding up between the stones until the whole room swims in cold green light. The grazers have made it their own: armoured backs shift in the glow, mandibles rasping at the caps in slow, patient circuits, and smaller things burrow trails through the spongy ground. The crack is back north; a colder glint shows through a gap east, and the growth thins into shadow south.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "d1.spore.mouth", "east": "d1.spore.seam", "south": "d1.spore.nest" },
+    "fixtures": ["witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 2, "respawn": 90 },
+      { "mob": "thornbug", "max": 1, "respawn": 90 },
+      { "mob": "grub", "max": 2, "respawn": 120 }
+    ]
+  },
+  "d1.spore.seam": {
+    "id": "d1.spore.seam",
+    "zone": "abyss",
+    "name": "The Glinting Pocket",
+    "description": "A blind pocket off the beds where the witchglow gives way to broken stone. Through the green glow something colder threads the broken face — a hairline seam of raw glimmer caught in the rock, flecks and thread-thin veins of blue-white light, the picked-over kind the shallows near the Rim still hold. The luminous caps crowd close around it, as though drawn to a deeper light they cannot match. The beds are back west.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "d1.spore.beds" },
+    "fixtures": ["witchglow-cluster", "glimmer-seam"],
+    "groundItems": [{ "template": "rusty-hammer", "qty": 1, "respawn": 600, "hidden": { "perception": 6 } }],
+    "spawns": []
+  },
+  "d1.spore.nest": {
+    "id": "d1.spore.nest",
+    "zone": "abyss",
+    "name": "The Centipede Nest",
+    "description": "Here the witchglow thins to a few struggling brackets and the green light goes dim and patchy, and the floor turns brittle underfoot — a litter of moulted segments, dry husks, and the picked bones of grazers that strayed too far from the bright. The walls are seamed with narrow runs, and from each one the dark between the caps watches back, antennae testing the air. They nest where the glow runs weakest, in the one corner of the warren the brightness never quite fills. The beds are back north.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "d1.spore.beds" },
+    "fixtures": ["witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "centipede-broodmother", "max": 1, "respawn": 600 },
+      { "mob": "cave-centipede", "max": 2, "respawn": 180 }
+    ]
   },
   "d1.hollow": {
     "id": "d1.hollow",
