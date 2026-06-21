@@ -892,7 +892,9 @@
     "description": "The lanes open into a rounded hollow where the caps grow richest, fattened on a slow seep that beads down the far wall and keeps the moss feeding. The floor is churned and trodden, the air close and faintly sweet with the smell of the feed. This is the heart of the browse, where the heaviest of the herd keep their slow circuits and the lesser ones scatter from their path. Lanes lead back north and away east, deeper into the glow.",
     "exits": { "north": "d4.thornreach.approach", "east": "d4.thornreach.deep" },
     "fixtures": ["thornbug-egg-sacks"],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "thornbug-egg", "qty": 1, "respawn": 300 }
+    ],
     "spawns": [
       { "mob": "thornbug", "max": 2, "respawn": 120 },
       { "mob": "elder-thornbug", "max": 2, "respawn": 600 }

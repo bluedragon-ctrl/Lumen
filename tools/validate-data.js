@@ -119,9 +119,11 @@ function main() {
   // the room (see commands.throwBomb / state.detonateRoom) — and `heal-over-time`,
   // a drunk-down regen pulse (the `drink` path pushes any non-`restore` effect as a
   // status; _tickEffects mends the drinker each interval, as the Regeneration spell
-  // does). Neither is valid on a weapon onHit/onDamage trigger, so they live apart
-  // from EFFECT_TYPES.
-  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time"];
+  // does). `summon` conjures a friendly companion under the user's command (the
+  // pet path — see commands.drink), mirroring the spell effect of the same name.
+  // None is valid on a weapon onHit/onDamage trigger, so they live apart from
+  // EFFECT_TYPES.
+  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time", "summon"];
   const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
   const RARITIES = ["common", "uncommon", "rare", "epic", "legendary"];
 
@@ -254,6 +256,13 @@ function main() {
                 errs.push(`item ${id}: effect.dot.duration must be a positive number (ticks)`);
             }
           }
+        }
+        // A `summon` consumable conjures a friendly companion (faction "player",
+        // permanent) — it must name a real mob template, and any count is a count.
+        if (eff.type === "summon") {
+          if (!eff.mob || !has(mobs, eff.mob)) errs.push(`item ${id}: summon effect references missing mob ${eff.mob}`);
+          if (eff.count != null && (!Number.isInteger(eff.count) || eff.count < 1))
+            errs.push(`item ${id}: effect.count must be a positive integer`);
         }
       }
     }

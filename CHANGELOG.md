@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `assist` any thornbug a player attacks and `pursue` a fleeing victim up to 2 rooms
   from their lair — so striking one bug brings the elders down on you together. A
   visual-only **egg sacks** fixture clusters in the Bristle Hollow (more to come).
+- **Thornbug eggs you can hatch into a pet.** A **thornbug egg** lies among the egg
+  sacks in the Bristle Hollow (respawns). `use` it and the egg is consumed, hatching
+  a friendly **baby thornbug** — a `player`-faction, **permanent** companion that
+  trundles at your heel (the pet counterpart to the time-limited combat Summon spell,
+  not a war asset). A per-owner recast cap holds you to one at a time: hatching another
+  sends the first off into the dark. Built on a new `summon` **consumable** effect type
+  (`{ type: "summon", mob, group }`), reusing the existing summon primitive. Richer pet
+  handling (naming, following, dismissal) is to follow.
 - **A hidden witchglow warren below the Spore Vault (`d1.spore.*`).** Four new
   depth-1 rooms reached through a concealed crack south of `d1.vault`, gated behind
   a `perception 3` search: **The Sporechoke** (the choked entrance), **The Mushroom
