@@ -23,8 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trundles at your heel (the pet counterpart to the time-limited combat Summon spell,
   not a war asset). A per-owner recast cap holds you to one at a time: hatching another
   sends the first off into the dark. Built on a new `summon` **consumable** effect type
-  (`{ type: "summon", mob, group }`), reusing the existing summon primitive. Richer pet
-  handling (naming, following, dismissal) is to follow.
+  (`{ type: "summon", mob, group }`), reusing the existing summon primitive — so the
+  baby **follows you between rooms** like any owned summon. Richer pet handling (naming,
+  dismissal) is to follow.
 - **A hidden witchglow warren below the Spore Vault (`d1.spore.*`).** Four new
   depth-1 rooms reached through a concealed crack south of `d1.vault`, gated behind
   a `perception 3` search: **The Sporechoke** (the choked entrance), **The Mushroom
@@ -69,6 +70,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the grotto to the north.
 
 ### Fixed
+- **Follow-line grammar for summons/pets.** A delver moving with an owned summon at
+  heel read "Your a baby thornbug follows." — the article is now stripped, so it reads
+  "Your baby thornbug follows." (also affects spell summons like "a Wisp").
 - **Combat and room-effect death tests updated for paced death.** Pacing player
   death (`#121`) split the instant respawn into a `death-begin` + dying beat with
   the `death`/respawn deferred to the tick loop, but five tests still asserted the

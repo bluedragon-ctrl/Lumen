@@ -108,7 +108,7 @@ function move(state, player, dir, ctx) {
     }
     qmsgs = quests.noteEnter(state, player, dest); // a quest may begin on first arrival
   }
-  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
+  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName.replace(/^an? /i, "")).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
   // Room effects that fire on entering (a waterfall douses your flame, a ward
   // mends or saps you). Mutate before building the view so it reflects the result
   // (e.g. a doused room reads dark). Mechanical events go out via ctx.emit; the
