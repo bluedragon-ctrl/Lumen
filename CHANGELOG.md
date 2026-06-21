@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A browser-based recipe editor (`tools/recipe-editor/`, `npm run edit-recipes`,
+  port 3942).** A local form for editing `data/world/recipes.json` the same way the
+  item and mob editors work: pick a recipe (or add a new one), edit its name, station,
+  shards cost, repeatable `{ template, qty }` inputs, and output, then **Validate &
+  preview** (writes, runs `npm run validate`, shows the `git diff`, then restores the
+  tree) or **Create pull request** (validates, branches, commits, pushes, opens a PR
+  via `gh`). Item templates and crafting stations are offered from `items.json` and the
+  fixtures, so a recipe can only reference things that exist. Unchanged recipes keep
+  their exact source text byte-for-byte, so the PR diff is minimal.
 - **A thornbug grazing range south of the Drowned Strand (`d4.thornreach.*`).**
   Four new depth-4 rooms reached through a new `south` exit off `d4.lake.strand`,
   laid out as a connected loop in their own `fourth-thornreach` zone: **The Capwalk**
