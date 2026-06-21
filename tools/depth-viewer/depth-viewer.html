@@ -52,6 +52,26 @@
   ul.items li { color:var(--ink); }
   ul.items li .q { color:var(--dim); }
   .err { color:var(--bad); padding:1rem; }
+  .toggle { display:flex; border:1px solid var(--line); border-radius:5px; overflow:hidden; }
+  .toggle button { background:var(--panel2); color:var(--dim); border:0; padding:.4rem .8rem; font:inherit; cursor:pointer; }
+  .toggle button.on { background:var(--accent); color:#1a1206; font-weight:600; }
+  .legend { color:var(--dim); font-size:11px; margin:0 0 .6rem; display:flex; gap:1.1rem; flex-wrap:wrap; align-items:center; }
+  .legend .k { display:inline-flex; align-items:center; gap:.4rem; }
+  .legend .sw { width:22px; height:0; border-top:2px solid var(--dim); display:inline-block; }
+  .legend .sw.hidden { border-top:2px dashed var(--info); }
+  .legend .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .map-wrap { overflow:auto; border:1px solid var(--line); border-radius:8px; background:#0e1116; max-height:calc(100vh - 165px); }
+  svg.map { display:block; }
+  svg.map text { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  svg.map .node rect { fill:var(--panel); stroke:var(--line); cursor:pointer; }
+  svg.map .node:hover rect { stroke:var(--accent); }
+  svg.map .node.hostile rect { stroke:#5a2b2b; }
+  svg.map .node.dim { opacity:.28; }
+  svg.map .node .nm { fill:var(--accent); font-size:11px; }
+  svg.map .node .id { fill:var(--dim); font-size:9.5px; }
+  svg.map .node .badge { fill:var(--info); font-size:9.5px; }
+  svg.map .edge { stroke:var(--dim); stroke-width:1.5; }
+  svg.map .edge.hidden { stroke:var(--info); stroke-dasharray:4 3; }
 </style>
 </head>
 <body>
@@ -71,6 +91,7 @@ let WORLD = null;
 let activeDepth = null;
 let filter = "";
 let showHidden = true;
+let view = "list"; // "list" | "map"
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
@@ -157,20 +178,17 @@ function groundHtml(rm) {
   return `<div class="sect"><span class="lbl">Ground items</span><ul class="items">${li}</ul></div>`;
 }
 
-function render() {
-  const rooms = roomsAtDepth(activeDepth).filter((rm) => {
-    if (!filter) return true;
-    const hay = `${rm.id} ${rm.name} ${rm.zone} ${rm.description}`.toLowerCase();
-    return hay.includes(filter);
-  });
+function matchesFilter(rm) {
+  if (!filter) return true;
+  return `${rm.id} ${rm.name} ${rm.zone} ${rm.description}`.toLowerCase().includes(filter);
+}
 
-  const toolbar = `<div class="toolbar">
-    <input class="filter" id="filter" placeholder="filter rooms on this depth (name, id, zone, text)…" value="${esc(filter)}" />
-    <label><input type="checkbox" id="hid" ${showHidden ? "checked" : ""}/> hidden exits</label>
-    <span class="sub" style="color:var(--dim)">${rooms.length} room${rooms.length === 1 ? "" : "s"} · depth ${activeDepth}</span>
-  </div>`;
+// Jump to a single room in the list view (called from a map node).
+function pickRoom(id) { view = "list"; filter = id.toLowerCase(); render(); }
 
-  const body = rooms.length ? rooms.map((rm) => {
+function renderList(rooms) {
+  if (!rooms.length) return `<div class="empty">No rooms match.</div>`;
+  return rooms.map((rm) => {
     const fixtures = (rm.fixtures || []).length ? `<div class="sect"><span class="lbl">Fixtures</span>${esc(rm.fixtures.join(", "))}</div>` : "";
     const effects = (rm.effects || []).length ? `<div class="sect"><span class="lbl">Effects</span>${esc(rm.effects.length)} effect(s)</div>` : "";
     return `<div class="room">
@@ -187,13 +205,171 @@ function render() {
       ${effects}
       <div class="sect"><span class="lbl">Exits</span>${exitsHtml(rm)}</div>
     </div>`;
-  }).join("") : `<div class="empty">No rooms match.</div>`;
+  }).join("");
+}
 
+// --- Map view -------------------------------------------------------------
+// Cardinal deltas in grid cells (north = up the screen).
+const DELTA = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] };
+
+// Assign each room on a depth an integer (x,y) cell by walking N/S/E/W exits
+// from a seed (BFS). Collisions spiral out to the nearest free cell; separate
+// connected clusters are placed side by side. Returns Map<id, {x,y}>.
+function layoutDepth(rooms) {
+  const byId = new Map(rooms.map((r) => [r.id, r]));
+  const onDepth = new Set(rooms.map((r) => r.id));
+  const pos = new Map();
+  const occupied = new Map(); // "x,y" -> id
+  const free = (x, y) => !occupied.has(x + "," + y);
+  const place = (id, x, y) => {
+    if (!free(x, y)) {
+      for (let ring = 1; ; ring++) {
+        let found = null;
+        for (let dx = -ring; dx <= ring && !found; dx++)
+          for (let dy = -ring; dy <= ring && !found; dy++)
+            if ((Math.abs(dx) === ring || Math.abs(dy) === ring) && free(x + dx, y + dy)) found = [x + dx, y + dy];
+        if (found) { x = found[0]; y = found[1]; break; }
+      }
+    }
+    pos.set(id, { x, y });
+    occupied.set(x + "," + y, id);
+  };
+  const maxX = () => { let m = -Infinity; for (const k of occupied.keys()) m = Math.max(m, Number(k.split(",")[0])); return m; };
+  for (const start of rooms) {
+    if (pos.has(start.id)) continue;
+    const startX = occupied.size ? maxX() + 2 : 0;
+    place(start.id, startX, 0);
+    const queue = [start.id];
+    while (queue.length) {
+      const cur = queue.shift();
+      const p = pos.get(cur);
+      for (const [dir, to] of Object.entries(byId.get(cur).exits || {})) {
+        if (!DELTA[dir] || !onDepth.has(to) || pos.has(to)) continue;
+        place(to, p.x + DELTA[dir][0], p.y + DELTA[dir][1]);
+        queue.push(to);
+      }
+    }
+  }
+  return pos;
+}
+
+const trunc = (s, n) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
+
+function renderMap(rooms) {
+  if (!rooms.length) return `<div class="empty">No rooms on this depth.</div>`;
+  const byId = new Map(rooms.map((r) => [r.id, r]));
+  const pos = layoutDepth(rooms);
+  const CELL_W = 184, CELL_H = 108, NODE_W = 156, NODE_H = 72, MARGIN = 28;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const { x, y } of pos.values()) { minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); }
+  const W = (maxX - minX + 1) * CELL_W + 2 * MARGIN;
+  const H = (maxY - minY + 1) * CELL_H + 2 * MARGIN;
+  const nx = (id) => MARGIN + (pos.get(id).x - minX) * CELL_W + (CELL_W - NODE_W) / 2;
+  const ny = (id) => MARGIN + (pos.get(id).y - minY) * CELL_H + (CELL_H - NODE_H) / 2;
+  const cx = (id) => nx(id) + NODE_W / 2;
+  const cy = (id) => ny(id) + NODE_H / 2;
+
+  // Does `to` have a cardinal exit back to `from`? (for one-way detection)
+  const linksBack = (from, to) => {
+    const r = byId.get(to);
+    if (!r) return false;
+    return Object.entries(r.exits || {}).some(([d, t]) => DELTA[d] && t === from);
+  };
+
+  // Edges: cardinal exits between two placed rooms. Dedupe by pair.
+  let edges = "";
+  const seen = new Set();
+  const drawEdge = (a, b, hidden, oneway) => {
+    const cls = "edge" + (hidden ? " hidden" : "");
+    const marker = oneway ? ` marker-end="url(#arrow)"` : "";
+    edges += `<line class="${cls}" x1="${cx(a)}" y1="${cy(a)}" x2="${cx(b)}" y2="${cy(b)}"${marker}/>`;
+  };
+  for (const r of rooms) {
+    for (const [dir, to] of Object.entries(r.exits || {})) {
+      if (!DELTA[dir] || !pos.has(to)) continue;
+      const key = [r.id, to].sort().join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      drawEdge(r.id, to, false, !linksBack(r.id, to));
+    }
+    if (showHidden) {
+      for (const [dir, h] of Object.entries(r.hiddenExits || {})) {
+        const to = typeof h === "string" ? h : h.to;
+        if (!DELTA[dir] || !pos.has(to)) continue;
+        const key = "h|" + [r.id, to].sort().join("|");
+        if (seen.has(key)) continue;
+        seen.add(key);
+        drawEdge(r.id, to, true, !linksBack(r.id, to));
+      }
+    }
+  }
+
+  // Nodes.
+  let nodes = "";
+  const ARROW = { north: "↑", south: "↓", east: "→", west: "←", up: "▲", down: "▼" };
+  for (const r of rooms) {
+    if (!pos.has(r.id)) continue;
+    // Exits not drawn as edges on this floor: up/down, or any leading off-depth.
+    const badges = [];
+    for (const [dir, to] of Object.entries(r.exits || {})) {
+      if (DELTA[dir] && pos.has(to)) continue;
+      badges.push(`${ARROW[dir] || dir} ${to}`);
+    }
+    const spawns = r.spawns || [];
+    const hostile = spawns.some((s) => WORLD.mobInfo[s.mob] && WORLD.mobInfo[s.mob].hostile);
+    const dimmed = filter && !matchesFilter(r) ? " dim" : "";
+    const dotColor = !spawns.length ? "transparent" : hostile ? "var(--bad)" : "var(--good)";
+    const title = `${r.name || r.id} [${r.id}]\nzone: ${r.zone || "—"} · light: ${r.ambientLight ?? "—"}\n`
+      + (spawns.length ? "spawns: " + spawns.map((s) => (WORLD.mobInfo[s.mob] ? WORLD.mobInfo[s.mob].name : s.mob) + "×" + (s.max ?? "?")).join(", ") + "\n" : "")
+      + (r.description || "");
+    nodes += `<g class="node${hostile ? " hostile" : ""}${dimmed}" onclick="pickRoom('${esc(r.id)}')">`
+      + `<title>${esc(title)}</title>`
+      + `<rect x="${nx(r.id)}" y="${ny(r.id)}" width="${NODE_W}" height="${NODE_H}" rx="7"/>`
+      + (spawns.length ? `<circle cx="${nx(r.id) + NODE_W - 12}" cy="${ny(r.id) + 12}" r="4.5" fill="${dotColor}"><title>${spawns.length} spawn rule(s)</title></circle>` : "")
+      + `<text class="nm" x="${nx(r.id) + 10}" y="${ny(r.id) + 20}">${esc(trunc(r.name || r.id, 20))}</text>`
+      + `<text class="id" x="${nx(r.id) + 10}" y="${ny(r.id) + 36}">${esc(r.id)}</text>`
+      + (badges.length ? `<text class="badge" x="${nx(r.id) + 10}" y="${ny(r.id) + 54}">${esc(trunc(badges.join("  "), 24))}</text>` : "")
+      + `</g>`;
+  }
+
+  const legend = `<div class="legend">
+    <span class="k"><span class="sw"></span> exit</span>
+    <span class="k"><span class="sw hidden"></span> hidden exit</span>
+    <span class="k">▲▼ up/down or off-floor</span>
+    <span class="k"><span class="dot" style="background:var(--bad)"></span> hostile spawn</span>
+    <span class="k"><span class="dot" style="background:var(--good)"></span> spawn</span>
+    <span class="k" style="color:var(--dim)">click a room for details</span>
+  </div>`;
+
+  return legend + `<div class="map-wrap"><svg class="map" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="var(--dim)"/></marker></defs>
+    ${edges}${nodes}</svg></div>`;
+}
+
+function render() {
+  const all = roomsAtDepth(activeDepth);
+  const filtered = all.filter(matchesFilter);
+
+  const count = view === "map" ? all.length : filtered.length;
+  const toolbar = `<div class="toolbar">
+    <div class="toggle">
+      <button id="vList" class="${view === "list" ? "on" : ""}">List</button>
+      <button id="vMap" class="${view === "map" ? "on" : ""}">Map</button>
+    </div>
+    <input class="filter" id="filter" autocomplete="off" placeholder="filter rooms on this depth (name, id, zone, text)…" value="${esc(filter)}" />
+    <label><input type="checkbox" id="hid" ${showHidden ? "checked" : ""}/> hidden exits</label>
+    <span class="sub" style="color:var(--dim)">${count} room${count === 1 ? "" : "s"} · depth ${activeDepth}</span>
+  </div>`;
+
+  const body = view === "map" ? renderMap(all) : renderList(filtered);
   $("main").innerHTML = toolbar + body;
 
   const f = $("filter");
   f.oninput = () => { filter = f.value.toLowerCase(); const pos = f.selectionStart; render(); const nf = $("filter"); nf.focus(); nf.setSelectionRange(pos, pos); };
   $("hid").onchange = (e) => { showHidden = e.target.checked; render(); };
+  $("vList").onclick = () => { view = "list"; render(); };
+  $("vMap").onclick = () => { view = "map"; render(); };
 }
 
 load();

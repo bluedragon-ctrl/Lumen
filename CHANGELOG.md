@@ -30,7 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   description, zone, ambient light, exits (hidden exits flagged with their
   perception requirement), ground items, fixtures, and **spawns resolved to mob
   names** with population cap, respawn cadence, and hostility — plus a text
-  filter. It only reads `data/world/*.json` and never writes; editing still lives
+  filter. A **List / Map toggle** adds a visual floor map: rooms are laid out on
+  a grid by their north/south/east/west exits (BFS from a seed, disconnected
+  clusters placed side by side), with connecting lines (one-way exits arrowed,
+  hidden exits dashed), up/down and off-floor exits shown as ▲▼ badges, and a
+  spawn dot (red if any spawn is hostile); click a room to jump to its list
+  entry. It only reads `data/world/*.json` and never writes; editing still lives
   in the mob / item / spawn editors.
 - **Mining can now roll varied drops — and the first glimmer vein comes to the
   shallows.** Resource veins (`mine`/`harvest`/`fish`) gained an optional weighted
