@@ -157,6 +157,8 @@ function itemSpecLines(tmpl, w, viewer) {
     const bonus = viewer ? spellScaleBonus(effectiveAttributes(w, viewer), sc) : null;
     const cur = bonus ? `+${bonus} ` : "";
     lines.push(`damage: ${dmg} ${cur}(${sc.attr}/${sc.per || 1})`, `action cost: ${tmpl.weapon.actionCost}`);
+    // Flat crit the weapon adds on top of the viewer's Perception crit.
+    if (tmpl.weapon.crit) lines.push(`crit: +${Math.round(tmpl.weapon.crit * 100)}%`);
   }
   if (tmpl.armour) {
     const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0;

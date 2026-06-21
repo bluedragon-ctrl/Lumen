@@ -40,7 +40,8 @@ Map of `itemId → template`. Common fields, then ONE type-specific block.
   "sellValue": 12,                     // optional; sell = sellValue if set, else 20% of value
   "stackable": true,                   // for materials/consumables/currency
   "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12,
-              "scale": { "attr": "might", "per": 2 } }   // per +2 might → +1 dmg (optional)
+              "scale": { "attr": "might", "per": 2 },    // per +2 might → +1 dmg (optional)
+              "crit": 0.05 }                             // optional flat crit chance (0..1) on top of Perception crit
 }
 ```
 

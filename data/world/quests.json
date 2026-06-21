@@ -166,6 +166,23 @@
       ]
     }
   },
+  "smiths-hammer": {
+    "id": "smiths-hammer",
+    "name": "The Tinker's Hammer",
+    "description": "A rusted hammer from the deep, struck with the Rim smith's own maker's mark. Tobin would want this back.",
+    "start": {
+      "trigger": "item",
+      "item": "rusty-hammer",
+      "offerText": "Under the rust, a maker's mark — and you have seen it before, stamped into half the gear on the Craftsmen's Row. This is Tobin's mark. The tinker-smith struck this hammer, and someone carried it down into the dark and never brought it home. He would want it back."
+    },
+    "steps": [
+      { "deliver": "rusty-hammer", "count": 1, "npc": "rim-smith", "text": "Carry the rusted hammer to Tobin on the Craftsmen's Row" }
+    ],
+    "rewards": {
+      "xp": 50,
+      "items": [{ "template": "tobins-hammer" }]
+    }
+  },
   "kings-shell": {
     "id": "kings-shell",
     "name": "The King's Shell",

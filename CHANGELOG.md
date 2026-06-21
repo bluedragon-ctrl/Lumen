@@ -5,6 +5,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **A hidden witchglow warren below the Spore Vault (`d1.spore.*`).** Four new
+  depth-1 rooms reached through a concealed crack south of `d1.vault`, gated behind
+  a `perception 3` search: **The Sporechoke** (the choked entrance), **The Mushroom
+  Beds** (a witchglow-lit grazing chamber of stonebugs, thornbugs, and grubs), **The
+  Glinting Pocket** (a side-pocket holding a shallow `glimmer-seam`), and **The
+  Centipede Nest**. The nest is held by a new **centipede broodmother** mob — a
+  swollen, nest-bound centipede that summons `cave-centipede` young from the wall-runs
+  mid-fight (capped brood of 3), guarding the one corner of the warren the glow runs
+  weakest. She drops her venom-gland as the lesser centipedes do, and — only she — a
+  **warding ring** at 25% (a slim silver finger-band granting `ward 5`: ~5% magical
+  damage reduction and a 5% chance to negate a hostile spell). Reuses existing fungus,
+  grazers, and the `glimmer-seam` vein; the only new content is the four rooms, the
+  broodmother, and the ring.
+- **The Tinker's Hammer quest (`smiths-hammer`).** A **rusty hammer** lies hidden
+  (`perception 6`) by the glimmer seam in The Glinting Pocket, struck with Tobin the
+  tinker-smith's own maker's mark. Picking it up offers the quest; carrying it back to
+  Tobin on the Craftsmen's Row (he recognises his own first hammer — the one he lost
+  on the single descent that drove him to the forge for good) repairs and gifts it as
+  **Tobin's hammer**: a light, fast blunt weapon (`1d6` at action cost 9 with a 5%
+  crit chance), plus 50 XP. Tobin gains a delivery react line for the hand-off.
+- **Weapons can now grant a flat crit chance** via an optional `weapon.crit` (0..1),
+  mirroring a mob's `attack.crit` and stacking on top of the wielder's Perception
+  crit; surfaced in the Inspect window. Existing weapons (no `crit`) are unchanged.
+
 ### Changed
 - **Room ids are now depth-led: `d<depth>.[region.]name`.** The old prefixes were
   an inconsistent mix of theme and ordinal (`abyss.*` at depth 1, `second.*` at

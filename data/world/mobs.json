@@ -311,6 +311,9 @@
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "delivery": true }, "messages": [
+          { "target": "goes still at the sight of the hammer in your pack, the faraway look gone sharp: \"Where — give it here. That's mine. That's my first. I carried that down the once, and I came back up without it.\"", "room": "stares at the rusted hammer in {name}'s pack, every half-built contraption forgotten." }
+        ] },
         { "if": { "equipped": "rusted-blade" }, "messages": [
           { "target": "winces at your rusted blade: \"I could do better than that with my eyes shut. Half shut, anyway.\"", "room": "winces at {name}'s rusted blade." }
         ] },
@@ -637,6 +640,36 @@
       { "type": "emote", "weight": 2, "messages": ["pours over the rock on a hundred legs", "rears, antennae testing the air", "skitters along the dim edge of the light"] }
     ],
     "loot": [{ "template": "venom-gland", "chance": 0.7 }]
+  },
+  "centipede-broodmother": {
+    "id": "centipede-broodmother",
+    "name": "a centipede broodmother",
+    "description": "A centipede grown vast and slow with laying — a body the length of a forearm and thick as a wrist, its pale armoured segments swollen and dark in the seams. She does not range as her young do; she holds the nest, and the nest holds her, and from the runs in the wall she calls up more of her brood than any one delver should care to meet. Her bite carries the same festering venom, slowed and concentrated by her bulk.",
+    "maxHp": 32,
+    "speed": 12,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 7, "vitality": 9, "intellect": 0, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 6, "chance": 1 }]
+    },
+    "xp": 22,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "summon", "weight": 3, "mob": "cave-centipede", "count": 1, "max": 3, "verb": "shudders along her length, and the wall-runs spill a skittering of young" },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["coils protectively over the brood-litter", "rears, every antenna testing the air at once", "drags her swollen length across the husks"] }
+    ],
+    "loot": [
+      { "template": "venom-gland", "chance": 1 },
+      { "template": "warding-ring", "chance": 0.25 }
+    ]
   },
   "pale-salamander": {
     "id": "pale-salamander",

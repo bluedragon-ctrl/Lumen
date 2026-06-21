@@ -1013,7 +1013,7 @@ class GameState {
         band: p.perception,
         hitBonus: per * HIT_PER_PERCEPTION,
         dmgBonus: spellScaleBonus(attrs, weapon.scale),
-        crit: per * CRIT_PER_PERCEPTION,
+        crit: per * CRIT_PER_PERCEPTION + (weapon.crit || 0),
       };
       const mobName = w.mobs[mob.template].name;
       const mobEmits = !!w.mobs[mob.template].emitsLight;
