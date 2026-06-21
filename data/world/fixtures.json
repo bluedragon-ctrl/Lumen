@@ -60,7 +60,13 @@
     "name": "an iron vein",
     "description": "A seam of rust-red ore threads the broken rock, dense enough to work loose with a steady arm and time. The seam gives up only so much before it runs thin, and needs a long while to be worth the swing again.",
     "type": "resource",
-    "mine": { "template": "iron-ore", "yield": 1, "charges": 5, "respawn": 90, "energy": 30 }
+    "mine": {
+      "charges": 5, "respawn": 90, "energy": 30,
+      "drops": [
+        { "template": "iron-ore", "qty": 1, "weight": 9 },
+        { "template": "shards", "qty": "1d4", "weight": 1 }
+      ]
+    }
   },
   "smelter": {
     "id": "smelter",
@@ -107,7 +113,13 @@
     "name": "a silver vein",
     "description": "A pale seam threads the dark rock, its colour distinct from the rust-red iron all around it — cooler, finer, harder-won. The ore runs thin and wants more effort than iron to loose, but what comes free is worth the swing.",
     "type": "resource",
-    "mine": { "template": "silver-ore", "yield": 1, "charges": 4, "respawn": 120, "energy": 35 }
+    "mine": {
+      "charges": 4, "respawn": 120, "energy": 35,
+      "drops": [
+        { "template": "silver-ore", "qty": 1, "weight": 9 },
+        { "template": "shards", "qty": "1d6", "weight": 1 }
+      ]
+    }
   },
   "umbral-pillar": {
     "id": "umbral-pillar",
@@ -236,7 +248,28 @@
     "name": "a glimmer vein",
     "description": "A seam of raw glimmer threads the rock, cold mineral light caught in the stone in dull blue-white veins, too faint to push back the dark but unmistakable to a delver's eye. This is the richer find the Rush came down for: worked loose with a patient arm, the seam gives up a whole glimmer crystal before it runs thin — and it is a long, hard while before it is worth the swing again.",
     "type": "resource",
-    "mine": { "template": "crystal", "yield": 1, "charges": 2, "respawn": 900, "energy": 45 }
+    "mine": {
+      "charges": 2, "respawn": 900, "energy": 45,
+      "drops": [
+        { "template": "crystal", "qty": 1, "weight": 6 },
+        { "template": "crystal", "qty": 2, "weight": 3 },
+        { "template": "shards", "qty": "3d6", "weight": 1 }
+      ]
+    }
+  },
+  "glimmer-seam": {
+    "id": "glimmer-seam",
+    "name": "a thin glimmer seam",
+    "keywords": ["seam", "glimmer", "vein"],
+    "description": "A hairline seam of raw glimmer threads the broken face, cold blue-white light caught in the rock in flecks and thread-thin veins — not the fist-thick lodes the Rush came down dreaming of, but the picked-over shallows near the Rim still hold this much. A patient arm works the seam for a scatter of loose shards, and now and then, where the rock has not yet shed it, a whole small crystal comes free.",
+    "type": "resource",
+    "mine": {
+      "charges": 3, "respawn": 240, "energy": 35,
+      "drops": [
+        { "template": "shards", "qty": "2d4", "weight": 9 },
+        { "template": "crystal", "qty": 1, "weight": 1 }
+      ]
+    }
   },
   "prospectors-rigging": {
     "id": "prospectors-rigging",

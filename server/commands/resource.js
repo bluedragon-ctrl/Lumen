@@ -15,6 +15,7 @@
  */
 const { makeItemInstance, fixtureVisibleTo } = require("../state");
 const { canSee } = require("../light");
+const { rollDice } = require("../dice");
 const quests = require("../quests");
 const { selfAndViews, countItem, removeItem, addToInventory } = require("./shared");
 
@@ -98,6 +99,24 @@ function resourceRedirect(state, player, arg, selfKind) {
   return others.length === 1 ? resourceHandlers[others[0].kind] : null;
 }
 
+// What a single successful pull yields. A vein/bed/water can carry a weighted
+// `drops` table — one entry is rolled per action, so a vein "usually ore, rarely
+// a few shards" and a glimmer seam "usually shards, rarely a crystal" are the same
+// mechanic. `qty` is a dice string or integer (default 1). Without a table it
+// falls back to the legacy single `template`/`yield`.
+function rollResourceDrop(spec) {
+  const drops = spec.drops;
+  if (!drops || !drops.length) return { template: spec.template, qty: spec.yield || 1 };
+  const total = drops.reduce((s, d) => s + (d.weight || 1), 0);
+  let r = Math.random() * total;
+  let pick = drops[drops.length - 1];
+  for (const d of drops) {
+    r -= d.weight || 1;
+    if (r < 0) { pick = d; break; }
+  }
+  return { template: pick.template, qty: Math.max(1, rollDice(pick.qty != null ? pick.qty : 1)) };
+}
+
 // The shared worker behind mine/gather/fish. `kind` is the fixture flag; flavour
 // comes from RESOURCE_SPECS[kind]. Fishing alone consumes bait and may miss.
 function workResource(state, player, arg, ctx, kind) {
@@ -146,14 +165,24 @@ function workResource(state, player, arg, ctx, kind) {
     }
   }
   f.charges -= 1;
-  const qty = spec.yield || 1;
-  addToInventory(player, makeItemInstance({ template: spec.template, qty }, w), w);
-  const qmsgs = quests.noteAcquire(state, player, spec.template);
-  const itemName = w.items[spec.template].name;
-  ctx.toRoom(player.location, { type: "log", text: R.roomLine(player.name, itemName, ft.name, spec) }, player.id);
+  const drop = rollResourceDrop(spec);
+  const it = w.items[drop.template];
+  // Currency (shards) tallies to the purse, like gathering a floor pile; everything
+  // else goes into the pack. The label carries the count so "3 shards" / "2 iron ore"
+  // read naturally in both the actor and room lines.
+  let label;
+  if (it.type === "currency") {
+    player.shards = (player.shards || 0) + drop.qty;
+    label = `${drop.qty} shard${drop.qty === 1 ? "" : "s"}`;
+  } else {
+    addToInventory(player, makeItemInstance({ template: drop.template, qty: drop.qty }, w), w);
+    label = drop.qty > 1 ? `${drop.qty} ${it.name}` : it.name;
+  }
+  const qmsgs = quests.noteAcquire(state, player, drop.template);
+  ctx.toRoom(player.location, { type: "log", text: R.roomLine(player.name, label, ft.name, spec) }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const tail = f.charges <= 0 ? R.last : "";
-  const out = selfAndViews(state, player, `${R.success(itemName, spec)}${tail}`);
+  const out = selfAndViews(state, player, `${R.success(label, spec)}${tail}`);
   out.push(...qmsgs);
   return out;
 }

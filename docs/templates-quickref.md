@@ -253,9 +253,15 @@ Other variants:
 //   counts as a graph edge for reachability — a room reachable only via a door still validates
 // scenery with passive light
 "emitsLight": 1                                 // ≥0
-// resource — a mineable node
+// resource — a mineable node (single resource)
 "mine": { "template": "iron-ore", "yield": 1, "charges": 5, "respawn": 90, "energy": 30 }
 //   template must exist; charges & respawn >0; yield >0; energy ≥0
+// resource — weighted drop table (one entry rolled per swing; replaces template/yield)
+"mine": { "charges": 5, "respawn": 90, "energy": 30, "drops": [
+  { "template": "iron-ore", "qty": 1, "weight": 9 },   // qty: int or dice "2d4"; weight >0 (default 1)
+  { "template": "shards", "qty": "1d4", "weight": 1 }   // a currency drop tallies to the purse, not the pack
+]}
+//   declare EITHER template (+yield) OR drops, not both. Same shape works for harvest/fish.
 ```
 
 A fixture can be hidden behind `search` when referenced from a room as

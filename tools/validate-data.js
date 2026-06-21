@@ -359,6 +359,28 @@ function main() {
     }
   }
 
+  // A resource block (mine/harvest/fish) yields either a single `template` (+`yield`)
+  // or a weighted `drops` table — one entry rolled per action. Validate whichever it
+  // declares; `drops` and `template` are mutually exclusive ways to say the same thing.
+  const DICE_OR_INT = /^(\d+)d(\d+)([+-]\d+)?$|^\d+$/;
+  const checkResourceDrop = (block, label, id) => {
+    if (block.drops != null) {
+      if (block.template != null) errs.push(`fixture ${id}: ${label} declares both template and drops — use one`);
+      if (!Array.isArray(block.drops) || !block.drops.length)
+        return errs.push(`fixture ${id}: ${label}.drops must be a non-empty array`);
+      block.drops.forEach((d, i) => {
+        if (!d || typeof d !== "object") return errs.push(`fixture ${id}: ${label}.drops[${i}] must be an object`);
+        if (!has(items, d.template)) errs.push(`fixture ${id}: ${label}.drops[${i}] missing item ${d.template}`);
+        if (d.weight != null && (typeof d.weight !== "number" || d.weight <= 0))
+          errs.push(`fixture ${id}: ${label}.drops[${i}].weight must be a positive number`);
+        if (d.qty != null && !DICE_OR_INT.test(String(d.qty).trim()))
+          errs.push(`fixture ${id}: ${label}.drops[${i}].qty must be an integer or dice string (e.g. "2d4")`);
+      });
+    } else if (!has(items, block.template)) {
+      errs.push(`fixture ${id}: ${label}.template missing item ${block.template}`);
+    }
+  };
+
   for (const [id, f] of Object.entries(fixtures)) {
     if (f.emitsLight != null && (typeof f.emitsLight !== "number" || f.emitsLight < 0))
       errs.push(`fixture ${id}: emitsLight must be a non-negative number`);
@@ -375,7 +397,7 @@ function main() {
       if (f.door.open != null && typeof f.door.open !== "boolean") errs.push(`fixture ${id}: door.open must be a boolean`);
     }
     if (f.mine) {
-      if (!has(items, f.mine.template)) errs.push(`fixture ${id}: mine.template missing item ${f.mine.template}`);
+      checkResourceDrop(f.mine, "mine", id);
       for (const k of ["charges", "respawn"])
         if (typeof f.mine[k] !== "number" || f.mine[k] <= 0) errs.push(`fixture ${id}: mine.${k} must be a positive number`);
       if (f.mine.yield != null && (typeof f.mine.yield !== "number" || f.mine.yield <= 0))
@@ -384,7 +406,7 @@ function main() {
         errs.push(`fixture ${id}: mine.energy must be a non-negative number`);
     }
     if (f.harvest) {
-      if (!has(items, f.harvest.template)) errs.push(`fixture ${id}: harvest.template missing item ${f.harvest.template}`);
+      checkResourceDrop(f.harvest, "harvest", id);
       for (const k of ["charges", "respawn"])
         if (typeof f.harvest[k] !== "number" || f.harvest[k] <= 0) errs.push(`fixture ${id}: harvest.${k} must be a positive number`);
       if (f.harvest.yield != null && (typeof f.harvest.yield !== "number" || f.harvest.yield <= 0))
@@ -393,7 +415,7 @@ function main() {
         errs.push(`fixture ${id}: harvest.energy must be a non-negative number`);
     }
     if (f.fish) {
-      if (!has(items, f.fish.template)) errs.push(`fixture ${id}: fish.template missing item ${f.fish.template}`);
+      checkResourceDrop(f.fish, "fish", id);
       if (f.fish.bait != null && !has(items, f.fish.bait)) errs.push(`fixture ${id}: fish.bait missing item ${f.fish.bait}`);
       for (const k of ["charges", "respawn"])
         if (typeof f.fish[k] !== "number" || f.fish[k] <= 0) errs.push(`fixture ${id}: fish.${k} must be a positive number`);
