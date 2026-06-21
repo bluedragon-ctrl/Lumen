@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lumen — recipe editor</title>
+<style>
+  :root { --bg:#0b0d10; --panel:#12161b; --panel2:#171c23; --ink:#cdd3da; --dim:#8b95a1; --line:#252c35; --accent:#e0b15e; --good:#6fcf97; --bad:#e06f6f; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  header { padding:.6rem 1rem; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:1rem; }
+  header h1 { font-size:15px; margin:0; color:var(--accent); font-weight:600; }
+  header .sub { color:var(--dim); font-size:12px; }
+  .wrap { display:grid; grid-template-columns:260px 1fr; height:calc(100vh - 49px); }
+  aside { border-right:1px solid var(--line); overflow:auto; background:var(--panel); }
+  aside input.filter { width:100%; border:0; border-bottom:1px solid var(--line); background:var(--panel2); color:var(--ink); padding:.5rem .75rem; font:inherit; outline:none; }
+  ul.items { list-style:none; margin:0; padding:0; }
+  ul.items li { padding:.4rem .75rem; cursor:pointer; border-bottom:1px solid #1b2128; display:flex; justify-content:space-between; gap:.5rem; }
+  ul.items li:hover { background:var(--panel2); }
+  ul.items li.active { background:#1d2530; color:var(--accent); }
+  ul.items li.dirty::after { content:"\25CF"; color:var(--accent); }
+  ul.items li .id { color:var(--dim); font-size:11px; }
+  .newbtn { display:block; width:calc(100% - 1.5rem); margin:.6rem .75rem; padding:.4rem; background:transparent; color:var(--ink); border:1px dashed var(--line); border-radius:5px; cursor:pointer; font:inherit; }
+  .newbtn:hover { border-color:var(--accent); color:var(--accent); }
+  main { overflow:auto; padding:1rem 1.25rem; }
+  .empty { color:var(--dim); margin-top:3rem; text-align:center; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:.6rem 1rem; }
+  fieldset { border:1px solid var(--line); border-radius:6px; margin:0 0 1rem; padding:.75rem 1rem 1rem; }
+  legend { color:var(--accent); font-size:12px; padding:0 .4rem; text-transform:uppercase; letter-spacing:.06em; }
+  label { display:flex; flex-direction:column; gap:.2rem; font-size:12px; color:var(--dim); }
+  input[type=text], input[type=number], select { background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:4px; padding:.35rem .5rem; font:inherit; outline:none; }
+  input:focus, select:focus { border-color:var(--accent); }
+  .row { display:flex; gap:.5rem; align-items:flex-end; margin-bottom:.4rem; }
+  .row label { flex:1; }
+  .row .qty { width:90px; flex:none; }
+  .row button.del { background:transparent; color:var(--bad); border:1px solid var(--line); padding:.35rem .6rem; }
+  .full { grid-column:1/-1; }
+  p.hint { color:var(--dim); font-size:11px; margin:.6rem 0 .2rem; line-height:1.4; }
+  .bar { position:sticky; bottom:0; background:var(--panel); border-top:1px solid var(--line); padding:.75rem 1rem; margin:1rem -1.25rem -1rem; display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
+  .bar input.summary { flex:1; min-width:200px; }
+  button { background:var(--accent); color:#1a1206; border:0; border-radius:5px; padding:.45rem .9rem; font:inherit; font-weight:600; cursor:pointer; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  button.add { background:transparent; color:var(--good); border:1px dashed var(--line); }
+  button.add:hover { border-color:var(--good); }
+  button:disabled { opacity:.5; cursor:default; }
+  #out { margin-top:1rem; }
+  pre.diff { background:#0e1116; border:1px solid var(--line); border-radius:6px; padding:.75rem; overflow:auto; max-height:340px; font-size:12px; }
+  pre.diff .add { color:var(--good); } pre.diff .del { color:var(--bad); } pre.diff .hdr { color:var(--accent); }
+  .msg { padding:.6rem .8rem; border-radius:6px; margin-top:.5rem; white-space:pre-wrap; }
+  .msg.ok { background:#13241a; border:1px solid #244; color:var(--good); }
+  .msg.err { background:#241313; border:1px solid #422; color:var(--bad); }
+  .msg a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lumen &middot; recipe editor</h1>
+  <span class="sub">data/world/recipes.json</span>
+  <span class="sub" id="dirtycount"></span>
+</header>
+<div class="wrap">
+  <aside>
+    <input class="filter" id="filter" placeholder="filter recipes&hellip;" autocomplete="off" />
+    <button class="newbtn" id="newbtn">+ new recipe</button>
+    <ul class="items" id="list"></ul>
+  </aside>
+  <main id="main"><p class="empty">Loading recipes&hellip;</p></main>
+</div>
+<datalist id="itemlist"></datalist>
+<datalist id="stationlist"></datalist>
+<script>
+let original = {};   // pristine, parsed from disk
+let recipes = {};    // working copy (mutated as you edit)
+let current = null;  // selected recipe id
+let itemIds = [];    // valid item template ids (for input/output pickers)
+let stations = [];   // valid crafting stations (from fixtures)
+
+const $ = (s, r=document) => r.querySelector(s);
+const el = (tag, props={}, ...kids) => { const n = Object.assign(document.createElement(tag), props); for (const k of kids) n.append(k); return n; };
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const eq = (a,b) => JSON.stringify(a) === JSON.stringify(b);
+
+async function load() {
+  try {
+    const res = await fetch("/api/recipes");
+    if (!res.ok) throw new Error("HTTP " + res.status + " — is this served by the editor server?");
+    const r = await res.json();
+    original = r.recipes; recipes = clone(r.recipes);
+    itemIds = r.itemIds || []; stations = r.stations || [];
+    for (const id of itemIds) $("#itemlist").append(el("option", { value:id }));
+    for (const s of stations) $("#stationlist").append(el("option", { value:s }));
+    current = Object.keys(recipes)[0] || null;
+    renderList(); renderForm();
+  } catch (e) {
+    $("#main").innerHTML = "";
+    const p = el("p", { className:"empty" });
+    p.append(el("div", { textContent:"Couldn't load recipes: " + e.message }));
+    p.append(el("div", { style:"margin-top:.75rem", textContent:"Open this page from the recipe-editor server — run `npm run edit-recipes` and visit http://localhost:3942. It won't work through a static file or preview panel." }));
+    $("#main").append(p);
+  }
+}
+
+function isDirty(id) { return !eq(original[id], recipes[id]); }
+function dirtyIds() { return Object.keys(recipes).filter(isDirty); }
+
+function renderList() {
+  const q = $("#filter").value.trim().toLowerCase();
+  const ul = $("#list"); ul.textContent = "";
+  for (const id of Object.keys(recipes)) {
+    const rc = recipes[id];
+    if (q && !id.toLowerCase().includes(q) && !(rc.name||"").toLowerCase().includes(q) && !(rc.station||"").toLowerCase().includes(q)) continue;
+    const li = el("li", { className: (id===current?"active ":"") + (isDirty(id)?"dirty":"") });
+    li.append(el("span", {}, (rc.name||id)));
+    li.append(el("span", { className:"id", textContent:id }));
+    li.onclick = () => { current = id; renderList(); renderForm(); };
+    ul.append(li);
+  }
+  const n = dirtyIds().length;
+  $("#dirtycount").textContent = n ? ("· " + n + " edited") : "";
+}
+
+function renderForm() {
+  const main = $("#main"); main.textContent = "";
+  if (!current) { main.append(el("p", { className:"empty", textContent:"No recipe selected." })); return; }
+  const rc = recipes[current];
+
+  // --- identity ---
+  const ident = el("fieldset"); ident.append(el("legend", {}, "Identity"));
+  const ig = el("div", { className:"grid" });
+  ig.append(field("id", roInput(rc.id)));
+  ig.append(field("name (crafted-result label)", textInput(rc, "name")));
+  const stationL = field("station (must match a crafting fixture)", null);
+  const si = el("input", { type:"text", value: rc.station ?? "", placeholder:"alchemy, smithing, …" });
+  si.setAttribute("list", "stationlist");
+  si.oninput = () => { if (si.value === "") delete rc.station; else rc.station = si.value; touch(); };
+  stationL.append(si); ig.append(stationL);
+  ident.append(ig); main.append(ident);
+
+  // --- cost ---
+  const cost = el("fieldset"); cost.append(el("legend", {}, "Cost"));
+  const cg = el("div", { className:"grid" });
+  cg.append(field("shards (optional crafting fee)", numInput(rc, "shards")));
+  cost.append(cg);
+  cost.append(el("p", { className:"hint", textContent:"Shards are an optional fee on top of the inputs. Omit (leave blank) for a free craft; must be a non-negative whole number." }));
+  main.append(cost);
+
+  // --- inputs ---
+  const inF = el("fieldset"); inF.append(el("legend", {}, "Inputs — consumed when crafting"));
+  if (!Array.isArray(rc.inputs)) rc.inputs = [];
+  const inWrap = el("div", { id:"inputs" });
+  rc.inputs.forEach((row, idx) => inWrap.append(ingredientRow(rc.inputs, row, idx)));
+  inF.append(inWrap);
+  const addBtn = el("button", { className:"add", textContent:"+ add input" });
+  addBtn.onclick = () => { rc.inputs.push({ template:"", qty:1 }); touch(); renderForm(); };
+  inF.append(addBtn);
+  inF.append(el("p", { className:"hint", textContent:"An input with no template is dropped on save. A recipe with no inputs (just a shards cost) is allowed." }));
+  main.append(inF);
+
+  // --- output ---
+  const outF = el("fieldset"); outF.append(el("legend", {}, "Output — produced item"));
+  if (!rc.output || typeof rc.output !== "object") rc.output = { template:"", qty:1 };
+  outF.append(ingredientRow(null, rc.output, null, "output"));
+  main.append(outF);
+
+  main.append(actionBar());
+  main.append(el("div", { id:"out" }));
+}
+
+// A { template, qty } row. When `arr` is given it is an inputs entry (with a
+// delete button that splices it out); when `arr` is null it is the single
+// output object (no delete).
+function ingredientRow(arr, row, idx, kind) {
+  const wrap = el("div", { className:"row" });
+  const tplL = field(kind === "output" ? "output template" : "template", null);
+  const tpl = el("input", { type:"text", value: row.template ?? "", placeholder:"item id" });
+  tpl.setAttribute("list", "itemlist");
+  tpl.oninput = () => { row.template = tpl.value; touch(); };
+  tplL.append(tpl);
+  const qtyL = field("qty", null); qtyL.className = "qty";
+  const qty = el("input", { type:"number", min:"1", step:"1", value: row.qty ?? 1 });
+  qty.oninput = () => { row.qty = qty.value === "" ? 1 : Number(qty.value); touch(); };
+  qtyL.append(qty);
+  wrap.append(tplL, qtyL);
+  if (arr) {
+    const del = el("button", { className:"del", textContent:"✕", title:"remove input" });
+    del.onclick = () => { arr.splice(idx, 1); touch(); renderForm(); };
+    wrap.append(del);
+  }
+  return wrap;
+}
+
+function field(text, control, cls) {
+  const l = el("label", { className: cls || "" }); l.append(el("span", {}, text)); if (control) l.append(control); return l;
+}
+function roInput(v) { return el("input", { type:"text", value:v ?? "", readOnly:true, style:"opacity:.6" }); }
+function textInput(obj, key) {
+  const i = el("input", { type:"text", value: obj[key] ?? "" });
+  i.oninput = () => { if (i.value === "") delete obj[key]; else obj[key] = i.value; touch(); };
+  return i;
+}
+function numInput(obj, key) {
+  const i = el("input", { type:"number", value: obj[key] ?? "", min:"0", step:"1" });
+  i.oninput = () => {
+    if (i.value === "") delete obj[key]; else obj[key] = Number(i.value);
+    touch();
+  };
+  return i;
+}
+
+// Strip empty input rows and ensure qty is a positive integer, so the saved
+// payload is clean regardless of half-finished form rows.
+function tidy(rc) {
+  const out = clone(rc);
+  if (Array.isArray(out.inputs)) {
+    out.inputs = out.inputs
+      .filter((r) => r.template && String(r.template).trim())
+      .map((r) => ({ template: r.template, qty: Math.max(1, Math.round(Number(r.qty) || 1)) }));
+  }
+  if (out.output) out.output = { template: out.output.template, qty: Math.max(1, Math.round(Number(out.output.qty) || 1)) };
+  return out;
+}
+
+function newRecipe() {
+  const id = (prompt("New recipe id (kebab-case, e.g. forge-steel-axe):") || "").trim();
+  if (!id) return;
+  if (recipes[id]) { alert("A recipe with that id already exists."); current = id; renderList(); renderForm(); return; }
+  recipes[id] = { id, name:"", station: stations[0] || "", inputs: [], output: { template:"", qty:1 } };
+  current = id; renderList(); renderForm();
+}
+
+function actionBar() {
+  const bar = el("div", { className:"bar" });
+  const type = el("select", { id:"type" });
+  for (const t of ["chore","fix","feat"]) type.append(el("option", { value:t, textContent:t }));
+  const summary = el("input", { type:"text", className:"summary", id:"summary", placeholder:'commit summary (e.g. "add steel-axe recipe, cut iron-dagger shard cost")' });
+  const validateBtn = el("button", { className:"ghost", textContent:"Validate & preview" });
+  const prBtn = el("button", { textContent:"Create pull request" });
+  validateBtn.onclick = () => save("validate", validateBtn, prBtn);
+  prBtn.onclick = () => {
+    if (!confirm("Write recipes.json, run the validator, then branch, commit, push, and open a PR. Continue?")) return;
+    save("pr", validateBtn, prBtn);
+  };
+  bar.append(type, summary, validateBtn, prBtn);
+  return bar;
+}
+
+function touch() { renderList(); }
+
+async function save(mode) {
+  const btns = Array.prototype.slice.call(arguments, 1);
+  const out = $("#out"); out.textContent = "";
+  btns.forEach((b) => b.disabled = true);
+  out.append(el("p", { className:"sub", textContent:"Working…", style:"color:var(--dim)" }));
+  try {
+    const payload = { recipes: tidyAll(), mode, summary: $("#summary").value, type: $("#type").value };
+    const r = await (await fetch("/api/save", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) })).json();
+    out.textContent = "";
+    if (mode === "validate") return renderValidate(out, r);
+    return renderPR(out, r);
+  } catch (e) {
+    out.textContent = ""; msg(out, "err", "Request failed: " + e.message);
+  } finally {
+    btns.forEach((b) => b.disabled = false);
+  }
+}
+
+// Send a tidied copy of every recipe (drops empty input rows, normalises qty).
+function tidyAll() {
+  const out = {};
+  for (const id of Object.keys(recipes)) out[id] = tidy(recipes[id]);
+  return out;
+}
+
+function renderValidate(out, r) {
+  if (r.error) return msg(out, "err", r.error);
+  if (!r.changed || !r.changed.length) return msg(out, "ok", "No changes to save.");
+  msg(out, r.ok ? "ok" : "err", (r.ok ? "✓ Validation passed. " : "✗ Validation FAILED. ") + "Changed: " + r.changed.join(", ") + "\n\n" + (r.validate||""));
+  if (r.diff) out.append(diffBlock(r.diff));
+}
+function renderPR(out, r) {
+  if (r.ok) {
+    const m = msg(out, "ok", "✓ Pull request opened on branch " + r.branch + "\nChanged: " + (r.changed||[]).join(", ") + "\n");
+    if (r.url) m.append(el("a", { href:r.url, target:"_blank", textContent:r.url }));
+    return;
+  }
+  msg(out, "err", "✗ " + (r.error||"failed") + (r.validate ? "\n\n" + r.validate : ""));
+}
+function msg(out, kind, text) { const d = el("div", { className:"msg "+kind, textContent:text }); out.append(d); return d; }
+function diffBlock(diff) {
+  const pre = el("pre", { className:"diff" });
+  for (const line of diff.split("\n")) {
+    const cls = line.startsWith("+")&&!line.startsWith("+++") ? "add" : line.startsWith("-")&&!line.startsWith("---") ? "del" : (line.startsWith("@@")||line.startsWith("diff")||line.startsWith("index")) ? "hdr" : "";
+    pre.append(el("span", { className:cls, textContent: line + "\n" }));
+  }
+  return pre;
+}
+
+$("#filter").addEventListener("input", renderList);
+$("#newbtn").addEventListener("click", newRecipe);
+load();
+</script>
+</body>
+</html>

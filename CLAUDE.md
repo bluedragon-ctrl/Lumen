@@ -49,6 +49,10 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
 - `tools/item-editor/` — browser-based item editor (`npm run edit-items` or
   double-click `tools/item-editor/start.bat`, port 3941). Edits
   `data/world/items.json`; validates and can open a PR via `gh`.
+- `tools/recipe-editor/` — browser-based crafting-recipe editor (`npm run
+  edit-recipes` or double-click `tools/recipe-editor/start.bat`, port 3942).
+  Edits `data/world/recipes.json` (name, station, shards, inputs, output);
+  validates and can open a PR via `gh`.
 - `tools/spawn-editor/` — browser-based room spawn-rule editor (`npm run
   edit-spawns` or `tools/spawn-editor/start.bat`, port 3940). Edits the
   per-room `spawns` (mob / max / respawn) in `data/world/rooms.json`; validates
