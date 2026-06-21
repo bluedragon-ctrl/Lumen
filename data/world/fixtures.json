@@ -162,6 +162,12 @@
     "type": "scenery",
     "emitsLight": 2
   },
+  "thornbug-egg-sacks": {
+    "id": "thornbug-egg-sacks",
+    "name": "a cluster of egg sacks",
+    "description": "Wedged into a sheltered crook of the wall, a clutch of leathery egg sacks hangs in a dense, glistening cluster, each the size of a fist and translucent enough that a dark, curled shape can be made out coiled within. They give off no light of their own, only catching the cap-glow in a wet sheen, and a faint warmth rises off the mass where the heaviest of the herd keep their slow watch nearby. Nothing stirs in them yet.",
+    "type": "scenery"
+  },
   "umbral-coldlamp": {
     "id": "umbral-coldlamp",
     "name": "a cold glimmer-lamp",

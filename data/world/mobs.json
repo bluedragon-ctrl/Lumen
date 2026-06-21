@@ -569,6 +569,33 @@
     ],
     "loot": [{ "template": "chitin-spike", "chance": 1 }, { "template": "bug-meat", "chance": 0.5 }]
   },
+  "elder-thornbug": {
+    "id": "elder-thornbug",
+    "faction": "fauna",
+    "name": "an elder thornbug",
+    "description": "A thornbug grown vast with age, broad as a war-shield and crusted with overlapping spine-plates worn smooth at the edges. It grazes the richest caps with slow authority, and the lesser bugs give way before it.",
+    "maxHp": 26,
+    "speed": 9,
+    "armour": 4,
+    "ward": 0,
+    "attributes": { "might": 7, "vitality": 9, "intellect": 0, "wits": 4, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "helper": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "xp": 18,
+    "attack": { "damage": "3d4", "actionCost": 13 },
+    "spikes": { "damage": "1d4", "chance": 1 },
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 5 },
+      { "type": "emote", "weight": 2, "messages": ["bristles its worn spines", "shoulders a lesser bug aside", "rasps slowly at a fat cap"] },
+      { "type": "wander", "weight": 2, "verb": "trundles off through the caps", "scope": "zone", "requireTags": ["grazing"] }
+    ],
+    "loot": [{ "template": "chitin-spike", "chance": 1 }, { "template": "chitin-plate", "chance": 0.5 }, { "template": "bug-meat", "chance": 1 }]
+  },
   "grub": {
     "id": "grub",
     "faction": "fauna",

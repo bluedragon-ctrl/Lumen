@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A thornbug grazing range south of the Drowned Strand (`d4.thornreach.*`).**
+  Four new depth-4 rooms reached through a new `south` exit off `d4.lake.strand`,
+  laid out as a connected loop in their own `fourth-thornreach` zone: **The Capwalk**
+  (the lit, cap-strewn entrance), **The Bristle Hollow** (the rich heart of the
+  browse), **The Mossed Terraces**, and **The Quiet Browse**. A peaceful, moss-lit
+  range of common **thornbugs** (2–4 a room) that turns dangerous only if a delver
+  draws first blood. Two new **elder thornbug** mobs roam the whole zone (`grazing`
+  wander): grown vast and armoured, hitting for `3d4` with guaranteed spikes, they
+  `assist` any thornbug a player attacks and `pursue` a fleeing victim up to 2 rooms
+  from their lair — so striking one bug brings the elders down on you together. A
+  visual-only **egg sacks** fixture clusters in the Bristle Hollow (more to come).
 - **A hidden witchglow warren below the Spore Vault (`d1.spore.*`).** Four new
   depth-1 rooms reached through a concealed crack south of `d1.vault`, gated behind
   a `perception 3` search: **The Sporechoke** (the choked entrance), **The Mushroom
