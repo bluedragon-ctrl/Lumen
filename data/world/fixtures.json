@@ -92,7 +92,7 @@
     "name": "a heavy trapdoor",
     "description": "A square of banded planks set flush into the shed floor, an iron pull-ring sunk in one edge. It is barred from above, not below — Vesper keeps what she keeps down there. Heave it open and a ladder drops into the dark of her practice cellar.",
     "type": "door",
-    "door": { "dir": "down", "to": "rim.training", "open": false }
+    "door": { "dir": "down", "to": "d0.training", "open": false }
   },
   "ward-ring": {
     "id": "ward-ring",
@@ -213,7 +213,7 @@
     "name": "a low cellar hatch",
     "description": "A plank hatch set into the floorboards behind the bar, worn smooth where Maeve lifts it day in, day out. A faint, animal reek drifts up through the seams — and now and then a scrabble of claws on stone. She is quick to wave a delver off it: nothing down there, dear, only stores. Heave it open and a short ladder drops into the cellar.",
     "type": "door",
-    "door": { "dir": "down", "to": "rim.cellar", "open": false }
+    "door": { "dir": "down", "to": "d0.cellar", "open": false }
   },
   "camp-lamp": {
     "id": "camp-lamp",

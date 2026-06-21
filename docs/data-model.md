@@ -86,14 +86,14 @@ A map of `roomId → room`.
 
 ```json
 {
-  "settlement.plaza": {
-    "id": "settlement.plaza",
-    "zone": "settlement",
+  "d0.plaza": {
+    "id": "d0.plaza",
+    "zone": "rim",
     "name": "The Rim Plaza",
     "description": "Lantern-light pools across worn flagstones at the abyss's lip...",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "east": "settlement.market", "down": "shaft.landing-1" },
+    "exits": { "east": "d0.market", "down": "d1.landing" },
     "fixtures": ["alchemist-bench"],
     "groundItems": [{ "template": "vial", "qty": 2 }],
     "spawns": [{ "mob": "lightbug", "max": 1, "respawn": 20 }]
@@ -103,8 +103,8 @@ A map of `roomId → room`.
 
 | Field          | Type              | Notes |
 |----------------|-------------------|-------|
-| `id`           | string            | Unique, matches the map key. Convention: `area.name`. |
-| `zone`         | string?           | Area tag (e.g. `rim`/`abyss`). Bounds `wander` with `scope: "zone"` — a mob only roams between rooms sharing its current zone. (Future: pursuit limits.) |
+| `id`           | string            | Unique, matches the map key. Convention: **`d<depth>.[region.]name`** — the depth prefix is mandatory and the validator enforces that it matches the `depth` field (so a retune can't leave an id lying about its depth). The middle `region` segment is optional and used only where a depth has named sub-areas (e.g. `d2.mine.3`, `d4.lake.shrine`, `d4.umbral.gallery`); through/connective rooms omit it (`d1.fissure`, `d2.crossing`). |
+| `zone`         | string?           | Area tag (e.g. `rim`/`abyss`). Bounds `wander` with `scope: "zone"` — a mob only roams between rooms sharing its current zone. (Future: pursuit limits.) Independent of the id's depth prefix — `zone` is a movement boundary, not a location label. |
 | `tags`         | string[]?         | Free-form terrain tags (e.g. `"water"`, `"outdoor"`). Cross-cut zones. Used by tag-aware mob movement: a `wander`/`flee` action's `requireTags`/`forbidTags` filter destinations by these. Untagged is the neutral default — an untagged room satisfies no `requireTags` and trips no `forbidTags`, so existing mobs roam unchanged. |
 | `name`         | string            | Short room title. |
 | `description`  | string            | Shown in the Inspect window when visible. |
@@ -614,7 +614,7 @@ is backfilled from this template onto older saves that predate it.
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "maxHp": 18, "maxMana": 10, "speed": 12,
   "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
-  "startLocation": "rim.plaza",
+  "startLocation": "d0.plaza",
   "startInventory": [{ "template": "torch", "fuel": 200 }],
   "startEquipment": { "hand": "short-sword", "body": "leather-jerkin", "light": null },
   "knownRecipes": ["minor-light-potion"]

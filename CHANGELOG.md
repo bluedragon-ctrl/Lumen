@@ -5,6 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Room ids are now depth-led: `d<depth>.[region.]name`.** The old prefixes were
+  an inconsistent mix of theme and ordinal (`abyss.*` at depth 1, `second.*` at
+  depth 2, `lake.*` at depth 4) that told you nothing reliable about where a room
+  sat. All 71 rooms were renamed so the id leads with its depth (`d1.fissure`,
+  `d2.mine.3`, `d4.lake.shrine`, `d7.lair`); the optional middle `region` segment
+  groups named sub-areas (mine/graze, lake/umbral, fault). Room ids are pure data
+  with no code references, so only the four data files that point at rooms changed
+  (`rooms.json`, `fixtures.json`, `quests.json`, the player template). `zone`
+  fields are untouched — they bound mob wander and are deliberately independent of
+  the id. The validator now enforces that an id's `d<depth>` prefix matches the
+  room's `depth` field, so a future retune can't leave an id lying about its depth.
+
+### Removed
+- **The concealed crawlway between the Spore Vault and the Echoing Fissure.**
+  The two-way hidden passage (`abyss.vault` ↔ `abyss.fissure`) didn't fit the
+  rooms' layout, so both halves were removed. The Spore Vault remains reachable
+  from the grotto to the north.
+
 ### Fixed
 - **Combat and room-effect death tests updated for paced death.** Pacing player
   death (`#121`) split the instant respawn into a `death-begin` + dying beat with

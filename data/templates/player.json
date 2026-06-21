@@ -6,7 +6,7 @@
   "manaRegen": 0.125,
   "speed": 12,
   "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
-  "startLocation": "rim.plaza",
+  "startLocation": "d0.plaza",
   "startInventory": [
     { "template": "short-sword" },
     { "template": "torch", "fuel": 200 }
