@@ -829,7 +829,7 @@
     "depth": 4,
     "ambientLight": 1,
     "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. Where that cold light falls steadiest, a scatter of pale mushrooms has taken to the damp sand — the first growing things to feed on a glow since the river far above. The air is all cold mist and the smell of deep water. Where the fall meets the rock to the west, the spray hangs across the stone like a curtain, and what lies behind the falling water is lost to sight. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
-    "exits": { "up": "d3.falls", "east": "d4.lake.shallows" },
+    "exits": { "up": "d3.falls", "east": "d4.lake.shallows", "south": "d4.thornreach.approach" },
     "hiddenExits": { "west": { "to": "d4.lake.shrine", "perception": 4, "name": "a slick ledge behind the falls" } },
     "fixtures": ["weeping-moss-curtain"],
     "groundItems": [
@@ -971,6 +971,73 @@
       { "template": "witchglow-cap", "qty": 1, "respawn": 150 }
     ],
     "spawns": []
+  },
+  "d4.thornreach.approach": {
+    "id": "d4.thornreach.approach",
+    "zone": "fourth-thornreach",
+    "tags": ["grazing"],
+    "name": "The Capwalk",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The shore gives way south to a low, dry gallery, and the lake's roar falls to a murmur at your back. Pale mushroom-caps crowd the floor and the lower walls in glowing drifts, blue-white and thick as a meadow, and the rock is worn smooth in winding lanes where something heavy has trundled the same rounds for a long time. Spent husks and shed spines lie scattered among the caps. It is a still, fed place, far enough from the water to be quiet and close enough to be safe. The lanes run on south and east through the caps; the shore lies back north.",
+    "exits": { "north": "d4.lake.strand", "south": "d4.thornreach.hollow", "east": "d4.thornreach.terrace" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
+    ],
+    "spawns": [
+      { "mob": "thornbug", "max": 3, "respawn": 120 }
+    ]
+  },
+  "d4.thornreach.hollow": {
+    "id": "d4.thornreach.hollow",
+    "zone": "fourth-thornreach",
+    "tags": ["grazing"],
+    "name": "The Bristle Hollow",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The lanes open into a rounded hollow where the caps grow richest, fattened on a slow seep that beads down the far wall and keeps the moss feeding. The floor is churned and trodden, the air close and faintly sweet with the smell of the feed. This is the heart of the browse, where the heaviest of the herd keep their slow circuits and the lesser ones scatter from their path. Lanes lead back north and away east, deeper into the glow.",
+    "exits": { "north": "d4.thornreach.approach", "east": "d4.thornreach.deep" },
+    "fixtures": ["thornbug-egg-sacks"],
+    "groundItems": [
+      { "template": "thornbug-egg", "qty": 1, "respawn": 300 }
+    ],
+    "spawns": [
+      { "mob": "thornbug", "max": 2, "respawn": 120 },
+      { "mob": "elder-thornbug", "max": 2, "respawn": 600 }
+    ]
+  },
+  "d4.thornreach.terrace": {
+    "id": "d4.thornreach.terrace",
+    "zone": "fourth-thornreach",
+    "tags": ["grazing"],
+    "name": "The Mossed Terraces",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "Here the cave climbs in low shelves, each ledge furred with its own even crop of luminous cap and moss, so the light rises in soft blue-white steps toward the dark of the ceiling. The footing is good and the going gentle, and the caps have been cropped close along every reachable shelf. It is the kind of quiet a delver learns to mistrust only after the dark teaches them better. The way runs back west and drops away south.",
+    "exits": { "west": "d4.thornreach.approach", "south": "d4.thornreach.deep" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
+    ],
+    "spawns": [
+      { "mob": "thornbug", "max": 4, "respawn": 120 }
+    ]
+  },
+  "d4.thornreach.deep": {
+    "id": "d4.thornreach.deep",
+    "zone": "fourth-thornreach",
+    "tags": ["grazing"],
+    "name": "The Quiet Browse",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The lanes end in a deep, sheltered pocket where the glow pools thickest and the air goes warm and still. Nothing roars here, nothing hunts; the caps grow undisturbed but for the slow grazing, and the floor is soft with the leavings of a herd that has fed here, untroubled, for longer than anyone has come this deep to mark it. The lanes lead back north and west into the glow.",
+    "exits": { "north": "d4.thornreach.terrace", "west": "d4.thornreach.hollow" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "thornbug", "max": 3, "respawn": 120 }
+    ]
   },
   "d5.gullet": {
     "id": "d5.gullet",

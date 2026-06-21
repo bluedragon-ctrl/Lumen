@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A thornbug grazing range south of the Drowned Strand (`d4.thornreach.*`).**
+  Four new depth-4 rooms reached through a new `south` exit off `d4.lake.strand`,
+  laid out as a connected loop in their own `fourth-thornreach` zone: **The Capwalk**
+  (the lit, cap-strewn entrance), **The Bristle Hollow** (the rich heart of the
+  browse), **The Mossed Terraces**, and **The Quiet Browse**. A peaceful, moss-lit
+  range of common **thornbugs** (2–4 a room) that turns dangerous only if a delver
+  draws first blood. Two new **elder thornbug** mobs roam the whole zone (`grazing`
+  wander): grown vast and armoured, hitting for `3d4` with guaranteed spikes, they
+  `assist` any thornbug a player attacks and `pursue` a fleeing victim up to 2 rooms
+  from their lair — so striking one bug brings the elders down on you together. A
+  visual-only **egg sacks** fixture clusters in the Bristle Hollow (more to come).
+- **Thornbug eggs you can hatch into a pet.** A **thornbug egg** lies among the egg
+  sacks in the Bristle Hollow (respawns). `use` it and the egg is consumed, hatching
+  a friendly **baby thornbug** — a `player`-faction, **permanent** companion that
+  trundles at your heel (the pet counterpart to the time-limited combat Summon spell,
+  not a war asset). A per-owner recast cap holds you to one at a time: hatching another
+  sends the first off into the dark. Built on a new `summon` **consumable** effect type
+  (`{ type: "summon", mob, group }`), reusing the existing summon primitive — so the
+  baby **follows you between rooms** like any owned summon. Richer pet handling (naming,
+  dismissal) is to follow.
 - **A condemned prospector mine — the Quiet Claim (`d2.claim.*`).** A seven-room
   working driven north off **The Prospectors' Road**, dug too greedily until the
   picks broke into older Umbral stone and the gloom-crawler nest behind it came up
@@ -95,6 +115,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the grotto to the north.
 
 ### Fixed
+- **Follow-line grammar for summons/pets.** A delver moving with an owned summon at
+  heel read "Your a baby thornbug follows." — the article is now stripped, so it reads
+  "Your baby thornbug follows." (also affects spell summons like "a Wisp").
 - **Combat and room-effect death tests updated for paced death.** Pacing player
   death (`#121`) split the instant respawn into a `death-begin` + dying beat with
   the `death`/respawn deferred to the tick loop, but five tests still asserted the

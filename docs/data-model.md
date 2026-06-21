@@ -597,6 +597,12 @@ previous summon of that group before conjuring the new one. The conjured instanc
 spawn `faction:"player"` + `ownerId` (so they fight for and follow the caster); see
 [Summon instance fields](#faction--ownership-runtime) below.
 
+A **`consumable`** item may carry the same `summon` effect (the pet path — e.g. a
+`thornbug-egg` hatching a `baby-thornbug`). `use`-ing it consumes the item and
+conjures a **permanent** companion (`duration` omitted), with the same per-owner
+`group` recast cap. This is the pet counterpart to the time-limited combat Summon
+spell; richer pet handling (naming, dismissal, following) is to come.
+
 ---
 
 ## Starting character template (static) — `data/templates/player.json`

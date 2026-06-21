@@ -266,6 +266,19 @@
     "value": 3,
     "stackable": true
   },
+  "thornbug-egg": {
+    "id": "thornbug-egg",
+    "name": "a thornbug egg",
+    "description": "A single leathery egg, warm and faintly translucent, lifted whole from a clutch in the grazing range. A dark, curled shape shifts inside it when you turn it in the light. Kept warm in the hand it quickens fast — and what hatches imprints on the first thing it smells.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 6,
+    "stackable": true,
+    "consumable": {
+      "effect": { "type": "summon", "mob": "baby-thornbug", "group": "thornbug-pet" },
+      "flavour": "It uncurls, finds your scent, and trundles close at your heel."
+    }
+  },
   "delver-claim-tag": {
     "id": "delver-claim-tag",
     "name": "a delver's claim-tag",

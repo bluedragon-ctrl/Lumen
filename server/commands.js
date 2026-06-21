@@ -108,7 +108,7 @@ function move(state, player, dir, ctx) {
     }
     qmsgs = quests.noteEnter(state, player, dest); // a quest may begin on first arrival
   }
-  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
+  const followTail = followed.length ? ` Your ${followed.map((f) => f.mobName.replace(/^an? /i, "")).join(", ")} follow${followed.length === 1 ? "s" : ""}.` : "";
   // Room effects that fire on entering (a waterfall douses your flame, a ward
   // mends or saps you). Mutate before building the view so it reflects the result
   // (e.g. a doused room reads dark). Mechanical events go out via ctx.emit; the
@@ -431,6 +431,28 @@ function drink(state, player, arg, ctx, verb = "use") {
     ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${t.name}.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     return selfAndViews(state, player, `You ${verb} ${t.name}.${restoreGain(r)}`);
+  }
+  // A `summon` consumable hatches a friendly, permanent companion into the room
+  // under the user's command (faction "player", no lifetime) — the pet path, as
+  // opposed to the time-limited combat Summon spell. A per-owner group cap holds it
+  // to one of its kind: hatching another sends the first off into the dark first.
+  if (spec.type === "summon") {
+    const tmpl = w.mobs[spec.mob];
+    const group = spec.group || spec.mob;
+    const existing = [];
+    for (const r of Object.values(state.rooms))
+      for (const m of r.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
+    for (const m of existing) state._dismissSummon(m, "recast");
+    state._summon({
+      roomId: player.location, mobId: spec.mob, count: spec.count || 1,
+      faction: "player", ownerId: player.id, summonerId: player.id, group, lifetime: null,
+      by: "player", byName: player.name,
+    });
+    ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${t.name}, and ${tmpl.name} wriggles free.` }, player.id);
+    ctx.refreshRoom(player.location, player.id);
+    const replaced = existing.length ? ` Your previous ${tmpl.name.replace(/^an? /i, "")} skitters off into the dark.` : "";
+    const flavour = t.consumable.flavour ? ` ${t.consumable.flavour}` : "";
+    return selfAndViews(state, player, `You ${verb} ${t.name}, and ${tmpl.name} hatches into your keeping.${replaced}${flavour}`);
   }
   state.applyEffect(player, spec);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
