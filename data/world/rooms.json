@@ -1,26 +1,26 @@
 {
-  "rim.plaza": {
-    "id": "rim.plaza",
+  "d0.plaza": {
+    "id": "d0.plaza",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Rim Plaza",
     "description": "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss, all green timber and oiled canvas crowded onto bare rock. Prospectors from a dozen distant lands jostle and haggle here, every other voice talking glimmer: who struck a rich seam, who went down and never came up. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering. Lanes lead off to the inn in the north, the market east, and the craftsmen's row to the west. Southward the cobbles give way to the descent.",
     "depth": 0,
     "ambientLight": 2,
-    "exits": { "north": "rim.inn", "east": "rim.market", "west": "rim.workshop", "south": "rim.gate" },
+    "exits": { "north": "d0.inn", "east": "d0.market", "west": "d0.workshop", "south": "d0.gate" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "rim-watchman", "max": 1, "respawn": 120 }]
   },
-  "rim.inn": {
-    "id": "rim.inn",
+  "d0.inn": {
+    "id": "d0.inn",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Lantern's Rest",
     "description": "Warmth and low talk spill from a long common room. A great hearth throws orange light across crowded benches, and the smell of broth and tallow hangs thick. Delvers nurse their drinks here between descents, trading rumours of what waits below. The plaza lies back through the door to the south.",
     "depth": 0,
     "ambientLight": 5,
-    "exits": { "south": "rim.plaza" },
+    "exits": { "south": "d0.plaza" },
     "fixtures": ["hearth", "cellar-hatch"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }],
@@ -29,52 +29,52 @@
         "message": "The hearth's warmth eases your hurts." }
     ]
   },
-  "rim.cellar": {
-    "id": "rim.cellar",
+  "d0.cellar": {
+    "id": "d0.cellar",
     "zone": "rim",
     "name": "The Inn Cellar",
     "description": "A cramped, earthen-floored cellar that smells less of stores than of straw and warm vermin. Casks and broth-crocks are shoved to one wall to clear the rest: a long pen of stacked crates and chicken-wire where dog-sized rats churn over a trough of kitchen scraps and gnawed bones, fat and unhurried and entirely unafraid of people. A cleaver and a coil of twine hang by the ladder, and the straw in the corner is dark with old stains. Whatever Maeve tells the delvers upstairs, the broth-pot's meat is bred down here. The ladder climbs back up to the common room.",
     "depth": 0,
     "ambientLight": 2,
-    "exits": { "up": "rim.inn" },
+    "exits": { "up": "d0.inn" },
     "fixtures": [],
     "groundItems": [{ "template": "shards", "qty": 12, "hidden": { "perception": 3 } }],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
   },
-  "rim.market": {
-    "id": "rim.market",
+  "d0.market": {
+    "id": "d0.market",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Rim Market",
     "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "west": "rim.plaza", "north": "rim.hatchery", "east": "rim.mageshed", "south": "rim.claims" },
+    "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.mageshed", "south": "d0.claims" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 120 }]
   },
-  "rim.claims": {
-    "id": "rim.claims",
+  "d0.claims": {
+    "id": "d0.claims",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Claims Office",
     "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and claims — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "north": "rim.market" },
+    "exits": { "north": "d0.market" },
     "fixtures": ["notice-board", "claims-ledger"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 120 }]
   },
-  "rim.hatchery": {
-    "id": "rim.hatchery",
+  "d0.hatchery": {
+    "id": "d0.hatchery",
     "zone": "rim",
     "name": "The Lightbug Hatchery",
     "description": "A long shed of stacked glass cells aglow with captive lightbugs, their massed shimmer washing the canvas walls a soft blue-white. Down in the abyss the bugs drift wild; here the Rim breeds them — for the steady, fuel-free light a delver can carry, and for the luminous glands the alchemists prize. Wick, who works all three of the Rim's farming sheds out of here, moves along the cells with a long gauze net. The market lies back south; a smell of churned moss and livestock drifts in from the stockpens to the north, and to the west the bug-glow bleeds through into the mushroom beds.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "south": "rim.market", "north": "rim.corral", "west": "rim.mushroomfarm" },
+    "exits": { "south": "d0.market", "north": "d0.corral", "west": "d0.mushroomfarm" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -82,40 +82,40 @@
       { "mob": "lightbug", "max": 3, "respawn": 120 }
     ]
   },
-  "rim.corral": {
-    "id": "rim.corral",
+  "d0.corral": {
+    "id": "d0.corral",
     "zone": "rim",
     "tags": ["grazing"],
     "name": "The Stockpens",
     "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "south": "rim.hatchery", "north": "rim.fault" },
+    "exits": { "south": "d0.hatchery", "north": "d0.fault" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
   },
-  "rim.fault": {
-    "id": "rim.fault",
+  "d0.fault": {
+    "id": "d0.fault",
     "zone": "rim",
     "name": "The Riven Yard",
     "depth": 0,
     "ambientLight": 2,
     "description": "Past the stockpens the boomtown simply gives out: the last canvas lean-to falls behind and the made ground ends at a bare shelf of rock the builders never floored over, strewn with broken crates and the grey tailings of someone's abandoned dig. A long crack splits the stone from end to end, wider than a hand at its mouth, and a cold draft breathes steadily up out of it — slow and constant, carrying the smell of deep water and a dark far older than the Rim above it. The pens are back south.",
-    "exits": { "south": "rim.corral" },
-    "hiddenExits": { "down": { "to": "fault.deep", "perception": 8, "name": "a squeeze down through the fault" } },
+    "exits": { "south": "d0.corral" },
+    "hiddenExits": { "down": { "to": "d5.fault.deep", "perception": 8, "name": "a squeeze down through the fault" } },
     "fixtures": [],
     "groundItems": [],
     "spawns": []
   },
-  "rim.mushroomfarm": {
-    "id": "rim.mushroomfarm",
+  "d0.mushroomfarm": {
+    "id": "d0.mushroomfarm",
     "zone": "rim",
     "name": "The Mushroom Beds",
     "description": "Stacked timber beds of dark, dampened soil run the length of a low canvas lean-to, each one furred with the plump, ivory palecaps the Rim cooks down for broth. There are no lanterns here — the beds drink the blue bug-light bleeding through the shared wall from the hatchery, for in the dark, fungus grows only where the light reaches. Pale grubs inch over the richest beds, fattening on the crop; Wick lets them be, and picks them off for bait when they grow bold. The hatchery is back east.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "east": "rim.hatchery" },
+    "exits": { "east": "d0.hatchery" },
     "fixtures": [],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 120 }
@@ -124,88 +124,88 @@
       { "mob": "grub", "max": 3, "respawn": 120 }
     ]
   },
-  "rim.mageshed": {
-    "id": "rim.mageshed",
+  "d0.mageshed": {
+    "id": "d0.mageshed",
     "zone": "rim",
     "name": "The Mage's Shed",
     "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The market lane lies back west.",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "west": "rim.market" },
+    "exits": { "west": "d0.market" },
     "fixtures": ["alchemist-bench", "trapdoor"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 120 }]
   },
-  "rim.training": {
-    "id": "rim.training",
+  "d0.training": {
+    "id": "d0.training",
     "zone": "rim",
     "name": "The Warded Cellar",
     "description": "A low stone cellar dug beneath the shed, the rough walls chalked from floor to ceiling with sigils and crossings-out — Vesper's working notes, written large. This is where she lets a delver learn the feel of a spell with something fighting back: a wisp coaxed loose from the glimmer and pinned inside a warding ring scored into the floor, snapping its cold light at anything that comes near. The only way up is the ladder back through the trapdoor.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "up": "rim.mageshed" },
+    "exits": { "up": "d0.mageshed" },
     "fixtures": ["ward-ring", "vesper-field-journal"],
     "groundItems": [],
     "spawns": [{ "mob": "wisp", "max": 1, "respawn": 120 }]
   },
-  "rim.workshop": {
-    "id": "rim.workshop",
+  "d0.workshop": {
+    "id": "d0.workshop",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Craftsmen's Row",
     "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
     "depth": 0,
     "ambientLight": 4,
-    "exits": { "east": "rim.plaza" },
+    "exits": { "east": "d0.plaza" },
     "fixtures": ["forge", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 120 }]
   },
-  "rim.gate": {
-    "id": "rim.gate",
+  "d0.gate": {
+    "id": "d0.gate",
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Descent Gate",
     "description": "The lanterns thin out here, at the edge of the settlement. A low stone arch frames the path south, and beyond it the ground falls away into shadow. A weathered sign warns delvers to count their light before they go down. The plaza is north.",
     "depth": 0,
     "ambientLight": 2,
-    "exits": { "north": "rim.plaza", "south": "rim.descent" },
+    "exits": { "north": "d0.plaza", "south": "d0.descent" },
     "fixtures": [],
     "groundItems": [],
     "spawns": []
   },
-  "rim.descent": {
-    "id": "rim.descent",
+  "d0.descent": {
+    "id": "d0.descent",
     "zone": "rim",
     "name": "The Mouth of the Shaft",
     "description": "The path ends at a great black throat in the rock — the way down. A timber winch and a frayed rope lean over the drop, and the last of the rim-light dies a few feet past the edge. The cold from below is constant now. The gate lies north; the abyss waits down.",
     "depth": 0,
     "ambientLight": 2,
-    "exits": { "north": "rim.gate", "down": "abyss.first" },
+    "exits": { "north": "d0.gate", "down": "d1.first" },
     "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": []
   },
-  "abyss.first": {
-    "id": "abyss.first",
+  "d1.first": {
+    "id": "d1.first",
     "zone": "abyss",
     "name": "The First Dark",
     "description": "A rough chamber hewn or worn into the rock just below the rim. The shaft's faint light does not reach here; without a light of your own the dark is total. Something shifts against the far wall, just out of hearing. The way up is back the way you came.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "up": "rim.descent", "east": "abyss.gallery", "north": "abyss.roost", "west": "abyss.tunnel", "south": "abyss.hollow" },
+    "exits": { "up": "d0.descent", "east": "d1.gallery", "north": "d1.roost", "west": "d1.tunnel", "south": "d1.hollow" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 120 }]
   },
-  "abyss.gallery": {
-    "id": "abyss.gallery",
+  "d1.gallery": {
+    "id": "d1.gallery",
     "zone": "abyss",
     "name": "The Collapsed Gallery",
     "description": "A passage cut smooth and square by no human hand, long since half-choked by fallen rock — old Umbral work, its walls still bearing the worn ghost of a carved relief. A crack in the ceiling lets down a grey thread of daylight, enough to see by. A hairline seam of cold blue-white glimmer threads the broken face, and the rust-red ore the old miners chased dives away south into the dark. Rats nest in the rubble, fat and unafraid. The First Dark lies back to the west; the way deepens north, east, and down the ore-drift to the south.",
     "depth": 1,
     "ambientLight": 1,
-    "exits": { "west": "abyss.first", "north": "abyss.fissure", "east": "abyss.warren", "south": "abyss.drift" },
+    "exits": { "west": "d1.first", "north": "d1.fissure", "east": "d1.warren", "south": "d1.drift" },
     "fixtures": ["glimmer-seam", "umbral-relief"],
     "groundItems": [{ "template": "shards", "qty": 15, "hidden": { "perception": 3 } }],
     "spawns": [
@@ -213,27 +213,27 @@
       { "mob": "feral-mongrel", "max": 1, "respawn": 240 }
     ]
   },
-  "abyss.warren": {
-    "id": "abyss.warren",
+  "d1.warren": {
+    "id": "d1.warren",
     "zone": "abyss",
     "name": "The Rat Warren",
     "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The only way out is back west to the gallery.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "west": "abyss.gallery" },
+    "exits": { "west": "d1.gallery" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 120 }]
   },
-  "abyss.drift": {
-    "id": "abyss.drift",
+  "d1.drift": {
+    "id": "d1.drift",
     "zone": "abyss",
     "tags": ["grazing"],
     "name": "The Ore Drift",
     "description": "A narrow working driven along the ore seam and abandoned where it thinned — square-cut Umbral stone giving way to the rougher scars of a later, greedier pick. A fresh face of rust-red ore still stands at the end, good for the working. A seam of pale mushrooms has crept across one damp wall, and the grazers have found them: armoured backs shift in the dim, mandibles rasping at the light. Something else waits up among the rafters of stone, folded and patient. The gallery is back north.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.gallery", "down": "second.descent" },
+    "exits": { "north": "d1.gallery", "down": "d2.descent" },
     "fixtures": ["iron-vein", "pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -242,89 +242,87 @@
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
-  "abyss.fissure": {
-    "id": "abyss.fissure",
+  "d1.fissure": {
+    "id": "d1.fissure",
     "zone": "abyss",
     "name": "The Echoing Fissure",
     "description": "A tall, narrow cleft in the rock where every sound comes back doubled. A thin seam of daylight falls from a crack overhead, and leathery wings stir in the shadows of the vaulted dark above. The gallery is south; a passage runs west toward a deeper roost.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "south": "abyss.gallery", "west": "abyss.roost" },
-    "hiddenExits": { "east": { "to": "abyss.vault", "perception": 3, "name": "a concealed crawlway" } },
+    "exits": { "south": "d1.gallery", "west": "d1.roost" },
     "fixtures": ["narrow-fissure"],
     "groundItems": [],
     "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 120 }]
   },
-  "abyss.roost": {
-    "id": "abyss.roost",
+  "d1.roost": {
+    "id": "d1.roost",
     "zone": "abyss",
     "name": "The Bat Roost",
     "description": "The ceiling vanishes upward into a dark, reeking vault thick with the rustle and chitter of roosting bats. A fissure far above lets down a wan grey light. Disturbed, the colony wheels and dives in erratic loops. The First Dark is south; the fissure echoes to the east.",
     "depth": 1,
     "ambientLight": 1,
-    "exits": { "south": "abyss.first", "east": "abyss.fissure" },
+    "exits": { "south": "d1.first", "east": "d1.fissure" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 90 }]
   },
-  "abyss.tunnel": {
-    "id": "abyss.tunnel",
+  "d1.tunnel": {
+    "id": "d1.tunnel",
     "zone": "abyss",
     "tags": ["water"],
     "name": "The Dripping Tunnel",
     "description": "A cramped, twisting tunnel where water seeps from the rock and gathers in a black pool. A thin fringe of moss clings to the wet stone above it, glowing the faintest blue-white — too dim to truly light the place, where the dark is otherwise absolute and something pale flows along the walls just out of reach, hunting by the sound of your steps. The First Dark is back east; the tunnel narrows west toward a faint, earthy smell of fungus.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "east": "abyss.first", "west": "abyss.grotto" },
+    "exits": { "east": "d1.first", "west": "d1.grotto" },
     "fixtures": ["dripping-pool", "weeping-moss-fringe"],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
-  "abyss.grotto": {
-    "id": "abyss.grotto",
+  "d1.grotto": {
+    "id": "d1.grotto",
     "zone": "abyss",
     "name": "The Fungal Grotto",
     "description": "A damp hollow where pale mushrooms push up between the stones in soft, ivory clusters. They are good eating, if you can gather them in the dark — and the dark here is not empty. The tunnel is east; a deeper recess glows faintly to the south.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "east": "abyss.tunnel", "south": "abyss.vault" },
+    "exits": { "east": "d1.tunnel", "south": "d1.vault" },
     "fixtures": [],
     "groundItems": [{ "template": "palecap-mushroom", "qty": 1, "respawn": 120 }],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
-  "abyss.vault": {
-    "id": "abyss.vault",
+  "d1.vault": {
+    "id": "d1.vault",
     "zone": "abyss",
     "name": "The Spore Vault",
     "description": "A close, cathedral-quiet chamber lit by its own cold green glow. A great cluster of witchglow fungus fans across the wall, and slender, luminous caps drip light from their gills. Nothing dark-dwelling will come near the glow — which is why the poison grows here in peace. The grotto is back north.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.grotto" },
-    "hiddenExits": { "west": { "to": "abyss.fissure", "perception": 3, "name": "a concealed crawlway" } },
+    "exits": { "north": "d1.grotto" },
     "fixtures": ["witchglow-cluster"],
     "groundItems": [{ "template": "witchglow-cap", "qty": 1, "respawn": 150 }],
     "spawns": []
   },
-  "abyss.hollow": {
-    "id": "abyss.hollow",
+  "d1.hollow": {
+    "id": "d1.hollow",
     "zone": "abyss",
     "name": "The Lightbug Hollow",
     "description": "A wide, still cavern where lightbugs drift in lazy constellations, their soft glow rising and falling like slow breath. It is the one gentle place this side of the rim — a delver can rest here, and gather the cold light the bugs leave behind. The First Dark is north; the floor slopes down into a darker cut to the south.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.first", "south": "abyss.cut" },
+    "exits": { "north": "d1.first", "south": "d1.cut" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "lightbug", "max": 3, "respawn": 50 }]
   },
-  "abyss.cut": {
-    "id": "abyss.cut",
+  "d1.cut": {
+    "id": "d1.cut",
     "zone": "abyss",
     "name": "The Sunken Cut",
     "description": "A prospector's dig, abandoned mid-work: a rusted pick, a snapped ladder, a trench cut into the floor and never finished — someone came down full of hope and left their tools where they fell. The dark has moved back in, and with it the vermin. Something larger has been dragging things down the passage to the south. The hollow's glow is faint to the north.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.hollow", "south": "abyss.den" },
+    "exits": { "north": "d1.hollow", "south": "d1.den" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -333,62 +331,62 @@
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
-  "abyss.den": {
-    "id": "abyss.den",
+  "d1.den": {
+    "id": "d1.den",
     "zone": "abyss",
     "name": "The Brood-Mother's Den",
     "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The only way out is north, behind you.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "abyss.cut" },
+    "exits": { "north": "d1.cut" },
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 600 }]
   },
-  "second.descent": {
-    "id": "second.descent",
+  "d2.descent": {
+    "id": "d2.descent",
     "zone": "second",
     "name": "The Winch-Head",
     "depth": 2,
     "ambientLight": 1,
     "description": "A rough waystation hacked from the rock at the base of the lower shaft — a hauling winch bolted to a timber frame, its rope frayed to silk at the wear-points, a capstan bar worn smooth by many hands. The rock face is chalked with tally marks: haul dates, weights, and a running count that stops abruptly mid-column. Someone's arithmetic, abandoned. A lantern hangs on a spike above the winch and has not yet guttered out. The ore drift is back up; the prospectors' road runs west.",
-    "exits": { "up": "abyss.drift", "west": "second.road" },
+    "exits": { "up": "d1.drift", "west": "d2.road" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "lightbug", "max": 2, "respawn": 50 }]
   },
-  "second.road": {
-    "id": "second.road",
+  "d2.road": {
+    "id": "d2.road",
     "zone": "second",
     "name": "The Prospectors' Road",
     "depth": 2,
     "ambientLight": 0,
     "description": "A passage worn smooth by boots and boot-nails, wider than the wild tunnels around it — this one has been walked. Cairns of stacked stones mark the safe line through the dark, and chalk arrows on the wall point the way back up. Whoever laid the markers knew what they were doing. The winch-head is east; the passage runs on west to the crossing, and a side-way drops south into the grazing galleries.",
-    "exits": { "east": "second.descent", "west": "second.crossing", "south": "second.graze1" },
+    "exits": { "east": "d2.descent", "west": "d2.crossing", "south": "d2.graze.1" },
     "fixtures": [],
     "groundItems": [],
     "spawns": []
   },
-  "second.crossing": {
-    "id": "second.crossing",
+  "d2.crossing": {
+    "id": "d2.crossing",
     "zone": "second",
     "name": "The Crossing",
     "depth": 2,
     "ambientLight": 0,
     "description": "The road meets a junction where the passage widens and a hewn adit opens north — a mine-mouth driven square into the rock, the pick-scars fresh enough that the dust has not fully settled. The prospectors' chalk marks stop here; beyond the adit mouth the dark is unmarked and complete. The road runs east toward the winch-head and west toward the deep stair.",
-    "exits": { "east": "second.road", "west": "second.stair", "north": "second.mine1" },
+    "exits": { "east": "d2.road", "west": "d2.stair", "north": "d2.mine.1" },
     "fixtures": [],
     "groundItems": [],
     "spawns": []
   },
-  "second.stair": {
-    "id": "second.stair",
+  "d2.stair": {
+    "id": "d2.stair",
     "zone": "second",
     "name": "The Deep Stair",
     "depth": 2,
     "ambientLight": 0,
     "description": "The passage ends at a cleft in the rock where cut stone steps drop away into a black throat — a stair driven deeper than any prospector on this floor has yet worked. A length of rope is knotted to an iron spike and runs over the lip, taut now, where a steadier hand than the last has made it fast. Far below, faint and constant, comes the sound of running water. The prospectors' chalk on the wall here said NOT YET, and someone has scratched it through. The crossing is east; the stair drops away down.",
-    "exits": { "east": "second.crossing", "down": "third.landing" },
+    "exits": { "east": "d2.crossing", "down": "d3.landing" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 12, "hidden": { "perception": 3 } },
@@ -396,15 +394,15 @@
     ],
     "spawns": []
   },
-  "second.graze1": {
-    "id": "second.graze1",
+  "d2.graze.1": {
+    "id": "d2.graze.1",
     "zone": "second-graze",
     "tags": ["grazing"],
     "name": "The Grazing Galleries",
     "depth": 2,
     "ambientLight": 1,
     "description": "A broad, low gallery lit by the soft pulse of pale mushrooms spread across the damp walls — enough light to graze by, which is exactly what the stonebugs do. Armoured backs catch the glow as the bugs work their slow circuits, and the floor is smooth where they have turned it under them for years. The prospectors' road is north; the galleries open south and east.",
-    "exits": { "north": "second.road", "south": "second.graze2", "east": "second.graze4" },
+    "exits": { "north": "d2.road", "south": "d2.graze.2", "east": "d2.graze.4" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -412,15 +410,15 @@
       { "mob": "thornbug", "max": 1, "respawn": 120 }
     ]
   },
-  "second.graze2": {
-    "id": "second.graze2",
+  "d2.graze.2": {
+    "id": "d2.graze.2",
     "zone": "second-graze",
     "tags": ["grazing"],
     "name": "The Spine-Thicket",
     "depth": 2,
     "ambientLight": 1,
     "description": "A close, low gallery where the pale mushrooms cluster thick and the thornbugs have followed the food. They crowd the walls in bristling rows — squat, spiked shapes rasping at the caps, indifferent to company until company gets too close. The galleries open back north; the way deepens south.",
-    "exits": { "north": "second.graze1", "south": "second.graze3" },
+    "exits": { "north": "d2.graze.1", "south": "d2.graze.3" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -429,28 +427,28 @@
       { "mob": "cave-centipede", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
-  "second.graze3": {
-    "id": "second.graze3",
+  "d2.graze.3": {
+    "id": "d2.graze.3",
     "zone": "second-graze",
     "tags": ["grazing"],
     "name": "The Grinder's Hollow",
     "depth": 2,
     "ambientLight": 1,
     "description": "The rock here is smooth as dressed stone — not cut, but worn flat by years of slow circling. The pale mushrooms crowd the walls, and in the centre of it all, older than anything else in the galleries, the great stonebug makes its endless round. The hollow fits it exactly; it made the hollow. The spine-thicket is back north.",
-    "exits": { "north": "second.graze2" },
+    "exits": { "north": "d2.graze.2" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [{ "mob": "old-grinder", "max": 1, "respawn": 600 }]
   },
-  "second.graze4": {
-    "id": "second.graze4",
+  "d2.graze.4": {
+    "id": "d2.graze.4",
     "zone": "second-graze",
     "tags": ["grazing"],
     "name": "The Skitter-Crack",
     "depth": 2,
     "ambientLight": 0,
     "description": "A low, dark crack running off from the galleries — the pale mushrooms don't reach here, and whatever nests in the crack prefers it that way. The stone underfoot is scored with thin, close marks, the kind many fast legs leave. Something hunts the strays that drift out of the lit galleries. The galleries are back west.",
-    "exits": { "west": "second.graze1" },
+    "exits": { "west": "d2.graze.1" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -458,14 +456,14 @@
       { "mob": "thornbug", "max": 1, "respawn": 120 }
     ]
   },
-  "second.mine1": {
-    "id": "second.mine1",
+  "d2.mine.1": {
+    "id": "d2.mine.1",
     "zone": "second-mine",
     "name": "The Adit",
     "depth": 2,
     "ambientLight": 0,
     "description": "The hewn mouth of the mine, square-cut and fresh-worked — the pick-scars still sharp on the walls. A seam of rust-red iron runs along the right face and dips deeper into the dark, and a hairline thread of cold blue-white glimmer glints in the rock beside it, easy to miss against the rust. The crossing is back south; the working runs north and west.",
-    "exits": { "south": "second.crossing", "north": "second.mine2", "west": "second.mine3" },
+    "exits": { "south": "d2.crossing", "north": "d2.mine.2", "west": "d2.mine.3" },
     "fixtures": ["iron-vein", "glimmer-seam"],
     "groundItems": [],
     "spawns": [
@@ -473,54 +471,54 @@
       { "mob": "scour-slug", "max": 1, "respawn": 120 }
     ]
   },
-  "second.mine2": {
-    "id": "second.mine2",
+  "d2.mine.2": {
+    "id": "d2.mine.2",
     "zone": "second-mine",
     "name": "The Black Drift",
     "depth": 2,
     "ambientLight": 0,
     "description": "A long working driven north along a second iron seam, the walls pressing close. The floor is tracked and churned — this drift has seen steady traffic, and not all of it human-footed. The adit is back south; a side-cut runs west.",
-    "exits": { "south": "second.mine1", "west": "second.mine4" },
+    "exits": { "south": "d2.mine.1", "west": "d2.mine.4" },
     "fixtures": ["iron-vein", { "template": "silver-vein", "hidden": { "perception": 4 } }],
     "groundItems": [],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 120 }]
   },
-  "second.mine3": {
-    "id": "second.mine3",
+  "d2.mine.3": {
+    "id": "d2.mine.3",
     "zone": "second-mine",
     "name": "The Silver Cut",
     "depth": 2,
     "ambientLight": 0,
     "description": "A short cut driven west off the main adit where the pick broke into something unexpected — a pale seam, neither rust-red nor common grey, threading the rock at a steep angle. The ore the Rim calls the mine's prize; it runs thin, and the cut is not large. The ceiling is low and close. The adit is east; the cut opens north into older stone.",
-    "exits": { "east": "second.mine1", "north": "second.mine4" },
+    "exits": { "east": "d2.mine.1", "north": "d2.mine.4" },
     "fixtures": ["silver-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
-  "second.mine4": {
-    "id": "second.mine4",
+  "d2.mine.4": {
+    "id": "d2.mine.4",
     "zone": "second-mine",
     "name": "The Umbral Stope",
     "depth": 2,
     "ambientLight": 0,
     "description": "The prospectors' rough scars give way abruptly to square-cut Umbral stone — the picks broke through a worked wall and into something older. A wide, low chamber opens out, the walls dressed smooth and set with a squat pillar scored with lightless-eye glyphs. The air here is different: stiller, older, pressing back. A thin seam of cold blue-white glimmer threads the dressed stone behind the pillar — faint flecks of caught light the old masons either missed or left. The silver cut is south; the black drift is east; the stope descends north to the deepest working.",
-    "exits": { "south": "second.mine3", "east": "second.mine2", "north": "second.mine5" },
+    "exits": { "south": "d2.mine.3", "east": "d2.mine.2", "north": "d2.mine.5" },
     "fixtures": ["umbral-pillar", "glimmer-seam"],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 1, "respawn": 90 }]
   },
-  "second.mine5": {
-    "id": "second.mine5",
+  "d2.mine.5": {
+    "id": "d2.mine.5",
     "zone": "second-mine",
     "tags": ["water"],
     "name": "The Sump",
     "depth": 2,
     "ambientLight": 0,
     "description": "The mine's lowest point, where the workings run into water. A black pool has gathered in the deepest cut, fed from a dozen hair-thin seeps in the Umbral stone, and the floor slopes into it from all sides. Things live in the water and in the dark above it. The stope is back south — and something in the dark came from further off, following the sound of boots.",
-    "exits": { "south": "second.mine4" },
-    "hiddenExits": { "down": { "to": "second.grotto", "perception": 4, "name": "a flooded tunnel" } },
+    "exits": { "south": "d2.mine.4" },
+    "hiddenExits": { "down": { "to": "d2.mine.grotto", "perception": 4, "name": "a flooded tunnel" } },
     "fixtures": ["dripping-pool"],
     "groundItems": [],
     "spawns": [
@@ -528,15 +526,15 @@
       { "mob": "pallid-hunter", "max": 1, "respawn": 200 }
     ]
   },
-  "second.grotto": {
-    "id": "second.grotto",
+  "d2.mine.grotto": {
+    "id": "d2.mine.grotto",
     "zone": "second-mine",
     "tags": ["water"],
     "name": "The Drowned Hollow",
     "depth": 2,
     "ambientLight": 0,
     "description": "The flooded tunnel spits you out into a pocket the workings never found. Half the floor is water — black, perfectly still, cold enough to ache in the joints — and the stone above it is slick and low. Above the waterline a narrow ledge runs the far wall, and a glimmer crystal still juts from the seam that birthed it there — whole, untouched, its captive light pressing faint blue-white against the dark in a slow, almost breathing pulse, waiting for a steady hand to work it free. Pale salamanders lie along the wet stone near the ledge, skin the colour of old candle-wax, eyes sealed over and useless. They do not react to your presence. The air is close and cold and tastes of deep water. The only way back is through the flooded tunnel, up.",
-    "exits": { "up": "second.mine5" },
+    "exits": { "up": "d2.mine.5" },
     "fixtures": ["dripping-pool"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 }
@@ -545,28 +543,28 @@
       { "mob": "pale-salamander", "max": 2, "respawn": 90 }
     ]
   },
-  "third.landing": {
-    "id": "third.landing",
+  "d3.landing": {
+    "id": "d3.landing",
     "zone": "third",
     "tags": ["water"],
     "name": "The River Stair",
     "depth": 3,
     "ambientLight": 0,
     "description": "The deep stair bottoms out on a broad shelf of water-smoothed rock, and the sound that carried down the shaft resolves into a river — a wide, black current sliding out of the dark on one side and away into it on the other, older than any working above. The air is cool and wet and clean, and after the close mine-dust of the upper floors it feels almost kind. No vermin nest here; the water keeps the dark things off. Where the last steps meet the shelf, a thin seam of cold blue-white glimmer threads the water-smoothed rock, faint but unmistakable to a delver's eye. The stair climbs back up; the bank runs west along the current.",
-    "exits": { "up": "second.stair", "west": "third.shallows" },
+    "exits": { "up": "d2.stair", "west": "d3.shallows" },
     "fixtures": ["glimmer-seam"],
     "groundItems": [],
     "spawns": []
   },
-  "third.shallows": {
-    "id": "third.shallows",
+  "d3.shallows": {
+    "id": "d3.shallows",
     "zone": "third",
     "tags": ["water"],
     "name": "The Pale Shallows",
     "depth": 3,
     "ambientLight": 0,
     "description": "The river widens and slows, spreading thin over a pale stone shelf where it runs barely shin-deep. Blind cave-fish drift the slack water in lazy, unhurried circles, nosing the current. It looks a still, easy stretch of bank — the sort of place a delver might unsling a baited line and breathe a while, though the water is darker where it deepens at the far edge, and not every shadow under it is stone. The stair-landing is back east; the bank runs on west toward a deeper sound of water.",
-    "exits": { "east": "third.landing", "west": "third.pools" },
+    "exits": { "east": "d3.landing", "west": "d3.pools" },
     "fixtures": ["river-shallows", "weeping-moss-curtain"],
     "groundItems": [],
     "spawns": [
@@ -574,42 +572,42 @@
       { "mob": "cave-lurker", "max": 2, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
-  "third.pools": {
-    "id": "third.pools",
+  "d3.pools": {
+    "id": "d3.pools",
     "zone": "third",
     "tags": ["water"],
     "name": "The Still Pools",
     "depth": 3,
     "ambientLight": 1,
     "description": "Here the current loses itself in a chain of broad, deep pools, their black surfaces lit faintly from below by a phosphor-glow caught in the deep water. The fish run larger down in the cold dark, and rise in slow rings to feed. A worked path branches south, away from the water — cut stone, dressed smooth, with the soft glow of something tended bleeding up from below. The bank runs west toward the falls and east back to the shallows.",
-    "exits": { "east": "third.shallows", "west": "third.falls", "south": "third.dwelling" },
+    "exits": { "east": "d3.shallows", "west": "d3.falls", "south": "d3.umbral.dwelling" },
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [{ "mob": "blind-cave-fish", "max": 3, "respawn": 90 }]
   },
-  "third.falls": {
-    "id": "third.falls",
+  "d3.falls": {
+    "id": "d3.falls",
     "zone": "third",
     "tags": ["water"],
     "name": "The Sunless Falls",
     "depth": 3,
     "ambientLight": 1,
     "description": "The river gathers itself and pours over a black lip into a roaring dark — a waterfall the Umbrals name the paqcha, falling further than any light here can follow. Cold spray hangs in the air, faintly luminous, and the rock trembles with the weight of falling water. The glow comes from the moss: a dense curtain of weeping chasm-moss clinging to the ceiling and the high rock, its blue-white bioluminescence caught and scattered by the spray into something that barely passes for light. A narrow ledge runs down beside the cataract — the rope-stakes are driven home and the line strung taut at last, the descent made fast, and it switchbacks away into the cold roar below toward a wider water glimmering far down. A low cave mouth gapes north, half-curtained by the spray, where the falls have hollowed a flooded pocket into the rock. The bank runs back east.",
-    "exits": { "east": "third.pools", "north": "third.cave", "down": "lake.strand" },
+    "exits": { "east": "d3.pools", "north": "d3.cave", "down": "d4.lake.strand" },
     "fixtures": ["weeping-moss-curtain"],
     "groundItems": [],
     "spawns": []
   },
-  "third.cave": {
-    "id": "third.cave",
+  "d3.cave": {
+    "id": "d3.cave",
     "zone": "third",
     "tags": ["water"],
     "name": "The Plunge Cave",
     "depth": 3,
     "ambientLight": 0,
     "description": "The falls have gnawed a deep pocket back into the rock here, and the river's overspill gathers in a broad, cold plunge-pool that fills most of the floor. For all the water the falls feed it the pool never rises to overflow — somewhere beneath the surface it has worn its own way out, and a slow, cold draw tugs at anything that drifts too near the deep end. The roar of the cataract comes muffled through the stone, and the dark is total but for what light a delver brings. This is no quiet fishing-hole: pale crayfish own the water, eyeless and armoured, claws raised at anything that nears their pool — they swarm the fish the falls wash down, and will turn those same claws on a careless hand. The way out is back south, through the spray.",
-    "exits": { "south": "third.falls" },
-    "hiddenExits": { "down": { "to": "warren.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
+    "exits": { "south": "d3.falls" },
+    "hiddenExits": { "down": { "to": "d7.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [{ "mob": "pale-crayfish", "max": 2, "respawn": 120 }],
@@ -618,26 +616,26 @@
         "message": "Cold spray off the plunge-pool drowns your flame in a hiss of steam." }
     ]
   },
-  "third.dwelling": {
-    "id": "third.dwelling",
+  "d3.umbral.dwelling": {
+    "id": "d3.umbral.dwelling",
     "zone": "third-umbral",
     "name": "Mallki's Hollow",
     "depth": 3,
     "ambientLight": 0,
     "description": "The worked path opens into a low, dry hollow carved square from the living rock — a dwelling, plainly, and a very old one. A cold glimmer-lamp throws a soft, heatless blue over shelves of river-shells, coils of woven gut-line, and neat stacks of dried fungus. There are no torches and no flame; the light here is kept low and kind, easy on eyes that were never meant for the sun. Against one wall a squat glimmer-hearth breathes a low blue heat beside a worked-stone anvil — Mallki's forge, where he binds chitin, glimmer, and stranger things still into worked steel. Mallki keeps this place. The pools lie back north; the light of a tended garden glows up from a passage south.",
-    "exits": { "north": "third.pools", "south": "third.garden" },
+    "exits": { "north": "d3.pools", "south": "d3.umbral.garden" },
     "fixtures": ["umbral-coldlamp", "umbral-forge"],
     "groundItems": [],
     "spawns": [{ "mob": "umbral-trader", "max": 1, "respawn": 600 }, { "mob": "umbral-chitin-warden", "max": 1, "respawn": 300 }]
   },
-  "third.garden": {
-    "id": "third.garden",
+  "d3.umbral.garden": {
+    "id": "d3.umbral.garden",
     "zone": "third-umbral",
     "name": "The Sunless Garden",
     "depth": 3,
     "ambientLight": 0,
     "description": "A cavern given over wholly to cultivation: terraced beds of dark earth climb the walls, each furred with a tended, even crop of luminous fungus that breathes a soft blue-green light over the whole chamber. The air is rich and damp and faintly sweet. A stone cistern set into the floor catches a clean seep drop by drop and leads the overflow off among the beds in a worked channel. Pale grubs work the richest beds, fattening on the crop — Mallki lets them be, and picks them off for the line when they grow bold. This is where the Umbral feeds himself, and has, by the look of it, for longer than the Rim has stood. The way back up to the hollow is north; a low passage south carries the smell of stone and grazing beasts.",
-    "exits": { "north": "third.dwelling", "south": "third.grazing" },
+    "exits": { "north": "d3.umbral.dwelling", "south": "d3.umbral.grazing" },
     "fixtures": ["umbral-garden-beds", "umbral-cistern"],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
@@ -646,29 +644,29 @@
       { "mob": "grub", "max": 3, "respawn": 120 }
     ]
   },
-  "third.grazing": {
-    "id": "third.grazing",
+  "d3.umbral.grazing": {
+    "id": "d3.umbral.grazing",
     "zone": "third-umbral",
     "tags": ["grazing"],
     "name": "The Grazing Hollow",
     "depth": 3,
     "ambientLight": 0,
     "description": "The passage opens into a wide, low hollow where the moss grows thick and wild, glowing blue-green across the floor and up the lower walls. Stonebugs drift through it in slow, patient circuits, armoured backs catching the soft light, mandibles working the feed — they come and go as they like, in out of the dark, drawn by the easy grazing and the thread of cistern-water that trickles down the channel from the garden to pool against the far wall. Nothing here is penned or fenced. Mallki simply lives beside the herd, takes what the balance allows, and lets the moss grow back the faster for their cropping. The garden lies back north.",
-    "exits": { "north": "third.garden" },
+    "exits": { "north": "d3.umbral.garden" },
     "fixtures": ["umbral-stonebug-grounds"],
     "groundItems": [],
     "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
   },
-  "lake.strand": {
-    "id": "lake.strand",
+  "d4.lake.strand": {
+    "id": "d4.lake.strand",
     "zone": "fourth-lake",
     "tags": ["water"],
     "name": "The Drowned Strand",
     "depth": 4,
     "ambientLight": 1,
     "description": "The ledge bottoms out on a shelf of black sand, and the paqcha comes down beside you in a single unbroken fall — a column of cold water roaring out of the dark above to hammer into a vast, still lake that runs away further than the light can chase. This is the foot of the falls, and the cavern that holds the lake is huge: the far shore is only a guessed-at line of deeper black. Weeping chasm-moss hangs thick on the wet rock here where the spray keeps it fed, its blue-white glow pooling over the sand and the water's edge, enough to walk by. Where that cold light falls steadiest, a scatter of pale mushrooms has taken to the damp sand — the first growing things to feed on a glow since the river far above. The air is all cold mist and the smell of deep water. Where the fall meets the rock to the west, the spray hangs across the stone like a curtain, and what lies behind the falling water is lost to sight. The way up the cataract climbs back into the roar; the shore runs on east, level and dry, along the lake.",
-    "exits": { "up": "third.falls", "east": "lake.shallows" },
-    "hiddenExits": { "west": { "to": "lake.shrine", "perception": 4, "name": "a slick ledge behind the falls" } },
+    "exits": { "up": "d3.falls", "east": "d4.lake.shallows" },
+    "hiddenExits": { "west": { "to": "d4.lake.shrine", "perception": 4, "name": "a slick ledge behind the falls" } },
     "fixtures": ["weeping-moss-curtain"],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
@@ -677,15 +675,15 @@
       { "mob": "pale-salamander", "max": 1, "respawn": 120 }
     ]
   },
-  "lake.shallows": {
-    "id": "lake.shallows",
+  "d4.lake.shallows": {
+    "id": "d4.lake.shallows",
     "zone": "fourth-lake",
     "tags": ["water"],
     "name": "The Black Shallows",
     "depth": 4,
     "ambientLight": 1,
     "description": "Here the lake comes ashore in a long, shallow margin, the black water spreading thin and glass-still over a shelf of pale stone before it drops away into the deep. Blind cave-fish hang in the slack, larger than those of the river above and many more of them — the falls feed this lake, and what the falls wash down gathers here. It is a still, easy stretch, the moss-glow soft on the water, the kind of place a delver might unsling a baited line and breathe a while; only the pale crayfish that own the silt give it any edge. The shore runs west toward the roar of the falls and east toward a narrowing of the bank. A dry passage opens south, away from the water, where the rough cave gives way to old cut stone.",
-    "exits": { "west": "lake.strand", "east": "lake.narrows", "south": "lake.fissure" },
+    "exits": { "west": "d4.lake.strand", "east": "d4.lake.narrows", "south": "d4.umbral.fissure" },
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [
@@ -693,58 +691,58 @@
       { "mob": "pale-crayfish", "max": 1, "respawn": 120 }
     ]
   },
-  "lake.narrows": {
-    "id": "lake.narrows",
+  "d4.lake.narrows": {
+    "id": "d4.lake.narrows",
     "zone": "fourth-lake",
     "tags": ["water"],
     "name": "The Shorewalk Narrows",
     "depth": 4,
     "ambientLight": 1,
     "description": "The cavern wall closes in on the lake here, pinching the shore down to a slick ledge barely a body wide, deep black water on one hand and cold stone on the other. The moss thins where the spray no longer reaches, and the glow with it, so the footing must be read more than seen. It is the one tight place on the walk around the water, and the crayfish know it — they gather where the bank forces everything past within reach of their claws. The ledge widens again to the east, where the lake begins to drain away. To the west the shore opens back toward the shallows. North, a low gravel spit runs out into the lake itself, pale against the black.",
-    "exits": { "west": "lake.shallows", "east": "lake.farshore", "north": "lake.causeway" },
+    "exits": { "west": "d4.lake.shallows", "east": "d4.lake.farshore", "north": "d4.lake.causeway" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "pale-crayfish", "max": 2, "respawn": 90 }
     ]
   },
-  "lake.farshore": {
-    "id": "lake.farshore",
+  "d4.lake.farshore": {
+    "id": "d4.lake.farshore",
     "zone": "fourth-lake",
     "tags": ["water"],
     "name": "The Far Bank",
     "depth": 4,
     "ambientLight": 1,
     "description": "The shore-walk ends on a broad bank of water-smoothed rock at the lake's far reach, where the still water finds its outflow at last — drawn down a black throat in the floor with a low, endless suck of current, away into a deeper dark than this. A little weeping-moss has taken on the wet rock at the lip of it, throwing just enough light to see the water turn and go down. The descent continues here, and someone has made it fast at last: the stakes are driven home and a knotted line runs taut over the lip and down beside the outflow, switchbacking away into the roar of the draining water. Old chalk-marks and a discarded coil say the work was finished some seasons back and little used since. The shore runs back west; the line goes down, into the black throat with the water.",
-    "exits": { "west": "lake.narrows", "down": "deep.gullet" },
+    "exits": { "west": "d4.lake.narrows", "down": "d5.gullet" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "pale-salamander", "max": 1, "respawn": 120 }
     ]
   },
-  "lake.causeway": {
-    "id": "lake.causeway",
+  "d4.lake.causeway": {
+    "id": "d4.lake.causeway",
     "zone": "fourth-lake",
     "name": "The Gravel Spit",
     "depth": 4,
     "ambientLight": 1,
     "description": "A natural causeway of pale gravel and tumbled stone runs out from the bank into the lake, low and bare, black water lapping at both edges of it. Walking it feels like walking out onto the water itself, the shore-glow falling away behind and the cold rising off the lake on every side. Ahead, where the spit lifts clear of the water, a hump of rock breaks the surface — a small island, and something on it catches what little light there is and throws it back in a cold, mineral shimmer. The spit runs north toward the island and back south to the safety of the shore.",
-    "exits": { "south": "lake.narrows", "north": "lake.islet" },
+    "exits": { "south": "d4.lake.narrows", "north": "d4.lake.islet" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "pale-crayfish", "max": 1, "respawn": 120 }
     ]
   },
-  "lake.islet": {
-    "id": "lake.islet",
+  "d4.lake.islet": {
+    "id": "d4.lake.islet",
     "zone": "fourth-lake",
     "name": "The King's Reach",
     "depth": 4,
     "ambientLight": 1,
     "description": "The spit climbs onto a low island of heaped, water-worn rock, ringed on every side by the deep black lake — the richest hunting on the water, where everything the falls wash down eventually drifts. The stone is littered with the leavings of a long reign: cracked shells and the picked-clean bones of fish and crayfish and things less easy to name, heaped and trodden into the rock over years. Here and there among the heap a harder edge catches the light — things that are neither shell nor bone, sunk in the silt of the King's table. This is the Pale King's ground, and he suffers nothing to share it. There is no way on from here; the gravel spit runs back south to the shore.",
-    "exits": { "south": "lake.causeway" },
+    "exits": { "south": "d4.lake.causeway" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 15, "hidden": { "perception": 3 } },
@@ -754,38 +752,38 @@
     ],
     "spawns": [{ "mob": "pale-king", "max": 1, "respawn": 900 }]
   },
-  "lake.fissure": {
-    "id": "lake.fissure",
+  "d4.umbral.fissure": {
+    "id": "d4.umbral.fissure",
     "zone": "fourth-umbral",
     "name": "The Dry Fissure",
     "depth": 4,
     "ambientLight": 0,
     "description": "The passage climbs away from the lake into dry rock, and the moss-glow dies behind you — here the dark is total but for what light a delver carries. A few steps in, the rough cave changes character: the walls go suddenly straight and true, dressed smooth, the floor levelled and swept. This is worked stone, old Umbral work, and far older than the half-built ledges of the delvers above — someone shaped this passage long ago and meant it to last. The air is dry and dead-still and carries a faint, sour wrongness, like a clean room gone unaired for years. Where the old chisels bit deepest into the side wall, the cut has laid bare a seam of pale metal threading the stone — raw silver, unworked, the kind of find that starts rushes. The lake glows faintly back to the north; the worked passage runs deeper south.",
-    "exits": { "north": "lake.shallows", "south": "lake.gallery" },
+    "exits": { "north": "d4.lake.shallows", "south": "d4.umbral.gallery" },
     "fixtures": ["silver-vein"],
     "groundItems": [],
     "spawns": []
   },
-  "lake.gallery": {
-    "id": "lake.gallery",
+  "d4.umbral.gallery": {
+    "id": "d4.umbral.gallery",
     "zone": "fourth-umbral",
     "name": "The Failing Reliefs",
     "depth": 4,
     "ambientLight": 0,
     "description": "The passage opens into a long gallery, and both walls are carved end to end with Umbral relief — the same patient stonework that ornaments the worked tunnels above, figures of the deep-folk at their crafts and their rites, worn soft but unmistakable. Follow them along the wall, though, and something goes wrong with them. The figures grow taller and thinner as they go, their fine faces lengthening into something gaunt and starved, hands curling, eyes opening too wide; the careful lines turn ragged, then gouged, then to raw hacking at the stone, as if the same hand that began them kept working long after it had forgotten what it was carving. The last reliefs are barely figures at all. A thin seam of cold blue-white glimmer threads the stone beneath the ruined carving, still here long after the hand that cut them failed. A cold draught breathes up from the dark ahead, southward; the worked passage runs back north toward the lake.",
-    "exits": { "north": "lake.fissure", "south": "lake.warren" },
+    "exits": { "north": "d4.umbral.fissure", "south": "d4.umbral.warren" },
     "fixtures": ["glimmer-seam"],
     "groundItems": [],
     "spawns": []
   },
-  "lake.warren": {
-    "id": "lake.warren",
+  "d4.umbral.warren": {
+    "id": "d4.umbral.warren",
     "zone": "fourth-umbral",
     "name": "Yana's Hollow",
     "depth": 4,
     "ambientLight": 0,
     "description": "The passage ends in a low, square hollow — a dwelling, once, and unmistakably a brother to Mallki's clean lamp-lit room far above: the same carved shelves, the same cold-lamp niche, the same care in the cut of the walls. But the lamp is long dead, the shelves are swept to the floor and the floor is fouled, and the careful order has been clawed apart from within and rebuilt into something a beast would make. Whatever light there is comes from the thing that keeps this place now — a faint blue-green glow moving under grey skin, the very same glow Mallki carries, but stretched thin over a frame gone tall and wrong, flinching from even the memory of light. This was an Umbral once, and not long enough ago. Something small lies half-buried in the swept wreckage by the dead lamp, where the thing returns to claw and worry at the filth. The only way out is back north, the way you came.",
-    "exits": { "north": "lake.gallery" },
+    "exits": { "north": "d4.umbral.gallery" },
     "fixtures": [],
     "groundItems": [
       { "template": "apprentice-glimmer-charm", "hidden": { "perception": 4 } }
@@ -794,14 +792,14 @@
       { "mob": "yana", "max": 1, "respawn": 1200 }
     ]
   },
-  "lake.shrine": {
-    "id": "lake.shrine",
+  "d4.lake.shrine": {
+    "id": "d4.lake.shrine",
     "zone": "fourth-lake",
     "name": "Behind the Paqcha",
     "depth": 4,
     "ambientLight": 0,
     "description": "The ledge slips behind the falling water into a pocket the roar cannot quite follow, and the noise drops to a deep, close hush. It is a made place: a small niche carved square into the living rock, its back wall worked with an Umbral relief of the paqcha itself — the fall rendered in patient, flowing lines, with the deep-folk small and bowed at its foot. A cold glimmer-lamp still burns in its cradle, untended for who knows how long, throwing soft blue light over the offerings left here long ago. This is the Umbrals' shrine to the water they named, kept secret behind the curtain of the fall, and the surface-folk's Rush has never touched it. A glimmer crystal rests in the offering-niche, and loose shards lie scattered before it. Where the lamp's cold light falls steadiest, a slender witchglow cluster has crept up the damp niche-wall, dripping its own green glow over the offerings — beautiful, and poison, and grown here in a peace nothing has thought to disturb. The only way out is back east, through the water.",
-    "exits": { "east": "lake.strand" },
+    "exits": { "east": "d4.lake.strand" },
     "fixtures": ["umbral-coldlamp", "shrine-font", "witchglow-cluster"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 },
@@ -810,42 +808,42 @@
     ],
     "spawns": []
   },
-  "deep.gullet": {
-    "id": "deep.gullet",
+  "d5.gullet": {
+    "id": "d5.gullet",
     "zone": "fifth-descent",
     "name": "The Gullet",
     "depth": 5,
     "ambientLight": 0,
     "description": "The line drops you into a narrow throat of wet rock, and the lake's outflow comes down it with you — a black race of water roaring in the dark to your one side, close enough to soak you with its cold. The moss-glow of the lake dies within a few steps and does not return; here there is only what light a delver carries, and the noise of the water filling the stone. The stair the prospectors cut is a rough switchback of stakes and notched ledges, slick underfoot, doubling back on itself as it follows the current down. There is no glow, no growing thing, nothing to feed on a light this deep — only the descent, longer than it looks, working steadily down. The line climbs back up toward the lake; below, the throat opens out and the roar begins to fall behind.",
-    "exits": { "up": "lake.farshore", "down": "deep.camp" },
+    "exits": { "up": "d4.lake.farshore", "down": "d6.camp" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "pale-salamander", "max": 1, "respawn": 150 }
     ]
   },
-  "deep.camp": {
-    "id": "deep.camp",
+  "d6.camp": {
+    "id": "d6.camp",
     "zone": "fifth-descent",
     "name": "The Forward Camp",
     "depth": 6,
     "ambientLight": 0,
     "description": "The throat opens onto a wide, dry ledge set back from the water, and the roar drops to a steady hush below. Prospectors held this place once — the last flat, dry ground before the dark goes bad — and the bones of their camp are still here: a ring of fire-blackened stones, a plank bench knocked together across two crates, a brass lamp standing dark on a flat rock, bedrolls rotted to felt against the wall. They meant to push deeper from here and stage their finds on the climb out. The chalk tallies by the bench break off mid-season, and no one struck the camp or carried it home; it was simply left. It is a good place to strike a light, cook a catch, and gather yourself — for the camp ends where the prospectors' nerve did. A low passage runs on south into a colder dark, unstaked and unmarked, where no line has yet been made fast. The stair climbs back up toward the lake.",
-    "exits": { "up": "deep.gullet", "south": "warren.throat" },
+    "exits": { "up": "d5.gullet", "south": "d7.throat" },
     "fixtures": ["camp-lamp", "camp-firepit", "camp-bench", "camp-seep"],
     "groundItems": [
       { "template": "lamp-oil", "qty": 1, "respawn": 600 }
     ],
     "spawns": []
   },
-  "warren.throat": {
-    "id": "warren.throat",
+  "d7.throat": {
+    "id": "d7.throat",
     "zone": "gloom-warren",
     "name": "Where the Dark Goes Bad",
     "depth": 7,
     "ambientLight": -1,
     "description": "The low passage south of the camp pinches down to a crawl and then lets go all at once into a colder, larger dark. The roar of the lake is gone; there is no glow here, no moss, no growing thing — the stone is dry and dead and the air sits heavy and still, the way air sits in a place that has not been disturbed in a long time. This is where the prospectors' chalk-line ends and their nerve ended with it: the last stake is hammered into the rock just inside the mouth, the line knotted off and cut, going no further. Beyond it the floor is fouled with the litter of old feeding — cracked shell, gnawed bone, pale moulted husks shed by things that grew too big for them — and something low and wet shifts in the black just past the edge of your light. The camp is back to the north. South and down, the warren opens out.",
-    "exits": { "north": "deep.camp", "south": "warren.hall" },
+    "exits": { "north": "d6.camp", "south": "d7.hall" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 3, "respawn": 90 }],
@@ -855,14 +853,14 @@
         "message": "The dark presses close and drinks the warmth from you." }
     ]
   },
-  "warren.hall": {
-    "id": "warren.hall",
+  "d7.hall": {
+    "id": "d7.hall",
     "zone": "gloom-warren",
     "name": "The Crawling Hall",
     "depth": 7,
     "ambientLight": 0,
     "description": "A vast black gallery, so wide your light cannot find its walls and so high the ceiling is only a guess — a held breath of a cavern, and you the one small warmth in all of it. The floor is a slow tide of pale bodies: gloom-crawlers in their dozens, flowing over one another and the heaped middens of their feeding, a dry endless rasp of flesh on stone that comes from every side at once. They do not mind the dark; they own it. Raise a light and the nearest of them rouse and turn toward the warmth of it, the whole tide stirring your way — and somewhere out in the black the larger shapes shift, the old ones, too big to hurry and too patient to need to. A side passage breaks off west into a narrower dark; eastward the floor falls away into a reek of old bone; the warren runs on south, deeper; the throat climbs back north.",
-    "exits": { "north": "warren.throat", "west": "warren.drift", "east": "warren.midden", "south": "warren.gallery" },
+    "exits": { "north": "d7.throat", "west": "d7.drift", "east": "d7.midden", "south": "d7.gallery" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -871,14 +869,14 @@
       { "mob": "gloom-creeper", "max": 2, "respawn": 120 }
     ]
   },
-  "warren.drift": {
-    "id": "warren.drift",
+  "d7.drift": {
+    "id": "d7.drift",
     "zone": "gloom-warren",
     "name": "The Moulting Drift",
     "depth": 7,
     "ambientLight": 0,
     "description": "The west passage opens into a long, low drift where the crawlers come to shed. The floor climbs in soft pale dunes of moulted husk, knee-deep in places, dry and brittle and whispering underfoot — years of it, the cast skins of a colony that never leaves. The air is thick with a chalk-fine dust that catches in the throat. Bigger husks lie further in, split lengthwise and big as a man, the moults of the old ones; and where the dunes bank against the far wall a seam of raw glimmer crusts the stone, lit cold and faint by its own deep glow, never yet worked by any hand. The hall lies back east.",
-    "exits": { "east": "warren.hall" },
+    "exits": { "east": "d7.hall" },
     "fixtures": [],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 1200 },
@@ -889,14 +887,14 @@
       { "mob": "elder-gloom-crawler", "max": 2, "respawn": 200 }
     ]
   },
-  "warren.midden": {
-    "id": "warren.midden",
+  "d7.midden": {
+    "id": "d7.midden",
     "zone": "gloom-warren",
     "name": "The Bone Field",
     "depth": 7,
     "ambientLight": 0,
     "description": "East of the hall the floor drops a few feet into a wide, low chamber that the warren uses to discard what it cannot eat. The ground is a field of bone — cracked, gnawed, picked clean and pale, heaped in slow drifts against the walls and crunching to splinters underfoot — the leavings of a colony that has fed here a very long time. Rat-bone and bug-shell and the long bones of bigger things lie tangled together, and here and there among them the unmistakable shape of a delver: a staved-in helm, a boot with the foot still in it, a ribcage swept clean. Scour-slugs haul themselves over the heaps in the dark, working the last of the marrow, leaving their clean wet tracks across the dead. Somewhere under the drifts, the crawlers' middens have buried whatever the dead carried down. The hall is back west, up the lip.",
-    "exits": { "west": "warren.hall" },
+    "exits": { "west": "d7.hall" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 18, "respawn": 1800, "hidden": { "perception": 4 } },
@@ -907,14 +905,14 @@
       { "mob": "scour-slug", "max": 2, "respawn": 120 }
     ]
   },
-  "warren.gallery": {
-    "id": "warren.gallery",
+  "d7.gallery": {
+    "id": "d7.gallery",
     "zone": "gloom-warren",
     "name": "The Long Gallery",
     "depth": 7,
     "ambientLight": 0,
     "description": "The second great cavern of the warren, longer than it is wide — a black gallery that runs on south past the reach of any light a delver carries, the floor sloping gently down the whole way as though the stone itself is leaning toward the deep. A seam of rust-red iron ore shows in one wall, worth the working for a delver with the arm to spare. The crawlers are thinner here than in the hall but not gone; they flow along the walls and the long centre in loose, restless streams, all of them moving the same way, downslope, as though something below were calling the whole tide of them down. A side gallery opens west, and from it comes a dry, massed rasping louder than anywhere else in the warren. At the gallery's low end the floor gives out entirely into a black shaft dropping down; the hall lies back north.",
-    "exits": { "north": "warren.hall", "west": "warren.brood", "down": "warren.chasm" },
+    "exits": { "north": "d7.hall", "west": "d7.brood", "down": "d7.chasm" },
     "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
@@ -922,14 +920,14 @@
       { "mob": "gloom-touched-crawler", "max": 2, "respawn": 200 }
     ]
   },
-  "warren.brood": {
-    "id": "warren.brood",
+  "d7.brood": {
+    "id": "d7.brood",
     "zone": "gloom-warren",
     "name": "The Brood-Heart",
     "depth": 7,
     "ambientLight": 0,
     "description": "The west gallery chokes down and then opens into a chamber where the crawlers are not streams but a single heaving mass — they pile here thicker than anywhere else in the warren, layered over one another wall to wall and floor to unseen ceiling, a slow churning carpet of pale flesh that never quite stills and never quite quiets, the dry rasp of them filling the dark like surf. Among the smaller bodies the old ones lie half-buried and content, vast and unhurried, and the cast husks drift waist-deep in the corners. Where the far wall shows through the press of them, a vein of raw glimmer threads the rock in dull blue-white seams — a rich find, in a place that means to kill you for the reaching of it. Whatever this place is to them — a heart, a hold, the centre they all return to — they suffer no light in it gladly, and the nearest of them are already turning your way. The only way back is east, the way you came.",
-    "exits": { "east": "warren.gallery" },
+    "exits": { "east": "d7.gallery" },
     "fixtures": ["glimmer-vein"],
     "groundItems": [],
     "spawns": [
@@ -937,41 +935,41 @@
       { "mob": "gloom-touched-crawler", "max": 2, "respawn": 200 }
     ]
   },
-  "warren.chasm": {
-    "id": "warren.chasm",
+  "d7.chasm": {
+    "id": "d7.chasm",
     "zone": "gloom-warren",
     "name": "The Black Chimney",
     "depth": 7,
     "ambientLight": 0,
     "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. Where the old water polished the flue smooth, a pale vein of silver ore runs through the rock within arm's reach of the ledge. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery. One stretch of the western wall is split by a flowstone-choked fissure, and a faint draught breathes out of it — warmer and wetter than the warren's dead air, carrying the far ghost of running water, as though the crack climbed toward the living river somewhere high above.",
-    "exits": { "up": "warren.gallery", "south": "warren.hush" },
-    "hiddenExits": { "west": { "to": "third.cave", "perception": 4, "name": "the prospectors' rigged climbing-flue" } },
+    "exits": { "up": "d7.gallery", "south": "d7.hush" },
+    "hiddenExits": { "west": { "to": "d3.cave", "perception": 4, "name": "the prospectors' rigged climbing-flue" } },
     "fixtures": ["silver-vein", { "template": "prospectors-rigging", "hidden": { "perception": 4 } }],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 2, "respawn": 90 }]
   },
-  "warren.hush": {
-    "id": "warren.hush",
+  "d7.hush": {
+    "id": "d7.hush",
     "zone": "gloom-warren",
     "name": "The Hush",
     "depth": 7,
     "ambientLight": 0,
     "description": "The passage off the ledge opens into a small, square chamber, and the moment you cross into it the dark changes its quality — the rasp of the crawlers cuts off behind you, the air goes dead and close, and your light shrinks back to a guttering knot, as though the room itself disapproved of it. The walls here are worked: cut square and true, faced smooth by patient hands long ago, and across the far wall an old relief has been carved — a band of flowing Umbral glyphs gone soft at the edges with age, and at their centre a single hard mark, struck deep and unmistakable in any tongue. It means turn back. Whatever the deep-folk knew when they cut it, they cut it to keep something on the far side of this room, and they did not come back to tend it. The crawlers will not cross the worked threshold; they gather at the passage mouth behind you and no further. Something grows here even so: in the cracks of the old worked stone a pale, lightless fungus has taken hold, and a few grubs inch blindly through it, chewing their slow pale trails — the only life willing to share this room with what waits beyond it. Ahead, south, the dark waits. The chimney is back north.",
-    "exits": { "north": "warren.chasm", "south": "warren.relict" },
+    "exits": { "north": "d7.chasm", "south": "d7.relict" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "grub", "max": 4, "respawn": 90 }
     ]
   },
-  "warren.relict": {
-    "id": "warren.relict",
+  "d7.relict": {
+    "id": "d7.relict",
     "zone": "gloom-warren",
     "name": "The Last Claim",
     "depth": 7,
     "ambientLight": 0,
     "description": "Past the warded room the worked stone gives way to raw cave again, and here, against the wall, someone made a last stand. A prospector sits where they died, propped against the rock with a spent lantern in their lap and a pick laid across their knees, gone to leather and bone in the dry cold but otherwise undisturbed — even the scour-slugs do not come this far down. They got further than anyone: past the swarm, past the warded hush, almost to the bottom of the warren. On the wall beside them, scratched in chalk by a failing hand, a last claim is staked over the seam it marks — a name, a date, and above them a vein of raw glimmer that threads the rock in dull blue-white, the strike they came all this way for. Beneath the claim, smaller: *it drinks the light. do not bring a light.* A few shards have spilled from a rotted pouch, and in their cupped hands, held to the end, is a single crystal they had worked loose before the dark found them. South, the cave opens into a deeper black; north leads back to the hush.",
-    "exits": { "north": "warren.hush", "south": "warren.lair" },
+    "exits": { "north": "d7.hush", "south": "d7.lair" },
     "fixtures": ["glimmer-vein"],
     "groundItems": [
       { "template": "shards", "qty": 15, "respawn": 1800 },
@@ -979,14 +977,14 @@
     ],
     "spawns": [{ "mob": "gloom-crawler", "max": 2, "respawn": 90 }]
   },
-  "warren.lair": {
-    "id": "warren.lair",
+  "d7.lair": {
+    "id": "d7.lair",
     "zone": "gloom-warren",
     "name": "The Drowned Black",
     "depth": 7,
     "ambientLight": 0,
     "description": "The cave opens south into the deepest hollow of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers do not follow you in — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends, and the dead one's chalk was right. The only way out is back north.",
-    "exits": { "north": "warren.relict" },
+    "exits": { "north": "d7.relict" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -994,14 +992,14 @@
       { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
     ]
   },
-  "fault.deep": {
-    "id": "fault.deep",
+  "d5.fault.deep": {
+    "id": "d5.fault.deep",
     "zone": "deep-fault",
     "name": "The Fault's Foot",
     "depth": 5,
     "ambientLight": -1,
     "description": "The crack lets you down a long, scraping squeeze through cold rock and opens, all at once, into a chamber with no floor of light at all — the dark here is the deep kind, the kind that drinks a flame and gives nothing back. Dripping water ticks somewhere unseen, and the air is dead and still. The fault you came down by climbs back up; the chamber goes on down, where the rock has split further and the draft rises from somewhere deeper still.",
-    "exits": { "up": "rim.fault" },
+    "exits": { "up": "d0.fault" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "cave-lurker", "max": 1, "respawn": 300, "hidden": { "perception": 3 } }]

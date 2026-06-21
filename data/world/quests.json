@@ -24,7 +24,7 @@
     "description": "Vesper needs glowing palecap mushrooms from the deep clusters for her glimmer-work.",
     "start": {
       "trigger": "enter",
-      "room": "rim.mageshed",
+      "room": "d0.mageshed",
       "offerText": "Vesper looks up from her bench. \"Headed down into the dark? Then do me a turn — palecap mushrooms grow on the glow-cap clusters below. Pick me a few and bring them back; I render their light into my work, and I pay for the trouble.\""
     },
     "steps": [

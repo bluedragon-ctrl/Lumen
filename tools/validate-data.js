@@ -38,6 +38,13 @@ function main() {
 
   for (const [id, r] of Object.entries(rooms)) {
     if (r.id !== id) errs.push(`room ${id}: id field mismatch (${r.id})`);
+    // Room ids are depth-led: `d<depth>.[region.]name`. The id's depth prefix is
+    // the canonical handle, so it must agree with the room's `depth` field — this
+    // is what keeps a retune from silently leaving an id that lies about its depth.
+    const dm = /^d(\d+)\./.exec(id);
+    if (!dm) errs.push(`room ${id}: id must start with a depth prefix like "d<depth>."`);
+    else if (Number(dm[1]) !== r.depth)
+      errs.push(`room ${id}: id depth prefix d${dm[1]} disagrees with depth field (${r.depth})`);
     if (r.zone != null && typeof r.zone !== "string") errs.push(`room ${id}: zone must be a string`);
     // Free-form room tags (e.g. "water", "outdoor") — gate tag-aware wander/flee
     // destinations (a mob's requireTags/forbidTags). Must be an array of strings.
