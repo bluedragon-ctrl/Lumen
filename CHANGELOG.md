@@ -87,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crit; surfaced in the Inspect window. Existing weapons (no `crit`) are unchanged.
 
 ### Changed
+- **Items** — item tuning (prospectors-hatchet, apprentice-glimmer-charm, glimmersteel-coil, delver-claim-tag, scroll-regeneration, palecap-mushroom, witchglow-cap, deep-stew, book-of-chitin-craft).
 - **Recipes** — recipe tuning (minor-light-potion, regeneration-draught, mana-tonic, acid-bomb, forge-chitin-cuirass, forge-kingshell-cuirass, forge-heavy-chitin-plate, forge-barbed-flail, forge-glimmersteel-cuirass).
 - **Light is now tiered into "see" vs "repel the dark", and the two premium lamps
   carry stats.** Output drops: **brass lantern 4 → 3**, **glimmersteel lamp 5 → 4**.

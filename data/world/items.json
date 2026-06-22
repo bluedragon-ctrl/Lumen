@@ -72,7 +72,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 26,
-    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 } }
+    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 } }
   },
   "leather-jerkin": {
     "id": "leather-jerkin",
@@ -136,7 +136,7 @@
     "slot": "neck",
     "weight": 0,
     "value": 120,
-    "armour": { "ward": 2, "attrMod": { "perception": 2 } }
+    "armour": { "ward": 5, "attrMod": { "perception": 2 } }
   },
   "umbral-glimmer-ring": {
     "id": "umbral-glimmer-ring",
@@ -154,7 +154,7 @@
     "id": "glimmersteel-coil",
     "rarity": "rare",
     "name": "a glimmersteel coil",
-    "keywords": ["coil", "ring", "band", "glimmersteel"],
+    "keywords": ["coil", "ring", "band", "glimmersteel", "coil"],
     "description": "A band for the finger wound from a single hair-fine wire of glimmersteel, coiled tight around a mote of pressed glimmer dust at its heart. The captive light never quite stops welling up, and worn against the skin it seeps slowly back into the wearer — so a caster's well refills even on the move, where idle hands would only crawl. Tobin's work, and the one contraption of his that does just what he claims.",
     "type": "armour",
     "slot": "finger",
@@ -287,7 +287,8 @@
     "filterGroup": "other",
     "weight": 0,
     "value": 0,
-    "stackable": false
+    "stackable": false,
+    "keywords": ["tag"]
   },
   "quiet-claim-key": {
     "id": "quiet-claim-key",
@@ -318,7 +319,8 @@
     "weight": 0,
     "value": 60,
     "stackable": true,
-    "scroll": { "spell": "regeneration" }
+    "scroll": { "spell": "regeneration" },
+    "keywords": ["regen"]
   },
   "scroll-glimmerskin": {
     "id": "scroll-glimmerskin",
@@ -427,7 +429,8 @@
     "type": "material",
     "weight": 0,
     "value": 4,
-    "stackable": true
+    "stackable": true,
+    "keywords": ["cap"]
   },
   "witchglow-cap": {
     "id": "witchglow-cap",
@@ -436,7 +439,8 @@
     "type": "material",
     "weight": 0,
     "value": 8,
-    "stackable": true
+    "stackable": true,
+    "keywords": ["glowcap"]
   },
   "hearty-broth": {
     "id": "hearty-broth",
@@ -999,10 +1003,8 @@
     "weight": 1,
     "value": 14,
     "stackable": true,
-    "consumable": {
-      "flavour": "You eat the deep stew slowly, savouring it. Rich and warming, it fills you to the back teeth and a settled strength flows back into your limbs and your mind alike.",
-      "effect": { "type": "restore", "hp": 12, "mana": 6 }
-    }
+    "consumable": { "flavour": "You eat the deep stew slowly, savouring it. Rich and warming, it fills you to the back teeth and a settled strength flows back into your limbs and your mind alike.", "effect": { "type": "restore", "hp": 12, "mana": 6 } },
+    "rarity": "uncommon"
   },
   "beer": {
     "id": "beer",
@@ -1201,7 +1203,8 @@
     "weight": 1,
     "value": 400,
     "stackable": true,
-    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] }
+    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] },
+    "rarity": "uncommon"
   },
   "book-of-glimmersteel": {
     "id": "book-of-glimmersteel",
