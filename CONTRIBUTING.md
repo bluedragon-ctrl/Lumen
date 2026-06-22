@@ -59,11 +59,15 @@ leaving your hand-written changelog *prose* untouched. It:
 2. writes the new version to `VERSION` and `package.json`;
 3. stamps `CHANGELOG.md` — leaves a fresh empty `[Unreleased]` on top and moves your
    existing notes under a new `## [x.y.z] - YYYY-MM-DD` header (prose unchanged);
-4. creates a `chore/release-x.y.z` branch and a `chore(release): vx.y.z` commit.
+4. creates a `chore/release-x.y.z` branch + `chore(release): vx.y.z` commit, then
+   **pushes and opens a PR into `main`** via `gh` (falling back to printing a
+   ready-to-click compare URL if `gh` isn't installed).
 
-Then push the branch, open a PR into `main`, and **after it merges, tag the merge
-commit** (`git tag v0.2.0 && git push origin v0.2.0`). The release is the tag.
+Review and merge the PR as usual, then **tag the merge commit** (`git tag v0.2.0
+&& git push origin v0.2.0`) — the release is the tag. (The script can't tag for
+you because a squash-merge changes the commit SHA.)
 
 Useful flags: `--dry-run` (preview, touch nothing), `--major`/`--minor`/`--patch`
 (override the detected level), an explicit `1.0.0` (the deliberate first-stable cut),
-`--no-commit` (write files only). `1.0.0` is never chosen automatically.
+`--no-pr` (branch + commit but don't push/open a PR), `--no-commit` (write files
+only). `1.0.0` is never chosen automatically.
