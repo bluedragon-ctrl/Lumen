@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   commits since the last `v*` tag (pre-1.0: any `feat` → MINOR, else PATCH), stamps
   `VERSION`, `package.json`, and the `CHANGELOG.md` (leaving an empty `[Unreleased]`
   on top and dating your hand-written notes under a new version header — prose
-  untouched), then prepares a `chore/release-x.y.z` branch + commit for the normal
-  PR review. Flags: `--dry-run`, `--major`/`--minor`/`--patch`, an explicit version
-  (e.g. `1.0.0`), and `--no-commit`. See CONTRIBUTING.md → *Cutting a release*.
+  untouched), commits on a `chore/release-x.y.z` branch, and pushes + opens the PR
+  via `gh` (falling back to a compare URL if `gh` is absent). Flags: `--dry-run`,
+  `--major`/`--minor`/`--patch`, an explicit version (e.g. `1.0.0`), `--no-pr`, and
+  `--no-commit`. See CONTRIBUTING.md → *Cutting a release*.
 - **A browser-based recipe editor (`tools/recipe-editor/`, `npm run edit-recipes`,
   port 3942).** A local form for editing `data/world/recipes.json` the same way the
   item and mob editors work: pick a recipe (or add a new one), edit its name, station,

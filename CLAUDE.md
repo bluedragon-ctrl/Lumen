@@ -46,8 +46,9 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
 - `tools/release.js` — release cutter (`npm run release`, or double-click
   `tools/release.bat`). Derives the next SemVer
   from the Conventional Commit history since the last tag, stamps `VERSION` /
-  `package.json` / `CHANGELOG.md`, and prepares a `chore/release-x.y.z` PR branch.
-  See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a release*.
+  `package.json` / `CHANGELOG.md`, commits on a `chore/release-x.y.z` branch, and
+  pushes + opens the PR via `gh` (compare-URL fallback if `gh` is absent). Tagging
+  after merge stays manual. See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a release*.
 - `tools/mob-editor/` — browser-based NPC stat editor (`npm run edit-mobs` or
   double-click `tools/mob-editor/start.bat`, port 3939). Edits
   `data/world/mobs.json`; validates and can open a PR via `gh`.

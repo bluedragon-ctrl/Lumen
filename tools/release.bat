@@ -10,7 +10,7 @@ node "tools\release.js" --dry-run %*
 if errorlevel 1 goto end
 
 echo.
-set /p ANSWER="Cut this release? It will branch + commit. [y/N] "
+set /p ANSWER="Cut this release? It will branch, commit, push + open a PR. [y/N] "
 if /i not "%ANSWER%"=="y" (
   echo Aborted. Nothing changed.
   goto end

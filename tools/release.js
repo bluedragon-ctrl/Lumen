@@ -14,6 +14,11 @@
  *   node tools/release.js --minor          # force a bump level (--major/--minor/--patch)
  *   node tools/release.js 1.0.0            # set an explicit version (e.g. the 1.0 cut)
  *   node tools/release.js --no-commit      # write the files but don't branch/commit
+ *   node tools/release.js --no-pr          # branch + commit, but don't push/open a PR
+ *
+ * By default, after committing it pushes the branch and opens a PR via `gh` (the
+ * same path the editors use). If `gh` isn't installed it falls back to printing a
+ * ready-to-click compare URL — nothing is lost, you just open the PR by hand.
  *
  * Bump policy (CONTRIBUTING.md → Versioning):
  *   pre-1.0:  any feat (or breaking) since last tag → MINOR, else → PATCH.
@@ -36,12 +41,35 @@ const args = process.argv.slice(2);
 const has = (flag) => args.includes(flag);
 const DRY = has("--dry-run");
 const NO_COMMIT = has("--no-commit");
+const NO_PR = has("--no-pr");
 const forced =
   (has("--major") && "major") || (has("--minor") && "minor") || (has("--patch") && "patch") || null;
 const explicit = args.find((a) => /^v?\d+\.\d+\.\d+$/.test(a)) || null;
 
 function git(...a) {
   return execFileSync("git", a, { cwd: ROOT, encoding: "utf8" }).trim();
+}
+
+// Run a command, returning { ok, output } instead of throwing (for push / gh).
+function run(cmd, a) {
+  try {
+    const out = execFileSync(cmd, a, { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    return { ok: true, output: out.trim() };
+  } catch (e) {
+    return { ok: false, output: [e.stdout, e.stderr].filter(Boolean).join("\n").trim() || e.message };
+  }
+}
+
+// Turn the origin remote into a https web base, e.g. https://github.com/owner/repo.
+function remoteWebUrl() {
+  let url;
+  try {
+    url = git("remote", "get-url", "origin");
+  } catch {
+    return null;
+  }
+  const m = /github\.com[:/](.+?)(?:\.git)?$/.exec(url);
+  return m ? `https://github.com/${m[1]}` : null;
 }
 
 function fail(msg) {
@@ -156,16 +184,35 @@ function main() {
   }
 
   const relBranch = `chore/release-${fmt(next)}`;
+  const subject = `chore(release): v${fmt(next)}`;
   git("checkout", "-b", relBranch);
   git("add", "VERSION", "package.json", "CHANGELOG.md");
-  git("commit", "-m", `chore(release): v${fmt(next)}`);
-
+  git("commit", "-m", subject);
   console.log(`\n\x1b[32m✓ committed on ${relBranch}\x1b[0m`);
-  console.log("\nNext steps:");
-  console.log(`  1. Push the branch and open a PR into main.`);
-  console.log(`  2. After it merges, tag the merge commit on main:`);
-  console.log(`       git checkout main && git pull`);
-  console.log(`       git tag v${fmt(next)} && git push origin v${fmt(next)}`);
+
+  // --- push + open a PR --------------------------------------------------
+  let prUrl = null;
+  if (!NO_PR) {
+    const pushed = run("git", ["push", "-u", "origin", relBranch]);
+    if (!pushed.ok) {
+      console.log(`\n\x1b[33m! push failed — open the PR by hand once you've pushed:\x1b[0m\n${pushed.output}`);
+    } else {
+      const body = `Cuts **v${fmt(next)}** (${kind} bump, ${commits.length} commits since ${lastTag || "the start"}).\n\nVersion stamped into VERSION + package.json; the hand-written CHANGELOG \`[Unreleased]\` notes are dated under a new \`[${fmt(next)}]\` header (prose unchanged).\n\nAfter merge, tag the merge commit: \`git tag v${fmt(next)} && git push origin v${fmt(next)}\`.`;
+      const pr = run("gh", ["pr", "create", "--base", "main", "--head", relBranch, "--title", subject, "--body", body]);
+      if (pr.ok) {
+        prUrl = (pr.output.match(/https?:\/\/\S+/) || [pr.output])[0];
+        console.log(`\x1b[32m✓ opened PR: ${prUrl}\x1b[0m`);
+      } else {
+        const web = remoteWebUrl();
+        console.log(`\n\x1b[33m! \`gh pr create\` unavailable — open the PR here:\x1b[0m`);
+        console.log(`  ${web ? `${web}/compare/main...${relBranch}?expand=1` : `(push branch ${relBranch} and open a PR into main)`}`);
+      }
+    }
+  }
+
+  console.log("\nAfter the PR merges, tag the release on main:");
+  console.log(`  git checkout main && git pull`);
+  console.log(`  git tag v${fmt(next)} && git push origin v${fmt(next)}`);
 }
 
 main();
