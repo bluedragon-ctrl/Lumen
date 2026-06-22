@@ -43,6 +43,11 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   known recipes). Data model: [docs/data-model.md](docs/data-model.md).
 - `client/` — vanilla 4-pane browser client.
 - `tools/validate-data.js` — pre-commit data validator.
+- `tools/release.js` — release cutter (`npm run release`, or double-click
+  `tools/release.bat`). Derives the next SemVer
+  from the Conventional Commit history since the last tag, stamps `VERSION` /
+  `package.json` / `CHANGELOG.md`, and prepares a `chore/release-x.y.z` PR branch.
+  See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a release*.
 - `tools/mob-editor/` — browser-based NPC stat editor (`npm run edit-mobs` or
   double-click `tools/mob-editor/start.bat`, port 3939). Edits
   `data/world/mobs.json`; validates and can open a PR via `gh`.
