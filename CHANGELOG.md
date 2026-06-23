@@ -145,6 +145,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   mirroring a mob's `attack.crit` and stacking on top of the wielder's Perception
   crit; surfaced in the Inspect window. Existing weapons (no `crit`) are unchanged.
 
+### Fixed
+- **Examining a mob or item is no longer interrupted by room activity.** A reactive
+  room refresh (a mob entering, someone healing, light flickering) used to snap the
+  Inspect window back from an examine view to the live room, stealing the player's
+  focus. Such passive refreshes are now tagged `reactive` server-side and the client
+  leaves an open examine view in place — `look` or the back button still return to a
+  freshly-fetched room.
+
 ### Changed
 - **Items** — item tuning (prospectors-hatchet, apprentice-glimmer-charm, glimmersteel-coil, delver-claim-tag, scroll-regeneration, palecap-mushroom, witchglow-cap, deep-stew, book-of-chitin-craft).
 - **Recipes** — recipe tuning (minor-light-potion, regeneration-draught, mana-tonic, acid-bomb, forge-chitin-cuirass, forge-kingshell-cuirass, forge-heavy-chitin-plate, forge-barbed-flail, forge-glimmersteel-cuirass).
