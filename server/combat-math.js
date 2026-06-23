@@ -79,7 +79,12 @@ const EVASION_PER_WITS = 0.02;
 const HIT_PER_PERCEPTION = 0.02;
 const CRIT_PER_PERCEPTION = 0.01;
 // Attribute-derived pools and the sight curve (see GameState.deriveStats).
-const HP_PER_VITALITY = 5;
+// Max HP is a flat base + a per-level grant every build receives + a Vitality
+// bonus, so no build is locked out of HP growth and a fresh L1/Vit-3 character
+// still starts at HP_BASE + 3*HP_PER_VITALITY = 15.
+const HP_BASE = 6;
+const HP_PER_LEVEL = 2;
+const HP_PER_VITALITY = 3;
 const MANA_PER_INTELLECT = 4;
 const ATTR_BASELINE = 3; // starting value of every attribute
 const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimBelow by 1
@@ -232,13 +237,18 @@ const MIN_HIT = 0.05;
  *  @param defender { armour, ward, evasion } — mitigation + dodge.
  *  Accuracy is the light tier (clear 100% / glare 50% / can't-see 5%) plus the
  *  attacker's hit bonus minus the defender's evasion, clamped to [MIN_HIT, 1].
+ *  Accuracy *past* 100% isn't wasted: the surplus sharpens into bonus crit at
+ *  1:1 (evasion is subtracted first, so it's paid down before any spills over) —
+ *  this is what keeps Perception's to-hit meaningful once a delver can't miss.
  *  `sighted` drives miss-message wording; a crit doubles the damage roll. */
 function strike(attacker, defender, light, dice, damageType = "physical") {
-  const chance = Math.max(MIN_HIT, Math.min(1, hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0)));
+  const raw = hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0);
+  const chance = Math.max(MIN_HIT, Math.min(1, raw));
+  const overflowCrit = Math.max(0, raw - 1); // accuracy beyond a sure hit becomes crit
   const sighted = canSee(attacker.band, light);
   if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
-  const crit = Math.random() < (attacker.crit || 0);
+  const crit = Math.random() < ((attacker.crit || 0) + overflowCrit);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
   // Physical blows are soaked flat by Armour. Magical-type blows are cut by Ward
   // as a PERCENT reduction (ward is a percentage: ward 50 → halved). A spell
@@ -260,6 +270,8 @@ module.exports = {
   EVASION_PER_WITS,
   HIT_PER_PERCEPTION,
   CRIT_PER_PERCEPTION,
+  HP_BASE,
+  HP_PER_LEVEL,
   HP_PER_VITALITY,
   MANA_PER_INTELLECT,
   ATTR_BASELINE,
