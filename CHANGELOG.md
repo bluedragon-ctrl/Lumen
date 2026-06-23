@@ -164,6 +164,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the room and a reactive refresh shows it gone from a room you can still see (a mob
   died, a floor item was taken, another delver left), the Inspect window now drops
   back to the room. Carried/equipped items you examine are unaffected.
+- **The release cutter (`tools/release.js`) no longer crashes when its target branch
+  already exists.** A re-run after a failed/abandoned release used to stamp the
+  version files and *then* die with a raw stack trace at `git checkout -b`, leaving a
+  dirty working tree behind. It now checks for the `chore/release-x.y.z` branch up
+  front — before touching any files — and fails fast with recovery guidance, or
+  replaces the branch when re-run with the new `--force` flag.
 
 ### Changed
 - **Items** — item tuning (prospectors-hatchet, apprentice-glimmer-charm, glimmersteel-coil, delver-claim-tag, scroll-regeneration, palecap-mushroom, witchglow-cap, deep-stew, book-of-chitin-craft).

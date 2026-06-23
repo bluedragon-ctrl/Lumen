@@ -15,6 +15,7 @@
  *   node tools/release.js 1.0.0            # set an explicit version (e.g. the 1.0 cut)
  *   node tools/release.js --no-commit      # write the files but don't branch/commit
  *   node tools/release.js --no-pr          # branch + commit, but don't push/open a PR
+ *   node tools/release.js --force          # replace an existing release branch instead of failing
  *
  * By default, after committing it pushes the branch and opens a PR via `gh` (the
  * same path the editors use). If `gh` isn't installed it falls back to printing a
@@ -42,12 +43,23 @@ const has = (flag) => args.includes(flag);
 const DRY = has("--dry-run");
 const NO_COMMIT = has("--no-commit");
 const NO_PR = has("--no-pr");
+const FORCE = has("--force");
 const forced =
   (has("--major") && "major") || (has("--minor") && "minor") || (has("--patch") && "patch") || null;
 const explicit = args.find((a) => /^v?\d+\.\d+\.\d+$/.test(a)) || null;
 
 function git(...a) {
   return execFileSync("git", a, { cwd: ROOT, encoding: "utf8" }).trim();
+}
+
+// True if a local branch with this name already exists.
+function branchExists(name) {
+  try {
+    git("rev-parse", "--verify", "--quiet", `refs/heads/${name}`);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // Run a command, returning { ok, output } instead of throwing (for push / gh).
@@ -143,6 +155,21 @@ function main() {
 
   if (fmt(next) === fmt(current)) fail(`computed version ${fmt(next)} equals current — nothing to do`);
 
+  // Guard the target branch before stamping anything, so a leftover branch from a
+  // previous run fails fast with guidance instead of crashing mid-write at checkout.
+  const relBranch = `chore/release-${fmt(next)}`;
+  if (!DRY && !NO_COMMIT && branchExists(relBranch)) {
+    if (!FORCE) {
+      fail(
+        `branch ${relBranch} already exists — a previous run probably cut this release.\n` +
+          `  • If it's stale/unmerged, delete it:   git branch -D ${relBranch}\n` +
+          `  • Or re-run with --force to replace it automatically.`
+      );
+    }
+    console.log(`\x1b[33m(--force) replacing existing branch ${relBranch}\x1b[0m`);
+    git("branch", "-D", relBranch);
+  }
+
   // --- report ------------------------------------------------------------
   console.log(`\nLumen release\n  branch:   ${branch}`);
   console.log(`  current:  ${fmt(current)}   (last tag: ${lastTag || "none"})`);
@@ -183,7 +210,6 @@ function main() {
     return;
   }
 
-  const relBranch = `chore/release-${fmt(next)}`;
   const subject = `chore(release): v${fmt(next)}`;
   git("checkout", "-b", relBranch);
   git("add", "VERSION", "package.json", "CHANGELOG.md");
