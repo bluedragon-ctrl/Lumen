@@ -21,19 +21,20 @@
   "vespers-caps": {
     "id": "vespers-caps",
     "name": "Caps for the Mage",
-    "description": "Vesper needs glowing palecap mushrooms from the deep clusters for her glimmer-work.",
+    "description": "Vesper needs glowing witchglow caps from the deep clusters for her glimmer-work.",
     "start": {
       "trigger": "enter",
       "room": "d0.mageshed",
-      "offerText": "Vesper looks up from her bench. \"Headed down into the dark? Then do me a turn — palecap mushrooms grow on the glow-cap clusters below. Pick me a few and bring them back; I render their light into my work, and I pay for the trouble.\""
+      "offerText": "Vesper looks up from her bench. \"Headed down into the dark? Then do me a turn — witchglow caps grow on the clusters below, dripping that cold green light. Pick me a few and bring them back; I render their glow into my work, and I pay for the trouble.\""
     },
     "steps": [
-      { "collect": "palecap-mushroom", "count": 3, "text": "Pick 3 palecap mushrooms from a glow-cap cluster" },
-      { "deliver": "palecap-mushroom", "count": 3, "npc": "rim-mage", "text": "Bring the mushrooms to Vesper" }
+      { "collect": "witchglow-cap", "count": 3, "text": "Pick 3 witchglow caps from a witchglow cluster" },
+      { "deliver": "witchglow-cap", "count": 3, "npc": "rim-mage", "text": "Bring the witchglow caps to Vesper" }
     ],
     "rewards": {
       "xp": 35,
-      "shards": 20
+      "shards": 20,
+      "items": [{ "template": "regeneration-draught", "qty": 1 }]
     }
   },
   "glimmer-for-vesper": {
@@ -54,22 +55,22 @@
       "spells": ["spark"]
     }
   },
-  "wick-bats": {
-    "id": "wick-bats",
-    "name": "Wings over the Hatchery",
-    "description": "Cave-bats come down off the rim in the dark hours and pick Wick's lightbugs off the wire.",
+  "wick-stalker": {
+    "id": "wick-stalker",
+    "name": "Something in the Pens",
+    "description": "Something is killing Wick's stonebugs and dragging them off — and it must be denning somewhere close to the stockpens.",
     "start": {
       "trigger": "talk",
       "npc": "rim-hatcher",
-      "offerText": "\"The bats found my cells,\" Wick says, barely above a whisper. \"They come down in the dark hours and take my bugs off the wire — the poor things go dim with fright for a day after. The colony roosts in the vault past the First Dark. Thin it for me? I'd pay. And the cells would sing for you.\""
+      "offerText": "\"I'm losing stonebugs,\" Wick says, low and angry. \"Not to the pot — to whatever's been getting into the pens at night. Three this week, dragged clean off, nothing left but cracked shell. It's denning somewhere close, I'd swear it. Go and search the ground around the pens — the dead yard out east, the back corners, anywhere a thing could squeeze in. Find it, kill it, and I'll teach you to brew your own light for the trouble.\""
     },
     "steps": [
-      { "kill": "cave-bat", "count": 4, "text": "Cull 4 cave-bats in the roosts below" }
+      { "kill": "cave-centipede", "count": 1, "text": "Search the ground around the stockpens and kill whatever has been taking Wick's stonebugs" }
     ],
     "rewards": {
       "xp": 40,
       "shards": 20,
-      "items": [{ "template": "minor-light-potion", "qty": 2 }]
+      "recipes": ["minor-light-potion"]
     }
   },
   "fenn-quiet-claim": {
@@ -99,33 +100,15 @@
     "start": {
       "trigger": "use",
       "fixture": "notice-board",
-      "offerText": "A posting in Fenn's careful copy-hand: \"BOUNTY, STANDING. The pale crawlers work the dim margins off the First Dark and take the new-come and the wounded. Four culled keeps the descent passable a while. Payment on the traders' purse.\""
+      "offerText": "A posting in Fenn's careful copy-hand: \"BOUNTY, STANDING. The pale crawlers work the dim margins off the First Dark and take the new-come and the wounded — and the lurkers drop on them from the dark overhead. Seven crawlers and three lurkers culled keeps the descent passable a while. Payment on the traders' purse.\""
     },
     "steps": [
-      { "kill": "gloom-crawler", "count": 4, "text": "Cull 4 gloom-crawlers below the descent" }
+      { "kill": "gloom-crawler", "count": 7, "text": "Cull 7 gloom-crawlers below the descent" },
+      { "kill": "cave-lurker", "count": 3, "text": "Cull 3 cave lurkers below the descent" }
     ],
     "rewards": {
-      "xp": 20,
-      "shards": 15
-    }
-  },
-  "board-venom-proof": {
-    "id": "board-venom-proof",
-    "name": "Proof of Venom",
-    "description": "Centipedes hunt the grazing galleries on the second floor; Fenn pays the bounty on proof of venom.",
-    "repeatable": true,
-    "start": {
-      "trigger": "use",
-      "fixture": "notice-board",
-      "offerText": "A posting stamped twice with Fenn's lead seal: \"BOUNTY. The centipedes in the second-floor galleries grow bold and the graze thins for it. Three culled, and a venom gland on the counter as proof — no gland, no payment. Settled at this office.\""
-    },
-    "steps": [
-      { "kill": "cave-centipede", "count": 3, "text": "Cull 3 cave-centipedes in the grazing galleries" },
-      { "deliver": "venom-gland", "count": 1, "npc": "rim-recorder", "text": "Lay a venom gland on Fenn's counter as proof" }
-    ],
-    "rewards": {
-      "xp": 25,
-      "shards": 15
+      "xp": 50,
+      "shards": 35
     }
   },
   "board-tallow-order": {
@@ -139,11 +122,11 @@
       "offerText": "A posting gone translucent with grease at one corner: \"STANDING ORDER. Bug-tallow, by the lump, flat rate — the lamps don't fill themselves. Bring it to Garrick at the market stall. Don't haggle. He won't.\""
     },
     "steps": [
-      { "deliver": "bug-tallow", "count": 3, "npc": "rim-shopkeeper", "text": "Bring 3 lumps of bug-tallow to Garrick" }
+      { "deliver": "bug-tallow", "count": 10, "npc": "rim-shopkeeper", "text": "Bring 10 lumps of bug-tallow to Garrick" }
     ],
     "rewards": {
-      "xp": 15,
-      "shards": 12
+      "xp": 20,
+      "shards": 15
     }
   },
   "heart-of-the-dark": {
@@ -203,6 +186,25 @@
         { "template": "kingshell-plate" },
         { "template": "schematic-kingshell-cuirass" }
       ]
+    }
+  },
+  "mallki-lost-blade": {
+    "id": "mallki-lost-blade",
+    "name": "The Blade He Lost",
+    "description": "Mallki lost an old deep-stone blade on a climb toward the surface. He is sentimental about it, and would have it back.",
+    "start": {
+      "trigger": "talk",
+      "npc": "umbral-trader",
+      "offerText": "Mallki turns a glimmer-lamp low and is quiet a moment. \"Once I carried a blade up toward your sun, yaku-runa — deep-stone, glimmer-veined, shaped by my own hand. The dark took it from me on the climb, somewhere near the rim, and I have not gone up to look. I am... fond of it.\" His lightless eyes settle on you. \"Bring it back to me, and I will shape you one of your own. A better one.\""
+    },
+    "steps": [
+      { "collect": "rusted-blade", "count": 1, "text": "Find Mallki's lost blade, somewhere up near the rim" },
+      { "deliver": "rusted-blade", "count": 1, "npc": "umbral-trader", "text": "Return the blade to Mallki by the river" }
+    ],
+    "rewards": {
+      "xp": 50,
+      "shards": 20,
+      "items": [{ "template": "glimmerglass-blade" }]
     }
   }
 }

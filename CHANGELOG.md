@@ -6,6 +6,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A hidden centipede lair behind the stockpens, and a reworked Wick quest that
+  teaches `search`.** Two new depth-0 Rim rooms east of `d0.corral`: *Behind the
+  Stockpens* (`d0.backpens`), a transitional dead-end yard whose `north` exit into
+  the lair is hidden behind a **Perception 3** check, and *The Drag-Burrow*
+  (`d0.burrow`), a cave-centipede's nest strewn with dragged-in stonebug shells
+  and chitin plates, breathing the same deep dark as the adjacent Riven Yard.
+- **A rat-nest off the Sunken Cut.** Two new depth-1 abyss rooms west of the rat
+  corridor: *The Rat-Run* (`d1.ratrun`, west of `d1.cut`) and *The Brood-Nest*
+  (`d1.brood`, west of `d1.den`), linked north/south to close a loop with the
+  cut/den. The Brood-Nest holds a **witchglow cluster** (faint light + harvestable
+  caps). All four nest rooms (`d1.cut`, `d1.den`, `d1.ratrun`, `d1.brood`) now carry
+  a `nest` tag.
+- **A new mob, the `brood-rat`.** Gnaw's oversized get — stats between the common
+  giant-rat and Gnaw (20 HP, 1d4, xp 14) — that **wanders** the `nest`-tagged rooms
+  on patrol and hunts on sight, but won't stray out of nest territory.
+- **A new Umbral sword, the `glimmerglass-blade`** (1d8, `crit 0.10`, +2 mana on
+  hit), the reward for a new quest, *The Blade He Lost* (`mallki-lost-blade`):
+  Mallki the qhatuq lost an old deep-stone blade on a climb toward the surface;
+  find it (rats dragged it into the Brood-Nest) and return it, and he shapes you a
+  finer one. He keeps his old blade, and reacts to its return.
+
+### Removed
+- **The "Proof of Venom" notice-board bounty (`board-venom-proof`).** The
+  repeatable centipede-gland bounty has been retired.
+- **The orphaned `deep-dweller` mob.** It was defined but never spawned anywhere,
+  so its loot (the `rusted-blade`) was unobtainable. The blade now has a home (see
+  below); `vial`, its other drop, remains available from shops, recipes, and ground.
+
+### Changed
+- **Wick's quest is now "Something in the Pens" (replaces "Wings over the
+  Hatchery").** Instead of culling cave-bats below, Wick reports stonebugs being
+  killed and dragged off by something denning near the pens and asks the player to
+  **search the ground around the stockpens** — the only way to find the hidden
+  burrow exit — then kill the cave-centipede within. The reward is now the
+  **Minor Light Potion recipe** (previously two potions), and that recipe has been
+  **removed from the new-player starting recipes** so the quest is how a delver
+  first learns to brew their own light.
+- **`vespers-caps` now uses witchglow caps instead of palecaps**, and its reward
+  gains a **regeneration-draught** (itself brewed from witchglow), alongside the
+  existing xp/shards.
+- **Retuned two notice-board bounties.** `board-tallow-order` now asks for **10**
+  bug-tallow (was 3) and pays 20 xp / 15 shards — a premium over selling the lumps
+  directly. `board-crawler-bounty` now culls **7 gloom-crawlers and 3 cave-lurkers**
+  (was 4 crawlers) and pays 50 xp / 35 shards.
+- **The `rusted-blade` is now a placed, lore-bearing quest item.** Found on the
+  floor of the Brood-Nest, reflavoured as a *damaged Umbral deep-stone blade* (its
+  "rust" is glimmer-tarnish, not iron), with stats raised to match an iron sword
+  (1d8). It is the target of *The Blade He Lost*.
 - **A release cutter (`tools/release.js`, `npm run release`, or `tools/release.bat`).**
   Versions are now cut
   from the Conventional Commit history rather than bumped per-PR: `[Unreleased]`

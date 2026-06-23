@@ -12,6 +12,6 @@
     { "template": "torch", "fuel": 200 }
   ],
   "startEquipment": { "hand": null, "body": null, "head": null, "neck": null, "finger": null, "light": null },
-  "knownRecipes": ["minor-light-potion", "smelt-iron", "smelt-silver", "forge-iron-dagger"],
+  "knownRecipes": ["smelt-iron", "smelt-silver", "forge-iron-dagger"],
   "knownSpells": []
 }

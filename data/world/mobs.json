@@ -142,6 +142,30 @@
     ],
     "loot": [{ "template": "rat-meat", "chance": 0.6 }]
   },
+  "brood-rat": {
+    "id": "brood-rat",
+    "name": "a brood-rat",
+    "description": "One of Gnaw's larger get — a rat grown past common size on the nest's plunder, its grey hide thick with scar and its incisors worn to chisels. It runs the nest's tunnels on patrol, and does not scatter from the light the way the lesser vermin do.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 7, "intellect": 0, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "helper": true,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 14,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "wander", "weight": 3, "verb": "lopes off down a rat-run into the dark", "scope": "zone", "requireTags": ["nest"] },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["bares worn, chisel-like incisors", "drags a cracked bone across the floor", "rears on its haunches, whiskers testing the air", "lets out a low, rattling hiss"] }
+    ],
+    "loot": [{ "template": "rat-meat", "chance": 1 }]
+  },
   "cave-bat": {
     "id": "cave-bat",
     "name": "a cave bat",
@@ -188,31 +212,6 @@
       { "type": "summon", "weight": 2, "mob": "giant-rat", "count": 2, "max": 4, "verb": "throws back her head and shrieks; vermin boil out of the dark" }
     ],
     "loot": [{ "template": "crystal", "chance": 0.5 }, { "template": "rat-meat", "chance": 1 }]
-  },
-  "deep-dweller": {
-    "id": "deep-dweller",
-    "name": "a deep-dweller",
-    "description": "Tall, gaunt, and grey, it guards the dark with patient malice. Bright light pains it.",
-    "maxHp": 22,
-    "speed": 12,
-    "armour": 2,
-    "ward": 1,
-    "attributes": { "might": 8, "vitality": 7, "intellect": 3, "wits": 5, "perception": 6 },
-    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
-    "behavior": "guard",
-    "hostile": true,
-    "attack": { "damage": "1d6", "actionCost": 14 },
-    "lightBane": { "above": 2, "damage": "1d3" },
-    "xp": 20,
-    "actions": [
-      { "type": "attack", "weight": 8 },
-      { "type": "idle", "weight": 3 },
-      { "type": "emote", "weight": 2, "messages": ["hisses, shielding its eyes", "utters something in a dead tongue", "bares jagged teeth"] }
-    ],
-    "loot": [
-      { "template": "vial", "chance": 0.6 },
-      { "template": "rusted-blade", "chance": 0.2 }
-    ]
   },
   "rim-innkeeper": {
     "id": "rim-innkeeper",
@@ -889,6 +888,9 @@
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "delivery": true }, "messages": [
+          { "target": "goes still as he marks the old blade in your pack, the light beneath his skin dimming low: \"That is mine, yaku-runa. I carried it up toward your sun, and the dark took it from my hand on the climb. Bring it here — I would not lose it twice.\"", "room": "goes still at the old deep-stone blade in {name}'s pack." }
+        ] },
         { "if": { "equipped": "lantern" }, "messages": [
           { "target": "turns his face from the brightness of your lantern: \"Softly, yaku-runa. Your light presses on my eyes.\"", "room": "turns his face from the brightness of {name}'s lantern." }
         ] },
