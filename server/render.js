@@ -5,7 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
-const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, MELEE_SCALE } = require("./state");
+const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, buyValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, MELEE_SCALE } = require("./state");
 
 // How a posture reads to OTHERS in the room (the social tag). Standing is the
 // default and shows nothing.
@@ -235,7 +235,7 @@ function buildExamineView(state, p, q) {
       // Spined if it has `spikes` sugar or any onDamage entry that hits the attacker back.
       const retaliates = (t.onDamage || []).some((e) => (e.target || "attacker") === "attacker" && (e.type === "damage" || e.type === "damage-over-time"));
       if (t.spikes || retaliates) hints.push("Spined — striking it draws blood.");
-      if (t.shop) hints.push("Trades here — try `list`, then `buy <item>` / `sell <item>`.");
+      if (t.shop) hints.push("Trades here — `list` the wares, `examine <ware>` for its stats, then `buy <item>` / `sell <item>`.");
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
         hints,
@@ -317,6 +317,31 @@ function buildExamineView(state, p, q) {
     if (slot && hit(slot.id, w.items[slot.template].name)) {
       const t = w.items[slot.template];
       return entity("item", slot.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
+    }
+  }
+  // Shop wares on display. After everything you can hold or perceive as a real
+  // instance has missed, fall back to the present trader's stock: a ware is a
+  // template offer, not a room instance, but a visible shopkeeper lets you
+  // inspect it before buying — as CircleMUD does with `look <ware>` at the
+  // counter. Anything you already carry above wins a name clash, so this only
+  // fires for goods you don't have. Quest-gated stock stays invisible until earned.
+  if (see) {
+    const trader = rt.mobs.find((m) => mobVisibleTo(state, p, m) && w.mobs[m.template].shop);
+    if (trader) {
+      const done = (p.quests && p.quests.done) || [];
+      for (const o of w.mobs[trader.template].shop.sells || []) {
+        if (o.requiresQuest && !done.includes(o.requiresQuest)) continue;
+        const t = w.items[o.template];
+        if (!hit(o.template, t.name)) continue;
+        if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
+        const price = o.price != null ? o.price : buyValueOf(t);
+        return entity("item", o.template, t.name, t.description, {
+          rarity: t.rarity || "common",
+          lines: itemSpecLines(t, w, p),
+          hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
+          actions: [{ label: `Buy (${price})`, command: `buy ${o.template}` }],
+        });
+      }
     }
   }
   return null;
