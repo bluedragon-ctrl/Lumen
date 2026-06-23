@@ -237,13 +237,18 @@ const MIN_HIT = 0.05;
  *  @param defender { armour, ward, evasion } — mitigation + dodge.
  *  Accuracy is the light tier (clear 100% / glare 50% / can't-see 5%) plus the
  *  attacker's hit bonus minus the defender's evasion, clamped to [MIN_HIT, 1].
+ *  Accuracy *past* 100% isn't wasted: the surplus sharpens into bonus crit at
+ *  1:1 (evasion is subtracted first, so it's paid down before any spills over) —
+ *  this is what keeps Perception's to-hit meaningful once a delver can't miss.
  *  `sighted` drives miss-message wording; a crit doubles the damage roll. */
 function strike(attacker, defender, light, dice, damageType = "physical") {
-  const chance = Math.max(MIN_HIT, Math.min(1, hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0)));
+  const raw = hitChance(attacker.band, light) + (attacker.hitBonus || 0) - (defender.evasion || 0);
+  const chance = Math.max(MIN_HIT, Math.min(1, raw));
+  const overflowCrit = Math.max(0, raw - 1); // accuracy beyond a sure hit becomes crit
   const sighted = canSee(attacker.band, light);
   if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
-  const crit = Math.random() < (attacker.crit || 0);
+  const crit = Math.random() < ((attacker.crit || 0) + overflowCrit);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
   // Physical blows are soaked flat by Armour. Magical-type blows are cut by Ward
   // as a PERCENT reduction (ward is a percentage: ward 50 → halved). A spell
