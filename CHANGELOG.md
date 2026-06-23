@@ -159,6 +159,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   focus. Such passive refreshes are now tagged `reactive` server-side and the client
   leaves an open examine view in place — `look` or the back button still return to a
   freshly-fetched room.
+- **Examining an entity that then vanishes no longer leaves a stale view.** As a
+  follow-up to the focus-preserving fix above: if the thing you're examining was in
+  the room and a reactive refresh shows it gone from a room you can still see (a mob
+  died, a floor item was taken, another delver left), the Inspect window now drops
+  back to the room. Carried/equipped items you examine are unaffected.
 
 ### Changed
 - **Items** — item tuning (prospectors-hatchet, apprentice-glimmer-charm, glimmersteel-coil, delver-claim-tag, scroll-regeneration, palecap-mushroom, witchglow-cap, deep-stew, book-of-chitin-craft).

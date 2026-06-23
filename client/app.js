@@ -11,6 +11,18 @@ const cmdEl = $("cmd");
 let lastRoom = null;
 let lastPlayer = null;
 
+// The entity currently shown in the examine view, and whether it was a thing in
+// the room (a mob / floor item / fixture / other player) as opposed to something
+// carried or equipped. A reactive room refresh that no longer lists a room-bound
+// examined entity means it died / was taken / left — drop the now-stale view.
+let examinedId = null;
+let examinedRoomBound = false;
+function roomHasEntity(room, id) {
+  if (!room || !room.contents || id == null) return false;
+  const { players, mobs, items, fixtures } = room.contents;
+  return [players, mobs, items, fixtures].some((arr) => arr.some((e) => e.id === id));
+}
+
 // Inventory filter — persisted across page refreshes.
 let invFilter = localStorage.getItem("inv-filter") || "all";
 const INV_GROUP = {
@@ -195,7 +207,13 @@ function renderRoom(room) {
   // yank the Inspect window out of an examine view the player opened. Skip the
   // repaint while examining; lastRoom is already cached for the divider logic,
   // and "look" / the ex-back button re-fetch a fresh room when they return.
-  if (room.reactive && !$("examine-view").hidden) return;
+  // Exception: if the examined thing was in the room and is now gone from a room
+  // we can still see (it died, was picked up, walked off), fall through and
+  // repaint so the view doesn't dwell on something that no longer exists.
+  if (room.reactive && !$("examine-view").hidden) {
+    const vanished = examinedRoomBound && room.canSee && !roomHasEntity(room, examinedId);
+    if (!vanished) return;
+  }
 
   // Receiving a room view (on move / look / light change) returns the Inspect
   // window from any examine view back to the live room.
@@ -251,6 +269,11 @@ function renderRoom(room) {
 
 // --- Examine (single entity in the Inspect window) -------------------------
 function renderExamine(e) {
+  // Remember what we're examining so a reactive room refresh can tell whether it
+  // has since vanished (room-bound) or is safely in hand (carried / equipped).
+  examinedId = e.id;
+  examinedRoomBound = roomHasEntity(lastRoom, e.id);
+
   // Tint the examine view by the current room's light band, so detail text reads
   // gray in dim → washed/shimmering in searing, aligned with the room view.
   $("inspect").className = "pane light-" + (lastRoom ? lastRoom.light.band : "unknown");
