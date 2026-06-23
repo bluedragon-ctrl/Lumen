@@ -191,6 +191,12 @@ consoleEl.addEventListener("scroll", () => {
 
 // --- Inspect (room) --------------------------------------------------------
 function renderRoom(room) {
+  // A reactive refresh (mob entered, someone healed, light flickered) must not
+  // yank the Inspect window out of an examine view the player opened. Skip the
+  // repaint while examining; lastRoom is already cached for the divider logic,
+  // and "look" / the ex-back button re-fetch a fresh room when they return.
+  if (room.reactive && !$("examine-view").hidden) return;
+
   // Receiving a room view (on move / look / light change) returns the Inspect
   // window from any examine view back to the live room.
   $("examine-view").hidden = true;

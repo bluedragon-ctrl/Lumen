@@ -66,7 +66,10 @@ const markViews = (playerId) => { dirtyRoomViews.add(playerId); dirtyPlayerViews
 function flushViews() {
   for (const id of dirtyRoomViews) {
     const p = state.players.get(id);
-    if (p) sendToPlayer(id, buildRoomView(state, p));
+    if (!p) continue;
+    const view = buildRoomView(state, p);
+    view.room.reactive = true; // a passive refresh — must not steal an open examine view
+    sendToPlayer(id, view);
   }
   for (const id of dirtyPlayerViews) {
     const p = state.players.get(id);
