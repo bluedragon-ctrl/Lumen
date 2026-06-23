@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-06-23
 ### Added
 - **`examine`/`look <ware>` now inspects a shopkeeper's stock before you buy.**
   When a visible trader is present, examining a ware you don't already carry
