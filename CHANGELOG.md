@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`examine`/`look <ware>` now inspects a shopkeeper's stock before you buy.**
+  When a visible trader is present, examining a ware you don't already carry
+  falls back to the trader's offers and renders full item detail (stats,
+  description, buy price) in the Inspect pane, with a one-click **Buy** action —
+  the same view you get for a held item. Quest-gated stock stays hidden until
+  earned, and anything in your own pack still wins a name clash. The shopkeeper's
+  examine hint now advertises the flow (`list` → `examine <ware>` → `buy`).
 - **A hidden centipede lair behind the stockpens, and a reworked Wick quest that
   teaches `search`.** Two new depth-0 Rim rooms east of `d0.corral`: *Behind the
   Stockpens* (`d0.backpens`), a transitional dead-end yard whose `north` exit into
