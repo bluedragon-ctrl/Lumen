@@ -79,7 +79,12 @@ const EVASION_PER_WITS = 0.02;
 const HIT_PER_PERCEPTION = 0.02;
 const CRIT_PER_PERCEPTION = 0.01;
 // Attribute-derived pools and the sight curve (see GameState.deriveStats).
-const HP_PER_VITALITY = 5;
+// Max HP is a flat base + a per-level grant every build receives + a Vitality
+// bonus, so no build is locked out of HP growth and a fresh L1/Vit-3 character
+// still starts at HP_BASE + 3*HP_PER_VITALITY = 15.
+const HP_BASE = 6;
+const HP_PER_LEVEL = 2;
+const HP_PER_VITALITY = 3;
 const MANA_PER_INTELLECT = 4;
 const ATTR_BASELINE = 3; // starting value of every attribute
 const SIGHT_PER_PERCEPTION = 5; // every +5 Perception over baseline lowers dimBelow by 1
@@ -260,6 +265,8 @@ module.exports = {
   EVASION_PER_WITS,
   HIT_PER_PERCEPTION,
   CRIT_PER_PERCEPTION,
+  HP_BASE,
+  HP_PER_LEVEL,
   HP_PER_VITALITY,
   MANA_PER_INTELLECT,
   ATTR_BASELINE,

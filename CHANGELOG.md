@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Max HP now grows with level, not just Vitality.** Previously a player's max
+  HP was `Vitality × 5`, so any build that didn't pour points into Vitality stayed
+  at its starting 15 HP forever while foes scaled with depth — making Vitality a
+  mandatory tax. The new formula is `6 + 2 × (level − 1) + 3 × Vitality + gear`:
+  every build gains durability each level, while a dedicated Vitality build still
+  pulls meaningfully ahead. A fresh level-1 character is unchanged at 15 HP, and
+  each level-up now grants its new HP capacity immediately (mirroring `train`).
 
 ## [0.2.0] - 2026-06-23
 ### Added

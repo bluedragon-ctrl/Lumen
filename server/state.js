@@ -6,7 +6,7 @@ const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS } = require("./conf
 // Imported here and re-exported below so the public surface stays unchanged.
 const {
   xpForLevel, MELEE_SCALE, weaponOf, mobOnDamage, playerOnDamage,
-  HP_PER_VITALITY, MANA_PER_INTELLECT, ATTR_BASELINE, SIGHT_PER_PERCEPTION,
+  HP_BASE, HP_PER_LEVEL, HP_PER_VITALITY, MANA_PER_INTELLECT, ATTR_BASELINE, SIGHT_PER_PERCEPTION,
   HIT_PER_PERCEPTION, CRIT_PER_PERCEPTION,
   effectiveAttributes, playerDefence, effectiveSpeed, mobDefence,
   spellScaleBonus, durationScaleBonus, scaledAmount, wardNegates,
@@ -594,17 +594,17 @@ class GameState {
 
   /**
    * Recompute a player's derived stats from their attributes (DESIGN.md §3.2):
-   * max HP (Vitality), max Mana (Intellect), the standing mana-regen rate (global
-   * trickle + gear), and the low-light sight band (Perception). Idempotent —
-   * always derived from `attributes`/gear plus the template's perception band as
-   * the baseline-at-3 anchor, so it is safe to re-run on every admit and whenever
-   * gear changes. Innate Ward/evasion (Wits), to-hit/crit (Perception), and melee
-   * damage (Might) are applied live at combat time, not stored here. Does NOT
-   * touch current hp/mana — callers clamp.
+   * max HP (flat base + per-level grant + Vitality + gear), max Mana (Intellect),
+   * the standing mana-regen rate (global trickle + gear), and the low-light sight
+   * band (Perception). Idempotent — always derived from `level`/`attributes`/gear
+   * plus the template's perception band as the baseline-at-3 anchor, so it is safe
+   * to re-run on every admit and whenever level/gear change. Innate Ward/evasion
+   * (Wits), to-hit/crit (Perception), and melee damage (Might) are applied live at
+   * combat time, not stored here. Does NOT touch current hp/mana — callers clamp.
    */
   deriveStats(player) {
     const a = player.attributes || {};
-    player.maxHp = (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
+    player.maxHp = HP_BASE + ((player.level || 1) - 1) * HP_PER_LEVEL + (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
     player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT + this._equipManaBonus(player);
     player.manaRegen = this.manaRegenFor(player);
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
@@ -623,6 +623,9 @@ class GameState {
     while (player.xp >= xpForLevel((player.level || 1) + 1)) {
       player.level = (player.level || 1) + 1;
       player.unspentPoints = (player.unspentPoints || 0) + POINTS_PER_LEVEL;
+      const prevHp = player.maxHp;
+      this.deriveStats(player); // each level lifts maxHp (HP_PER_LEVEL) for every build
+      if (player.maxHp > prevHp) player.hp += player.maxHp - prevHp; // grant the new capacity, like training
       ups.push({ level: player.level, points: POINTS_PER_LEVEL });
     }
     return ups;
