@@ -57,12 +57,12 @@
   "rusted-blade": {
     "id": "rusted-blade",
     "name": "a rusted blade",
-    "description": "Pitted iron, but it still holds an edge.",
+    "description": "A leaf-shaped blade knapped from dark, glassy deep-stone — Umbral work, its spine carved with worn relief and threaded by a hair-fine vein of glimmer gone dull and red with age. Notched along one edge and cracked near the tang, it has plainly seen hard use and harder neglect; yet the old ground edge still holds, and it bites as deep as honest iron. Not forged but shaped — the kind of thing a deep-folk hand would know at a glance.",
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
     "value": 8,
-    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 12 }
   },
   "prospectors-hatchet": {
     "id": "prospectors-hatchet",
@@ -1276,6 +1276,22 @@
       "damage": { "physical": "1d4" },
       "actionCost": 10,
       "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
+    }
+  },
+  "glimmerglass-blade": {
+    "id": "glimmerglass-blade",
+    "name": "a glimmerglass blade",
+    "keywords": ["glimmerglass", "blade", "sword", "umbral"],
+    "description": "A short, single-edged blade ground from dark deep-stone, its glassy face drinking the light, and a living vein of glimmer threads the spine in a slow blue-green pulse. Umbral work, and unhurt by the years — the knapped edge is keen enough to slip the gap in any guard, and where it bites the glimmer answers, a little of its light flowing back up the arm to the hand that holds it. Mallki shaped it himself; the deep-folk do not part lightly with what they make.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 110,
+    "weapon": {
+      "damage": { "physical": "1d8" },
+      "actionCost": 11,
+      "crit": 0.1,
+      "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }]
     }
   }
 }

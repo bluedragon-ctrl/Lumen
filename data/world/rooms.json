@@ -87,13 +87,44 @@
     "zone": "rim",
     "tags": ["grazing"],
     "name": "The Stockpens",
-    "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south.",
+    "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south, and a gap in the back wall opens east onto the strip of dead ground behind the pens.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "south": "d0.hatchery", "north": "d0.fault" },
+    "exits": { "south": "d0.hatchery", "north": "d0.fault", "east": "d0.backpens" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "stonebug", "max": 3, "respawn": 120 }]
+  },
+  "d0.backpens": {
+    "id": "d0.backpens",
+    "zone": "rim",
+    "name": "Behind the Stockpens",
+    "description": "East of the pens the made ground gives out into a strip of bare rock the builders never bothered to floor — a dead-end yard of rubble and old straw, walled on three sides by the stone backs of the stockpens. The herd-reek thins here, and something sourer creeps in under it: a sharp, chemical sting, like crushed beetle. The dirt is scored with long drag-marks, all of them running the same way, toward the base of the north wall — and there a heavy stonebug shell lies cracked open and licked clean. The pens are back west.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "west": "d0.corral" },
+    "hiddenExits": { "north": { "to": "d0.burrow", "perception": 3, "name": "a low gnawed crack at the base of the north wall" } },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "chitin-plate", "qty": 1, "respawn": 300 }
+    ],
+    "spawns": []
+  },
+  "d0.burrow": {
+    "id": "d0.burrow",
+    "zone": "rim",
+    "name": "The Drag-Burrow",
+    "description": "A burrow gnawed back into the fault-rock, close and lightless, the walls slick with a film that stings the eyes. This is where the dragging ends: stonebug shells lie heaped and split along the floor, the meat scraped from them, loose chitin plates strewn where they fell. The sour venom-reek is thick enough to taste, and a cold draft breathes through a hairline seam in the back wall — the same dark that splits the Riven Yard, come up under the pens. Somewhere in the black the thing that made this nest shifts its hundred legs against the stone. The crack back out lies south.",
+    "depth": 0,
+    "ambientLight": 1,
+    "exits": { "south": "d0.backpens" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "chitin-plate", "qty": 2, "respawn": 600 }
+    ],
+    "spawns": [
+      { "mob": "cave-centipede", "max": 1, "respawn": 600 }
+    ]
   },
   "d0.fault": {
     "id": "d0.fault",
@@ -375,11 +406,12 @@
   "d1.cut": {
     "id": "d1.cut",
     "zone": "abyss",
+    "tags": ["nest"],
     "name": "The Sunken Cut",
-    "description": "A prospector's dig, abandoned mid-work: a rusted pick, a snapped ladder, a trench cut into the floor and never finished — someone came down full of hope and left their tools where they fell. The dark has moved back in, and with it the vermin. Something larger has been dragging things down the passage to the south. The hollow's glow is faint to the north.",
+    "description": "A prospector's dig, abandoned mid-work: a rusted pick, a snapped ladder, a trench cut into the floor and never finished — someone came down full of hope and left their tools where they fell. The dark has moved back in, and with it the vermin. Something larger has been dragging things down the passage to the south. A gnawed gap in the west wall opens on a stink of vermin and old nesting. The hollow's glow is faint to the north.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "d1.hollow", "south": "d1.den" },
+    "exits": { "north": "d1.hollow", "south": "d1.den", "west": "d1.ratrun" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -388,14 +420,49 @@
       { "mob": "cave-lurker", "max": 1, "respawn": 600, "hidden": { "perception": 3 } }
     ]
   },
+  "d1.ratrun": {
+    "id": "d1.ratrun",
+    "zone": "abyss",
+    "tags": ["nest"],
+    "name": "The Rat-Run",
+    "description": "A low side-gallery the rats have made their own — the floor worn smooth and greasy with their running, the walls scored with gnaw-marks and packed with shredded nesting. Droppings crunch underfoot, and small shapes scatter from the light only to circle back at its edge. The cut lies east; the run drops south into the warren proper.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "east": "d1.cut", "south": "d1.brood" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "giant-rat", "max": 3, "respawn": 60 },
+      { "mob": "brood-rat", "max": 1, "respawn": 180 }
+    ]
+  },
+  "d1.brood": {
+    "id": "d1.brood",
+    "zone": "abyss",
+    "tags": ["nest"],
+    "name": "The Brood-Nest",
+    "description": "The rat-run opens into the nest itself: a stinking, bone-littered hollow where the brood packs thickest. A single witchglow cluster has rooted in the damp of the far wall, breathing a faint, cold-green light over the heaving nests — enough to glint off a hundred small eyes. The run climbs north; a gnawed hole east lets onto the brood-mother's den.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "north": "d1.ratrun", "east": "d1.den" },
+    "fixtures": ["witchglow-cluster"],
+    "groundItems": [
+      { "template": "rusted-blade", "qty": 1, "respawn": 600 }
+    ],
+    "spawns": [
+      { "mob": "giant-rat", "max": 3, "respawn": 60 },
+      { "mob": "brood-rat", "max": 1, "respawn": 180 }
+    ]
+  },
   "d1.den": {
     "id": "d1.den",
     "zone": "abyss",
+    "tags": ["nest"],
     "name": "The Brood-Mother's Den",
-    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The only way out is north, behind you.",
+    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "d1.cut" },
+    "exits": { "north": "d1.cut", "west": "d1.brood" },
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 600 }]
