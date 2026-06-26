@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   your bindings, or `alias F1` (key only) to clear one. Bindings live on the
   character and persist across sessions and devices. Keys work whether or not the
   command line has focus; F5+ are left to the browser.
+- **Backspace closes the Inspect window** (same as the ‹ back button), returning you
+  to the room view — but only when the command line is empty, so it still edits text
+  mid-typing.
 - **Gloom-silk now has a use: two Umbral caster garments.** A **Gloom-silk Robe**
   (body: +2 Ward, +6 max mana, +1 speed) and a **Gloom-silk Hood** (head: +1 Ward,
   +3 max mana), both woven at an alchemy bench from gloom-silk + glimmer-dust.
@@ -26,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **The Inspect window no longer shows an Attack button for a creature.** Examining a
+  mob is now purely informational; attack via the command line or the room chip.
 - **`Candlelight` duration now scales with Intellect** (30s per point) instead of a
   flat 60s, matching the summon-wisp convention. A keener mage holds the light
   longer; the `spells` listing reflects the scaled duration.

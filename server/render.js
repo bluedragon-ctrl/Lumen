@@ -222,8 +222,7 @@ function buildExamineView(state, p, q) {
     if (!mobVisibleTo(state, p, m)) continue; // a hidden lurker isn't examinable until searched out
     const t = w.mobs[m.template];
     if ((see || t.emitsLight) && hit(m.id, t.name)) {
-      const attack = { actions: [{ label: "Attack", command: `attack ${m.id}` }] };
-      if (!detailed) return entity("mob", m.id, t.name, null, { dim: true, ...tooDim, ...attack });
+      if (!detailed) return entity("mob", m.id, t.name, null, { dim: true, ...tooDim });
       const hints = [
         t.hostile ? "Hostile — it may attack if it senses you."
           : t.lightAggro ? "Calm in the dark — light rouses it."
@@ -242,7 +241,6 @@ function buildExamineView(state, p, q) {
       return entity("mob", m.id, t.name, t.description, {
         bars: [{ label: "HP", value: m.hp, max: m.maxHp, kind: "hp" }],
         hints,
-        ...attack,
       });
     }
   }

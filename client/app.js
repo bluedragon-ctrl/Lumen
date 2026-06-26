@@ -336,6 +336,17 @@ function renderExamine(e) {
 // Back to the live room view.
 document.getElementById("ex-back").addEventListener("click", () => sendCommand("look"));
 
+// Backspace closes the Inspect window (same as clicking ‹ back) — but only when the
+// command line is empty, so it still edits text mid-typing. Works whether or not the
+// input has focus, so it also reclaims the key from the browser's "navigate back".
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Backspace") return;
+  if ($("examine-view").hidden) return;
+  if (cmdEl.value !== "") return;
+  ev.preventDefault();
+  sendCommand("look");
+});
+
 // Jump-to-newest pill: snap to the bottom and clear the unread badge, then return
 // focus to the command line so the player can keep typing.
 $("jump-pill").addEventListener("click", () => {
