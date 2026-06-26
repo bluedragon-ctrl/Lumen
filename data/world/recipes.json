@@ -132,6 +132,16 @@
     ],
     "output": { "template": "cooked-skewer", "qty": 1 }
   },
+  "fried-mushrooms": {
+    "id": "fried-mushrooms",
+    "name": "Fried Mushrooms",
+    "station": "cooking",
+    "inputs": [
+      { "template": "palecap-mushroom", "qty": 2 },
+      { "template": "bug-tallow", "qty": 1 }
+    ],
+    "output": { "template": "fried-mushrooms", "qty": 1 }
+  },
   "roasted-grubs": {
     "id": "roasted-grubs",
     "name": "Roasted Grubs",
@@ -414,6 +424,28 @@
       { "template": "weeping-chasm-moss", "qty": 3 }
     ],
     "output": { "template": "gloom-silk", "qty": 1 }
+  },
+  "weave-gloom-silk-robe": {
+    "id": "weave-gloom-silk-robe",
+    "name": "Gloom-silk Robe",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "gloom-silk", "qty": 3 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 4,
+    "output": { "template": "gloom-silk-robe", "qty": 1 }
+  },
+  "weave-gloom-silk-hood": {
+    "id": "weave-gloom-silk-hood",
+    "name": "Gloom-silk Hood",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "gloom-silk", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "gloom-silk-hood", "qty": 1 }
   },
   "forge-hungering-dagger": {
     "id": "forge-hungering-dagger",

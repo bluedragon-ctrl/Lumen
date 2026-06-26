@@ -342,6 +342,16 @@
     "stackable": true,
     "scroll": { "spell": "candlelight" }
   },
+  "scroll-halo": {
+    "id": "scroll-halo",
+    "name": "a Scroll of Halo",
+    "description": "Not vellum but a thin leaf of dark deep-stone, the glyphs cut cold and exact in the Umbral hand and inlaid with a hair-fine thread of glimmer that never quite stops glowing. Study it to learn the Halo weave — a ring of cold blue-white light that lifts the dark and lies against hostile magic at once — and the worked stone crumbles to grit in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 60,
+    "stackable": true,
+    "scroll": { "spell": "halo" }
+  },
   "scroll-mage-armour": {
     "id": "scroll-mage-armour",
     "name": "a Scroll of Mage Armour",
@@ -839,7 +849,7 @@
     "weight": 1,
     "value": 40,
     "stackable": true,
-    "teaches": { "recipes": ["hearty-broth", "cooked-skewer", "roasted-grubs"] }
+    "teaches": { "recipes": ["fried-mushrooms", "cooked-skewer", "roasted-grubs"] }
   },
   "book-of-hearty-cooking": {
     "id": "book-of-hearty-cooking",
@@ -849,7 +859,7 @@
     "weight": 1,
     "value": 60,
     "stackable": true,
-    "teaches": { "recipes": ["deep-stew"] }
+    "teaches": { "recipes": ["hearty-broth", "deep-stew"] }
   },
   "chitin-plate": {
     "id": "chitin-plate",
@@ -954,6 +964,19 @@
     "consumable": {
       "flavour": "You crunch through the roasted grubs. Greasy and warm, they take the worst of the edge off your hunger.",
       "effect": { "type": "restore", "hp": 4 }
+    }
+  },
+  "fried-mushrooms": {
+    "id": "fried-mushrooms",
+    "name": "a mess of fried mushrooms",
+    "description": "Pale mushrooms sliced thick and fried in rendered tallow until their edges crisp and brown, glistening and faintly nutty. Plain camp-fare off Maeve's hearth, but hot grease and a good sear make even cellar-cap mushrooms eat like a meal.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 5,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You fork down the fried mushrooms. Hot, greasy and savoury, they settle warm in your belly.",
+      "effect": { "type": "restore", "hp": 5 }
     }
   },
   "bug-meat": {
@@ -1228,6 +1251,16 @@
     "stackable": true,
     "recipe": "process-gloom-silk"
   },
+  "umbral-weaving-method": {
+    "id": "umbral-weaving-method",
+    "name": "an Umbral weaving-method",
+    "description": "A folded length of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the drawing of gloom-silk into cloth, the cutting of the robe and the cowl, the working of a thread of cold glimmer through the weave. No words, only the sequence of steps. Study it to fix both methods in memory.",
+    "type": "book",
+    "weight": 0,
+    "value": 70,
+    "stackable": true,
+    "teaches": { "recipes": ["weave-gloom-silk-robe", "weave-gloom-silk-hood"] }
+  },
   "weeping-chasm-moss": {
     "id": "weeping-chasm-moss",
     "name": "a clump of weeping chasm-moss",
@@ -1246,6 +1279,30 @@
     "weight": 0,
     "value": 40,
     "stackable": true
+  },
+  "gloom-silk-robe": {
+    "id": "gloom-silk-robe",
+    "rarity": "uncommon",
+    "name": "a gloom-silk robe",
+    "keywords": ["robe", "gloom-silk", "gloomsilk", "cloth", "umbral"],
+    "description": "A long robe woven whole from gloom-silk and threaded through with a mote of glimmer worked cold into the weave, so a faint blue-white light moves in its folds where the dark presses close. It lies so light on the shoulders it scarcely seems worn — it quickens the step rather than burdening it — and turns no blade worth the name, but the deep-made cloth lies close against hostile magic, and the captive glimmer deepens the well a caster draws from. Umbral weaving, in the patient deep-folk method.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 1,
+    "value": 145,
+    "armour": { "armour": 1, "ward": 2, "maxMana": 6, "speedPenalty": -1 }
+  },
+  "gloom-silk-hood": {
+    "id": "gloom-silk-hood",
+    "rarity": "uncommon",
+    "name": "a gloom-silk hood",
+    "keywords": ["hood", "cowl", "gloom-silk", "gloomsilk", "cloth", "umbral"],
+    "description": "A deep cowl of gloom-silk drawn close about the brow, a single hair-fine thread of glimmer run through the hem so it never quite stops glowing. It sits light as a whisper and shadows the face against the glare a surface-lamp throws — and the cold cloth lies a little against hostile magic while it lends a caster's well a touch more depth. Umbral work, woven to match the robe.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 0,
+    "value": 80,
+    "armour": { "armour": 1, "ward": 1, "maxMana": 3, "speedPenalty": 0 }
   },
   "shadow-heart": {
     "id": "shadow-heart",
