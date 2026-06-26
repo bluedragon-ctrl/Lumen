@@ -461,6 +461,19 @@ let histIdx = -1;
 // blur), pull it back the instant the player types a printable character — so the
 // keystroke lands in the input rather than being lost. Modifier combos
 // (Ctrl/Cmd+C to copy log text, etc.) are left alone.
+// F1–F4 fire the player's bound shortcuts. We send the key as a bare command and
+// let the server resolve it against the account's aliases — so bindings follow the
+// character across devices and there's nothing to sync to the client. Works whether
+// or not the command line has focus; only once logged in.
+document.addEventListener("keydown", (ev) => {
+  if (!authed) return;
+  if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  if (!/^F[1-4]$/.test(ev.key)) return;
+  ev.preventDefault();
+  addLine("> " + ev.key, "echo");
+  sendCommand(ev.key);
+});
+
 document.addEventListener("keydown", (ev) => {
   if (document.activeElement === cmdEl) return;
   if (ev.ctrlKey || ev.metaKey || ev.altKey || ev.key.length !== 1) return;

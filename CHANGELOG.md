@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
+  one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
+  your bindings, or `alias F1` (key only) to clear one. Bindings live on the
+  character and persist across sessions and devices. Keys work whether or not the
+  command line has focus; F5+ are left to the browser.
 - **Gloom-silk now has a use: two Umbral caster garments.** A **Gloom-silk Robe**
   (body: +2 Ward, +6 max mana, +1 speed) and a **Gloom-silk Hood** (head: +1 Ward,
   +3 max mana), both woven at an alchemy bench from gloom-silk + glimmer-dust.

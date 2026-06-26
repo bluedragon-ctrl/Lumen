@@ -37,6 +37,11 @@ const SEARCH_COST = 12;
 const DIRS = ["north", "south", "east", "west", "up", "down"];
 const DIR_ALIAS = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
 
+// The function keys a player may bind to a command via `alias` (and that the
+// client forwards as a bare key token on keypress). F1–F4 only — F5+ are
+// reserved by the browser (reload/devtools/fullscreen) and can't be trapped.
+const ALIAS_KEYS = ["F1", "F2", "F3", "F4"];
+
 // Every command word the dispatcher understands, in PRIORITY order. A typed verb
 // that isn't an exact match resolves to the FIRST entry it is a prefix of
 // (DikuMUD-style abbreviation) — so common verbs precede rarer ones that share a
@@ -54,7 +59,7 @@ const VERBS = [
   "mine", "dig", "gather", "forage", "harvest", "pick", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
   "talk", "give", "deliver", "quest", "quests", "journal",
   // `rest` (an alias of `sit`) sits late so `re`/`r` favour refuel/remove/recipes.
-  "unequip", "remove", "rest", "help",
+  "unequip", "remove", "rest", "help", "alias",
   // `quit`/`logout` sit after `quaff` so `q`/`qu` still mean quaff; quitting needs `qui`+.
   "quit", "logout", "logoff",
 ];
@@ -793,6 +798,35 @@ function quit(state, player, arg, ctx) {
   return [{ type: "goodbye", text: "You slip away into the dark. Your progress is saved — you can safely close this tab. (Closing the tab at any time saves too.)" }];
 }
 
+// `alias` — bind a command to a function key (F1–F4), clear one, or list them.
+//   alias                  → show all four slots
+//   alias F1 cast spark    → bind F1
+//   alias F1               → clear F1
+// Bindings live on the player (player.aliases) and persist with the account.
+function alias(state, player, arg) {
+  const parts = (arg || "").trim().split(/\s+/);
+  const key = (parts[0] || "").toUpperCase();
+  const command = parts.slice(1).join(" ").trim();
+  player.aliases = player.aliases || {};
+
+  // No key: list the current bindings.
+  if (!key) {
+    const lines = ALIAS_KEYS.map((k) => `  ${k} — ${player.aliases[k] || "(unbound)"}`);
+    return [{ type: "log", text: `Your shortcuts:\n${lines.join("\n")}\n\nSet one with "alias F1 cast spark"; clear it with "alias F1".` }];
+  }
+  if (!ALIAS_KEYS.includes(key)) {
+    return [{ type: "error", text: `You can only bind ${joinList(ALIAS_KEYS)}.` }];
+  }
+  // Key but no command: clear that slot.
+  if (!command) {
+    if (!player.aliases[key]) return [{ type: "log", text: `${key} is already unbound.` }];
+    delete player.aliases[key];
+    return [{ type: "log", text: `Cleared ${key}.` }];
+  }
+  player.aliases[key] = command;
+  return [{ type: "log", text: `${key} now runs "${command}".` }];
+}
+
 // The verb→handler table. Each row lists the verbs/aliases that share a handler;
 // `run(state, player, arg, ctx)` returns the actor's messages. This replaces the
 // old dispatch `switch` — VERBS (above) stays the curated abbreviation list, and
@@ -837,6 +871,7 @@ const COMMANDS = [
   { verbs: ["equip", "wield", "wear"], run: equip },
   { verbs: ["unequip", "remove"], run: unequip },
   { verbs: ["help", "?"], run: (s, p) => [{ type: "log", text: buildHelp(p) }] },
+  { verbs: ["alias"], run: alias },
   { verbs: ["quit", "logout", "logoff"], run: quit },
 ];
 
@@ -853,6 +888,15 @@ for (const v of VERB_SET) {
 function execute(state, player, input, ctx = NOOP_CTX) {
   // A fallen delver can do nothing but wait out the dark until they wake at the rim.
   if (player && player.dying != null) return [{ type: "error", text: "You have fallen. There is only the dark — wait." }];
+  // F-key alias: a bare F1–F4 (the client sends the key as the whole command)
+  // resolves to its bound command. Resolved once here, so a binding can't point
+  // at another F-key and loop.
+  const keyToken = (input || "").trim().toUpperCase();
+  if (player && ALIAS_KEYS.includes(keyToken)) {
+    const bound = player.aliases && player.aliases[keyToken];
+    if (!bound) return [{ type: "error", text: `${keyToken} is not bound. Set it with "alias ${keyToken} <command>".` }];
+    input = bound;
+  }
   const parts = (input || "").trim().split(/\s+/);
   let verb = (parts[0] || "").toLowerCase();
   const arg = parts.slice(1).join(" ");
