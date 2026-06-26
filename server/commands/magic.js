@@ -49,7 +49,9 @@ function spellList(state, player) {
       const parts = [];
       if (e.armour) parts.push(`armour ${fmtAmount(e.armour)}`);
       if (e.ward) parts.push(`ward ${fmtAmount(e.ward)}`);
-      tail = ` — ${parts.join(", ")} for ${fmtTicks(e.duration || 0)}`;
+      if (e.emitLight) parts.push(`sheds ${e.emitLight} light`);
+      const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
+      tail = ` — ${parts.join(", ")} for ${fmtTicks(dur)}${e.durationScale ? ` (${e.durationScale.attr})` : ""}`;
     }
     else if (e.type === "damage-over-time") {
       const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
@@ -61,8 +63,10 @@ function spellList(state, player) {
       tail = ` — ${e.damage} ${bonus ? `+${bonus} ` : ""}${e.damageType || "magical"} to every foe in the room` +
         (e.scale ? ` (${e.scale.attr}/${e.scale.per})` : "");
     }
-    else if (e.type === "emit-light")
-      tail = ` — sheds ${e.magnitude || 1} light for ${fmtTicks(e.duration || 0)}`;
+    else if (e.type === "emit-light") {
+      const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
+      tail = ` — sheds ${e.magnitude || 1} light for ${fmtTicks(dur)}${e.durationScale ? ` (${e.durationScale.attr})` : ""}`;
+    }
     else if (e.type === "sleep")
       tail = ` — lulls a foe to sleep (resisted by Ward, broken by any blow)`;
     else if (e.type === "summon") {
@@ -123,9 +127,18 @@ function cast(state, player, arg, ctx) {
   // target to name. Eligibility/narration live in castBurst.
   if (spell.effect && spell.effect.type === "damage-room") return castBurst(state, player, spell, ctx);
 
-  if (!targetQ) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
-  const mob = findMobInRoom(state, player, targetQ, false);
-  if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
+  let mob;
+  if (targetQ) {
+    mob = findMobInRoom(state, player, targetQ, false);
+    if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
+  } else {
+    // No explicit target: fall back to the foe you're already engaged with — the
+    // pending attack target shown in the Inspect pane — so `cast spark` mid-fight
+    // strikes the current foe without having to name it again.
+    const pendId = player.pending && player.pending.type === "attack" ? player.pending.targetId : null;
+    mob = pendId ? state.rooms[player.location].mobs.find((m) => m.id === pendId) : null;
+    if (!mob) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
+  }
 
   const mt = w.mobs[mob.template];
   const verb = spell.name.toLowerCase();
@@ -262,8 +275,10 @@ function castSupport(state, player, spell, targetQ, ctx) {
     const parts = [];
     if (res.armour) parts.push(`+${res.armour} armour`);
     if (res.ward) parts.push(`+${res.ward} ward`);
+    if (res.light) parts.push(`${res.light} light`);
     const grant = parts.length ? parts.join(", ") : "a faint sheen";
-    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a crust of hardened glimmer grants ${grant} for ${fmtTicks(res.duration)}.`);
+    const sheath = res.light ? "a wreath of cold glimmer-light" : "a crust of hardened glimmer";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${sheath} grants ${grant} for ${fmtTicks(res.duration)}.`);
   }
   if (res.effect === "emit-light") {
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a mote of light kindles overhead, shedding ${res.perPulse} light for ${fmtTicks(res.duration)}.`);

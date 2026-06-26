@@ -5,7 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Gloom-silk now has a use: two Umbral caster garments.** A **Gloom-silk Robe**
+  (body: +2 Ward, +6 max mana, +1 speed) and a **Gloom-silk Hood** (head: +1 Ward,
+  +3 max mana), both woven at an alchemy bench from gloom-silk + glimmer-dust.
+  Recipes are taught by *an Umbral weaving-method* (teaches both), sold by Mallki
+  the qhatuq. Previously gloom-silk could be processed but nothing consumed it.
+- **New `Halo` light spell** — an Umbral cold-light weave, stronger than Candlelight
+  (sheds 3 light) that also lays a **Ward = Intellect** against hostile magic.
+  Fuelled by a luminescent gland (consumed on cast); both light and ward last
+  60s + 15s/Intellect. Learned from a *Scroll of Halo*, sold by Mallki the qhatuq.
+  As part of this, the `protect` effect type now supports companion light
+  (`emitLight`) and Intellect duration scaling (`durationScale`).
+- **New `Fried Mushrooms` cooking recipe** — 2 palecap mushrooms fried in
+  bug-tallow for a small HP restore. Taught by *a book of cooking*.
+
 ### Changed
+- **`Candlelight` duration now scales with Intellect** (30s per point) instead of a
+  flat 60s, matching the summon-wisp convention. A keener mage holds the light
+  longer; the `spells` listing reflects the scaled duration.
+- **`cast` now defaults to a sensible target when none is named.** A hostile spell
+  cast with no target (`cast spark`) strikes the foe you're already engaged with —
+  the pending attack target shown in the Inspect pane — instead of refusing. (Buffs
+  and heals already default to self.)
+- **`Hearty Broth` moved from *a book of cooking* to *a book of hearty cooking*.**
+  The common cookbook now teaches the new Fried Mushrooms recipe in its place,
+  while the broth joins Deep Stew in the rarer folio.
 - **Max HP now grows with level, not just Vitality.** Previously a player's max
   HP was `Vitality × 5`, so any build that didn't pour points into Vitality stayed
   at its starting 15 HP forever while foes scaled with depth — making Vitality a

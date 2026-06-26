@@ -1274,22 +1274,37 @@ class GameState {
       // Bake the caster-scaled defence into the instance (base + attribute bonus).
       const armour = scaledAmount(attrs, eff.armour);
       const ward = scaledAmount(attrs, eff.ward);
-      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
+      // Lifetime can scale with the caster (durationScale, ticks per point) on top of
+      // any flat base — a keener mage holds the weave longer.
+      const duration = (eff.duration || 0) + durationScaleBonus(attrs, eff.durationScale);
+      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration, refresh: eff.refresh, good: true });
+      // A radiant ward (Halo) also sheds light: a companion emit-light state, lasting
+      // as long as the ward, brightens the room at once — mirrors the smouldering DoT's
+      // glow (see castSpell) and the way a quaffed light potion lifts the room.
+      if (eff.emitLight) {
+        this.applyEffect(target.actor, { type: "emit-light", name: eff.name || "protect", magnitude: eff.emitLight, duration, refresh: eff.refresh, good: true });
+        this.rooms[player.location].light = this.computeRoomLight(player.location);
+      }
       this._narrateEffectApplied(events, target, eff.name || eff.type);
       this._drawSupportThreat(player, target.id, 1); // a pure buff: a flat sliver of threat
-      return { effect: "protect", name: spell.name, armour, ward, duration: eff.duration || 0 };
+      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration };
     }
 
     // Status effects (heal-over-time and future buffs). Bake any caster scaling
     // into the magnitude so the instance carries a fixed strength.
     const bonus = spellScaleBonus(attrs, eff.scale);
     const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
-    this.applyEffect(target.actor, { ...eff, magnitude });
+    // Lifetime can scale with the caster (durationScale, ticks per point) on top of
+    // any flat base — a keener mage holds Candlelight longer, like a longer-lived summon.
+    const duration = eff.durationScale
+      ? (eff.duration || 0) + durationScaleBonus(attrs, eff.durationScale)
+      : eff.duration;
+    this.applyEffect(target.actor, { ...eff, magnitude, duration });
     // A light-shedding weave (Candlelight) brightens the room at once, like a potion.
     if (eff.type === "emit-light") this.rooms[player.location].light = this.computeRoomLight(player.location);
     this._narrateEffectApplied(events, target, eff.name || eff.type);
     this._drawSupportThreat(player, target.id, magnitude); // mend-over-time: per-pulse magnitude as threat
-    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: eff.duration || 0 };
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: duration || 0 };
   }
 
   /**

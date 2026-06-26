@@ -163,7 +163,10 @@ function itemSpecLines(tmpl, w, viewer) {
   if (tmpl.armour) {
     const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0;
     if (ar || wd) lines.push(`armour ${ar}, ward ${wd}`); // skip for pure-bonus gear (a ring, a coil)
-    if (tmpl.armour.speedPenalty) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
+    // A positive value slows the wearer (heavy plate); a negative one quickens them
+    // (feather-light cloth) and reads as a speed bonus rather than a "penalty".
+    if (tmpl.armour.speedPenalty > 0) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);
+    else if (tmpl.armour.speedPenalty < 0) lines.push(`speed +${-tmpl.armour.speedPenalty}`);
     if (tmpl.armour.maxHp) lines.push(`max HP +${tmpl.armour.maxHp}`);
     if (tmpl.armour.maxMana) lines.push(`max mana +${tmpl.armour.maxMana}`);
     if (tmpl.armour.manaRegen) lines.push(`mana regen +${tmpl.armour.manaRegen}/tick`);
