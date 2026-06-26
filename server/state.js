@@ -659,6 +659,7 @@ class GameState {
       knownRecipes: [...(t.knownRecipes || [])],
       knownSpells: [...(t.knownSpells || [])],
       quests: { active: {}, done: [] }, // quest log: in-progress cursors + finished ids (see quests.js)
+      aliases: {}, // F-key shortcuts: { "F1": "cast spark", … } — set via the `alias` command
       visitedRooms: [t.startLocation], // first-entry explore XP; the spawn room is free
     };
     for (const [slot, tmplId] of Object.entries(t.startEquipment || {})) {
@@ -701,6 +702,8 @@ class GameState {
     // Explore XP added later: seed with the current room so a pre-existing delver
     // isn't paid for re-treading ground, then earns from the next new room on.
     if (!Array.isArray(player.visitedRooms)) player.visitedRooms = [player.location];
+    // F-key alias map added later: backfill so older saves can take bindings.
+    if (!player.aliases || typeof player.aliases !== "object") player.aliases = {};
     // Posture always resets to standing on login — a delver wakes up when they
     // reconnect, so a save can't strand them blind and asleep.
     player.posture = "standing";
