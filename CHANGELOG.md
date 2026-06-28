@@ -55,6 +55,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **The void-light (below-zero) Inspect visuals are gentler.** The dark-closing-in
+  vignette now breathes slowly and shallowly (8s, a smaller swing) instead of a
+  fast, deep pulse that yanked the readable centre out from under the text — so
+  examining or reading a room in the void no longer feels like a disruptive blink.
+  The shiver and gray tint are unchanged.
 - **The Inspect window no longer shows an Attack button for a creature.** Examining a
   mob is now purely informational; attack via the command line or the room chip.
 - **`Candlelight` duration now scales with Intellect** (30s per point) instead of a

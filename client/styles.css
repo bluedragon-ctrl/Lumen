@@ -191,7 +191,9 @@ body {
 @keyframes searing-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 /* void: light is below zero — a deep dark that ordinary light can't beat. The
    mirror of searing: a black vignette that breathes inward (the dark closing in)
-   plus a faint shiver on the room text. */
+   plus a faint shiver on the room text. The breath is slow and shallow — the dark
+   only leans in and eases back, so the central text never drops out from under the
+   reader (an earlier, faster/deeper pulse felt like a disruptive blink). */
 .light-void { background: #040506; color: #5a6770; }
 .light-void #room-name { color: #6b7882; }
 .light-void #room-name, .light-void .room-desc {
@@ -199,13 +201,13 @@ body {
 }
 .light-void::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  animation: void-breathe 4.5s ease-in-out infinite;
+  animation: void-breathe 8s ease-in-out infinite;
 }
 @keyframes void-breathe {
-  0%, 100% { background: radial-gradient(ellipse 80% 80% at 50% 45%,
-              rgba(0,0,0,0) 0%, rgba(0,0,0,.45) 58%, rgba(0,0,0,.92) 100%); }
-  50%      { background: radial-gradient(ellipse 44% 50% at 50% 45%,
-              rgba(0,0,0,0) 0%, rgba(0,0,0,.7) 45%, rgba(0,0,0,.99) 90%); }
+  0%, 100% { background: radial-gradient(ellipse 88% 88% at 50% 45%,
+              rgba(0,0,0,0) 0%, rgba(0,0,0,.32) 64%, rgba(0,0,0,.8) 100%); }
+  50%      { background: radial-gradient(ellipse 70% 72% at 50% 45%,
+              rgba(0,0,0,0) 0%, rgba(0,0,0,.46) 56%, rgba(0,0,0,.88) 96%); }
 }
 @keyframes void-shiver {
   0%, 100% { transform: translate(0, 0); }
@@ -220,8 +222,8 @@ body {
   .light-void #room-name, .light-void .room-desc { animation: none; }
   .light-void::after {
     animation: none;
-    background: radial-gradient(ellipse 55% 58% at 50% 45%,
-      rgba(0,0,0,0) 0%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.96) 95%);
+    background: radial-gradient(ellipse 80% 80% at 50% 45%,
+      rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 60%, rgba(0,0,0,.85) 96%);
   }
   .chip.luminous { animation: none; }
 }
