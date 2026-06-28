@@ -229,7 +229,17 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["hums a wandering old lullaby", "wipes the bar down with a worn grey cloth", "ladles steaming broth into a chipped bowl", "smiles warmly and pats an empty stool", "stokes the hearth until it pops and crackles"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["turns every lamp in the common-room up high against the coming dark", "props the door for stragglers and watches the lane, mouth tight", "murmurs that no one good is left out in a dark like this", "stokes the hearth to a roar and keeps it there"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 1 }, "messages": [
+          { "target": "grabs your sleeve, alarmed: \"No light at all, and the Tide coming on? You're not going out in that, love. Sit.\"", "room": "grabs {name}'s sleeve, alarmed at their dark hands." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 4 }, "messages": [
+          { "target": "frowns at your little lamp: \"That guttering thing won't see you through the Tide, dear. Buy better of Garrick first.\"", "room": "frowns at the weak light {name} is carrying." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "keeps the hearth high: \"Stay till it passes if you can, love. The dark's hungry tonight.\"", "room": "keeps the hearth high and watches the door for {name}." }
+        ] },
         { "if": { "delivery": true }, "messages": [
           { "target": "catches your eye: \"Those for my pot, love? Hand them over while they're fresh.\"", "room": "catches {name}'s eye and nods at their pack." },
           { "target": "wipes her hands on her apron: \"Don't keep an old woman waiting on her stores, dear.\"", "room": "wipes her hands on her apron and beckons {name} over to the bar." }
@@ -270,7 +280,17 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["scowls at a passing delver", "counts a stack of coins with a low grunt", "snaps his ledger shut", "mutters that gear costs what it costs", "eyes your coin-purse, then your boots"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["counts his lanterns twice, as if the dark might thin the shelf", "turns the shop-lamp to full and growls at the dark past the sill", "drags a crate of oil-flasks to the front of the counter", "checks the door-bar, then checks it again"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 1 }, "messages": [
+          { "target": "jabs a thumb at his shelves: \"Into a Tide blind? Buy a lantern or buy a plot. I sell the one.\"", "room": "jabs a thumb at his lantern shelf as {name} passes." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 4 }, "messages": [
+          { "target": "taps your lamp, unimpressed: \"That, against a full Tide? You'll want a better wick and oil to spare — both on the wall.\"", "room": "eyes {name}'s feeble lamp and shakes his head." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "shoves a flask of oil across the counter: \"Tide's in. Top off before you go. Don't come crying when you run dry in the dark.\"", "room": "shoves a flask of oil toward {name}." }
+        ] },
         { "if": { "delivery": true }, "messages": [
           { "target": "holds out a flat palm: \"You're carrying what I ordered. Hand it over and we'll square up.\"", "room": "holds out a flat palm toward {name}." }
         ] },
@@ -309,6 +329,7 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["squints at a half-built contraption, baffled", "starts a formula aloud and loses the thread", "taps the anvil twice, then forgets why", "sketches a diagram in the soot, frowning", "holds up two odd parts, unsure which fits where"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["lights a second lamp off the first, then a third, muttering", "fumbles the bellows, chasing the forge-flame higher against the gloom", "loses his thread mid-formula and just stares at the darkening lane", "taps the anvil for comfort and keeps the coals bright"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "delivery": true }, "messages": [
           { "target": "goes still at the sight of the hammer in your pack, the faraway look gone sharp: \"Where — give it here. That's mine. That's my first. I carried that down the once, and I came back up without it.\"", "room": "stares at the rusted hammer in {name}'s pack, every half-built contraption forgotten." }
@@ -348,6 +369,7 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["coaxes a stray lightbug back into its cell with the net", "hums low, and the nearest cells seem to brighten", "taps a stonebug's shell with the goad until it shuffles aside", "scatters a handful of glowing moss into the pens", "picks a bold grub off the mushroom beds and pockets it for bait", "checks a clutch of pale eggs against the glow", "wipes her hands on a work-stiff apron"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["herds the brightest lightbugs to the front of their cells against the dark", "hushes the pens as the glow-moss dims and the bugs huddle close", "cups a frightened lightbug and holds it up like a small lantern", "checks the hatchery shutters, soothing the restless clutches"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "equipped": "torch" }, "messages": [
           { "target": "edges between your torch and the cells: \"Mind the flame, please — the bugs go dark when they're frightened.\"", "room": "edges between {name}'s torch and the cells." }
@@ -384,6 +406,7 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["traces a slow sigil that hangs glowing a moment, then fades", "holds a glimmer shard up to a candle and frowns at its light", "murmurs over a hand-copied grimoire", "grinds a pinch of glimmer to dust with a brass pestle", "studies you as though reading a page"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["kindles a hovering glimmer-light and sets it turning slowly overhead", "reads the dark the way one reads weather, lips pressed thin", "grinds glimmer to dust faster, feeding a steadier glow", "traces a warding sigil over the doorway and watches it hold"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "delivery": true }, "messages": [
           { "target": "looks up from her bench: \"You have something of mine, I believe. Let's see it.\"", "room": "marks {name} with a cool, appraising eye." }
@@ -420,6 +443,7 @@
     "actions": [
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 1, "messages": ["dips his pen and scratches a long entry into the ledger", "squares a stack of claim papers edge to edge", "stamps a document with a small lead seal, twice", "runs a finger down a column of names, lips moving", "blots the ledger and frowns at the smudge"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["weights the ledger open and pulls his desk-lamp close against the dark", "lights the reading-candle, then a second beside it, frowning", "mutters that the dark is no excuse to fall behind on the entries", "trims the wick higher and squints at the failing light"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "delivery": true }, "messages": [
           { "target": "looks up sharply: \"You carry something owed to this office, I believe. Proof on the counter; payment follows.\"", "room": "looks up sharply and beckons {name} to the counter." }
@@ -461,7 +485,17 @@
       { "type": "idle", "weight": 9 },
       { "type": "wander", "weight": 2, "verb": "moves on along his round", "scope": "zone", "requireTags": ["patrol"] },
       { "type": "emote", "weight": 1, "messages": ["rests a hand on his cudgel and scans the lane", "rolls a shard across his knuckles, watching the street", "checks a shutter's latch with one big thumb", "stifles a yawn that goes on a while", "nods to a passing delver without breaking stride"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["turns his lamp's flame high and steps to the edge of the light", "calls a low all's-well down the lane, lamp swinging", "raps a shuttered window: \"Lamps up. It's coming in.\"", "plants himself between the lit lane and the gathering dark"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 1 }, "messages": [
+          { "target": "blocks your way, lamp raised: \"Bare-handed into a Tide, no light? Not on my watch, friend. Find one before you go.\"", "room": "blocks {name}'s way, lamp raised." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 4 }, "messages": [
+          { "target": "swings his own lamp up beside yours: \"See the difference? That stub won't last the Tide. Get better off Garrick.\"", "room": "holds his lamp up beside {name}'s, comparing." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "sets himself at the edge of the light: \"It's coming in. Stay in the glow and you'll see what passes for dawn down here.\"", "room": "plants himself between {name} and the gathering dark." }
+        ] },
         { "if": { "hpBelow": 0.4 }, "messages": [
           { "target": "looks your wounds over: \"Trouble below, or trouble up here? The second kind's my business.\"", "room": "looks {name}'s wounds over, unhurried." }
         ] },
@@ -888,7 +922,17 @@
       { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 12 },
       { "type": "emote", "weight": 2, "messages": ["traces a slow glyph in the air, the light beneath his skin pulsing once as he does", "watches you with wide, lightless eyes and says nothing", "turns a glimmer-lamp down a notch, easing the glare", "sorts a handful of pale river-shells with long, careful fingers", "says, slow and careful: \"Yaku-runa.\" — water-folk, the name his people give the delvers who follow the river down"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["turns his glimmer-lamp lower still as the rim-folk turn theirs up", "watches the bright-folk scramble for their lamps, unmoved, the light beneath his skin steady", "says, slow: \"Your people fear the deep breath. Mine were born inside it.\"", "stills, listening to the dark the way one listens to an old song"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 1 }, "messages": [
+          { "target": "regards your unlit hands without alarm: \"You walk as my people do — but your eyes are not ours, yaku-runa. The Tide will blind you. Carry a flame, for your sake, not mine.\"", "room": "regards {name}'s unlit hands with calm, lightless eyes." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 4 }, "messages": [
+          { "target": "considers your small light: \"Enough for a quiet hour. Not for the deep breath that comes. The bright-folk sell stronger; take it.\"", "room": "considers {name}'s small light, unhurried." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "turns his own lamp low as the dark gathers: \"Your kin fear this hour. Mine were born in it. Keep your fire close, yaku-runa, and it will pass.\"", "room": "turns his glimmer-lamp low as the Tide gathers." }
+        ] },
         { "if": { "delivery": true }, "messages": [
           { "target": "goes still as he marks the old blade in your pack, the light beneath his skin dimming low: \"That is mine, yaku-runa. I carried it up toward your sun, and the dark took it from my hand on the climb. Bring it here — I would not lose it twice.\"", "room": "goes still at the old deep-stone blade in {name}'s pack." }
         ] },
@@ -936,7 +980,8 @@
       { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 4 },
       { "type": "wander", "weight": 2, "verb": "scuttles off over the worked stone", "scope": "zone" },
-      { "type": "emote", "weight": 2, "messages": ["bristles its glyph-scored spines and settles again", "drags its gut-line taut, testing the peg", "rasps its plates against the worked floor", "swivels toward the dark, then loses interest"] }
+      { "type": "emote", "weight": 2, "messages": ["bristles its glyph-scored spines and settles again", "drags its gut-line taut, testing the peg", "rasps its plates against the worked floor", "swivels toward the dark, then loses interest"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["bristles every glyph-scored spine as the dark presses in", "drags its gut-line taut and sets itself toward the deepening black", "rasps a low warning-note none of the rim-folk can hear", "swivels toward the gathering dark and goes very still"] }
     ],
     "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "chitin-spike", "chance": 0.5 }]
   },

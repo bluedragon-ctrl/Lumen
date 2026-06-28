@@ -509,6 +509,22 @@ class GameState {
     this._indexPlayer(player);
   }
 
+  /** The strength of the light a player carries: the greater of their equipped
+   *  light-slot source's output (whether or not it is currently lit — they can
+   *  strike it) and any active carried Light effect (Candlelight, Halo, a potion).
+   *  0 if they carry nothing. Used by NPC react conditions (`carriedLightBelow`) to
+   *  judge whether a delver is fit to face the Tide's dark. */
+  _carriedLightOutput(player) {
+    let out = 0;
+    const li = player.equipment && player.equipment.light;
+    if (li) {
+      const t = this.world.items[li.template];
+      out = (t && t.light && t.light.output) || 0;
+    }
+    const e = actorEmitLight(player); // a spell/potion Light effect glows even with no lamp
+    return e > out ? e : out;
+  }
+
   /**
    * Effective light for a room: ambient + every active source present
    * (light-emitting mobs, plus players carrying a lit light source).

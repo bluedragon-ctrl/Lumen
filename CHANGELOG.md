@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   room throws on its switchable lamps — and snuffs them again once the Tide recedes
   — so a tended camp lights itself against the dark (wild fauna won't work a switch;
   author/player-lit lamps are left be).
+- **NPCs speak to the Tide.** As the dark gathers (Stirring and Tide), every settled
+  human and Umbral NPC takes on Tide-specific behaviour: Maeve turns the inn's lamps
+  up high, Garrick counts his lanterns, Vesper sets a glimmer-light turning, Mallki —
+  born to the dark — turns his lamp *down* as the others raise theirs, and so on (the
+  bound chitin warden bristles at the deepening black). The four who'd naturally warn
+  a delver — **Hale** (the watch), **Maeve** (the inn), **Garrick** (who sells the
+  lamps), and **Mallki** (the deep-dweller) — now call out an under-lit delver during
+  the Tide: a sharp warning for **no light at all**, a gentler nudge for a **weak lamp**
+  (torch/brass lantern), and a "stay in the glow" word for the well-equipped. Built on
+  three new data hooks: a `phase` filter on any mob action, and `phase` /
+  `carriedLightBelow` conditions on react reactions.
 - **The Tide grows teeth — void shadows.** During the Tide the dark itself hunts:
   each tick, any room where a delver stands in failed light (room light below 0) has
   a small chance to birth a **void shadow** right beside them — lesser kin of the

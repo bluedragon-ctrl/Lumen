@@ -201,6 +201,10 @@ class MobAIMixin {
     let options;
     if (Array.isArray(t.actions) && t.actions.length) {
       options = t.actions.filter((a) => {
+        // Tide-gated action: only eligible while the world clock is in one of the
+        // named phases (e.g. an NPC's "the lamps gutter" emote fires only as the
+        // dark gathers — Stirring/Tide). No `phase` field → eligible always.
+        if (a.phase && !a.phase.includes(this.tidePhase)) return false;
         if (a.type === "attack") return aggressive && t.attack && candidates.length > 0;
         if (a.type === "cast") {
           const sp = a.spell && this.world.spells[a.spell];
@@ -256,6 +260,13 @@ class MobAIMixin {
     if (cond.hpBelow != null && !(player.hp < player.maxHp * cond.hpBelow)) return false;
     if (cond.slotEmpty && player.equipment && player.equipment[cond.slotEmpty]) return false;
     if (cond.equipped && !Object.values(player.equipment || {}).some((i) => i && i.template === cond.equipped)) return false;
+    // Tide-gated reaction: fires only while the world clock is in a named phase, so
+    // a delver hears the warning as the dark gathers, not in the Calm.
+    if (cond.phase && !cond.phase.includes(this.tidePhase)) return false;
+    // The delver's carried light is too weak (output < N): no lamp at all is 0, a
+    // torch/brass lantern is 3, a glimmersteel lamp 4. Lets an NPC warn a delver
+    // who means to face the Tide under-lit (see carriedLightOutput).
+    if (cond.carriedLightBelow != null && !(this._carriedLightOutput(player) < cond.carriedLightBelow)) return false;
     return true;
   }
 

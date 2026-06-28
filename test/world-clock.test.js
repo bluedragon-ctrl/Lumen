@@ -252,3 +252,53 @@ test("Tide creep: the ebb sweeps every shadow back into the dark", () => {
   s.forceTidePhase("calm"); // the recede reclaims the tide-spawned
   assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 0);
 });
+
+// --- NPC Tide reactions: phase + carried-light gating ----------------------
+
+function makeLightWorld() {
+  return {
+    rooms: { rim: { id: "rim", name: "Rim", description: "", depth: 0, ambientLight: 3, exits: {} } },
+    items: {
+      lantern: { id: "lantern", name: "a brass lantern", type: "light", slot: "light", light: { output: 3 } },
+      glimmersteel: { id: "glimmersteel", name: "a glimmersteel lamp", type: "light", slot: "light", light: { output: 4 } },
+    },
+    mobs: {}, fixtures: {}, recipes: {}, spells: {}, quests: {},
+    playerTemplate: {
+      level: 1, xp: 0, shards: 0,
+      attributes: { might: 5, vitality: 5, intellect: 5, wits: 5, perception: 5 },
+      manaRegen: 0, speed: 12,
+      perception: { blindBelow: 1, dimBelow: 3, harmedAbove: 9 },
+      startLocation: "rim", startInventory: [], startEquipment: { light: null },
+      knownRecipes: [], knownSpells: [],
+    },
+  };
+}
+
+test("_carriedLightOutput reads the equipped light slot (lit or not)", () => {
+  const s = new GameState(makeLightWorld());
+  const p = s.createCharacter("Delver"); s.admit(p);
+  assert.equal(s._carriedLightOutput(p), 0); // empty slot
+  p.equipment.light = { template: "lantern" };
+  assert.equal(s._carriedLightOutput(p), 3);
+  p.equipment.light = { template: "glimmersteel" };
+  assert.equal(s._carriedLightOutput(p), 4);
+});
+
+test("react if.phase gates a reaction to the matching Tide phase", () => {
+  const s = new GameState(makeLightWorld());
+  const p = s.createCharacter("Delver"); s.admit(p);
+  assert.equal(s._reactMatches(p, { phase: ["stirring", "tide"] }, null), false); // Calm
+  s.forceTidePhase("tide");
+  assert.equal(s._reactMatches(p, { phase: ["stirring", "tide"] }, null), true);
+  assert.equal(s._reactMatches(p, { phase: ["stirring"] }, null), false); // wrong phase
+});
+
+test("react if.carriedLightBelow matches an under-lit delver", () => {
+  const s = new GameState(makeLightWorld());
+  const p = s.createCharacter("Delver"); s.admit(p);
+  assert.equal(s._reactMatches(p, { carriedLightBelow: 4 }, null), true); // no light (0 < 4)
+  p.equipment.light = { template: "lantern" }; // brass lantern, output 3
+  assert.equal(s._reactMatches(p, { carriedLightBelow: 4 }, null), true); // weak (3 < 4)
+  p.equipment.light = { template: "glimmersteel" }; // output 4
+  assert.equal(s._reactMatches(p, { carriedLightBelow: 4 }, null), false); // adequate (4 not < 4)
+});
