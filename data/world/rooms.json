@@ -21,7 +21,7 @@
     "depth": 0,
     "ambientLight": 5,
     "exits": { "south": "d0.plaza" },
-    "fixtures": ["hearth", "cellar-hatch"],
+    "fixtures": ["hearth", "cellar-hatch", "lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }],
     "effects": [
@@ -50,7 +50,7 @@
     "depth": 0,
     "ambientLight": 4,
     "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.mageshed", "south": "d0.claims" },
-    "fixtures": [],
+    "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 120 }]
   },
@@ -63,7 +63,7 @@
     "depth": 0,
     "ambientLight": 3,
     "exits": { "north": "d0.market" },
-    "fixtures": ["notice-board", "claims-ledger"],
+    "fixtures": ["notice-board", "claims-ledger", "lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-recorder", "max": 1, "respawn": 120 }]
   },
@@ -75,7 +75,7 @@
     "depth": 0,
     "ambientLight": 3,
     "exits": { "south": "d0.market", "north": "d0.corral", "west": "d0.mushroomfarm" },
-    "fixtures": [],
+    "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": [
       { "mob": "rim-hatcher", "max": 1, "respawn": 120 },
@@ -163,7 +163,7 @@
     "depth": 0,
     "ambientLight": 4,
     "exits": { "west": "d0.market" },
-    "fixtures": ["alchemist-bench", "trapdoor"],
+    "fixtures": ["alchemist-bench", "trapdoor", "lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 120 }]
   },
@@ -188,7 +188,7 @@
     "depth": 0,
     "ambientLight": 4,
     "exits": { "east": "d0.plaza" },
-    "fixtures": ["forge", "smelter", { "template": "makers-mark", "hidden": { "perception": 2 } }],
+    "fixtures": ["forge", "smelter", "lamp", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 120 }]
   },

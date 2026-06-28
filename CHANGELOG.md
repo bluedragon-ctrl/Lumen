@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   room throws on its switchable lamps — and snuffs them again once the Tide recedes
   — so a tended camp lights itself against the dark (wild fauna won't work a switch;
   author/player-lit lamps are left be).
+- **Settled NPCs now have lamps, keeping their rooms safe through the Tide.** Every
+  non-wandering Rim and Umbral NPC's room now holds a lamp that lifts its light to
+  at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
+  hatchery, mage's shed, workshop) gain the descent's iron lamp, lit by their keeper
+  as the dark closes in; the Umbral hall's cold glimmer-lamp is strengthened (now
+  sheds 4) so it stays habitable when the Tide is deepest. The Rim Plaza, watched
+  only by the patrolling watchman, is intentionally left dark for now.
   Tunable in `config.TIDE`; admins drive it by hand with `@tide <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
