@@ -73,7 +73,7 @@
     "name": "The Lightbug Hatchery",
     "description": "A long shed of stacked glass cells aglow with captive lightbugs, their massed shimmer washing the canvas walls a soft blue-white. Down in the abyss the bugs drift wild; here the Rim breeds them — for the steady, fuel-free light a delver can carry, and for the luminous glands the alchemists prize. Wick, who works all three of the Rim's farming sheds out of here, moves along the cells with a long gauze net. The market lies back south; a smell of churned moss and livestock drifts in from the stockpens to the north, and to the west the bug-glow bleeds through into the mushroom beds.",
     "depth": 0,
-    "ambientLight": 3,
+    "ambientLight": 0,
     "exits": { "south": "d0.market", "north": "d0.corral", "west": "d0.mushroomfarm" },
     "fixtures": ["lamp"],
     "groundItems": [],
