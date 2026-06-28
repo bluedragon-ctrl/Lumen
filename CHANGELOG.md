@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Tide — a world clock that makes the abyss breathe.** On a fixed cycle the
+  world passes through **Calm → Stirring → Tide → Receding**: during the Tide every
+  room darkens, scaled by depth (`-2` at the rim down to a `-5` floor in the deep),
+  pulling unlit passages into the dark and starving all but the best-lit camps. The
+  **Stirring** phase telegraphs it with a world-wide warning ("the lamps gutter…")
+  and a gentle dim; **Receding** ebbs the light back. Lamps and torches still sum on
+  top, so light sources are the only refuge. Engine + tuning only for now — the
+  light-fearing predator roster and lamp-lit safe camps are a follow-up content task.
+  Tunable in `config.TIDE`; admins drive it by hand with `@tide <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
   your bindings, or `alias F1` (key only) to clear one. Bindings live on the

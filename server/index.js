@@ -262,6 +262,15 @@ const MOB_DEATH_VERB = {
   spikes: { room: "is impaled on its own spines and dies", slay: "Your thorns finish off" },
 };
 
+// The Tide turning — one world-wide line per phase change (see state._applyTidePhase).
+// Coloured to land: red as the dark floods in, calmer on the ebb.
+const TIDE_PHASE_FLAVOUR = {
+  stirring: "<#gold>The lamps gutter and dim. Far below, something vast draws breath — the dark is stirring.<#reset>",
+  tide: "<#red>The Tide comes in. The dark floods every passage. Seek the light, or be taken by it.<#reset>",
+  receding: "<#cyan>The Tide turns. The dark loosens its grip and begins to ebb.<#reset>",
+  calm: "<#cyan>The abyss settles. The dark has receded — for now.<#reset>",
+};
+
 // A mob died: narrate to the room, reward the killer, then share XP / level-ups /
 // quest progress with every participant (Model A — full value to all).
 function handleMobDeath(ev) {
@@ -481,6 +490,18 @@ const EVENT_HANDLERS = {
   },
 
   "combat-stop": (ev) => sendToPlayer(ev.playerId, { type: "log", text: ev.reason }),
+
+  "tide-phase": (ev) => {
+    // The world clock turned. Announce it to every connected delver and refresh
+    // each view — the world has darkened (or lifted) under everyone at once, so
+    // even an idle player watches their room change. Mob spawn/flee events from
+    // the same transition narrate the predators per-room on their own.
+    const text = TIDE_PHASE_FLAVOUR[ev.phase];
+    for (const p of state.players.values()) {
+      if (text) sendToPlayer(p.id, { type: "system", text });
+      markViews(p.id);
+    }
+  },
 
   "aggro-engage": (ev) => {
     // A mob committed to attack (see state._engageTell): either it proactively
