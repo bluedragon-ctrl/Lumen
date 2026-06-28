@@ -50,6 +50,14 @@ function sendRawToPlayer(playerId, data) {
   if (ws && ws.readyState === ws.OPEN) ws.send(data);
 }
 
+// Push the current Tide status to every connected delver (the HUD indicator on
+// the shards line). Sent on each phase change and on a slow heartbeat so the
+// bar creeps forward between phases; it's a tiny frame, not a view rebuild.
+function broadcastTide() {
+  const data = JSON.stringify({ type: "tide", ...state.tideStatus() });
+  for (const ws of connections.values()) if (ws && ws.readyState === ws.OPEN) ws.send(data);
+}
+
 // --- Per-burst view coalescing ---------------------------------------------
 // Room and vitals views are idempotent snapshots, and a single tick (or command)
 // often fires several events touching the same room — each previously rebuilt and
@@ -143,6 +151,7 @@ function login(ws, rawName) {
   });
   send(ws, buildPlayerView(state, player));
   send(ws, buildRoomView(state, player));
+  send(ws, { type: "tide", ...state.tideStatus() }); // seed the HUD tide indicator
   console.log(`[lumen] ${player.name} logged in (${state.players.size} online).`);
 }
 
@@ -260,6 +269,15 @@ const MOB_DEATH_VERB = {
   bleed: { room: "bleeds out and dies", slay: "Your wounds finish off" },
   venom: { room: "succumbs to the venom and dies", slay: "Your venom finishes off" },
   spikes: { room: "is impaled on its own spines and dies", slay: "Your thorns finish off" },
+};
+
+// The Tide turning — one world-wide line per phase change (see state._applyTidePhase).
+// Coloured to land: red as the dark floods in, calmer on the ebb.
+const TIDE_PHASE_FLAVOUR = {
+  stirring: "<#gold>The lamps gutter and dim. Far below, something vast draws breath — the dark is stirring.<#reset>",
+  tide: "<#red>The Tide comes in. The dark floods every passage. Seek the light, or be taken by it.<#reset>",
+  receding: "<#cyan>The Tide turns. The dark loosens its grip and begins to ebb.<#reset>",
+  calm: "<#cyan>The abyss settles. The dark has receded — for now.<#reset>",
 };
 
 // A mob died: narrate to the room, reward the killer, then share XP / level-ups /
@@ -482,6 +500,28 @@ const EVENT_HANDLERS = {
 
   "combat-stop": (ev) => sendToPlayer(ev.playerId, { type: "log", text: ev.reason }),
 
+  "tide-phase": (ev) => {
+    // The world clock turned. Announce it to every connected delver and refresh
+    // each view — the world has darkened (or lifted) under everyone at once, so
+    // even an idle player watches their room change. Mob spawn/flee events from
+    // the same transition narrate the predators per-room on their own.
+    const text = TIDE_PHASE_FLAVOUR[ev.phase];
+    for (const p of state.players.values()) {
+      if (text) sendToPlayer(p.id, { type: "system", text });
+      markViews(p.id);
+    }
+    broadcastTide(); // refresh the HUD indicator the instant the phase turns
+  },
+
+  "tide-lamp": (ev) => {
+    // NPCs lit (or snuffed) this room's lamps as the Tide turned. Narrate to
+    // anyone present; the room refresh rides the tide-phase view sweep above.
+    const text = ev.on
+      ? "Lamps flare to life around you, beating back the gathering dark."
+      : "The lamps are snuffed out as the dark recedes.";
+    roomCtx.toRoom(ev.roomId, { type: "log", text });
+  },
+
   "aggro-engage": (ev) => {
     // A mob committed to attack (see state._engageTell): either it proactively
     // noticed a delver, or — `remembered` — a `remembers` mob recognised a foe it
@@ -603,7 +643,9 @@ const EVENT_HANDLERS = {
     broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} ${ev.verb}.`, { refreshRoom: true }),
 
   "mob-spawn": (ev) =>
-    broadcastRoom(ev.roomId, ev, (n) => (n === "something"
+    broadcastRoom(ev.roomId, ev, (n) => (ev.tideCreep
+      ? `The dark thickens and folds — ${n} peels itself out of the unlit air beside you.`
+      : n === "something"
       ? "Something stirs in the dark."
       : `${cap(ev.mobName)} appears.`), { refreshRoom: true }),
 
@@ -670,6 +712,7 @@ function dispatchEvent(ev) {
 const tickTimer = setInterval(() => {
   for (const ev of state.advance()) dispatchEvent(ev);
   flushViews(); // coalesce a tick's worth of view refreshes into one send per player
+  if (state.tick % 5 === 0) broadcastTide(); // creep the HUD tide bar forward between phase turns
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
     // Periodic snapshot — fire async writes off the event loop, skipping players
     // whose data is unchanged, so disk I/O never stalls the tick.

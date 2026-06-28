@@ -117,6 +117,23 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       ctx.refreshRoom(dest, player.id);
       return selfAndViews(state, player, `You blink to ${dest}.`);
     }
+    case "@tide": {
+      // Drive the world clock by hand for testing (see state.forceTidePhase /
+      // world-clock.js). `auto` resumes the automatic cycle; `status` reports the
+      // current phase. A dev affordance, not authored content.
+      const PHASES = ["calm", "stirring", "tide", "receding"];
+      const a = (arg || "").trim().toLowerCase();
+      if (a === "status")
+        return [{ type: "log", text: `Tide phase: ${state.tidePhase}${state.tideOverride ? " (forced)" : " (auto)"}.` }];
+      if (a === "" || a === "auto") {
+        state.tideOverride = null;
+        return [{ type: "log", text: `Tide clock resumed (auto). Current phase: ${state.tidePhase}.` }];
+      }
+      if (!PHASES.includes(a))
+        return [{ type: "error", text: `Usage: @tide <${PHASES.join("|")}|auto|status>. Unknown phase "${a}".` }];
+      for (const ev of state.forceTidePhase(a)) ctx.emit(ev);
+      return [{ type: "log", text: `Tide forced to "${a}" (pinned — "@tide auto" to resume the clock).` }];
+    }
     case "@help": {
       const lines = ["<#gold>Admin commands<#reset>", ""];
       for (const e of ADMIN_HELP_SECTION[1]) lines.push(helpEntry(e));

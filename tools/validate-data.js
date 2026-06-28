@@ -10,6 +10,7 @@
 const fs = require("fs");
 const path = require("path");
 const { FACTIONS } = require("../server/config");
+const { PHASES } = require("../server/world-clock");
 
 const ROOT = path.resolve(__dirname, "..");
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
@@ -315,6 +316,9 @@ function main() {
     for (const a of m.actions || []) {
       if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon", "react"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
+      // Tide-gated action: a `phase` array restricts when the action is eligible.
+      if (a.phase != null && (!Array.isArray(a.phase) || !a.phase.length || a.phase.some((p) => !PHASES.includes(p))))
+        errs.push(`mob ${id}: action phase must be a non-empty array of ${PHASES.map((p) => `"${p}"`).join(", ")}`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
       if (a.type === "cast") {
@@ -353,6 +357,10 @@ function main() {
             errs.push(`mob ${id}: react if.slotEmpty must be a slot name string`);
           if (c.equipped != null && !has(items, c.equipped))
             errs.push(`mob ${id}: react if.equipped references missing item ${c.equipped}`);
+          if (c.phase != null && (!Array.isArray(c.phase) || !c.phase.length || c.phase.some((p) => !PHASES.includes(p))))
+            errs.push(`mob ${id}: react if.phase must be a non-empty array of ${PHASES.map((p) => `"${p}"`).join(", ")}`);
+          if (c.carriedLightBelow != null && (typeof c.carriedLightBelow !== "number" || c.carriedLightBelow <= 0))
+            errs.push(`mob ${id}: react if.carriedLightBelow must be a positive number`);
         }
       }
       if ((a.type === "wander" || a.type === "flee") && a.scope != null && !["zone", "any"].includes(a.scope))

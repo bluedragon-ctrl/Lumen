@@ -85,7 +85,7 @@ function buildRoomView(state, p) {
   for (const m of rt.mobs) {
     if (!mobVisibleTo(state, p, m)) continue;
     const t = w.mobs[m.template];
-    const luminous = !!t.emitsLight;
+    const luminous = t.emitsLight > 0; // a dark-shedding mob (negative emit) never glows or shows in the dark
     if (see || luminous) {
       // A trader exposes the names of its wares so the client can Tab-complete `buy`.
       const sells = t.shop && t.shop.sells ? t.shop.sells.map((o) => w.items[o.template].name) : undefined;

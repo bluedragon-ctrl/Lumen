@@ -6,6 +6,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Tide — a world clock that makes the abyss breathe.** On a fixed cycle the
+  world passes through **Calm → Stirring → Tide → Receding**: during the Tide every
+  room darkens, scaled by depth (`-2` at the rim down to a `-5` floor in the deep),
+  pulling unlit passages into the dark and starving all but the best-lit camps. The
+  **Stirring** phase telegraphs it with a world-wide warning ("the lamps gutter…")
+  and a gentle dim; **Receding** ebbs the light back. Lamps and torches still sum on
+  top, so light sources are the only refuge. Engine + tuning only for now — the
+  light-fearing predators and the lamp-lit safe camps that build on it follow below.
+  As the dark gathers (Stirring through the Tide), a Rim or Umbral NPC present in a
+  room throws on its switchable lamps — and snuffs them again once the Tide recedes
+  — so a tended camp lights itself against the dark (wild fauna won't work a switch;
+  author/player-lit lamps are left be).
+- **NPCs speak to the Tide.** As the dark gathers (Stirring and Tide), every settled
+  human and Umbral NPC takes on Tide-specific behaviour: Maeve turns the inn's lamps
+  up high, Garrick counts his lanterns, Vesper sets a glimmer-light turning, Mallki —
+  born to the dark — turns his lamp *down* as the others raise theirs, and so on (the
+  bound chitin warden bristles at the deepening black). The four who'd naturally warn
+  a delver — **Hale** (the watch), **Maeve** (the inn), **Garrick** (who sells the
+  lamps), and **Mallki** (the deep-dweller) — now call out an under-lit delver during
+  the Tide: a sharp warning for **no light at all**, a gentler nudge for a **weak lamp**
+  (torch/brass lantern), and a "stay in the glow" word for the well-equipped. Built on
+  three new data hooks: a `phase` filter on any mob action, and `phase` /
+  `carriedLightBelow` conditions on react reactions.
+- **The Tide grows teeth — void shadows.** During the Tide the dark itself hunts:
+  each tick, any room where a delver stands in failed light (room light below 0) has
+  a small chance to birth a **void shadow** right beside them — lesser kin of the
+  Starving Dark, conjured by a delver's own unlit risk. They are fast, relentless
+  pursuers that snuff your flame and deepen the dark around them, and **bright light
+  sears them** (any light above darkness), so a lamp is at once shield and weapon.
+  Capped at five abroad worldwide, so a long dark mounts pressure without flooding; a
+  lit camp (light ≥ 0) is never a birthplace, and the ebb reclaims every shadow still
+  abroad — no corpse, like a dismissed summon. Unmade by the light, a shadow leaves a
+  **shadow shard** 5% of the time: a rare crafting material (recipes to come) that
+  sells dear. One tier for now; deeper, stronger kin follow later. Tunable in
+  `config.TIDE.predator`.
+- **Settled NPCs now have lamps, keeping their rooms safe through the Tide.** Every
+  non-wandering Rim and Umbral NPC's room now holds a lamp that lifts its light to
+  at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
+  hatchery, mage's shed, workshop) gain the descent's iron lamp, lit by their keeper
+  as the dark closes in. Their base ambient is lowered to 3 (the hatchery to 0, left
+  to its captive lightbugs) so the lamp, the patrolling watchman's lamp, and the
+  hatchery's bugs stack into a bright, welcoming glow rather than overshooting into
+  painful glare. The Umbral hall's cold glimmer-lamp is strengthened (now
+  sheds 4) so it stays habitable when the Tide is deepest.
+- **Hale the watchman now carries a lit lamp** (sheds 3) — a moving pool of light
+  that travels his patrol, lighting whichever Rim room he walks rather than fixing a
+  lamp to the plaza. So the watched heart of the Rim is safe while the watch is on
+  it, and falls dark when Hale has moved on.
+  A small **Tide indicator** sits on the shards line in the player panel: a phase
+  label and a bar that fills with the dark — quiet in Calm, gold as it Stirs, red at
+  the Tide, cool on the ebb — creeping forward on a slow heartbeat so you can read
+  the dark coming. Tunable in `config.TIDE`; admins drive it by hand with `@tide
+  <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
   your bindings, or `alias F1` (key only) to clear one. Bindings live on the
@@ -29,6 +82,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **The void-light (below-zero) Inspect visuals are gentler.** The dark-closing-in
+  vignette now breathes slowly and shallowly (8s, a smaller swing) instead of a
+  fast, deep pulse that yanked the readable centre out from under the text — so
+  examining or reading a room in the void no longer feels like a disruptive blink.
+  The shiver and gray tint are unchanged.
 - **The Inspect window no longer shows an Attack button for a creature.** Examining a
   mob is now purely informational; attack via the command line or the room chip.
 - **`Candlelight` duration now scales with Intellect** (30s per point) instead of a
@@ -55,6 +113,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Perception meaningful in good light or against low-evasion foes — where the raw
   hit bonus previously hit the cap and did nothing — without touching its
   dark-fighting edge. Mobs are unaffected (they carry no Perception hit bonus).
+
+### Fixed
+- **A creature of darkness no longer gives itself away in the dark.** Mob visibility
+  treated any non-zero `emitsLight` as self-illuminating, so a *dark-shedding* mob
+  (negative `emitsLight`, like the new void shadow) was wrongly always visible — named
+  in the log and shown glowing in the room view even to a blind delver. Only positive
+  light now counts as visible; a shadow in the void reads as an unseen "something"
+  until you bring light to it. (No other mob emits negative light, so nothing else
+  changes.)
 
 ## [0.2.0] - 2026-06-23
 ### Added

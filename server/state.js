@@ -1,7 +1,8 @@
 "use strict";
 const { effectiveLight } = require("./light");
 const { rollDice } = require("./dice");
-const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS } = require("./config");
+const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, TIDE } = require("./config");
+const { tidePhaseAt, tideOffset } = require("./world-clock");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
 const {
@@ -36,6 +37,9 @@ const RESTING = (actor) => actor.posture === "sitting" || actor.posture === "sle
 // A per-mob `regen: { delay, perTick }` overrides either knob.
 const OOC_REGEN_DELAY = 5; // ticks out of combat before recovery starts
 const OOC_REGEN_TICKS = 20; // ticks to mend from empty to full (sets the default rate)
+// Factions whose NPCs tend lamps against the Tide: the Rim's human settlers and
+// the Umbrals. The wild fauna and beasts won't work a switch (see _setTideLamps).
+const LAMP_TENDER_FACTIONS = new Set(["rim", "umbral"]);
 
 /**
  * Authoritative in-memory world state (DESIGN.md §6.1). Owns all dynamic state:
@@ -50,6 +54,11 @@ class GameState {
     this.rooms = {}; // roomId -> { mobs:[], items:[], light:int }
     this.revealedMobs = new Map(); // playerId -> Set(mob runtime id); ephemeral hidden-mob reveals
     this.ownedCounts = new Map(); // `${roomId}|${mob}` -> living mobs from that spawner (see _countOwned)
+    // The Tide (world-clock.js): the world's current phase, derived from `tick`
+    // each tick. `tideOverride` pins it for admin testing (@tide), bypassing the
+    // clock. Set before _initRooms so the first light computation sees the phase.
+    this.tidePhase = TIDE.enabled ? tidePhaseAt(this.tick, TIDE.phaseTicks).phase : "calm";
+    this.tideOverride = null;
     this._initRooms();
   }
 
@@ -127,7 +136,7 @@ class GameState {
     this.rooms[roomId].light = this.computeRoomLight(roomId); // a glowing summon lights the room
     events.push({
       type: "summon", roomId, by, byId: by === "player" ? ownerId : summonerId, byName,
-      mobTemplate: mobId, mobName: t.name, emitsLight: !!t.emitsLight,
+      mobTemplate: mobId, mobName: t.name, emitsLight: t.emitsLight > 0,
       count: made.length, light: this.rooms[roomId].light, verb,
     });
     return made;
@@ -143,7 +152,7 @@ class GameState {
       mob.hp = 0; // mark gone for any lingering reference
       rt.light = this.computeRoomLight(roomId);
       const t = this.world.mobs[mob.template];
-      events.push({ type: "summon-end", roomId, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, reason });
+      events.push({ type: "summon-end", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, reason });
       return;
     }
   }
@@ -160,7 +169,7 @@ class GameState {
     m.hp = 0; // mark gone for any lingering reference
     this._adjustOwned(m, -1); // free the spawn slot — it repops on the room's timer
     rt.light = this.computeRoomLight(roomId);
-    events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, verb: verb || "slips out of sight" });
+    events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, verb: verb || "slips out of sight" });
   }
 
   /** Dismiss every summon owned by `ownerId` (owner death/disconnect). */
@@ -183,7 +192,7 @@ class GameState {
       if (idx >= 0) rtFrom.mobs.splice(idx, 1);
       rtDest.mobs.push(m);
       const t = this.world.mobs[m.template];
-      moved.push({ mobName: t.name, emitsLight: !!t.emitsLight });
+      moved.push({ mobName: t.name, emitsLight: t.emitsLight > 0 });
     }
     if (moved.length) {
       rtFrom.light = this.computeRoomLight(from);
@@ -245,7 +254,7 @@ class GameState {
       const m = this._spawnMob(sp.roomId, sp.mob, sp.hidden);
       const t = this.world.mobs[sp.mob];
       const light = this.rooms[sp.roomId].light = this.computeRoomLight(sp.roomId);
-      events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light });
+      events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light });
     }
   }
 
@@ -290,6 +299,189 @@ class GameState {
     }
   }
 
+  // --- The Tide (world clock) ------------------------------------------------
+  // Each tick, resolve the current phase (from the clock, or a pinned override)
+  // and, when it changes, apply the transition: every room's effective light
+  // shifts at once, predators stir on the way in and sink back on the way out.
+
+  /** Resolve the tide phase for this tick and, if it changed, apply it. */
+  _tideTick(events) {
+    if (!TIDE.enabled) return;
+    const phase = this.tideOverride || tidePhaseAt(this.tick, TIDE.phaseTicks).phase;
+    if (phase === this.tidePhase) return;
+    const prev = this.tidePhase;
+    this.tidePhase = phase;
+    this._applyTidePhase(prev, phase, events);
+  }
+
+  /** Admin/testing hook: pin the tide to `phase` (bypassing the clock) and apply
+   *  the transition now. Pass null to resume the automatic clock. Returns the
+   *  transition events for the caller to dispatch (see the @tide command). */
+  forceTidePhase(phase) {
+    this.tideOverride = phase;
+    const events = [];
+    if (phase && phase !== this.tidePhase) {
+      const prev = this.tidePhase;
+      this.tidePhase = phase;
+      this._applyTidePhase(prev, phase, events);
+    }
+    return events;
+  }
+
+  /** A compact read of the Tide for the client HUD: the current phase and a 0..1
+   *  `intensity` (how dark the world is right now — 0 in Calm, rising through
+   *  Stirring, full at the Tide, falling through Receding). `enabled` is false when
+   *  the world clock is off, so the client can hide the indicator entirely. */
+  tideStatus() {
+    if (!TIDE.enabled) return { enabled: false, phase: "calm", intensity: 0 };
+    const info = tidePhaseAt(this.tick, TIDE.phaseTicks);
+    const phase = this.tideOverride || info.phase;
+    let intensity;
+    if (this.tideOverride) {
+      intensity = phase === "tide" ? 1 : phase === "stirring" || phase === "receding" ? 0.5 : 0;
+    } else {
+      const frac = Math.min(1, info.sinceStart / (TIDE.phaseTicks[phase] || 1));
+      intensity = phase === "tide" ? 1 : phase === "stirring" ? frac : phase === "receding" ? 1 - frac : 0;
+    }
+    return { enabled: true, phase, intensity: Math.round(intensity * 100) / 100 };
+  }
+
+  /** A tide phase change. Recompute EVERY room's light first — the darkening
+   *  lands worldwide at once, but the per-tick light loop only refreshes occupied
+   *  rooms, so a delver who later walks into a distant room would otherwise see
+   *  stale light (the light-refresh invariant). Then the Tide looses its
+   *  predators (onset) or sweeps the survivors back (any ebb). The `tide-phase`
+   *  event tells every connected delver and refreshes their view so an idle
+   *  player watches the world darken. */
+  _applyTidePhase(prev, phase, events) {
+    for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
+    // NPCs light their lamps against the gathering dark (Stirring through the
+    // Tide) and snuff them once it has receded (Calm) — before spawn, so a lit
+    // camp's brightness already repels the predators' maxLight check.
+    if (phase === "stirring" || phase === "tide") this._setTideLamps(true, events);
+    else if (phase === "calm") this._setTideLamps(false, events);
+    if (phase === "tide") this._tideSpawn(events);
+    else this._tideSweep(events);
+    events.push({ type: "tide-phase", phase, prev });
+  }
+
+  /** NPCs work the lamps as the Tide turns. With `on`, every room that holds a
+   *  living NPC has its switchable light fixtures (a lamp, currently off) thrown
+   *  on, tagged `tideLit`. With `on` false (the recede to Calm), only those
+   *  Tide-lit lamps are snuffed again — an author- or player-lit lamp is left
+   *  burning. Only a living lamp-tending NPC (Rim or Umbral — see
+   *  LAMP_TENDER_FACTIONS) works the switch; the wild fauna won't. A room with no
+   *  such tender, or no lamp, is simply skipped (the safe-camp content — pairing
+   *  lamps with NPCs — is the follow-up pass). */
+  _setTideLamps(on, events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      let changed = false;
+      if (on) {
+        if (!rt.mobs.some((m) => m.hp > 0 && LAMP_TENDER_FACTIONS.has(m.faction))) continue; // no lamp-tending NPC here
+        for (const f of rt.fixtures) {
+          const ft = this.world.fixtures[f.template];
+          if (ft && ft.switch && ft.switch.emitsLight && !f.on) { f.on = true; f.tideLit = true; changed = true; }
+        }
+      } else {
+        for (const f of rt.fixtures) if (f.tideLit) { f.on = false; f.tideLit = false; changed = true; }
+      }
+      if (changed) {
+        rt.light = this.computeRoomLight(roomId);
+        events.push({ type: "tide-lamp", roomId, on, light: rt.light });
+      }
+    }
+  }
+
+  /** Loose the Tide's light-fearing predators. Data-driven from an optional
+   *  `world.tideSpawns` roster (the followup content task) — until that lands the
+   *  dark comes empty-handed. Each rule: { mob, minDepth, maxDepth, count,
+   *  maxLight, faction, noSpoils }. A rule skips any room already brighter than
+   *  `maxLight`, so a lit camp keeps the hunters out. Spawned mobs are tagged
+   *  `tideSpawn` so the ebb can reclaim them; they carry no spawner `origin`
+   *  (never repop, never count against a room's cap). */
+  _tideSpawn(events) {
+    const roster = this.world.tideSpawns;
+    if (!Array.isArray(roster) || !roster.length) return;
+    for (const [roomId, room] of Object.entries(this.world.rooms)) {
+      const depth = room.depth || 0;
+      const rt = this.rooms[roomId];
+      for (const rule of roster) {
+        if (!this.world.mobs[rule.mob]) continue;
+        if (depth < (rule.minDepth || 0)) continue;
+        if (rule.maxDepth != null && depth > rule.maxDepth) continue;
+        if (rule.maxLight != null && rt.light > rule.maxLight) continue; // lamps keep the hunters out
+        const count = Math.max(1, rule.count || 1);
+        let last = null;
+        for (let i = 0; i < count; i++) {
+          const m = makeMobInstance(rule.mob, this.world);
+          m.tideSpawn = true; // the ebb reclaims it (see _tideSweep)
+          m.faction = rule.faction || "umbral";
+          m.noSpoils = !!rule.noSpoils;
+          rt.mobs.push(m);
+          last = m;
+        }
+        const light = rt.light = this.computeRoomLight(roomId); // a dark-shedding predator deepens the room
+        const t = this.world.mobs[rule.mob];
+        events.push({ type: "mob-spawn", roomId, mobId: last.id, mobName: t.name, emitsLight: t.emitsLight > 0, light });
+      }
+    }
+  }
+
+  /** The ebb: every Tide-spawned predator still abroad sinks back into the dark —
+   *  no corpse, loot, or XP, just a vanish (like a summon's dismissal). */
+  _tideSweep(events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      let removed = 0;
+      for (const m of [...rt.mobs]) {
+        if (!m.tideSpawn) continue;
+        const idx = rt.mobs.indexOf(m);
+        if (idx < 0) continue;
+        rt.mobs.splice(idx, 1);
+        m.hp = 0; // mark gone for any lingering reference
+        removed++;
+        const t = this.world.mobs[m.template];
+        events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, verb: "sinks back into the dark" });
+      }
+      if (removed) rt.light = this.computeRoomLight(roomId); // a dark predator leaving lifts the gloom
+    }
+  }
+
+  /** The Tide's living teeth, per tick (called from advance only while the phase is
+   *  `tide`). The dark itself births a predator beside a delver who has let their
+   *  light fail: every room holding a living player whose effective light is below 0
+   *  (the void band) has `TIDE.predator.chance` to spawn one `predator.mob` right
+   *  there. Capped at `predator.cap` shadows worldwide, so a long dark mounts pressure
+   *  toward the cap rather than flooding. A lit camp (light ≥ 0) is never a birthplace
+   *  — keeping a flame is the whole counterplay — and a shadow that strays into light
+   *  is seared by its lightBane as usual. Spawns are tagged `tideSpawn`, so the ebb's
+   *  `_tideSweep` reclaims any still abroad; they carry no `origin` (never repop, and
+   *  their pursuit is unleashed — the dark does not give up). */
+  _tideCreepTick(events) {
+    const cfg = TIDE.predator;
+    if (!cfg || !cfg.mob || !this.world.mobs[cfg.mob]) return;
+    const cap = cfg.cap != null ? cfg.cap : 5;
+    let alive = 0; // living tide-spawned shadows already abroad (the global cap)
+    for (const rt of Object.values(this.rooms))
+      for (const m of rt.mobs) if (m.tideSpawn && m.hp > 0) alive++;
+    if (alive >= cap) return;
+    const chance = cfg.chance != null ? cfg.chance : 0.05;
+    const t = this.world.mobs[cfg.mob];
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      if (alive >= cap) break;
+      if (rt.light >= 0) continue; // the dark only births where a delver's light has failed
+      if (!this.playersIn(roomId).some((p) => p.hp > 0)) continue; // beside a living delver
+      if (Math.random() >= chance) continue;
+      const m = makeMobInstance(cfg.mob, this.world);
+      m.tideSpawn = true; // the ebb reclaims it (see _tideSweep)
+      m.faction = cfg.faction || "wild";
+      m.noSpoils = !!cfg.noSpoils;
+      rt.mobs.push(m);
+      alive++;
+      const light = (rt.light = this.computeRoomLight(roomId)); // a dark-shedding predator deepens the room
+      events.push({ type: "mob-spawn", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light, tideCreep: true });
+    }
+  }
+
   /** Players currently located in a room. O(occupants) via the room index. */
   playersIn(roomId) {
     const set = this.playersByRoom.get(roomId);
@@ -315,6 +507,22 @@ class GameState {
     this._deindexPlayer(player);
     player.location = roomId;
     this._indexPlayer(player);
+  }
+
+  /** The strength of the light a player carries: the greater of their equipped
+   *  light-slot source's output (whether or not it is currently lit — they can
+   *  strike it) and any active carried Light effect (Candlelight, Halo, a potion).
+   *  0 if they carry nothing. Used by NPC react conditions (`carriedLightBelow`) to
+   *  judge whether a delver is fit to face the Tide's dark. */
+  _carriedLightOutput(player) {
+    let out = 0;
+    const li = player.equipment && player.equipment.light;
+    if (li) {
+      const t = this.world.items[li.template];
+      out = (t && t.light && t.light.output) || 0;
+    }
+    const e = actorEmitLight(player); // a spell/potion Light effect glows even with no lamp
+    return e > out ? e : out;
   }
 
   /**
@@ -347,7 +555,16 @@ class GameState {
       const e = actorEmitLight(p); // a held Light effect (potion/spell) glows too
       if (e) outputs.push(e);
     }
-    return effectiveLight(room.ambientLight, outputs);
+    return effectiveLight(room.ambientLight + this.tideOffsetFor(roomId), outputs);
+  }
+
+  /** The Tide's light offset for a room right now (≤ 0): the current phase's
+   *  depth-scaled darkening, folded into ambient by computeRoomLight. 0 when the
+   *  system is disabled or the world is Calm. See world-clock.js. */
+  tideOffsetFor(roomId) {
+    if (!TIDE.enabled) return 0;
+    const room = this.world.rooms[roomId];
+    return tideOffset(this.tidePhase, room ? room.depth : 0, TIDE);
   }
 
   /**
@@ -435,9 +652,9 @@ class GameState {
           for (const s of m.states) {
             if (s.type !== "heal-over-time" || !this._pulseReady(s)) continue;
             const healed = this._heal(m, s.magnitude);
-            if (healed) events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: s.name, emitsLight: !!t.emitsLight, light: rt.light });
+            if (healed) events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: s.name, emitsLight: t.emitsLight > 0, light: rt.light });
           }
-          this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, mobName: t.name, effectType: s.type, name: s.name, emitsLight: !!t.emitsLight, light: rt.light }));
+          this._expireStates(m, events, (s) => ({ type: "mob-effect-expired", roomId, mobId: m.id, mobName: t.name, effectType: s.type, name: s.name, emitsLight: t.emitsLight > 0, light: rt.light }));
         }
       }
     }
@@ -471,7 +688,7 @@ class GameState {
         const healed = this._heal(m, perTick);
         if (!healed) continue;
         const t = this.world.mobs[m.template];
-        events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: "recovery", emitsLight: !!t.emitsLight, light: rt.light });
+        events.push({ type: "mob-regen", roomId, mobId: m.id, mobName: t.name, amount: healed, name: "recovery", emitsLight: t.emitsLight > 0, light: rt.light });
       }
     }
   }
@@ -846,6 +1063,8 @@ class GameState {
     this.tick++;
     const events = [];
 
+    this._tideTick(events); // the world clock: darken/brighten the world on phase changes
+    if (this.tidePhase === "tide") this._tideCreepTick(events); // the dark grows teeth: shadows born beside delvers in failed light
     this._dyingTick(events); // fallen delvers count down to waking at the rim (death pacing)
 
     for (const p of this.players.values()) {
@@ -1160,7 +1379,7 @@ class GameState {
     // A hostile spell rouses a resting mob just as a blow does (only if it survived).
     if (spell.hostile && mob.hp > 0 && this._rouse(mob)) {
       const t = w.mobs[mob.template];
-      events.push({ type: "mob-woke", roomId: player.location, mobId: mob.id, mobName: t.name, emitsLight: !!t.emitsLight, light: this.rooms[player.location].light });
+      events.push({ type: "mob-woke", roomId: player.location, mobId: mob.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: this.rooms[player.location].light });
     }
 
     // Auto-retaliate on hostile spell: if the player isn't already attacking something, target this mob
@@ -1237,7 +1456,7 @@ class GameState {
         dot = true;
       }
       if (!death && this._rouse(mob))
-        events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light });
+        events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light });
       results.push({ id: mob.id, name: t.name, damage, dot, killed: !!death, death });
     }
     rt.light = this.computeRoomLight(roomId); // a luminous mob blasted apart changes the room
@@ -1366,7 +1585,7 @@ class GameState {
     const t = this.world.mobs[mob.template];
     const rt = this.rooms[roomId];
     mob.hp -= amount;
-    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: !!t.emitsLight, light: rt.light });
+    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: rt.light });
     if (mob.hp > 0) return null;
     const idx = rt.mobs.indexOf(mob);
     if (idx >= 0) rt.mobs.splice(idx, 1);

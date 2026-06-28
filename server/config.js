@@ -33,4 +33,24 @@ module.exports = {
   // is game logic and lives in state.js `FACTION_RELATIONS`.
   FACTIONS: ["player", "rim", "fauna", "wild", "umbral"],
   DEFAULT_FACTION: "wild", // a mob with no authored faction fights for the wild
+
+  // The Tide — the world clock (see server/world-clock.js). The abyss breathes
+  // on a fixed cycle: a long Calm, a brief Stirring (the telegraph), the Tide
+  // (every room darkens, depth-scaled, and light-fearing predators stir), then a
+  // Receding ebb back to Calm. Lengths are in ticks (≈ seconds at TICK_MS).
+  // `deepCap` floors the depth-scaled darkening; `edgeOffset` is the partial dim
+  // during Stirring/Receding. Toggle the whole system with `enabled`.
+  TIDE: {
+    enabled: true,
+    phaseTicks: { calm: 600, stirring: 60, tide: 240, receding: 60 },
+    deepCap: -5, // floor on the depth-scaled Tide darkening (-2 - floor(depth/3))
+    edgeOffset: -1, // the gentle dim during Stirring (warning) and Receding (ebb)
+    // The dark grows teeth: during the Tide, each tick every room where a living
+    // delver stands in failed light (room light < 0) has `predator.chance` to birth
+    // a `predator.mob` right beside them, up to `predator.cap` shadows worldwide. The
+    // ebb reclaims them (they are tide-spawned). Lit camps (light ≥ 0) are never
+    // touched. One tier for now; depth-scaled rosters come later. Set predator:null
+    // to leave the Tide toothless (the darkening cycle only, no hunters).
+    predator: { mob: "void-shadow", chance: 0.05, cap: 5, faction: "wild", noSpoils: false },
+  },
 };

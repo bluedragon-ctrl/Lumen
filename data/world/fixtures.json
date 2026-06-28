@@ -179,9 +179,9 @@
   "umbral-coldlamp": {
     "id": "umbral-coldlamp",
     "name": "a cold glimmer-lamp",
-    "description": "A fist-sized knot of raw glimmer rests in a carved stone cradle, breathing a low, blue-white light that throws no heat and no glare — enough for deep-adapted eyes, and gentle enough not to pain them. The Umbrals light their halls this way, where surface folk would strike a torch and wince at their own flame. A sliding stone shutter can hood the glimmer or bare it.",
+    "description": "A fist-sized knot of raw glimmer rests in a carved stone cradle, breathing a strong, blue-white light that throws no heat and no glare — bright enough to fill a hall, yet gentle enough not to pain deep-adapted eyes. The Umbrals light their halls this way, where surface folk would strike a torch and wince at their own flame. A sliding stone shutter can hood the glimmer or bare it.",
     "type": "switch",
-    "switch": { "emitsLight": 1, "on": true }
+    "switch": { "emitsLight": 4, "on": true }
   },
   "weeping-moss-curtain": {
     "id": "weeping-moss-curtain",
