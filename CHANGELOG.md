@@ -23,8 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
   hatchery, mage's shed, workshop) gain the descent's iron lamp, lit by their keeper
   as the dark closes in; the Umbral hall's cold glimmer-lamp is strengthened (now
-  sheds 4) so it stays habitable when the Tide is deepest. The Rim Plaza, watched
-  only by the patrolling watchman, is intentionally left dark for now.
+  sheds 4) so it stays habitable when the Tide is deepest.
+- **Hale the watchman now carries a lit lamp** (sheds 3) — a moving pool of light
+  that travels his patrol, lighting whichever Rim room he walks rather than fixing a
+  lamp to the plaza. So the watched heart of the Rim is safe while the watch is on
+  it, and falls dark when Hale has moved on.
   Tunable in `config.TIDE`; admins drive it by hand with `@tide <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
