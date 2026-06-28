@@ -152,3 +152,103 @@ test("Calm: the Tide-lit lamp is snuffed again, but an author-lit lamp is left a
   s.forceTidePhase("calm");
   assert.equal(s.rooms.camp.fixtures[0].on, true);
 });
+
+// --- The dark grows teeth: void shadows born beside delvers in the void -----
+
+function makeCreepWorld() {
+  return {
+    rooms: {
+      // a deep room that drops into the void band during the Tide
+      deep: { id: "deep", name: "Deep", description: "", depth: 6, ambientLight: 0, exits: {} },
+      // same depth, but a fixed torch keeps it lit through the Tide
+      lit: { id: "lit", name: "Lit", description: "", depth: 6, ambientLight: 0, exits: {}, fixtures: ["torch"] },
+    },
+    items: {},
+    mobs: {
+      // mirrors the real void-shadow (the predator config points here by id)
+      "void-shadow": {
+        id: "void-shadow", name: "a void shadow", faction: "wild", maxHp: 34, speed: 12,
+        hostile: true, pursues: true, emitsLight: -1, xp: 12,
+        perception: { blindBelow: -20, dimBelow: -20, harmedAbove: 0 },
+        lightBane: { above: 0, damage: "1d4" }, attack: { damage: "1d6" },
+      },
+    },
+    fixtures: { torch: { id: "torch", name: "a torch", emitsLight: 6 } },
+    recipes: {}, spells: {}, quests: {},
+    playerTemplate: {
+      level: 1, xp: 0, shards: 0,
+      attributes: { might: 5, vitality: 5, intellect: 5, wits: 5, perception: 5 },
+      manaRegen: 0, speed: 12,
+      perception: { blindBelow: 1, dimBelow: 3, harmedAbove: 9 },
+      startLocation: "deep", startInventory: [], startEquipment: {},
+      knownRecipes: [], knownSpells: [],
+    },
+  };
+}
+
+// Run fn with Math.random pinned to `v` (deterministic spawn rolls), then restore.
+function withRandom(v, fn) {
+  const real = Math.random;
+  Math.random = () => v;
+  try { fn(); } finally { Math.random = real; }
+}
+
+function admitAt(s, name, roomId) {
+  const p = s.createCharacter(name);
+  s.admit(p);
+  s.setPlayerLocation(p, roomId);
+  return p;
+}
+
+test("Tide creep: a void shadow is born beside a delver standing in the void", () => {
+  const s = new GameState(makeCreepWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Delver", "deep");
+  assert.ok(s.rooms.deep.light < 0, "the deep is in the void during the Tide");
+
+  const events = [];
+  withRandom(0, () => s._tideCreepTick(events)); // 0 < chance → always spawns
+  const shadows = s.rooms.deep.mobs.filter((m) => m.template === "void-shadow");
+  assert.equal(shadows.length, 1);
+  assert.equal(shadows[0].tideSpawn, true); // the ebb will reclaim it
+  assert.equal(shadows[0].faction, "wild");
+  assert.equal(shadows[0].noSpoils, false); // it drops the rare shard when slain
+  assert.ok(!shadows[0].origin, "tide spawns carry no origin (never repop, unleashed pursuit)");
+  assert.ok(events.some((e) => e.type === "mob-spawn" && e.tideCreep === true));
+});
+
+test("Tide creep: a lit room is never a birthplace; nor is an empty one", () => {
+  const s = new GameState(makeCreepWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Delver", "lit"); // a torch keeps this room out of the void
+  assert.ok(s.rooms.lit.light >= 0, "the torch holds the void off");
+
+  withRandom(0, () => s._tideCreepTick([]));
+  assert.equal(s.rooms.lit.mobs.length, 0, "a lit camp births nothing");
+  assert.equal(s.rooms.deep.mobs.length, 0, "a dark room with no delver births nothing");
+});
+
+test("Tide creep: the worldwide cap holds", () => {
+  const s = new GameState(makeCreepWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Delver", "deep");
+  // Pin five shadows abroad already (the default cap), then a forced roll spawns none.
+  for (let i = 0; i < 5; i++) {
+    const inst = require("../server/instances").makeMobInstance("void-shadow", s.world);
+    inst.tideSpawn = true;
+    s.rooms.deep.mobs.push(inst);
+  }
+  withRandom(0, () => s._tideCreepTick([]));
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 5);
+});
+
+test("Tide creep: the ebb sweeps every shadow back into the dark", () => {
+  const s = new GameState(makeCreepWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Delver", "deep");
+  withRandom(0, () => s._tideCreepTick([]));
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 1);
+
+  s.forceTidePhase("calm"); // the recede reclaims the tide-spawned
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 0);
+});

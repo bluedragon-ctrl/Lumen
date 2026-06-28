@@ -13,11 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **Stirring** phase telegraphs it with a world-wide warning ("the lamps gutter…")
   and a gentle dim; **Receding** ebbs the light back. Lamps and torches still sum on
   top, so light sources are the only refuge. Engine + tuning only for now — the
-  light-fearing predator roster and lamp-lit safe camps are a follow-up content task.
+  light-fearing predators and the lamp-lit safe camps that build on it follow below.
   As the dark gathers (Stirring through the Tide), a Rim or Umbral NPC present in a
   room throws on its switchable lamps — and snuffs them again once the Tide recedes
   — so a tended camp lights itself against the dark (wild fauna won't work a switch;
   author/player-lit lamps are left be).
+- **The Tide grows teeth — void shadows.** During the Tide the dark itself hunts:
+  each tick, any room where a delver stands in failed light (room light below 0) has
+  a small chance to birth a **void shadow** right beside them — lesser kin of the
+  Starving Dark, conjured by a delver's own unlit risk. They are fast, relentless
+  pursuers that snuff your flame and deepen the dark around them, and **bright light
+  sears them** (any light above darkness), so a lamp is at once shield and weapon.
+  Capped at five abroad worldwide, so a long dark mounts pressure without flooding; a
+  lit camp (light ≥ 0) is never a birthplace, and the ebb reclaims every shadow still
+  abroad — no corpse, like a dismissed summon. Unmade by the light, a shadow leaves a
+  **shadow shard** 5% of the time: a rare crafting material (recipes to come) that
+  sells dear. One tier for now; deeper, stronger kin follow later. Tunable in
+  `config.TIDE.predator`.
 - **Settled NPCs now have lamps, keeping their rooms safe through the Tide.** Every
   non-wandering Rim and Umbral NPC's room now holds a lamp that lifts its light to
   at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
@@ -90,6 +102,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Perception meaningful in good light or against low-evasion foes — where the raw
   hit bonus previously hit the cap and did nothing — without touching its
   dark-fighting edge. Mobs are unaffected (they carry no Perception hit bonus).
+
+### Fixed
+- **A creature of darkness no longer gives itself away in the dark.** Mob visibility
+  treated any non-zero `emitsLight` as self-illuminating, so a *dark-shedding* mob
+  (negative `emitsLight`, like the new void shadow) was wrongly always visible — named
+  in the log and shown glowing in the room view even to a blind delver. Only positive
+  light now counts as visible; a shadow in the void reads as an unseen "something"
+  until you bring light to it. (No other mob emits negative light, so nothing else
+  changes.)
 
 ## [0.2.0] - 2026-06-23
 ### Added

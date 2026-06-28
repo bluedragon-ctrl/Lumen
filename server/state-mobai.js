@@ -233,7 +233,7 @@ class MobAIMixin {
     if (choice.type === "react") return this._mobReact(m, t, roomId, choice, events);
     if (choice.type === "emote") {
       const text = choice.messages[Math.floor(Math.random() * choice.messages.length)];
-      events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light, text });
+      events.push({ type: "mob-emote", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, text });
       return;
     }
     if (choice.type === "wander") return this._mobMove(m, t, roomId, events, choice.verb || "wanders off", wanderDirs(choice));
@@ -279,7 +279,7 @@ class MobAIMixin {
       const msg = r.messages[Math.floor(Math.random() * r.messages.length)];
       m.reactCd[target.id] = this.tick + (action.cooldown || 120);
       events.push({
-        type: "mob-react", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight,
+        type: "mob-react", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0,
         light: rt.light, targetId: target.id, targetName: target.name,
         textTarget: msg.target, textRoom: msg.room,
       });
@@ -413,7 +413,7 @@ class MobAIMixin {
         type: "mob-assist", roomId, mobId: mob.id, mobName: t.name,
         targetId: e.id, targetKind: e.kind,
         targetName: e.kind === "player" ? e.actor.name : this.world.mobs[e.actor.template].name,
-        light: this.rooms[roomId].light, emitsLight: !!t.emitsLight,
+        light: this.rooms[roomId].light, emitsLight: t.emitsLight > 0,
       });
     }
   }
@@ -480,7 +480,7 @@ class MobAIMixin {
     events.push({
       type: "aggro-engage", roomId, mobId: mob.id, mobName: t.name,
       targetId: target.id, targetName: target.actor.name, rose, remembered,
-      light: this.rooms[roomId].light, emitsLight: !!t.emitsLight,
+      light: this.rooms[roomId].light, emitsLight: t.emitsLight > 0,
     });
   }
 
@@ -630,7 +630,7 @@ class MobAIMixin {
     this.rooms[home].light = this.computeRoomLight(home);
     events.push({
       type: "mob-move", mobId: mob.id, mobName: t.name, from: roomId, to: home, dir: null,
-      verb: "slips away into the dark", emitsLight: !!t.emitsLight,
+      verb: "slips away into the dark", emitsLight: t.emitsLight > 0,
       lightFrom: rt.light, lightTo: this.rooms[home].light,
     });
     return true;
@@ -666,7 +666,7 @@ class MobAIMixin {
    *  `_killerPlayerFor`). Shared by the player-attack path and mob-vs-mob combat. */
   _mobDefender(mob, mt, roomId, attacker, events) {
     return {
-      actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: !!mt.emitsLight, roomId,
+      actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: mt.emitsLight > 0, roomId,
       onDamage: mobOnDamage(mt),
       sourceId: null, // a mob defender's retaliatory DoT credits no one
       deal: (dmg) => {
@@ -763,10 +763,10 @@ class MobAIMixin {
       if (!set) { set = new Set(); this.revealedMobs.set(target.actor.id, set); }
       set.add(m.id);
       events.push({ type: "mob-ambush", roomId, mobId: m.id, mobName: t.name,
-        targetId: target.id, light: rt.light, emitsLight: !!t.emitsLight });
+        targetId: target.id, light: rt.light, emitsLight: t.emitsLight > 0 });
     }
     const targetName = isPlayer ? target.actor.name : tmt.name;
-    const targetEmitsLight = isPlayer ? false : !!tmt.emitsLight;
+    const targetEmitsLight = isPlayer ? false : tmt.emitsLight > 0;
     const defence = isPlayer
       ? playerDefence(this.world, target.actor)
       : mobDefence(tmt, target.actor);
@@ -781,7 +781,7 @@ class MobAIMixin {
       type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
       targetId: target.id, targetName, targetKind: target.kind, hit: r.hit, sighted: r.sighted,
       damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.actor.hp - r.damage), targetMaxHp: target.actor.maxHp,
-      light: rt.light, attackerEmitsLight: !!t.emitsLight, targetEmitsLight,
+      light: rt.light, attackerEmitsLight: t.emitsLight > 0, targetEmitsLight,
     };
     const defender = isPlayer
       ? this._playerDefender(target.actor, roomId, events)
@@ -789,7 +789,7 @@ class MobAIMixin {
     const { defenderDeath, attackerDeath } = this.applyHitOutcome({
       r, events, attackEvent,
       attacker: {
-        actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: !!t.emitsLight, roomId,
+        actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: t.emitsLight > 0, roomId,
         onHit: t.attack.onHit,
         sourceId: null, // a mob's venom credits no one
         // Reflect/retaliate lands on the mob; the struck defender's owner (a player,
@@ -870,8 +870,8 @@ class MobAIMixin {
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
     events.push({
-      type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: !!t.emitsLight, light: rt.light,
-      targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : !!tmt.emitsLight,
+      type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
+      targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
       spellName: spell.name, resisted, damage, effectName, doused, killed,
       targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
     });
@@ -908,7 +908,7 @@ class MobAIMixin {
     }
     events.push({
       type: "mob-cast-self", roomId, mobId: m.id, mobName: t.name,
-      emitsLight: !!t.emitsLight, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
+      emitsLight: t.emitsLight > 0, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
       // A negative emit-light weave is a darkness aura, not a self-buff — the client
       // narrates it as the room being swallowed rather than something drawn "about itself".
       darkened: eff.type === "emit-light" && ((eff.magnitude || 0) < 0),
@@ -932,7 +932,7 @@ class MobAIMixin {
     this.rooms[dest].light = this.computeRoomLight(dest);
     events.push({
       type: "mob-move", mobId: m.id, mobName: t.name, from: roomId, to: dest, dir, verb,
-      emitsLight: !!t.emitsLight, lightFrom: rt.light, lightTo: this.rooms[dest].light,
+      emitsLight: t.emitsLight > 0, lightFrom: rt.light, lightTo: this.rooms[dest].light,
     });
   }
 

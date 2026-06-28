@@ -1312,6 +1312,18 @@
     "weight": 1,
     "value": 70
   },
+  "shadow-shard": {
+    "id": "shadow-shard",
+    "rarity": "rare",
+    "name": "a shadow shard",
+    "keywords": ["shadow", "shard", "void", "dark", "splinter"],
+    "description": "A splinter of the void made solid — left where a void shadow was unmade by the light, its cold centre crystallised in the instant of its dying. It is black past black, so cold it aches in the palm, and it drinks the glow from the air the way the living dark once did. The deep-folk prize such splinters: there is a glimmer-craft in binding a slain shadow's hunger into worked steel and cloth, though the recipes are not yet a delver's to know. Until then, a trader will pay handsomely for so rare a thing.",
+    "type": "material",
+    "weight": 0,
+    "value": 60,
+    "sellValue": 48,
+    "stackable": true
+  },
   "book-of-shadow-binding": {
     "id": "book-of-shadow-binding",
     "name": "the Book of Shadow-Binding",

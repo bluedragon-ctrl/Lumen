@@ -45,5 +45,12 @@ module.exports = {
     phaseTicks: { calm: 600, stirring: 60, tide: 240, receding: 60 },
     deepCap: -5, // floor on the depth-scaled Tide darkening (-2 - floor(depth/3))
     edgeOffset: -1, // the gentle dim during Stirring (warning) and Receding (ebb)
+    // The dark grows teeth: during the Tide, each tick every room where a living
+    // delver stands in failed light (room light < 0) has `predator.chance` to birth
+    // a `predator.mob` right beside them, up to `predator.cap` shadows worldwide. The
+    // ebb reclaims them (they are tide-spawned). Lit camps (light ≥ 0) are never
+    // touched. One tier for now; depth-scaled rosters come later. Set predator:null
+    // to leave the Tide toothless (the darkening cycle only, no hunters).
+    predator: { mob: "void-shadow", chance: 0.05, cap: 5, faction: "wild", noSpoils: false },
   },
 };

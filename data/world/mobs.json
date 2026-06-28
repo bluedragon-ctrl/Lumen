@@ -1092,5 +1092,34 @@
       { "template": "shadow-heart", "chance": 1 },
       { "template": "crystal", "chance": 0.5 }
     ]
+  },
+  "void-shadow": {
+    "id": "void-shadow",
+    "name": "a void shadow",
+    "keywords": ["void", "shadow", "shade", "dark"],
+    "description": "Lesser kin of the Starving Dark, and never the only one for long — a shred of living black that peels itself out of the unlit air when the Tide drowns the deep and a delver's own light has failed. The eye slides off it; it is a deeper dark sliding against the dark, ringed in a cold that leans on the skin. It cannot bear a flame: bright light sears it thin and soundless and drives it off, so it snuffs what it can reach and closes in the black of its own making. Bold in the dark, and it follows. When the Tide recedes, it sinks back into the air it came from.",
+    "maxHp": 34,
+    "speed": 12,
+    "armour": 2,
+    "ward": 1,
+    "attributes": { "might": 7, "vitality": 8, "intellect": 5, "wits": 7, "perception": 9 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 0 },
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 3,
+    "emitsLight": -1,
+    "lightBane": { "above": 0, "damage": "1d4" },
+    "attack": { "damage": "1d6", "bonus": 1, "actionCost": 12 },
+    "xp": 12,
+    "actions": [
+      { "type": "cast", "weight": 3, "spell": "snuff" },
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": ["folds in on itself, and the cold deepens", "shifts — a darker dark sliding across the dark", "leans toward your light, hungry for it", "goes utterly still, and the silence presses in"] }
+    ],
+    "loot": [
+      { "template": "shadow-shard", "chance": 0.05 }
+    ]
   }
 }

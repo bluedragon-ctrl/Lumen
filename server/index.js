@@ -643,7 +643,9 @@ const EVENT_HANDLERS = {
     broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} ${ev.verb}.`, { refreshRoom: true }),
 
   "mob-spawn": (ev) =>
-    broadcastRoom(ev.roomId, ev, (n) => (n === "something"
+    broadcastRoom(ev.roomId, ev, (n) => (ev.tideCreep
+      ? `The dark thickens and folds — ${n} peels itself out of the unlit air beside you.`
+      : n === "something"
       ? "Something stirs in the dark."
       : `${cap(ev.mobName)} appears.`), { refreshRoom: true }),
 

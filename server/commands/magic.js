@@ -245,11 +245,11 @@ function castSupport(state, player, spell, targetQ, ctx) {
     } else {
       const mob = rt.mobs.find((m) => {
         const t = w.mobs[m.template];
-        return (see || t.emitsLight) && matchesQuery(ql, t.name, t.keywords, m.id);
+        return (see || t.emitsLight > 0) && matchesQuery(ql, t.name, t.keywords, m.id);
       });
       if (mob) {
         const mt = w.mobs[mob.template];
-        target = { kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId: player.location, emitsLight: !!mt.emitsLight };
+        target = { kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId: player.location, emitsLight: mt.emitsLight > 0 };
       }
     }
   }
