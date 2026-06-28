@@ -100,9 +100,14 @@ function makeLampWorld() {
       camp: { id: "camp", name: "Camp", description: "", depth: 4, ambientLight: 0, exits: {}, fixtures: ["lamp"], spawns: [{ mob: "warden", max: 1 }] },
       // a lamp but nobody to work it
       empty: { id: "empty", name: "Empty", description: "", depth: 4, ambientLight: 0, exits: {}, fixtures: ["lamp"] },
+      // a lamp tended only by wild fauna — which won't work a switch
+      lair: { id: "lair", name: "Lair", description: "", depth: 4, ambientLight: 0, exits: {}, fixtures: ["lamp"], spawns: [{ mob: "rat", max: 1 }] },
     },
     items: {},
-    mobs: { warden: { id: "warden", name: "a warden", maxHp: 10, speed: 10, attack: { damage: "1d2" } } },
+    mobs: {
+      warden: { id: "warden", name: "a warden", faction: "rim", maxHp: 10, speed: 10, attack: { damage: "1d2" } },
+      rat: { id: "rat", name: "a rat", faction: "fauna", maxHp: 5, speed: 10, attack: { damage: "1d2" } },
+    },
     fixtures: { lamp: { id: "lamp", name: "a lamp", switch: { on: false, emitsLight: 4 } } },
     recipes: {}, spells: {}, quests: {},
     playerTemplate: {
@@ -127,6 +132,7 @@ test("Stirring: an NPC lights its room's lamp; a lampless-tender room is untouch
   assert.equal(lamp.tideLit, true);
   assert.equal(s.rooms.camp.light, 4 - 1); // lamp +4 over the Stirring -1 edge dim
   assert.equal(s.rooms.empty.fixtures[0].on, false); // no NPC → lamp stays dark
+  assert.equal(s.rooms.lair.fixtures[0].on, false); // wild fauna won't work a switch
 
   // Through the Tide the lit camp stays bright while the dark deepens elsewhere.
   s.forceTidePhase("tide");

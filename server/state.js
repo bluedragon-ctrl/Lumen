@@ -37,6 +37,9 @@ const RESTING = (actor) => actor.posture === "sitting" || actor.posture === "sle
 // A per-mob `regen: { delay, perTick }` overrides either knob.
 const OOC_REGEN_DELAY = 5; // ticks out of combat before recovery starts
 const OOC_REGEN_TICKS = 20; // ticks to mend from empty to full (sets the default rate)
+// Factions whose NPCs tend lamps against the Tide: the Rim's human settlers and
+// the Umbrals. The wild fauna and beasts won't work a switch (see _setTideLamps).
+const LAMP_TENDER_FACTIONS = new Set(["rim", "umbral"]);
 
 /**
  * Authoritative in-memory world state (DESIGN.md §6.1). Owns all dynamic state:
@@ -348,13 +351,15 @@ class GameState {
    *  living NPC has its switchable light fixtures (a lamp, currently off) thrown
    *  on, tagged `tideLit`. With `on` false (the recede to Calm), only those
    *  Tide-lit lamps are snuffed again — an author- or player-lit lamp is left
-   *  burning. A room with no NPC, or no lamp, is simply skipped (the safe-camp
-   *  content — pairing lamps with NPCs — is the follow-up pass). */
+   *  burning. Only a living lamp-tending NPC (Rim or Umbral — see
+   *  LAMP_TENDER_FACTIONS) works the switch; the wild fauna won't. A room with no
+   *  such tender, or no lamp, is simply skipped (the safe-camp content — pairing
+   *  lamps with NPCs — is the follow-up pass). */
   _setTideLamps(on, events) {
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       let changed = false;
       if (on) {
-        if (!rt.mobs.some((m) => m.hp > 0)) continue; // no NPC present to work the lamp
+        if (!rt.mobs.some((m) => m.hp > 0 && LAMP_TENDER_FACTIONS.has(m.faction))) continue; // no lamp-tending NPC here
         for (const f of rt.fixtures) {
           const ft = this.world.fixtures[f.template];
           if (ft && ft.switch && ft.switch.emitsLight && !f.on) { f.on = true; f.tideLit = true; changed = true; }
