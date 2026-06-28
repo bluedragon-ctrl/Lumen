@@ -31,7 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that travels his patrol, lighting whichever Rim room he walks rather than fixing a
   lamp to the plaza. So the watched heart of the Rim is safe while the watch is on
   it, and falls dark when Hale has moved on.
-  Tunable in `config.TIDE`; admins drive it by hand with `@tide <phase|auto|status>`.
+  A small **Tide indicator** sits on the shards line in the player panel: a phase
+  label and a bar that fills with the dark — quiet in Calm, gold as it Stirs, red at
+  the Tide, cool on the ebb — creeping forward on a slow heartbeat so you can read
+  the dark coming. Tunable in `config.TIDE`; admins drive it by hand with `@tide
+  <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list
   your bindings, or `alias F1` (key only) to clear one. Bindings live on the

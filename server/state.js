@@ -328,6 +328,24 @@ class GameState {
     return events;
   }
 
+  /** A compact read of the Tide for the client HUD: the current phase and a 0..1
+   *  `intensity` (how dark the world is right now — 0 in Calm, rising through
+   *  Stirring, full at the Tide, falling through Receding). `enabled` is false when
+   *  the world clock is off, so the client can hide the indicator entirely. */
+  tideStatus() {
+    if (!TIDE.enabled) return { enabled: false, phase: "calm", intensity: 0 };
+    const info = tidePhaseAt(this.tick, TIDE.phaseTicks);
+    const phase = this.tideOverride || info.phase;
+    let intensity;
+    if (this.tideOverride) {
+      intensity = phase === "tide" ? 1 : phase === "stirring" || phase === "receding" ? 0.5 : 0;
+    } else {
+      const frac = Math.min(1, info.sinceStart / (TIDE.phaseTicks[phase] || 1));
+      intensity = phase === "tide" ? 1 : phase === "stirring" ? frac : phase === "receding" ? 1 - frac : 0;
+    }
+    return { enabled: true, phase, intensity: Math.round(intensity * 100) / 100 };
+  }
+
   /** A tide phase change. Recompute EVERY room's light first — the darkening
    *  lands worldwide at once, but the per-tick light loop only refreshes occupied
    *  rooms, so a delver who later walks into a distant room would otherwise see

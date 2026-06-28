@@ -268,7 +268,21 @@ body {
 #player { grid-area: player; padding: 10px 12px; }
 .player-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
 #p-name { font-weight: 700; color: var(--accent); }
-.shards-line { margin-bottom: 8px; }
+.shards-line { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* The Tide HUD indicator: a phase word + a bar that fills with the dark. Colour
+   tracks the phase — quiet in Calm, gold as it Stirs, red at the Tide, cool on the
+   ebb. Width/colour transition so the slow heartbeat updates glide rather than jump. */
+.tide-meter { display: inline-flex; align-items: center; gap: 6px; font-size: .82em; white-space: nowrap; }
+.tide-label { text-transform: capitalize; color: var(--muted); }
+.tide-bar { width: 46px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+.tide-fill { display: block; height: 100%; width: 0; background: var(--muted); transition: width .9s linear, background-color .9s ease; }
+.tide-stirring .tide-label { color: var(--gold); }
+.tide-stirring .tide-fill  { background: var(--gold); }
+.tide-tide .tide-label { color: var(--hostile); }
+.tide-tide .tide-fill  { background: var(--hostile); }
+.tide-receding .tide-label { color: var(--accent); }
+.tide-receding .tide-fill  { background: var(--accent); }
 .train-pts { color: var(--gold); font-weight: 600; }
 .muted { color: var(--muted); }
 #player h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; border-bottom: 1px solid var(--edge); padding-bottom: 3px; }

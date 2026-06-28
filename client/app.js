@@ -91,6 +91,7 @@ function handle(msg) {
       break;
     case "examine": renderExamine(msg.entity); break;
     case "player": lastPlayer = msg.player; renderPlayer(msg.player); break;
+    case "tide": renderTide(msg); break;
     default: addLine(JSON.stringify(msg), "log");
   }
 }
@@ -353,6 +354,22 @@ $("jump-pill").addEventListener("click", () => {
   jumpToBottom();
   cmdEl.focus();
 });
+
+// The Tide HUD indicator on the shards line — a small phase label + a bar that
+// fills with the dark (0 in Calm, full at the Tide). Driven by lightweight `tide`
+// frames, separate from the player view so it can creep forward on its own without
+// rebuilding the panel. Hidden entirely when the world clock is off.
+function renderTide(t) {
+  const el = $("tide-meter");
+  if (!el) return;
+  if (!t || !t.enabled) { el.hidden = true; return; }
+  el.hidden = false;
+  el.className = "tide-meter tide-" + t.phase;
+  const pct = Math.round((t.intensity || 0) * 100);
+  $("tide-label").textContent = t.phase;
+  $("tide-fill").style.width = pct + "%";
+  el.title = `The Tide — ${t.phase} (${pct}% dark)`;
+}
 
 // --- Player panel ----------------------------------------------------------
 function renderPlayer(p) {

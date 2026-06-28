@@ -50,6 +50,14 @@ function sendRawToPlayer(playerId, data) {
   if (ws && ws.readyState === ws.OPEN) ws.send(data);
 }
 
+// Push the current Tide status to every connected delver (the HUD indicator on
+// the shards line). Sent on each phase change and on a slow heartbeat so the
+// bar creeps forward between phases; it's a tiny frame, not a view rebuild.
+function broadcastTide() {
+  const data = JSON.stringify({ type: "tide", ...state.tideStatus() });
+  for (const ws of connections.values()) if (ws && ws.readyState === ws.OPEN) ws.send(data);
+}
+
 // --- Per-burst view coalescing ---------------------------------------------
 // Room and vitals views are idempotent snapshots, and a single tick (or command)
 // often fires several events touching the same room — each previously rebuilt and
@@ -143,6 +151,7 @@ function login(ws, rawName) {
   });
   send(ws, buildPlayerView(state, player));
   send(ws, buildRoomView(state, player));
+  send(ws, { type: "tide", ...state.tideStatus() }); // seed the HUD tide indicator
   console.log(`[lumen] ${player.name} logged in (${state.players.size} online).`);
 }
 
@@ -501,6 +510,7 @@ const EVENT_HANDLERS = {
       if (text) sendToPlayer(p.id, { type: "system", text });
       markViews(p.id);
     }
+    broadcastTide(); // refresh the HUD indicator the instant the phase turns
   },
 
   "tide-lamp": (ev) => {
@@ -700,6 +710,7 @@ function dispatchEvent(ev) {
 const tickTimer = setInterval(() => {
   for (const ev of state.advance()) dispatchEvent(ev);
   flushViews(); // coalesce a tick's worth of view refreshes into one send per player
+  if (state.tick % 5 === 0) broadcastTide(); // creep the HUD tide bar forward between phase turns
   if (state.tick % SNAPSHOT_EVERY_TICKS === 0) {
     // Periodic snapshot — fire async writes off the event loop, skipping players
     // whose data is unchanged, so disk I/O never stalls the tick.
