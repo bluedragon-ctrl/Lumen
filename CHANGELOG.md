@@ -22,7 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   non-wandering Rim and Umbral NPC's room now holds a lamp that lifts its light to
   at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
   hatchery, mage's shed, workshop) gain the descent's iron lamp, lit by their keeper
-  as the dark closes in; the Umbral hall's cold glimmer-lamp is strengthened (now
+  as the dark closes in. Their base ambient is lowered to 3 so the lamp, the
+  patrolling watchman's lamp, and the hatchery's lightbugs stack into a bright,
+  welcoming glow rather than overshooting into painful glare. The Umbral hall's cold
+  glimmer-lamp is strengthened (now
   sheds 4) so it stays habitable when the Tide is deepest.
 - **Hale the watchman now carries a lit lamp** (sheds 3) — a moving pool of light
   that travels his patrol, lighting whichever Rim room he walks rather than fixing a
