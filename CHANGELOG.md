@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and a gentle dim; **Receding** ebbs the light back. Lamps and torches still sum on
   top, so light sources are the only refuge. Engine + tuning only for now — the
   light-fearing predator roster and lamp-lit safe camps are a follow-up content task.
+  As the dark gathers (Stirring through the Tide), an NPC present in a room throws
+  on its switchable lamps — and snuffs them again once the Tide recedes — so a
+  tended camp lights itself against the dark (author/player-lit lamps are left be).
   Tunable in `config.TIDE`; admins drive it by hand with `@tide <phase|auto|status>`.
 - **Function-key shortcuts (`alias`).** Bind a command to **F1–F4** and fire it with
   one keypress (e.g. `alias F1 cast spark`). Run `alias` with no arguments to list

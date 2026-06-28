@@ -90,3 +90,59 @@ test("the clock fires a tide-phase event when it crosses a boundary", () => {
   assert.equal(s.tidePhase, "stirring");
   assert.ok(evs.some((e) => e.type === "tide-phase" && e.phase === "stirring"));
 });
+
+// --- NPCs lighting lamps as the Tide turns ---------------------------------
+
+function makeLampWorld() {
+  return {
+    rooms: {
+      // a camp: an (off) lamp + a resident NPC
+      camp: { id: "camp", name: "Camp", description: "", depth: 4, ambientLight: 0, exits: {}, fixtures: ["lamp"], spawns: [{ mob: "warden", max: 1 }] },
+      // a lamp but nobody to work it
+      empty: { id: "empty", name: "Empty", description: "", depth: 4, ambientLight: 0, exits: {}, fixtures: ["lamp"] },
+    },
+    items: {},
+    mobs: { warden: { id: "warden", name: "a warden", maxHp: 10, speed: 10, attack: { damage: "1d2" } } },
+    fixtures: { lamp: { id: "lamp", name: "a lamp", switch: { on: false, emitsLight: 4 } } },
+    recipes: {}, spells: {}, quests: {},
+    playerTemplate: {
+      level: 1, xp: 0, shards: 0,
+      attributes: { might: 5, vitality: 5, intellect: 5, wits: 5, perception: 5 },
+      manaRegen: 0, speed: 12,
+      perception: { blindBelow: 1, dimBelow: 3, harmedAbove: 9 },
+      startLocation: "camp", startInventory: [], startEquipment: {},
+      knownRecipes: [], knownSpells: [],
+    },
+  };
+}
+
+test("Stirring: an NPC lights its room's lamp; a lampless-tender room is untouched", () => {
+  const s = new GameState(makeLampWorld());
+  // Calm: lamp off, camp dark (ambient 0 - 0), and during the Tide it would be 0 - 3 = -3.
+  assert.equal(s.rooms.camp.light, 0);
+
+  s.forceTidePhase("stirring");
+  const lamp = s.rooms.camp.fixtures[0];
+  assert.equal(lamp.on, true); // the NPC threw the lamp on
+  assert.equal(lamp.tideLit, true);
+  assert.equal(s.rooms.camp.light, 4 - 1); // lamp +4 over the Stirring -1 edge dim
+  assert.equal(s.rooms.empty.fixtures[0].on, false); // no NPC → lamp stays dark
+
+  // Through the Tide the lit camp stays bright while the dark deepens elsewhere.
+  s.forceTidePhase("tide");
+  assert.equal(s.rooms.camp.light, 4 - 3); // +4 lamp over the depth-4 -3 darkening
+});
+
+test("Calm: the Tide-lit lamp is snuffed again, but an author-lit lamp is left alone", () => {
+  const s = new GameState(makeLampWorld());
+  s.forceTidePhase("stirring");
+  s.forceTidePhase("calm");
+  assert.equal(s.rooms.camp.fixtures[0].on, false); // snuffed on the recede
+  assert.equal(s.rooms.camp.fixtures[0].tideLit, false);
+
+  // A lamp the author left burning is never flagged, so it survives the recede.
+  s.rooms.camp.fixtures[0].on = true; // author/player lit
+  s.forceTidePhase("stirring"); // already on → not flagged tideLit
+  s.forceTidePhase("calm");
+  assert.equal(s.rooms.camp.fixtures[0].on, true);
+});

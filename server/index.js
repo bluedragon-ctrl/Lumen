@@ -503,6 +503,15 @@ const EVENT_HANDLERS = {
     }
   },
 
+  "tide-lamp": (ev) => {
+    // NPCs lit (or snuffed) this room's lamps as the Tide turned. Narrate to
+    // anyone present; the room refresh rides the tide-phase view sweep above.
+    const text = ev.on
+      ? "Lamps flare to life around you, beating back the gathering dark."
+      : "The lamps are snuffed out as the dark recedes.";
+    roomCtx.toRoom(ev.roomId, { type: "log", text });
+  },
+
   "aggro-engage": (ev) => {
     // A mob committed to attack (see state._engageTell): either it proactively
     // noticed a delver, or — `remembered` — a `remembers` mob recognised a foe it

@@ -334,9 +334,39 @@ class GameState {
    *  player watches the world darken. */
   _applyTidePhase(prev, phase, events) {
     for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
+    // NPCs light their lamps against the gathering dark (Stirring through the
+    // Tide) and snuff them once it has receded (Calm) — before spawn, so a lit
+    // camp's brightness already repels the predators' maxLight check.
+    if (phase === "stirring" || phase === "tide") this._setTideLamps(true, events);
+    else if (phase === "calm") this._setTideLamps(false, events);
     if (phase === "tide") this._tideSpawn(events);
     else this._tideSweep(events);
     events.push({ type: "tide-phase", phase, prev });
+  }
+
+  /** NPCs work the lamps as the Tide turns. With `on`, every room that holds a
+   *  living NPC has its switchable light fixtures (a lamp, currently off) thrown
+   *  on, tagged `tideLit`. With `on` false (the recede to Calm), only those
+   *  Tide-lit lamps are snuffed again — an author- or player-lit lamp is left
+   *  burning. A room with no NPC, or no lamp, is simply skipped (the safe-camp
+   *  content — pairing lamps with NPCs — is the follow-up pass). */
+  _setTideLamps(on, events) {
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      let changed = false;
+      if (on) {
+        if (!rt.mobs.some((m) => m.hp > 0)) continue; // no NPC present to work the lamp
+        for (const f of rt.fixtures) {
+          const ft = this.world.fixtures[f.template];
+          if (ft && ft.switch && ft.switch.emitsLight && !f.on) { f.on = true; f.tideLit = true; changed = true; }
+        }
+      } else {
+        for (const f of rt.fixtures) if (f.tideLit) { f.on = false; f.tideLit = false; changed = true; }
+      }
+      if (changed) {
+        rt.light = this.computeRoomLight(roomId);
+        events.push({ type: "tide-lamp", roomId, on, light: rt.light });
+      }
+    }
   }
 
   /** Loose the Tide's light-fearing predators. Data-driven from an optional
