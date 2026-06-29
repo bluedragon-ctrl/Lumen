@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Examine works on what you can craft.** As with a shopkeeper's wares, you can now
+  `examine <item>` against the output of any recipe you know — previewing its stats,
+  rarity, and what it's made from before you gather the materials. The examine view
+  offers a one-click Craft action. Real items you hold or wares on a counter still win
+  a name clash; this only fills in for things you could make but don't yet have.
 - **The Tide — a world clock that makes the abyss breathe.** On a fixed cycle the
   world passes through **Calm → Stirring → Tide → Receding**: during the Tide every
   room darkens, scaled by depth (`-2` at the rim down to a `-5` floor in the deep),
@@ -82,6 +87,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **Daggers are now finesse weapons.** The iron dagger and the hungering dagger scale
+  their damage off **Perception** (per 6) instead of Might, and each gains a flat +5%
+  crit. They lose to a sword in a Might build but pull ahead for a Perception/crit
+  build — the dagger is now the natural pick for a high-Perception delver rather than
+  a strictly-worse sword. (Crit alone couldn't separate the builds: a ×2 crit scales
+  every weapon equally, so the lever is what the damage scales *with*.)
+- **Exit destinations are hidden in the dark.** When a delver can't see (room light
+  below their perception), the Inspect window still lists which directions lead off
+  (e.g. "south") but no longer names where they go — you can feel for a passage, but
+  can't read its destination until you have light.
+- **The inn's hearth mends in slower, larger pulses.** The Lantern's Rest now restores
+  5 hp/mana every 12 ticks instead of 1 every 3 — a touch faster overall, but the
+  "the hearth's warmth eases your hurts" message fires a quarter as often.
+- **NPCs speak up less often.** The global damper on ambient NPC chatter is halved
+  (idle `emote` weight scaled by 0.25 instead of 0.5), so settled folk and creatures
+  alike fall quiet roughly twice as often between remarks.
 - **The void-light (below-zero) Inspect visuals are gentler.** The dark-closing-in
   vignette now breathes slowly and shallowly (8s, a smaller swing) instead of a
   fast, deep pulse that yanked the readable centre out from under the text — so
