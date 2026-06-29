@@ -25,7 +25,7 @@
     "groundItems": [],
     "spawns": [{ "mob": "rim-innkeeper", "max": 1, "respawn": 120 }],
     "effects": [
-      { "trigger": "tick", "interval": 3, "action": { "restore": { "hp": 1, "mana": 1 } },
+      { "trigger": "tick", "interval": 12, "action": { "restore": { "hp": 5, "mana": 5 } },
         "message": "The hearth's warmth eases your hurts." }
     ]
   },
