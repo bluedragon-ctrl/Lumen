@@ -1166,5 +1166,84 @@
     "loot": [
       { "template": "shadow-shard", "chance": 0.05 }
     ]
+  },
+  "pale-mother": {
+    "id": "pale-mother",
+    "name": "the Pale Mother",
+    "keywords": ["pale", "mother", "broodmother", "crawler"],
+    "description": "The mother of the warren, grown monstrous in the wet dark where nothing ever drove her off and the feeding never stopped — a pallid, glistening bulk the size of a man curled on itself, her segments swollen and straining, the seams of her gone dark with the deeper black that has soaked up out of the drowned stone into all her kind. She does not range as her brood do; she holds the sump, and the sump holds her, and from the egg-strings strung along the walls she calls up more of her young than any one delver should care to meet. Her bite carries the same rot her children's do, slowed and thickened by her bulk into something that festers. She is blind, and old, and she has never once gone hungry.",
+    "maxHp": 120,
+    "speed": 11,
+    "armour": 3,
+    "ward": 1,
+    "attributes": { "might": 9, "vitality": 18, "intellect": 0, "wits": 5, "perception": 9 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "guard",
+    "hostile": true,
+    "lightAggro": { "above": 0 },
+    "lightBane": { "above": 3, "damage": "1d3" },
+    "attack": {
+      "damage": "1d8",
+      "actionCost": 12,
+      "onHit": [
+        { "type": "damage-over-time", "name": "gloom-rot", "damage": "1d4", "duration": 6, "chance": 1 }
+      ]
+    },
+    "xp": 80,
+    "shards": "3d6",
+    "actions": [
+      { "type": "summon", "weight": 4, "mob": "gloom-crawler", "count": 1, "max": 3, "verb": "heaves along her swollen length, and the egg-strings split to spill a fresh skittering of brood" },
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": [
+        "coils protectively over the heaped brood-litter",
+        "heaves her swollen length across the husks, egg-strings trembling",
+        "fans her feelers wide, tasting the dark for warmth",
+        "lets out a low, wet rattle that the whole sump seems to answer"
+      ] }
+    ],
+    "loot": [
+      { "template": "brood-caul", "chance": 1 },
+      { "template": "crystal", "chance": 0.5 }
+    ]
+  },
+  "nawpa": {
+    "id": "nawpa",
+    "name": "Ñawpa, the Hollow Watch",
+    "keywords": ["nawpa", "umbral", "hollow", "watch", "keeper"],
+    "description": "Taller and greyer and further gone than the lost apprentice in her dead hollow far above — a deep-dweller that was an Umbral glimmer-singer once, and has kept this threshold so long the deep has all but finished with it. Its frame is stretched gaunt and wrong, its wide eyes gone raw and shy of a light it no longer needs to see, and the soft blue-green glow of the deep-folk still moves under its skin, the last unbroken thing about it. It does not conjure light the way the trader's kin do, nor drink it like the things of the warren; it builds. It sets worked plates upon the stone and drags the cold glimmer up through them until the dead shells stand and shield it, and it strikes with spears of frozen light dragged raw from the shards. It mouths broken scraps of the rounded Umbral tongue over its work — a word for a glyph, a word for a name — worn loose of all meaning. It will not pass the threshold it keeps; it will not let you pass it either.",
+    "maxHp": 110,
+    "speed": 12,
+    "armour": 4,
+    "ward": 5,
+    "attributes": { "might": 7, "vitality": 12, "intellect": 8, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": false,
+    "lightBane": { "above": 6, "damage": "1d3" },
+    "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
+    "xp": 90,
+    "shards": "5d4",
+    "actions": [
+      { "type": "summon", "weight": 4, "mob": "glimmer-husk", "count": 1, "max": 2, "verb": "sets a worked plate on the stone and drags the cold glimmer up through it, until the dead shell shudders and stands" },
+      { "type": "cast", "weight": 4, "spell": "glimmer-spike" },
+      { "type": "cast", "weight": 3, "spell": "glimmerskin" },
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": [
+        "shields its wide eyes and hisses, though no light reaches this deep",
+        "mouths a soft, rounded word of warding in the Umbral tongue, then loses the thread",
+        "drags a fingertip through the air in the start of a glyph, and the dark seems to thicken",
+        "sets a clawed hand on a worked plate and goes very still, listening"
+      ] }
+    ],
+    "loot": [
+      { "template": "chitin-plate", "chance": 1 },
+      { "template": "crystal", "chance": 0.5 },
+      { "template": "glimmerspine-spear", "chance": 0.25 },
+      { "template": "glimmer-lash", "chance": 0.25 }
+    ]
   }
 }

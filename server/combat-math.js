@@ -27,15 +27,23 @@ function weaponOf(world, player) {
   const hand = player.equipment && player.equipment.hand;
   if (hand) {
     const t = world.items[hand.template];
-    if (t.weapon) return {
-      dice: (t.weapon.damage && t.weapon.damage.physical) || "1d2",
-      actionCost: t.weapon.actionCost || 12,
-      scale: t.weapon.scale || MELEE_SCALE,
-      crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
-      onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
-    };
+    if (t.weapon) {
+      // A weapon's swing is physical by default; declaring `damage.magical` instead
+      // makes it a magical blow, cut by the defender's Ward percentage rather than
+      // soaked flat by Armour (see strike). Glimmer-craft weapons scale on Intellect.
+      const dmg = t.weapon.damage || {};
+      const magical = dmg.magical != null;
+      return {
+        dice: (magical ? dmg.magical : dmg.physical) || "1d2",
+        damageType: magical ? "magical" : "physical",
+        actionCost: t.weapon.actionCost || 12,
+        scale: t.weapon.scale || MELEE_SCALE,
+        crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
+        onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
+      };
+    }
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, crit: 0, onHit: null }; // unarmed
+  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------

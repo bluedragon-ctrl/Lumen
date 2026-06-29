@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Depth 8 — the Sunken Warren: a 12-room maze beneath the gloom-warren.** A drowned
+  lower warren that opens via a new `down` from **The Drowned Black** (`d7.lair`, past the
+  Starving Dark): a looping maze of flooded cave and old Umbral stone, fully dark, with the
+  gloom-crawler family carried over at higher density (elders and gloom-touched promoted to
+  common). Two waterfall rooms — **The Plunge Foot** and **The Chasm Ledge** — sit at the foot
+  of the great fall and **douse** your flame on entry; from the Ledge, the far outfall of the
+  black lake spilling over the Far Bank (`d4.lake.farshore`) is visible far up the shaft. Two
+  minibosses: **the Pale Mother** (the warren's swollen brood-queen, who summons crawlers and
+  drops a guaranteed unique rare material, the **brood-caul** — its recipes to come later) and
+  **Ñawpa, the Hollow Watch** (a mutated-Umbral glimmer-singer who raises glimmer-husks from
+  worked plates and strikes with glimmer-spikes — drops `chitin-plate`, the husk-spell's own
+  reagent, plus a 25%-each chance at two unique glimmer weapons: the **glimmerspine spear** and
+  the **glimmer lash**, both dealing **magical** damage that Ward, not Armour, blunts). A warded
+  Umbral stair descends south to a depth-9 **Sanctuary Threshold** (new zone `umbral-sanctuary`):
+  the gaunt things of the warren will not cross it, so the descent reads as a true safe haven. The
+  Sanctuary proper is a sealed inner door — a hook for later.
+- **Weapons can now deal magical damage.** A weapon declaring `damage.magical` (instead of
+  `damage.physical`) lands a magical blow — cut by the defender's Ward percentage rather than
+  soaked flat by Armour, exactly as `strike` already anticipated. Completes long-dormant
+  wiring in `weaponOf`; physical weapons are unaffected. First users are Ñawpa's glimmer
+  weapons above (the glimmerspine spear scaling on Perception, the glimmer lash on Wits).
 - **The barbed bomb — a new thrown consumable, and a sink for two orphan materials.**
   A vial of thornbug barbs bound with slug-slime: thrown, it bursts for a small physical
   hit (`2d4`) *and* sinks a lingering **bleed** (`1d4` for 4 ticks) into anything it

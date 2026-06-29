@@ -1281,14 +1281,205 @@
     "name": "The Drowned Black",
     "depth": 7,
     "ambientLight": 0,
-    "description": "The cave opens south into the deepest hollow of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers do not follow you in — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends, and the dead one's chalk was right. The only way out is back north.",
-    "exits": { "north": "d7.relict" },
+    "description": "The cave opens south into the deepest hollow of the warren, and the dark here is wrong. It is not merely the absence of light but the appetite for it: your flame shrinks and gutters the moment you arrive, the glow pulled thin as though something close by were drinking it, and the cold leans in against your skin like a held breath. The crawlers do not follow you in — even they keep to the edges of this place, gathered at the rim of your light and no closer, watching the centre with their blind faces turned. For there is a centre. A deeper black coils in the heart of the cave, shifting against the dark in a way that has nothing to do with your light, and as you understand what you are looking at, it understands that you have come. This is where the prospectors' road ends, and the dead one's chalk was right. But the warren does not end here. Where the coiling dark has kept its long vigil, the floor of the hollow gives way to a black throat going further down — a drowned shaft past where any prospector ever cut a step. The way back is north; the dark goes down.",
+    "exits": { "north": "d7.relict", "down": "d8.drop" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
       { "mob": "the-starving-dark", "max": 1, "respawn": 1200 },
       { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
     ]
+  },
+  "d8.drop": {
+    "id": "d8.drop",
+    "zone": "sunken-warren",
+    "name": "The Sounding Drop",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The throat in the floor of the Drowned Black drops you into a wet, sounding dark — a shaft worn round and smooth by water that has not run here in a long age, the rope you fixed above creaking somewhere out of sight. You come down onto a slick shelf of black stone, and the air changes: colder, heavier, thick with the smell of standing water and old rot. Somewhere below and ahead a steady drip counts time, and under it, faint and constant, a deeper roar you feel in the rock more than hear. This is past where any prospector ever cut a step — the warren keeps going down, and so, it seems, did something else. The shaft climbs up the way you came; the dark opens south.",
+    "exits": { "up": "d7.lair", "south": "d8.cistern" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d8.cistern": {
+    "id": "d8.cistern",
+    "zone": "sunken-warren",
+    "tags": ["water"],
+    "name": "The Cistern",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The shaft opens into a broad, low chamber that once held water and mostly still does — a black sheet of it lies still across the floor, ankle-deep and colder than the air, and your steps send slow rings out to walls you cannot see. Worked stone shows here and there under the silt, the same patient Umbral cutting found higher up, drowned and forgotten. Passages run off in every direction, their mouths all alike in the dark, and the still water carries every sound and gives back nothing of where it came from. It would be very easy to lose the way you came in. The drip and the distant roar come from the east; other ways run west and south, and the drop climbs north.",
+    "exits": { "north": "d8.drop", "east": "d8.plungefoot", "west": "d8.silt", "south": "d8.steps" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 4, "respawn": 90 },
+      { "mob": "gloom-creeper", "max": 2, "respawn": 120 }
+    ]
+  },
+  "d8.plungefoot": {
+    "id": "d8.plungefoot",
+    "zone": "sunken-warren",
+    "tags": ["water"],
+    "name": "The Plunge Foot",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "East the floor tilts down and the roar resolves into what makes it: a hard, cold column of water falling out of a crack in the high dark and hammering into a churning black pool, throwing up a freezing spray that fills the whole chamber. The cold of it drowns your flame the moment you step in, a hiss of steam and then nothing, and the dark closes whole. This is the foot of some great fall — the overspill of the drowned country far above come down at last to the bottom of the world. The water deafens. A wet ledge climbs north along the cataract; a low passage runs back west, and another east.",
+    "exits": { "west": "d8.cistern", "north": "d8.ledge", "east": "d8.cache" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [],
+    "effects": [
+      { "trigger": "enter", "action": { "douse": true },
+        "message": "The freezing spray off the plunge drowns your flame in a gout of steam." }
+    ]
+  },
+  "d8.ledge": {
+    "id": "d8.ledge",
+    "zone": "sunken-warren",
+    "tags": ["water"],
+    "name": "The Chasm Ledge",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The ledge climbs along the falling water onto a lip of wet stone above a chasm so deep your light, if you had any, would not find its bottom — and here the spray puts your flame out and holds it out, so you stand in the roaring dark. But the dark is not whole. Far, far up the shaft, past more fallen floors than you care to count, a single thread of pale water catches a light you cannot reach: a faint blue-white glimmer of moss-glow on spray, high and cold and impossibly distant. You would swear it for the black lake spilling over the Far Bank, the same water you walked beside an age of descent ago — fallen all this way down the throat of the world to break apart somewhere in the dark above your head. There is nowhere to go but back south, down the ledge.",
+    "exits": { "south": "d8.plungefoot" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [],
+    "effects": [
+      { "trigger": "enter", "action": { "douse": true },
+        "message": "Cold blown spray off the chasm snuffs your flame, and the roaring dark closes in." }
+    ]
+  },
+  "d8.silt": {
+    "id": "d8.silt",
+    "zone": "sunken-warren",
+    "name": "Silt Crawl",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "West of the cistern the ceiling comes down and the floor comes up to meet it, until the way is a low silt-floored crawl through drowned stone, the water gone to cold black mud that sucks at hand and knee. Pale things have been through here recently — the mud is churned with the wide, dragging trails the crawlers leave, and the trails are fresh. The smell of them is heavy here, that wet-coal reek of the warren, stronger than anywhere above. The crawl carries on south and opens west into something larger and worse-smelling still; the cistern lies back east.",
+    "exits": { "east": "d8.cistern", "south": "d8.backwash", "west": "d8.broodsump" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "elder-gloom-crawler", "max": 3, "respawn": 150 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d8.backwash": {
+    "id": "d8.backwash",
+    "zone": "sunken-warren",
+    "tags": ["water"],
+    "name": "The Backwash",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The crawl opens into a stagnant backwash where the standing water has gone foul, skinned over with a grey scum that breaks in slow rafts as something moves beneath it. The walls here are wrong — not crawler-work but the deeper dark itself, threads of that light-drinking black clinging in the seams the way it gathered around the thing in the Drowned Black, thicker the further you press. The crawlers here have taken the taint of it; they reach for your warmth and seem, for a moment, to drink it. A run climbs north back to the crawl; another opens east toward worked steps.",
+    "exits": { "north": "d8.silt", "east": "d8.steps" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gloom-touched-crawler", "max": 3, "respawn": 200 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d8.broodsump": {
+    "id": "d8.broodsump",
+    "zone": "sunken-warren",
+    "name": "Broodsump",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The west crawl spills into a vaulted sump that the warren has made wholly its own — the floor heaped with moulted husks and the pale, glistening litter of a nest, the walls furred with egg-strings strung between the worked-stone ribs of a chamber the Umbrals cut for some forgotten use — one rib laid bare where a thick vein of raw glimmer threads the stone, cold and faintly alight beneath the filth, too dim to lift the dark. The reek is overwhelming. And at the heart of it, vast and pallid and swollen past the size of any crawler you have met, something lifts its blind front from the brood and turns it toward the warmth of you. This is what the warren is for. This is what has been feeding it. The only way out is back east, the way you came.",
+    "exits": { "east": "d8.silt" },
+    "fixtures": ["glimmer-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-mother", "max": 1, "respawn": 1800 },
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d8.cache": {
+    "id": "d8.cache",
+    "zone": "sunken-warren",
+    "name": "The Drowned Cache",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "East of the plunge the spray thins and the passage ends in a dry pocket lifted just above the water-line — and someone reached it before you. A prospector's cache sits tucked into a worked niche: an oiled roll gone black with damp, a strongbox forced and emptied long since, and the scatter of what the finders did not think worth carrying back up through all that dark. What they came all this way for is still here, barely touched — a rich vein of raw glimmer threading the back of the niche, cold mineral light caught in the rock. They got this far down and turned around. Whether they made it back up, the cache does not say. The plunge roars west, the only way back.",
+    "exits": { "west": "d8.plungefoot" },
+    "fixtures": ["glimmer-vein"],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 900 }
+    ],
+    "spawns": [
+      { "mob": "gloom-crawler", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d8.steps": {
+    "id": "d8.steps",
+    "zone": "sunken-warren",
+    "tags": ["water"],
+    "name": "The Weeping Steps",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "South of the cistern the drowned cave gives way, abruptly, to worked stone again — a flight of shallow Umbral steps descending into the dark, each tread dished and weeping a thin film of water that runs down them step to step in a constant, glassy sheet. The cutting is old and fine and utterly unlike the warren's mindless tunnelling; whoever made this meant a road. Where the old chisels bit deepest into the wall beside the steps, the cut has laid bare a pale seam of silver threading the dark stone, unworked. The crawlers do not seem to like it here — their trails stop at the top step. The steps go down south toward more worked stone; the cave runs north back to the cistern and west to the backwash.",
+    "exits": { "north": "d8.cistern", "west": "d8.backwash", "south": "d8.reliefs" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d8.reliefs": {
+    "id": "d8.reliefs",
+    "zone": "sunken-warren",
+    "name": "The Waking Reliefs",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The steps end in a long worked gallery, both walls carved end to end with Umbral relief — and you have seen their like before, far above, where the figures of the deep-folk lengthened and starved into something wrong as you followed them down. Here the carving has gone all the way over. The figures on these walls are gaunt past humanity, hands curled to claws, eyes gouged wide, and the last of them are not carved at all but clawed: raw furrows hacked into the stone by something that learned the shape from the inside. A thin seam of cold blue-white glimmer threads the ruined work, and the air carries a faint, sour wrongness, like a clean place gone bad. Something moved here not long ago, and left a thing standing watch. The gallery runs south toward a colder dark; the steps climb back north.",
+    "exits": { "north": "d8.steps", "south": "d8.watch" },
+    "fixtures": ["glimmer-seam"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "glimmer-husk", "max": 1, "respawn": 300 }
+    ]
+  },
+  "d8.watch": {
+    "id": "d8.watch",
+    "zone": "sunken-warren",
+    "name": "The Hollow Watch",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The gallery opens into a round, domed chamber — a watch-post, or a shrine, the worked stone here finest of all, ringed with relief faces that all turn inward toward a single low dais. The faces are starved and clawed like the rest. On the dais, things have been set out with a terrible, broken care: worked chitin plates laid in a row, a cold-lamp long dead, glyphs scratched over glyphs in patterns that almost mean something and then don't. And tending them, rising now from its work to fix you with eyes gone raw and wide in the dark, is the keeper of this place — tall and grey and stretched wrong, the soft blue-green glow of the deep-folk still moving under its skin, the last unbroken thing about it. It was a glimmer-singer once. It still remembers the shape of the craft, if not its purpose, and it does not mean to let you pass. A black stair descends south, deeper than this; the gallery runs back north.",
+    "exits": { "north": "d8.reliefs", "south": "d8.stair" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "nawpa", "max": 1, "respawn": 1800 }
+    ]
+  },
+  "d8.stair": {
+    "id": "d8.stair",
+    "zone": "sunken-warren",
+    "name": "The Umbral Stair",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "Past the watch-post the worked road gathers itself for one last descent: a broad black stair going down into a dark so complete it seems to swallow the very idea of light. The walls to either side are dense with Umbral symbol and relief, but these are different from the failing work above — cut deep, sure, and unbroken, the same patient hand all the way down, marks of warding and welcome both. None of the warren's trails reach here; the gaunt things of the dark will not cross the threshold the deep-folk cut, whether it was meant to hold the dark out or to hold something in. The stair goes down into a kept quiet; the gallery lies back north.",
+    "exits": { "north": "d8.watch", "down": "d9.sanctuary.landing" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d9.sanctuary.landing": {
+    "id": "d9.sanctuary.landing",
+    "zone": "umbral-sanctuary",
+    "name": "The Sanctuary Threshold",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "The black stair bottoms out, and for the first time in a long descent the dark draws back of its own accord. A cold blue-green glimmer-lamp burns in a niche of worked stone — kept, tended, alive — throwing a soft, heatless light over a low threshold chamber swept clean and laid with care. After the drowned warren and the clawed reliefs above, the quiet here is almost a sound of its own, and nothing of the dark you climbed through has followed you down past the warded stair. This is the edge of something the deep-folk still hold whole: a sanctuary cut into the deep rock, warded against the dark and the things the dark makes. An inner way leads deeper south, sealed for now behind a worked door that does not yet open. The stair climbs back north into the dark you came from.",
+    "exits": { "up": "d8.stair" },
+    "fixtures": ["umbral-coldlamp"],
+    "groundItems": [],
+    "spawns": []
   },
   "d5.fault.deep": {
     "id": "d5.fault.deep",

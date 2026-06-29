@@ -1393,5 +1393,53 @@
       "crit": 0.1,
       "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }]
     }
+  },
+  "brood-caul": {
+    "id": "brood-caul",
+    "rarity": "rare",
+    "name": "a brood-caul",
+    "keywords": ["brood-caul", "caul", "brood", "mother"],
+    "description": "A glistening, leathery caul drawn from deep within the Pale Mother's swollen body — the living membrane she wound her brood in, grown thick and dark over a lifetime of feeding, the deeper black of the warren soaked all the way through it. It is faintly warm to the hand, and faintly wrong, and it neither dries nor stiffens the way honest hide does. There is only ever one. What an armourer or an alchemist who knew its working might draw from such a thing, no one this deep has yet had the chance to learn.",
+    "type": "material",
+    "weight": 1,
+    "value": 55,
+    "stackable": true
+  },
+  "glimmerspine-spear": {
+    "id": "glimmerspine-spear",
+    "rarity": "rare",
+    "name": "a glimmerspine spear",
+    "keywords": ["glimmerspine", "spear", "lance", "umbral", "glimmer"],
+    "description": "A long Umbral haft of dark deep-stone tipped with a single fluted spine of raw glimmer, drawn out and frozen into a needle of cold blue-white light that never warms to the hand. It is Ñawpa's own work, or the work of whatever the deep left of the glimmer-singer it was — the same craft that drove spears of frozen light through anything that came at the threshold. The point does not cut so much as burn cold, and no shell or hide turns it; only a warded mind blunts its bite. It rewards a keen eye for the opening, and a hand that drives true through it.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 130,
+    "weapon": {
+      "damage": { "magical": "1d8" },
+      "actionCost": 13,
+      "crit": 0.05,
+      "scale": { "attr": "perception", "per": 3 }
+    },
+    "armour": { "attrMod": { "intellect": 2 } }
+  },
+  "glimmer-lash": {
+    "id": "glimmer-lash",
+    "rarity": "rare",
+    "name": "a glimmer lash",
+    "keywords": ["glimmer", "lash", "whip", "umbral", "witchfire"],
+    "description": "A lash plaited not of cord but of bound glimmer-light, a living length of cold blue-white fire that Ñawpa wove and never let go out — supple as silk and freezing to the touch, hissing faintly as it moves. Where the weeping lash flays with barbs, this one sears: each stroke lays a clinging glimmer-burn into the wound that smoulders on long after, cold-bright in the dark. It rewards a cunning hand over a strong arm — read the opening, lay the light, and let the burn do the patient work.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 90,
+    "weapon": {
+      "damage": { "magical": "1d4" },
+      "actionCost": 11,
+      "scale": { "attr": "wits", "per": 6 },
+      "onHit": [
+        { "type": "damage-over-time", "name": "glimmer-burn", "damage": "1d3", "duration": 4, "chance": 1 }
+      ]
+    }
   }
 }
