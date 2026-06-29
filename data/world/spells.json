@@ -45,11 +45,11 @@
   "candlelight": {
     "id": "candlelight",
     "name": "Candlelight",
-    "description": "The humblest of human light-cantrips, taught to hedge-mages and night-travellers the world over: a delver kindles a mote of cold flame above the brow, just bright enough to push the dark back a single step. It sheds the barest light — and the steadier the caster's mind, the longer it holds before guttering out — but in a black drift it is the difference between blind and not. Cast it on yourself, an ally, or any creature you can see.",
+    "description": "The humblest of human light-cantrips, taught to hedge-mages and night-travellers the world over: a delver kindles a mote of cold flame above the brow, just bright enough to push the dark back a single step. It sheds the barest light — and the steadier the caster's mind, the longer it holds before guttering out — but in a black drift it is the difference between blind and not. Cast it on yourself, an ally, or any creature you can see; re-casting renews the mote rather than stacking it.",
     "manaCost": 3,
     "hostile": false,
     "target": "creature",
-    "effect": { "type": "emit-light", "name": "Candlelight", "magnitude": 1, "durationScale": { "attr": "intellect", "per": 30 } }
+    "effect": { "type": "emit-light", "name": "Candlelight", "magnitude": 1, "refresh": true, "durationScale": { "attr": "intellect", "per": 30 } }
   },
   "halo": {
     "id": "halo",
@@ -82,7 +82,7 @@
       "name": "Mage Armour",
       "duration": 180,
       "refresh": true,
-      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 10 } },
+      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 8 } },
       "ward": 0,
       "good": true
     }
