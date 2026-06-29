@@ -345,6 +345,32 @@ function buildExamineView(state, p, q) {
       }
     }
   }
+  // Craftable goods. Last of all — after anything real you hold, perceive, or can
+  // buy — fall back to the output of a recipe you KNOW: a craftable is a template
+  // you could make, not an instance, so (like a recipe sheet, which `recipes`
+  // shows regardless of light) it's recall rather than sight and examines clearly
+  // even in the dark. Anything you already carry or a ware on a counter wins a
+  // name clash, so this only fires for things you don't have but could make.
+  for (const rid of p.knownRecipes || []) {
+    const r = w.recipes[rid];
+    if (!r || !r.output) continue;
+    const t = w.items[r.output.template];
+    if (!t || !hit(r.output.template, t.name)) continue;
+    const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
+    if (r.shards) ins.push(`${r.shards} shards`);
+    const stationFix = Object.values(w.fixtures).find((x) => x.station === r.station);
+    const where = stationFix ? stationFix.name : `a ${r.station} station`;
+    const recName = r.name || rid;
+    return entity("item", r.output.template, t.name, t.description, {
+      rarity: t.rarity || "common",
+      lines: itemSpecLines(t, w, p),
+      hints: [
+        `Craftable${ins.length ? ` from ${ins.join(", ")}` : ""} — at ${where}.`,
+        `Make it with \`craft ${recName}\`.`,
+      ],
+      actions: [{ label: "Craft", command: `craft ${rid}` }],
+    });
+  }
   return null;
 }
 

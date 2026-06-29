@@ -553,7 +553,7 @@
     "slot": "hand",
     "weight": 1,
     "value": 24,
-    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 10 }
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 10, "scale": { "attr": "perception", "per": 6 }, "crit": 0.05 }
   },
   "rusty-hammer": {
     "id": "rusty-hammer",
@@ -1344,6 +1344,8 @@
     "weapon": {
       "damage": { "physical": "1d4" },
       "actionCost": 10,
+      "scale": { "attr": "perception", "per": 6 },
+      "crit": 0.05,
       "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
     }
   },

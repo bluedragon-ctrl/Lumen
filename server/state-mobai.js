@@ -26,7 +26,7 @@ const { bfsNextDir, bfsDist } = require("./pathfinding");
 // weight is scaled by this before the per-tick action roll, thinning idle
 // chatter without touching every template. Reacts are deliberately exempt —
 // they already carry a per-player cooldown and can deliver quest nudges.
-const EMOTE_WEIGHT_SCALE = 0.5;
+const EMOTE_WEIGHT_SCALE = 0.25;
 // Aggro detection (see _detectAndDecay): a proactive hunter accrues a
 // decaying "notice" meter on each enemy it can perceive, at AGGRO_RATE × the
 // light-tier noticeChance per action, capped at AGGRO_ENGAGE; once a target's

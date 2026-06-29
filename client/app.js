@@ -237,7 +237,9 @@ function renderRoom(room) {
     desc.textContent = "It is too dark to see. You can make out nothing here — a light source would help.";
   }
 
-  // Exits
+  // Exits. In the dark the direction still shows (you can feel a passage open off
+  // a wall) but not where it leads — the server nulls `to` when you can't see, so
+  // the chip falls back to the bare direction until you have light.
   const exits = $("room-exits");
   exits.innerHTML = "";
   if (room.exits.length) {
