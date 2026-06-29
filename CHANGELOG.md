@@ -115,6 +115,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dark-fighting edge. Mobs are unaffected (they carry no Perception hit bonus).
 
 ### Fixed
+- **Candlelight no longer stacks on itself.** Re-casting the cantrip now renews the
+  single mote rather than piling up independent light-shedding instances, matching
+  Halo and Mage Armour.
+- **Mage Armour scales a touch harder with Intellect** — its armour now grows by
+  `intellect / 8` rather than `/ 10`.
+- **Resource verbs honour authored fixture keywords.** `mine`/`gather`/`fish`
+  matching ran on fixture id and display name only, ignoring `keywords` — so
+  `mine vein` missed a glimmer-seam that carries "vein" as a keyword but not in its
+  name. Matching now routes through the canonical query matcher, so keywords count.
 - **A creature of darkness no longer gives itself away in the dark.** Mob visibility
   treated any non-zero `emitsLight` as self-illuminating, so a *dark-shedding* mob
   (negative `emitsLight`, like the new void shadow) was wrongly always visible — named

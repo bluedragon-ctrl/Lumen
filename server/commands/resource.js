@@ -17,7 +17,7 @@ const { makeItemInstance, fixtureVisibleTo } = require("../state");
 const { canSee } = require("../light");
 const { rollDice } = require("../dice");
 const quests = require("../quests");
-const { selfAndViews, countItem, removeItem, addToInventory } = require("./shared");
+const { selfAndViews, countItem, removeItem, addToInventory, matchesQuery } = require("./shared");
 
 const RESOURCE_KINDS = ["mine", "harvest", "fish"];
 const resourceHandlers = {}; // { mine, harvest: gather, fish } — wired up below.
@@ -73,10 +73,12 @@ function resourceFixtures(state, player, flag) {
   );
 }
 
-// Does `arg` (lower-cased) name this fixture, by template id or display name?
+// Does `arg` (lower-cased) name this fixture? Routes through the canonical
+// matcher so authored `keywords` count — e.g. `mine vein` finds a glimmer-seam
+// that carries "vein" as a keyword but not in its display name.
 function fixtureMatchesArg(state, f, ql) {
   const ft = state.world.fixtures[f.template];
-  return f.template.toLowerCase().includes(ql) || ft.name.toLowerCase().includes(ql);
+  return matchesQuery(ql, ft.name, ft.keywords, f.template);
 }
 
 // When a resource verb can't satisfy `arg` (or has none of its own kind here),
@@ -136,7 +138,7 @@ function workResource(state, player, arg, ctx, kind) {
   let f;
   if (arg) {
     const ql = arg.toLowerCase();
-    f = fixtures.find((v) => v.template.toLowerCase().includes(ql) || w.fixtures[v.template].name.toLowerCase().includes(ql));
+    f = fixtures.find((v) => fixtureMatchesArg(state, v, ql));
     if (!f) return [{ type: "error", text: R.notFound(arg) }];
   } else if (fixtures.length === 1) {
     f = fixtures[0];
