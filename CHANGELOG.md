@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The barbed bomb — a new thrown consumable, and a sink for two orphan materials.**
+  A vial of thornbug barbs bound with slug-slime: thrown, it bursts for a small physical
+  hit (`2d4`) *and* sinks a lingering **bleed** (`1d4` for 4 ticks) into anything it
+  doesn't kill — the burst-plus-bleed hybrid neither existing bomb does (the shard
+  grenade is one big burst, the acid bomb a pure corrosion cloud). Crafted at the alchemy
+  station from `chitin-spike ×4 + slug-slime ×1 + vial ×1` (recipe `craft-barbed-bomb`),
+  giving `chitin-spike` an alchemy sink and **slug-slime its first use anywhere** (it was
+  flavoured as "an alchemist's binder" but used in no recipe). The method
+  (`schematic-barbed-bomb`) sells from Mallki — a testing placeholder alongside the other
+  Umbral recipes.
 - **Examine works on what you can craft.** As with a shopkeeper's wares, you can now
   `examine <item>` against the output of any recipe you know — previewing its stats,
   rarity, and what it's made from before you gather the materials. The examine view
@@ -87,6 +97,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **The chitin maul is now a high-variance crusher.** Re-tuned to give it a niche of
+  its own between the steady iron sword and the hard-scaling iron mace: damage goes
+  `1d8` → **`1d12`** and it swings slower (`actionCost` 14 → **17**), keeping its
+  Might/3 scaling. Average throughput is essentially unchanged (~0.38/tick, on par with
+  the sword) — the trade is reliability for big, infrequent, feast-or-famine blows. Its
+  recipe now studs the head with thornbug barbs: `chitin-plate ×4 + chitin-spike ×2 +
+  iron-bar ×1` (was `chitin-plate ×4 + iron-bar ×1`), shards 6 → 7.
+- **The barbed flail is now the weeping lash — a Wits attrition weapon.** Renamed and
+  re-themed from a chain-and-iron flail into a whip-like lash of plaited **gloom-silk**
+  set with thornbug barbs. It now scales its damage off **Wits** (per 6) instead of
+  Might, giving the deep's purely-defensive stat its first offensive outlet: an evasive,
+  magic-warded duelist who wins by attrition (the armour-ignoring bleed) rather than
+  burst. Crafting moves to match the new form — woven at the **alchemy** station from
+  `gloom-silk ×2 + chitin-spike ×4` (recipe `weave-weeping-lash`), and its method moves
+  off the chitin-smithing tome onto the Umbral weaving-method book beside the gloom-silk
+  garments.
 - **Daggers are now finesse weapons.** The iron dagger and the hungering dagger scale
   their damage off **Perception** (per 6) instead of Might, and each gains a flat +5%
   crit. They lose to a sword in a Might build but pull ahead for a Perception/crit

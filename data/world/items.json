@@ -527,6 +527,22 @@
       "effect": { "type": "damage-room", "dot": { "name": "acid", "damage": "1d4", "duration": 6 }, "cause": "acid" }
     }
   },
+  "barbed-bomb": {
+    "id": "barbed-bomb",
+    "rarity": "uncommon",
+    "name": "a barbed bomb",
+    "keywords": ["bomb", "barbed", "barbs", "thornbug", "vial"],
+    "description": "A vial packed tight with thornbug barbs and bound in a clot of slug-slime so they hold until they're wanted. Thrown, the glass bursts and the barbs scatter, lodging in everything near and leaving ragged wounds that weep long after the throw. One throw and it's spent.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 28,
+    "stackable": true,
+    "consumable": {
+      "flavour": "The vial bursts and a fistful of thornbug barbs scatters across the room, lodging in everything nearby.",
+      "burst": "a scatter of barbs",
+      "effect": { "type": "damage-room", "damageType": "physical", "damage": "2d4", "dot": { "name": "bleed", "damage": "1d4", "duration": 4 }, "cause": "barbs" }
+    }
+  },
   "iron-ore": {
     "id": "iron-ore",
     "name": "a chunk of iron ore",
@@ -710,6 +726,17 @@
     "value": 5,
     "stackable": true,
     "recipe": "searing-flare"
+  },
+  "schematic-barbed-bomb": {
+    "id": "schematic-barbed-bomb",
+    "name": "a barbed-bomb method",
+    "keywords": ["method", "schematic", "barbed", "bomb"],
+    "description": "A strip of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the packing of thornbug barbs into a vial, the binding of them in slug-slime so they keep, and the throw that scatters them. No words, only the sequence of steps. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 12,
+    "stackable": true,
+    "recipe": "craft-barbed-bomb"
   },
   "schematic-render-oil": {
     "id": "schematic-render-oil",
@@ -1146,18 +1173,19 @@
   "chitin-maul": {
     "id": "chitin-maul",
     "name": "a chitin maul",
-    "description": "A great two-fisted head of fused stonebug plate, banded to a stout haft. It is heavier than it looks and slow off the mark, but a delver who puts their back into it brings the whole weight of the deep's own armour down on a single point.",
+    "description": "A great two-fisted head of fused stonebug plate, studded across its striking face with chitin spikes and banded to a stout haft. It is heavier than it looks and slow off the mark, but a delver who puts their back into it brings the whole weight of the deep's own armour down on a single point.",
     "type": "weapon",
     "slot": "hand",
     "weight": 4,
     "value": 34,
-    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 14, "scale": { "attr": "might", "per": 3 } }
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } }
   },
-  "barbed-flail": {
-    "id": "barbed-flail",
+  "weeping-lash": {
+    "id": "weeping-lash",
     "rarity": "uncommon",
-    "name": "a barbed flail",
-    "description": "A knot of thornbug spikes bound to a swinging head on a short chain — it does not so much strike as tear, leaving ragged, weeping wounds that will not close. Quick and light, it asks little strength; what it asks for is time, and a foe with nowhere to bleed out.",
+    "name": "a weeping lash",
+    "keywords": ["lash", "whip", "weeping", "gloom-silk", "gloomsilk", "thornbug", "barbed"],
+    "description": "A long cord of plaited gloom-silk set the whole length of its lash with thornbug barbs — supple, cold, and faintly luminous, more a tamed length of the weeping moss's own hunting tendril than any smith's work. It does not strike so much as flay, the barbs raking ragged, weeping wounds that will not close. It rewards a cunning hand over a strong one: read the opening, lay the lash, and leave a foe with nowhere to bleed out to do the rest.",
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
@@ -1165,6 +1193,7 @@
     "weapon": {
       "damage": { "physical": "1d4" },
       "actionCost": 11,
+      "scale": { "attr": "wits", "per": 6 },
       "onHit": [{ "type": "damage-over-time", "name": "bleed", "damage": "1d2", "duration": 4, "chance": 1 }]
     }
   },
@@ -1226,7 +1255,7 @@
     "weight": 1,
     "value": 400,
     "stackable": true,
-    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-barbed-flail", "forge-spiked-chitin-armor"] },
+    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-spiked-chitin-armor"] },
     "rarity": "uncommon"
   },
   "book-of-glimmersteel": {
@@ -1254,12 +1283,12 @@
   "umbral-weaving-method": {
     "id": "umbral-weaving-method",
     "name": "an Umbral weaving-method",
-    "description": "A folded length of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the drawing of gloom-silk into cloth, the cutting of the robe and the cowl, the working of a thread of cold glimmer through the weave. No words, only the sequence of steps. Study it to fix both methods in memory.",
+    "description": "A folded length of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the drawing of gloom-silk into cloth, the cutting of the robe and the cowl, the plaiting of a barbed lash, the working of a thread of cold glimmer through the weave. No words, only the sequence of steps. Study it to fix the methods in memory.",
     "type": "book",
     "weight": 0,
     "value": 70,
     "stackable": true,
-    "teaches": { "recipes": ["weave-gloom-silk-robe", "weave-gloom-silk-hood"] }
+    "teaches": { "recipes": ["weave-gloom-silk-robe", "weave-gloom-silk-hood", "weave-weeping-lash"] }
   },
   "weeping-chasm-moss": {
     "id": "weeping-chasm-moss",
