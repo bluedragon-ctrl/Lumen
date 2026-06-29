@@ -738,21 +738,23 @@ class GameState {
    *  `{ fired, doused, died }` — see the plan's contract. Shared by the tick
    *  driver (_roomEffectsTick) and the enter driver (move() in commands.js). */
   applyRoomEffect(player, roomId, effect, events) {
-    if (!roomEffectFires(effect, this.rooms[roomId].light)) return { fired: false, doused: 0, died: false };
+    if (!roomEffectFires(effect, this.rooms[roomId].light)) return { fired: false, doused: 0, died: false, silent: false };
     const a = effect.action || {};
     let doused = 0;
     let died = false;
+    let silent = false; // the action ran but had no tangible effect (e.g. restore at full vitals) — suppress flavour
     if (a.douse) {
       doused = this._douse(player);
       if (doused) this.rooms[roomId].light = this.computeRoomLight(roomId);
     } else if (a.restore) {
       const got = this.applyRestore(player, a.restore);
       if (got.hp || got.mana) events.push({ type: "vitals", playerId: player.id });
+      else silent = true; // already at full hp/mana — nothing to heal, so don't claim it
     } else if (a.damage) {
       if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause: "darkness" })) died = true;
       if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
     }
-    return { fired: true, doused, died };
+    return { fired: true, doused, died, silent };
   }
 
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
@@ -1651,7 +1653,7 @@ class GameState {
           const r = this.applyRoomEffect(p, roomId, eff, events);
           if (!r.fired) continue;
           if (r.died) { died.add(p); continue; } // respawned at the rim — don't act on the stale snapshot
-          if (eff.message) events.push({ type: "room-effect", playerId: p.id, text: eff.message, dimsRoom: r.doused > 0 });
+          if (eff.message && !r.silent) events.push({ type: "room-effect", playerId: p.id, text: eff.message, dimsRoom: r.doused > 0 });
           else if (r.doused) events.push({ type: "room-effect", playerId: p.id, text: "Your light is snuffed out.", dimsRoom: true });
           if (eff.roomMessage || r.doused) events.push({ type: "room-effect-room", roomId, exceptId: p.id, text: eff.roomMessage || "", dimsRoom: r.doused > 0 });
         }

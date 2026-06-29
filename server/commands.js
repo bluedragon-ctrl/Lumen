@@ -127,7 +127,7 @@ function move(state, player, dir, ctx) {
     const r = state.applyRoomEffect(player, dest, eff, evs);
     evs.forEach((e) => ctx.emit(e));
     if (!r.fired) continue;
-    if (eff.message) effectTail += ` ${eff.message}`;
+    if (eff.message && !r.silent) effectTail += ` ${eff.message}`;
     else if (r.doused) effectTail += " Your light is snuffed out."; // parity with the tick-path default
     if (eff.roomMessage) ctx.toRoom(dest, { type: "log", text: eff.roomMessage }, player.id);
     if (r.doused) ctx.refreshRoom(dest, player.id); // others see the room dim
