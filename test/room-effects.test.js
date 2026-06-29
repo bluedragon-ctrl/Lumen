@@ -91,7 +91,7 @@ test("applyRoomEffect: restore mends hp/mana and pushes vitals", () => {
   player.hp = 1; player.mana = 0;
   const events = [];
   const r = state.applyRoomEffect(player, "test.bright", { trigger: "tick", action: { restore: { hp: 1, mana: 2 } } }, events);
-  assert.deepEqual(r, { fired: true, doused: 0, died: false });
+  assert.deepEqual(r, { fired: true, doused: 0, died: false, silent: false });
   assert.equal(player.hp, 2);
   assert.equal(player.mana, 2);
   assert.ok(events.some((e) => e.type === "vitals" && e.playerId === player.id));

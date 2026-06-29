@@ -162,6 +162,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dark-fighting edge. Mobs are unaffected (they carry no Perception hit bonus).
 
 ### Fixed
+- **Room-effect test caught up to the result shape.** `applyRoomEffect` now returns
+  a `silent` flag (added alongside the heal-only-when-healing fix); the
+  `room-effects.test.js` restore assertion's expected object was updated to include
+  `silent: false` so the suite is green again.
 - **Healing room effects only speak when they heal.** A regen effect (e.g. the
   inn's hearth) no longer prints its flavour line when you're already at full hp and
   mana — the "warmth eases your hurts" message now appears only when it actually
