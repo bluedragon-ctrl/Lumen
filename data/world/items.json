@@ -604,6 +604,28 @@
     "value": 40,
     "stackable": true
   },
+  "fulgurite": {
+    "id": "fulgurite",
+    "rarity": "uncommon",
+    "name": "a shard of fulgurite",
+    "keywords": ["fulgurite", "glass", "stone", "shard"],
+    "description": "A jagged shard of natural glass, fused hard and dark in the deep's old fires and gone smoky near-black with a greasy sheen. It holds no light of its own — the Umbral fold the glimmer in later, at the kiln — but it takes a fusing-heat without cracking, which honest stone will not. Raw stock for glimmerglass.",
+    "type": "material",
+    "weight": 1,
+    "value": 18,
+    "stackable": true
+  },
+  "glimmerglass": {
+    "id": "glimmerglass",
+    "rarity": "rare",
+    "name": "a pane of glimmerglass",
+    "keywords": ["glimmerglass", "glimmer", "glass", "pane"],
+    "description": "Fulgurite fused with glimmer at the kiln and drawn flat — a dark, glassy pane shot through with a slow blue-green vein of captive light, drinking the dark and answering a striking edge with a little glow of its own. Umbral stock, for the blades and lamps a finer class of delver carries.",
+    "type": "material",
+    "weight": 1,
+    "value": 80,
+    "stackable": true
+  },
   "glimmersteel-bar": {
     "id": "glimmersteel-bar",
     "rarity": "rare",
@@ -787,6 +809,16 @@
     "value": 40,
     "stackable": true,
     "recipe": "glimmersteel"
+  },
+  "schematic-glimmerglass": {
+    "id": "schematic-glimmerglass",
+    "name": "a glimmerglass schematic",
+    "description": "A leaf of worked stone in the Umbral hand, its rounded glyphs setting out the kiln-work — fulgurite bedded in glimmer dust and brought to a fusing-heat until the light beds into the glass instead of guttering out, then drawn flat as a cold-shining pane. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "recipe": "fuse-glimmerglass"
   },
   "schematic-glimmer-dust": {
     "id": "schematic-glimmer-dust",
