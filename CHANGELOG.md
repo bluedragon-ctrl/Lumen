@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Depth 8 — the Sour Midden: a 6-room slug dungeon off the sanctuary.** The Centipede Run's
+  previously-unmapped south seam (`d9.sanctuary.run`) now opens into a sealed depth-8 charnel pit
+  (zone `sour-midden`) where the deep-folk gave their dead to the cleaner-slugs — and the gluttony
+  went sour. **The Sour Seam** climbs in to the reek; **The Reeking Midden** is a bone-heaped
+  charnel swarming with harmless grazing **scour-slugs** (with a searchable **fulgurite** shard,
+  Perception 6, hidden among the bones); **The Gorge Pools** is where the danger
+  lives — fuming caustic basins crowded with the new hostile **glut-slug** (bloated mid-tier slug,
+  acid-burn DoT on hit) — which drops a new special crafting material, the **caustic gland** (a
+  rare corrosive reagent; ~35% from a glut-slug, guaranteed from the boss); a lit **Witchglow
+  Cleft** branches west as a safe forage/rest pocket; and
+  past **The Sour Descent** lies **The Glut's Pit**, lair of the mini-boss **the Great Glut** — a
+  vast caustic bruiser (150 HP, heavy corrosion DoT, loot-only: slug-slime, shards, a chance at a
+  crystal). A **fulgurite vein** runs the wall of the Glut's Pit — minable once the boss is down.
+  The two slime-flooded rooms (Gorge Pools, Glut's Pit) carry a **corrosion-slime room
+  effect** that burns anyone standing in them every few ticks (1d3 / 1d4 hp), so they punish
+  loitering. All slugs are light-baned, so carrying light into the dark both reveals the rooms and
+  weakens what lives in them.
 - **Depth 10 — the Umbral fields: a 5-room farmland before the village.** The shrine's long
   black stair now **descends** into the deep-folk's own kept ground (zone `umbral-fields`) — the
   ominous sealed way down pays off not in horror but in a living, tended farmland. **The Field

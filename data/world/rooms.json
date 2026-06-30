@@ -1622,14 +1622,122 @@
     "name": "The Centipede Run",
     "depth": 9,
     "ambientLight": 0,
-    "description": "South of the hollow the warded light fails altogether and the worked stone gives way to a raw, dim run in the natural rock — the margin of the kept place, where the deep-folk's cutting stops and the dark begins again. The shrine's light does not reach this far, and so the hunters do: the dim-edge things that work wherever prey strays out of the glow. Whip-fast lengths of armoured segment pour over the rock on a hundred legs, antennae testing the air, fond of exactly this kind of border between the safe and the dark. They are the price of the edge. The hollow and its glow lie back north; the run carries on south into a dark that has not been mapped.",
-    "exits": { "north": "d9.sanctuary.hollow" },
+    "description": "South of the hollow the warded light fails altogether and the worked stone gives way to a raw, dim run in the natural rock — the margin of the kept place, where the deep-folk's cutting stops and the dark begins again. The shrine's light does not reach this far, and so the hunters do: the dim-edge things that work wherever prey strays out of the glow. Whip-fast lengths of armoured segment pour over the rock on a hundred legs, antennae testing the air, fond of exactly this kind of border between the safe and the dark. They are the price of the edge. The hollow and its glow lie back north; the run carries on south, and from somewhere down it drifts a thin, sour reek — a clean place gone bad, the smell of rot worked over and over by something patient in the dark.",
+    "exits": { "north": "d9.sanctuary.hollow", "south": "d8.midden.seam" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 8, "hidden": { "perception": 5 } }
     ],
     "spawns": [
       { "mob": "cave-centipede", "max": 3, "respawn": 120 }
+    ]
+  },
+  "d8.midden.seam": {
+    "id": "d8.midden.seam",
+    "zone": "sour-midden",
+    "name": "The Sour Seam",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The unmapped dark at the foot of the Centipede Run is not, it turns out, unending — the seam doubles back and climbs, worming up through old sealed diggings into a pocket the deep-folk closed off and the warden's light never cleaned. The reek thickens as you go: a sour, eating stink, rot turned over and over until it has gone past rot into something that stings the eyes. The walls are scored everywhere with pale, smoking tracks where something caustic has hauled itself through, and grey scour-slugs graze the slime in the dark, blind and unbothered. Whatever this place was, the deep-folk gave their dead to it. The seam drops back north toward the run; it opens south into a wider, fouler dark.",
+    "exits": { "north": "d9.sanctuary.run", "south": "d8.midden.pit" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "scour-slug", "max": 3, "respawn": 200 },
+      { "mob": "glut-slug", "max": 1, "respawn": 250 }
+    ]
+  },
+  "d8.midden.pit": {
+    "id": "d8.midden.pit",
+    "zone": "sour-midden",
+    "name": "The Reeking Midden",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The seam opens into the midden proper — a long, low charnel where the kept place above let down its dead, ages of them, heaped and gnawed and given over wholesale to the cleaners. Bones lie drifted to the walls, picked glass-clean and stacked by no hand but the slow industry of slugs, and the floor between is a living carpet of them: grey scour-slugs in their dozens, hauling over the heaps and over each other, grazing the dead in blind, untroubled multitudes. It is not the slugs that turn the stomach but the smell — sour past bearing, the reek of a thing that eats and eats and never cleans anymore. The seam climbs back north; the midden runs on south, where the slime pools deeper.",
+    "exits": { "north": "d8.midden.seam", "south": "d8.midden.gorge" },
+    "fixtures": ["bone-pile"],
+    "groundItems": [
+      { "template": "shards", "qty": 12, "hidden": { "perception": 6 } },
+      { "template": "fulgurite", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } }
+    ],
+    "spawns": [
+      { "mob": "scour-slug", "max": 6, "respawn": 200 },
+      { "mob": "glut-slug", "max": 1, "respawn": 250 }
+    ]
+  },
+  "d8.midden.gorge": {
+    "id": "d8.midden.gorge",
+    "zone": "sour-midden",
+    "name": "The Gorge Pools",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "Here the floor dips and the slime no longer smears but pools — shallow, fuming basins of the slugs' sour leavings, eating slow bowls into the very stone and breathing a haze that pricks the eyes and throat. This is where the fat ones gather: slugs swollen monstrous on the endless dead, too gorged and too changed to graze quietly anymore. They turn their blind, dripping fronts toward your warmth and begin, ponderously, to come. A faint, clean glow leaks from a cleft in the west wall, out of place in all this rot. The midden lies back north; the floor falls away south into a deeper dark.",
+    "exits": { "north": "d8.midden.pit", "west": "d8.midden.alcove", "south": "d8.midden.descent" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "glut-slug", "max": 3, "respawn": 250 },
+      { "mob": "scour-slug", "max": 3, "respawn": 200 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 3,
+        "action": { "damage": { "hp": "1d3" } },
+        "message": "The caustic pools fume around your feet, and the sour slime eats at you where it splashes.",
+        "roomMessage": "The slime-haze stings and smokes." }
+    ]
+  },
+  "d8.midden.alcove": {
+    "id": "d8.midden.alcove",
+    "zone": "sour-midden",
+    "name": "The Witchglow Cleft",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "The cleft in the west wall opens into a dry, lifted pocket the slime never reached — and after the fuming dark the cold green glow of it is a mercy. A great fan of witchglow spreads across the back rock, breathing its steady light, and pale mushrooms crowd the seams below it; the air here is only damp and clean, the reek shut out behind you. Someone sheltered here once, where the slugs could not climb and the sour pools could not reach: a scatter of left gear lies dry in a corner, waiting for a delver who never came back up the seam. The only way on is back east, into the gorge.",
+    "exits": { "east": "d8.midden.gorge" },
+    "fixtures": ["witchglow-cluster", "pale-cluster"],
+    "groundItems": [
+      { "template": "shards", "qty": 15 },
+      { "template": "regeneration-draught", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } },
+      { "template": "lamp-oil", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } }
+    ],
+    "spawns": []
+  },
+  "d8.midden.descent": {
+    "id": "d8.midden.descent",
+    "zone": "sour-midden",
+    "name": "The Sour Descent",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "South of the pools the floor tilts and drops, a slime-glazed chute of stone slick enough to take your feet from under you, all of it running with the slow downhill seep of the gorge above. The reek is a physical thing now, thick enough to taste, and the smoking slugtracks all run the same way — down, toward whatever lies at the bottom of the midden that everything else feeds. A few gorged slugs work the slick, and the dark below them is not empty: something very large shifts in it, and the whole chute trembles. The pools lie back north; the descent bottoms out south.",
+    "exits": { "north": "d8.midden.gorge", "south": "d8.midden.lair" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "glut-slug", "max": 2, "respawn": 250 },
+      { "mob": "scour-slug", "max": 2, "respawn": 200 }
+    ]
+  },
+  "d8.midden.lair": {
+    "id": "d8.midden.lair",
+    "zone": "sour-midden",
+    "name": "The Glut's Pit",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The descent bottoms out in a great round pit, the deepest cut of the midden, and the floor of it is a single seething flood of caustic slime that hisses and smokes against the stone. Everything the warren and the kept place ever let fall came down at last to here — and so did the thing that ate it. It fills the pit wall to wall, a hill of grey glistening flesh swollen past any natural size, blind and certain and already turning toward the warmth of you. There is nothing kept here anymore, nothing cleaned; only the Great Glut, and the long dark it has been growing in. Where the deep's old fires once licked the pit wall a band of dark, glassy fulgurite runs fused through the stone, throwing back what light you carry in a dull, oily sheen — but you will not get near it while the Glut still holds the pit. The only way out is back north, up the chute.",
+    "exits": { "north": "d8.midden.descent" },
+    "fixtures": ["bone-pile", "fulgurite-vein"],
+    "groundItems": [
+      { "template": "shards", "qty": 20, "hidden": { "perception": 7 } }
+    ],
+    "spawns": [
+      { "mob": "great-glut", "max": 1, "respawn": 1800 },
+      { "mob": "scour-slug", "max": 2, "respawn": 200 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 3,
+        "action": { "damage": { "hp": "1d4" } },
+        "message": "The flood of caustic slime laps at you, hissing, and burns wherever it touches.",
+        "roomMessage": "The seething slime hisses and smokes." }
     ]
   },
   "d10.fields.stair": {
