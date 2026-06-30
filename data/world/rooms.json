@@ -1314,7 +1314,10 @@
     "description": "The shaft opens into a broad, low chamber that once held water and mostly still does — a black sheet of it lies still across the floor, ankle-deep and colder than the air, and your steps send slow rings out to walls you cannot see. Worked stone shows here and there under the silt, the same patient Umbral cutting found higher up, drowned and forgotten. Passages run off in every direction, their mouths all alike in the dark, and the still water carries every sound and gives back nothing of where it came from. It would be very easy to lose the way you came in. The drip and the distant roar come from the east; other ways run west and south, and the drop climbs north.",
     "exits": { "north": "d8.drop", "east": "d8.plungefoot", "west": "d8.silt", "south": "d8.steps" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 2, "respawn": 1800, "hidden": { "perception": 6 } },
+      { "template": "shards", "qty": 16, "hidden": { "perception": 6 } }
+    ],
     "spawns": [
       { "mob": "gloom-crawler", "max": 4, "respawn": 90 },
       { "mob": "gloom-creeper", "max": 2, "respawn": 120 }
@@ -1362,6 +1365,7 @@
     "ambientLight": 0,
     "description": "West of the cistern the ceiling comes down and the floor comes up to meet it, until the way is a low silt-floored crawl through drowned stone, the water gone to cold black mud that sucks at hand and knee. Pale things have been through here recently — the mud is churned with the wide, dragging trails the crawlers leave, and the trails are fresh. The smell of them is heavy here, that wet-coal reek of the warren, stronger than anywhere above. The crawl carries on south and opens west into something larger and worse-smelling still; the cistern lies back east.",
     "exits": { "east": "d8.cistern", "south": "d8.backwash", "west": "d8.broodsump" },
+    "hiddenExits": { "north": { "to": "d8.grotto", "perception": 6, "name": "a low seam in the north wall, half-curtained by hanging silt" } },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -1378,7 +1382,7 @@
     "ambientLight": 0,
     "description": "The crawl opens into a stagnant backwash where the standing water has gone foul, skinned over with a grey scum that breaks in slow rafts as something moves beneath it. The walls here are wrong — not crawler-work but the deeper dark itself, threads of that light-drinking black clinging in the seams the way it gathered around the thing in the Drowned Black, thicker the further you press. The crawlers here have taken the taint of it; they reach for your warmth and seem, for a moment, to drink it. A run climbs north back to the crawl; another opens east toward worked steps.",
     "exits": { "north": "d8.silt", "east": "d8.steps" },
-    "fixtures": [],
+    "fixtures": [{ "template": "glimmer-vein", "hidden": { "perception": 7 } }],
     "groundItems": [],
     "spawns": [
       { "mob": "gloom-touched-crawler", "max": 3, "respawn": 200 },
@@ -1393,6 +1397,7 @@
     "ambientLight": 0,
     "description": "The west crawl spills into a vaulted sump that the warren has made wholly its own — the floor heaped with moulted husks and the pale, glistening litter of a nest, the walls furred with egg-strings strung between the worked-stone ribs of a chamber the Umbrals cut for some forgotten use — one rib laid bare where a thick vein of raw glimmer threads the stone, cold and faintly alight beneath the filth, too dim to lift the dark. The reek is overwhelming. And at the heart of it, vast and pallid and swollen past the size of any crawler you have met, something lifts its blind front from the brood and turns it toward the warmth of you. This is what the warren is for. This is what has been feeding it. The only way out is back east, the way you came.",
     "exits": { "east": "d8.silt" },
+    "hiddenExits": { "west": { "to": "d8.cache", "perception": 7, "name": "a flooded squeeze behind the nest the brood drag through, falling away west toward water" } },
     "fixtures": ["glimmer-vein"],
     "groundItems": [],
     "spawns": [
@@ -1406,8 +1411,9 @@
     "name": "The Drowned Cache",
     "depth": 8,
     "ambientLight": 0,
-    "description": "East of the plunge the spray thins and the passage ends in a dry pocket lifted just above the water-line — and someone reached it before you. A prospector's cache sits tucked into a worked niche: an oiled roll gone black with damp, a strongbox forced and emptied long since, and the scatter of what the finders did not think worth carrying back up through all that dark. What they came all this way for is still here, barely touched — a rich vein of raw glimmer threading the back of the niche, cold mineral light caught in the rock. They got this far down and turned around. Whether they made it back up, the cache does not say. The plunge roars west, the only way back.",
+    "description": "East of the plunge the spray thins and the passage ends in a dry pocket lifted just above the water-line — and someone reached it before you. A prospector's cache sits tucked into a worked niche: an oiled roll gone black with damp, a strongbox forced and emptied long since, and the scatter of what the finders did not think worth carrying back up through all that dark. What they came all this way for is still here, barely touched — a rich vein of raw glimmer threading the back of the niche, cold mineral light caught in the rock. They got this far down and turned around. Whether they made it back up, the cache does not say. The plunge roars west, the only way back — though the back of the niche does not quite ring solid.",
     "exits": { "west": "d8.plungefoot" },
+    "hiddenExits": { "east": { "to": "d8.camp", "perception": 8, "name": "a hairline crack behind the cache, squeezing east into the dark" } },
     "fixtures": ["glimmer-vein"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 }
@@ -1437,8 +1443,11 @@
     "ambientLight": 0,
     "description": "The steps end in a long worked gallery, both walls carved end to end with Umbral relief — and you have seen their like before, far above, where the figures of the deep-folk lengthened and starved into something wrong as you followed them down. Here the carving has gone all the way over. The figures on these walls are gaunt past humanity, hands curled to claws, eyes gouged wide, and the last of them are not carved at all but clawed: raw furrows hacked into the stone by something that learned the shape from the inside. A thin seam of cold blue-white glimmer threads the ruined work, and the air carries a faint, sour wrongness, like a clean place gone bad. Something moved here not long ago, and left a thing standing watch. The gallery runs south toward a colder dark; the steps climb back north.",
     "exits": { "north": "d8.steps", "south": "d8.watch" },
-    "fixtures": ["glimmer-seam"],
-    "groundItems": [],
+    "fixtures": ["glimmer-seam", { "template": "umbral-glyph-panel", "hidden": { "perception": 6 } }],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } },
+      { "template": "shards", "qty": 20, "hidden": { "perception": 6 } }
+    ],
     "spawns": [
       { "mob": "glimmer-husk", "max": 1, "respawn": 300 }
     ]
@@ -1468,6 +1477,35 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": []
+  },
+  "d8.camp": {
+    "id": "d8.camp",
+    "zone": "sunken-warren",
+    "name": "The Prospectors' Last Camp",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "Behind the cache the niche narrows to a crack you would never have squeezed through if you had not seen it — and beyond it the rock opens into a dry, still pocket the prospectors kept for their own. Whoever emptied the cache outside holed up here — as far down as their claim ever ran, the last dry ground before the dark below: a cold fire-ring set under a natural flue that draws the smoke away, a catch-basin walled in clay to take the clean seep threading down one wall, a battered oil-lamp left standing on a flat stone. It is untouched, exactly as they left it — bedrolls folded, a pot upturned by the ash — as though they meant to come back. They did not. But the makings are all sound, and the dark does not find its way in here. Strike the lamp, light the fire, drink, and gather yourself before going on. The only way out is back west, through the crack to the cache.",
+    "exits": { "west": "d8.cache" },
+    "fixtures": ["camp-firepit", "camp-seep", "camp-lamp"],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 2, "respawn": 1800 },
+      { "template": "shards", "qty": 10 }
+    ],
+    "spawns": []
+  },
+  "d8.grotto": {
+    "id": "d8.grotto",
+    "zone": "sunken-warren",
+    "name": "The Slug Grotto",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "A seam in the silt-crawl wall, easy to crawl past in the dark, opens into a low domed grotto — and after so long blind, the faint glow of it stops you where you stand. Pale mushrooms crowd the damp seams of the wall, each breathing a weak, steady light, and a great fan of witchglow spreads cold and green across the far rock, enough together to see by at last. Grey scour-slugs the length of a forearm haul themselves over the stone among the beds, grazing the fungus and leaving clean tracks behind, blind and untroubled by the light. Someone tried to make this place a camp once: a scatter of spilled gear lies rotting in a corner — a burst pack, a snapped pole, a single boot, a fire never lit — left where it dropped, with no bones to say whether they walked out or only the slugs cleaned up after. The crawl runs back south to the silt.",
+    "exits": { "south": "d8.silt" },
+    "fixtures": ["pale-cluster", "witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "scour-slug", "max": 5, "respawn": 200 }
+    ]
   },
   "d9.sanctuary.landing": {
     "id": "d9.sanctuary.landing",

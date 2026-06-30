@@ -22,6 +22,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Umbral stair descends south to a depth-9 **Sanctuary Threshold** (new zone `umbral-sanctuary`):
   the gaunt things of the warren will not cross it, so the descent reads as a true safe haven. The
   Sanctuary proper is a sealed inner door — a hook for later.
+- **Six Perception-gated secrets across the Sunken Warren.** Every one sits in a non-doused room,
+  so finding them needs your own carried light (the douse rooms stay barren): **The Prospectors'
+  Last Camp** (hidden off the Drowned Cache, Perception 8) — a true rest stop with a cooking fire,
+  a seep to drink from, and a striking oil-lamp, reachable only by its hidden crack so nothing
+  wanders in; **The Slug Grotto** (hidden off Silt Crawl, Perception 6) — a faintly-lit fungus
+  pocket of glowing pale-caps and witchglow grazed by five scour-slugs, around the rotting wreck
+  of a camp that didn't last; a one-way **flooded escape** behind the Pale Mother's nest dropping
+  out at the cache (Perception 7); a **silt-buried prospector's cache** of lamp-oil and shards
+  under the Cistern (Perception 6); a **hidden glimmer vein** in the tainted wall of the Backwash
+  (Perception 7); and a **concealed Umbral glyph-panel** behind the Waking Reliefs (Perception 6)
+  whose intact carving foreshadows the sealed sanctuary below, with a glimmer crystal and shards
+  cached at its foot.
 - **Weapons can now deal magical damage.** A weapon declaring `damage.magical` (instead of
   `damage.physical`) lands a magical blow — cut by the defender's Ward percentage rather than
   soaked flat by Armour, exactly as `strike` already anticipated. Completes long-dormant
