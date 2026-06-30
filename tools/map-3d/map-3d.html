@@ -116,8 +116,8 @@ const DEFAULT_CAM = JSON.parse(JSON.stringify(cam));
 let dpr = 1, W = 0, H = 0;
 
 // ── Layout constants ────────────────────────────────────────────────────
-const CELL = 90;        // horizontal grid spacing between rooms in a layer
-const LAYER = 220;      // vertical spacing between depths
+const CELL = 150;       // seed spacing for the directional walk
+const LAYER = 300;      // vertical spacing between traversal levels (one up/down step)
 const NODE_R = 7;       // base node radius (world units → screen via depth scale)
 
 // Compass → horizontal grid offset (north = away/-z, east = +x).
@@ -148,9 +148,13 @@ function showError(msg) {
 }
 
 // ─────────────────────── layout: rooms → 3D positions ────────────────────
-// BFS from the surface; within a depth-layer we accumulate compass offsets,
-// snapping each room to a free grid cell so rooms don't stack. Crossing to a
-// different depth re-anchors the new layer roughly under the connection.
+// Vertical (Y): the authored `depth` is the primary band (deeper depth → lower,
+// always), and up/down exits *within* a depth add a smaller sub-offset bounded
+// below one band — so a room you descend into (e.g. the inn cellar, a "down"
+// within depth 0) sits below the other depth-0 rooms yet still above depth 1,
+// the way it reads when you walk it, without ever letting depths cross.
+// Horizontal (X/Z): a compass walk seeds positions, then a force-directed pass
+// (nodes repel, edges pull) spreads crowded rooms apart for legibility.
 function buildLayout(rooms) {
   WORLD = rooms;
   const ids = Object.keys(rooms);
@@ -163,7 +167,7 @@ function buildLayout(rooms) {
     if (d > depthMax) depthMax = d;
   }
 
-  // Collect every exit (visible + hidden) as a directed link we can walk.
+  // Collect every exit (visible + hidden + door) as a directed link we can walk.
   function exitsOf(room) {
     const out = [];
     for (const [dir, to] of Object.entries(room.exits || {})) out.push({ dir, to, kind: "open" });
@@ -177,85 +181,82 @@ function buildLayout(rooms) {
     return out;
   }
 
-  const placed = {};                 // id → {x,z} (grid units, per layer)
-  const occupied = {};               // "depth|gx|gz" → true
-  const taken = (d, gx, gz) => occupied[d + "|" + gx + "|" + gz];
-  function claim(d, gx, gz) {
-    // spiral out to the nearest free cell at this depth
-    if (!taken(d, gx, gz)) { occupied[d + "|" + gx + "|" + gz] = true; return { x: gx, z: gz }; }
-    for (let r = 1; r < 60; r++) {
-      for (let dx = -r; dx <= r; dx++) for (let dz = -r; dz <= r; dz++) {
-        if (Math.abs(dx) !== r && Math.abs(dz) !== r) continue; // ring only
-        if (!taken(d, gx + dx, gz + dz)) { occupied[d + "|" + (gx + dx) + "|" + (gz + dz)] = true; return { x: gx + dx, z: gz + dz }; }
-      }
-    }
-    occupied[d + "|" + gx + "|" + gz] = true; return { x: gx, z: gz };
-  }
-
-  // Choose a root: the shallowest room (prefer a canonical plaza/landing).
+  // ── horizontal seed: compass walk from the surface ──
   const root = rooms["d0.plaza"] ? "d0.plaza"
     : ids.slice().sort((a, b) => (rooms[a].depth | 0) - (rooms[b].depth | 0))[0];
 
-  const queue = [];
-  function seed(id, gx, gz) {
-    if (placed[id]) return;
-    placed[id] = claim(rooms[id].depth | 0, gx, gz);
-    queue.push(id);
-  }
-  seed(root, 0, 0);
-
+  const placed = {};                 // id → { gx, gz }
+  const queue = [root];
+  placed[root] = { gx: 0, gz: 0 };
   while (queue.length) {
     const id = queue.shift();
-    const room = rooms[id];
     const here = placed[id];
-    const d = room.depth | 0;
-    for (const { to } of exitsOf(room)) {
+    for (const { to } of exitsOf(rooms[id])) {
       if (!rooms[to] || placed[to]) continue;
-      const nd = rooms[to].depth | 0;
-      let gx = here.x, gz = here.z;
-      if (nd === d) {
-        // same layer: offset by the compass direction if it's a planar one
-        const off = DIR[exitDirTo(room, to)];
-        if (off) { gx += off.x; gz += off.z; }
-      }
-      // different depth (up/down/cross): keep x/z, the layer gap separates them
-      placed[to] = claim(nd, gx, gz);
+      const off = DIR[exitDirTo(rooms[id], to)];
+      placed[to] = { gx: here.gx + (off ? off.x : 0), gz: here.gz + (off ? off.z : 0) };
       queue.push(to);
     }
   }
-
   // Any rooms unreachable from root (shouldn't happen — validator enforces it):
-  // drop them onto their own offset shelf so they still appear.
+  // shelve them off to the side so they still appear.
   let shelf = 0;
   for (const id of ids) {
     if (placed[id]) continue;
-    placed[id] = claim(rooms[id].depth | 0, 100 + (shelf % 10), 100 + Math.floor(shelf / 10));
+    placed[id] = { gx: 60 + (shelf % 8) * 2, gz: 60 + ((shelf / 8) | 0) * 2 };
     shelf++;
   }
 
-  // Materialise nodes in world space, centring each layer on its centroid.
-  const byDepth = {};
-  for (const id of ids) (byDepth[rooms[id].depth | 0] ||= []).push(id);
-  const centroid = {};
-  for (const [d, list] of Object.entries(byDepth)) {
-    let sx = 0, sz = 0;
-    for (const id of list) { sx += placed[id].x; sz += placed[id].z; }
-    centroid[d] = { x: sx / list.length, z: sz / list.length };
+  // ── vertical sub-offset: walk up/down exits *within* a depth ──
+  // micro[id] is a relative rank along intra-depth vertical chains (down = +1).
+  const micro = {};
+  for (const id of ids) {
+    if (micro[id] != null) continue;
+    micro[id] = 0;
+    const q = [id];
+    while (q.length) {
+      const cur = q.shift();
+      const cd = rooms[cur].depth | 0;
+      for (const { dir, to } of exitsOf(rooms[cur])) {
+        if (!rooms[to] || micro[to] != null || (rooms[to].depth | 0) !== cd) continue;
+        if (dir !== "up" && dir !== "down") continue;
+        micro[to] = micro[cur] + (dir === "down" ? 1 : -1);
+        q.push(to);
+      }
+    }
+  }
+  // Per-depth: normalise micro to start at 0 and scale so the deepest sub-room in
+  // a depth never reaches the next depth's band.
+  const dLo = {}, dHi = {};
+  for (const id of ids) {
+    const d = rooms[id].depth | 0, m = micro[id];
+    dLo[d] = Math.min(d in dLo ? dLo[d] : Infinity, m);
+    dHi[d] = Math.max(d in dHi ? dHi[d] : -Infinity, m);
+  }
+  const SUB_BASE = 120;              // base px per intra-depth down-step
+  function subOffset(id) {
+    const d = rooms[id].depth | 0;
+    const range = dHi[d] - dLo[d];
+    if (range <= 0) return 0;
+    const scale = Math.min(SUB_BASE, (LAYER * 0.75) / range);
+    return (micro[id] - dLo[d]) * scale;
   }
 
+  // Materialise nodes. A tiny deterministic jitter (golden-angle) breaks exact
+  // overlaps so the force pass has a direction to push them apart.
   NODES = []; NODE_BY_ID = {};
+  let i = 0;
   for (const id of ids) {
-    const room = rooms[id];
-    const d = room.depth | 0;
-    const c = centroid[d];
-    const node = {
+    const room = rooms[id], p = placed[id], d = room.depth | 0;
+    const a = i * 2.39996323;
+    NODES.push(NODE_BY_ID[id] = {
       id, name: room.name || id, depth: d, zone: room.zone || "",
-      x: (placed[id].x - c.x) * CELL,
-      y: -(d - depthMin) * LAYER,
-      z: (placed[id].z - c.z) * CELL,
+      x: p.gx * CELL + Math.cos(a) * 12,
+      y: -((d - depthMin) * LAYER + subOffset(id)),
+      z: p.gz * CELL + Math.sin(a) * 12,
       exits: exitsOf(room),
-    };
-    NODES.push(node); NODE_BY_ID[id] = node;
+    });
+    i++;
   }
 
   // Edges (dedupe undirected pairs; the most "open" kind on either direction wins
@@ -271,15 +272,27 @@ function buildLayout(rooms) {
         if (rank[ex.kind] > rank[seen[key].kind]) seen[key].kind = ex.kind;
         continue;
       }
-      const edge = { a: n, b: m, kind: ex.kind };
-      seen[key] = edge; EDGES.push(edge);
+      EDGES.push(seen[key] = { a: n, b: m, kind: ex.kind });
     }
   }
 
-  // Frame the whole structure.
-  const span = LAYER * Math.max(1, depthMax - depthMin);
-  cam.dist = Math.max(600, span * 1.2 + 400);
-  cam.target = { x: 0, y: -span / 2, z: 0 };
+  // ── stage 2: force-directed spreading in X/Z (Y stays fixed by level) ──
+  relaxHorizontal(NODES, EDGES);
+
+  // Centre on the horizontal centroid and frame the whole structure.
+  let cx = 0, cz = 0;
+  for (const n of NODES) { cx += n.x; cz += n.z; }
+  cx /= NODES.length; cz /= NODES.length;
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const n of NODES) {
+    n.x -= cx; n.z -= cz;
+    minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
+    minZ = Math.min(minZ, n.z); maxZ = Math.max(maxZ, n.z);
+    minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
+  }
+  const radius = 0.5 * Math.hypot(maxX - minX, maxY - minY, maxZ - minZ) || 400;
+  cam.dist = radius * 2.4 + 300;
+  cam.target = { x: 0, y: (minY + maxY) / 2, z: 0 };
   Object.assign(DEFAULT_CAM, JSON.parse(JSON.stringify(cam)));
 
   document.getElementById("subtitle").textContent =
@@ -287,6 +300,53 @@ function buildLayout(rooms) {
   document.getElementById("legMin").textContent = "d" + depthMin;
   document.getElementById("legMax").textContent = "d" + depthMax;
   buildLegend();
+}
+
+// Force-directed relaxation of X/Z only. Repulsion declutters; edge springs keep
+// connected rooms near each other; vertical distance is down-weighted so rooms on
+// different levels don't shove each other sideways. Deterministic (no randomness).
+function relaxHorizontal(nodes, edges) {
+  const N = nodes.length;
+  if (N < 2) return;
+  const REP = 26000;     // repulsion strength
+  const L = 200;         // desired edge length (X/Z)
+  const KS = 0.05;       // edge spring stiffness
+  const YW = 0.6;        // vertical weighting in the repulsion distance
+  const ITER = 360;
+  for (let k = 0; k < N; k++) nodes[k]._i = k;
+  const fx = new Float64Array(N), fz = new Float64Array(N);
+  for (let it = 0; it < ITER; it++) {
+    fx.fill(0); fz.fill(0);
+    for (let a = 0; a < N; a++) {
+      const na = nodes[a];
+      for (let b = a + 1; b < N; b++) {
+        const nb = nodes[b];
+        let dx = na.x - nb.x, dz = na.z - nb.z;
+        const dy = (na.y - nb.y) * YW;
+        let d2 = dx * dx + dz * dz + dy * dy;
+        if (d2 < 1) d2 = 1;
+        const inv = 1 / Math.sqrt(d2);
+        const f = REP / d2;
+        const ux = dx * inv, uz = dz * inv;
+        fx[a] += ux * f; fz[a] += uz * f;
+        fx[b] -= ux * f; fz[b] -= uz * f;
+      }
+    }
+    for (const e of edges) {
+      const a = e.a._i, b = e.b._i;
+      let dx = nodes[b].x - nodes[a].x, dz = nodes[b].z - nodes[a].z;
+      const d = Math.sqrt(dx * dx + dz * dz) || 0.01;
+      const f = KS * (d - L), ux = dx / d, uz = dz / d;
+      fx[a] += ux * f; fz[a] += uz * f;
+      fx[b] -= ux * f; fz[b] -= uz * f;
+    }
+    const maxStep = 50 * (1 - it / ITER) + 3;     // cooling
+    for (let k = 0; k < N; k++) {
+      const m = Math.hypot(fx[k], fz[k]);
+      const s = m > maxStep ? maxStep / m : 1;
+      nodes[k].x += fx[k] * s; nodes[k].z += fz[k] * s;
+    }
+  }
 }
 
 function exitDirTo(room, to) {

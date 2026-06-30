@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **3D world map viewer (`tools/map-3d/`).** A local, read-only, browser-based 3D model of the
   whole world: every room is a node labelled with its **name and id**, exits are edges, and depth
   is the vertical axis (warm lantern-gold at the surface fading to cold abyssal blue deep down).
+  Depths stack as ordered bands, and up/down exits *within* a depth add a sub-offset (a room you
+  descend into sits below where you came from yet above the next depth), while a force-directed
+  pass spreads the rooms of each level apart so the structure stays legible.
   Orbit by dragging, zoom with the wheel, pan with right-/Shift-drag; hover a room for its name,
   id, depth, zone, and exits. It always reads **current** data — `npm run view-map` (or
   double-click `tools/map-3d/start.bat`, port 3943) serves it and re-reads `rooms.json` on each
