@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Depth 10 — the Umbral fields: a 5-room farmland before the village.** The shrine's long
+  black stair now **descends** into the deep-folk's own kept ground (zone `umbral-fields`) — the
+  ominous sealed way down pays off not in horror but in a living, tended farmland. **The Field
+  Stair** lands you in lit crop; **The Lightfield Commons** is the hub, where lightbugs drift
+  thick overhead (they wander the whole zone, glow and all) and stonebugs, thornbugs and an elder
+  stonebug graze the rows; **The Moss Terraces** add the mushroom crop and a **weeping
+  chasm-moss** (`gloom-silk`) source over grubs in the rot. A stream wells up cold
+  in **The Tended Channel** and runs south to **The Keeper's Lake** — a stocked **fishing** spot
+  (new `keepers-lake` resource, grub-baited) where the water finally slides away into a cleft in
+  the cave wall and is gone. The whole zone is fully safe and lit (no hostile spawns); stonebugs
+  are confined to the two `grazing` rooms while lightbugs roam everywhere. South of the common a
+  **warded gate stands shut for now**, the way down to the Umbral village (not yet built).
 - **Depth 9 — the Umbral Sanctuary core: a 7-room warded haven.** The sealed inner door below
   **The Sanctuary Threshold** (`d9.sanctuary.landing`) now opens **south** into the kept place
   the deep-folk still hold whole (zone `umbral-sanctuary`). At its heart is **The Umbral Shrine**,
@@ -21,8 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hung with **weeping chasm-moss** (a `gloom-silk` source) and home to pale salamanders and a
   tremor-mole at the unlit water's edge. The one hostile room, **The Centipede Run**, sits on the
   southern margin where the warded light gives out — cave centipedes, and an unmapped dark beyond
-  as a hook for later. From the shrine itself a broad black stair descends, **sealed for now**, the
-  warded way down toward the next depth (room below not yet built).
+  as a hook for later. From the shrine itself a broad black stair now descends to depth 10 (see
+  above).
 - **Glimmerglass crafting.** A new material line: **fulgurite** (an uncommon raw glass
   mined from a new **fulgurite seam**) is fused with **glimmer dust** to make **glimmerglass**,
   a rare pane of dark glass veined with captive light. The fusing happens at a new crafting

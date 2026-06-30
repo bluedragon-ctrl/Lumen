@@ -1540,8 +1540,8 @@
     "name": "The Umbral Shrine",
     "depth": 9,
     "ambientLight": 1,
-    "description": "The hall opens into a round, vaulted shrine at the heart of the kept place — and the light here is its own, a great knot of raw glimmer cradled in worked stone, breathing a steady blue-white glow that fills the chamber and pains nothing. This is the source of the warding you have walked through: a light the deep-folk set against the dark and the things the dark makes, and it has not gone out. The walls are carved end to end with the old hand — the deep-folk gathered and bowed at the foot of the glow — and a shallow font below the relief catches a clean thread of water seeping through the rock. Nothing of the warren reaches here. The dark you climbed through stops at the cut, and for the first time since the Rim you may set down your guard, drink, and gather yourself. Ways open east to a soft green glow and west toward still water; the hall climbs back north. And from the heart of the shrine, behind the glimmer-cradle, a broad black stair goes down — long and worn and sure, the old hand's work running on into a dark far below the kept place, deeper than anything you have yet dared. A worked slab seals its head for now and does not give; whatever the deep-folk kept down there, the way to it has not yet opened.",
-    "exits": { "north": "d9.sanctuary.hall", "east": "d9.sanctuary.garden", "west": "d9.sanctuary.cistern" },
+    "description": "The hall opens into a round, vaulted shrine at the heart of the kept place — and the light here is its own, a great knot of raw glimmer cradled in worked stone, breathing a steady blue-white glow that fills the chamber and pains nothing. This is the source of the warding you have walked through: a light the deep-folk set against the dark and the things the dark makes, and it has not gone out. The walls are carved end to end with the old hand — the deep-folk gathered and bowed at the foot of the glow — and a shallow font below the relief catches a clean thread of water seeping through the rock. Nothing of the warren reaches here. The dark you climbed through stops at the cut, and for the first time since the Rim you may set down your guard, drink, and gather yourself. Ways open east to a soft green glow and west toward still water; the hall climbs back north. And from the heart of the shrine, behind the glimmer-cradle, a broad black stair goes down — long and worn and sure, the old hand's work running on into the deep below the kept place. Far down its throat the dark is not whole: a faint living glow rises to meet you, and on the slow air comes the green smell of growing things and tended water. Whatever the deep-folk keep down there, they keep it still — and the stair goes down to it.",
+    "exits": { "north": "d9.sanctuary.hall", "east": "d9.sanctuary.garden", "west": "d9.sanctuary.cistern", "down": "d10.fields.stair" },
     "fixtures": ["umbral-coldlamp", "shrine-font", "witchglow-cluster"],
     "groundItems": [
       { "template": "shards", "qty": 14, "hidden": { "perception": 6 } }
@@ -1630,6 +1630,87 @@
     ],
     "spawns": [
       { "mob": "cave-centipede", "max": 3, "respawn": 120 }
+    ]
+  },
+  "d10.fields.stair": {
+    "id": "d10.fields.stair",
+    "zone": "umbral-fields",
+    "name": "The Field Stair",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The long stair from the shrine bottoms out at last, and the deep you dreaded opens instead onto a low, lit cavern that someone has been keeping for a very long time. The faint glow you followed down the throat of the stair is the work of a hundred drifting lightbugs and bed upon bed of tended fungus, and the air is not the dead air of the warren but a living one — damp, green, faintly sweet, moving with the breath of running water somewhere south. Worked stone underfoot gives way to soft, dark earth gone to crop; the old hand has carried on down here, but down here it still tends rather than wards. Nothing means you harm. The stair climbs back north toward the shrine's glow; south the cavern opens wide into a lit common of fields.",
+    "exits": { "up": "d9.sanctuary.shrine", "south": "d10.fields.commons" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 3, "respawn": 120 }
+    ]
+  },
+  "d10.fields.commons": {
+    "id": "d10.fields.commons",
+    "zone": "umbral-fields",
+    "tags": ["grazing"],
+    "name": "The Lightfield Commons",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The fields open out into a broad lit common, and for the first time on the long way down the deep looks less like a wound in the world than a place lived in. Tended rows of luminous fungus run the floor in even crops, breathing a soft blue-green light; lightbugs drift thick overhead in a slow, shifting constellation, and the glow of them moves wherever they wander. Armoured grey stonebugs graze the rows on patient mandibles and bristling thornbugs trundle between the fattest caps, none of them troubled by you — there is forage enough, and no hunter has ever been let down this far. This is the Umbrals' own ground, kept and cropped and quiet. The stair climbs back north; moss terraces lie west, a worked water-channel runs east, and south the rows run on toward the close-set roofs and lamplit cuts of a village — but the way there drops through a low warded gate that stands shut for now, and does not yet open to you.",
+    "exits": { "north": "d10.fields.stair", "west": "d10.fields.terraces", "east": "d10.fields.channel" },
+    "fixtures": ["umbral-garden-beds", "witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 4, "respawn": 120 },
+      { "mob": "stonebug", "max": 1, "respawn": 200 },
+      { "mob": "thornbug", "max": 2, "respawn": 150 },
+      { "mob": "elder-stonebug", "max": 2, "respawn": 600 }
+    ]
+  },
+  "d10.fields.terraces": {
+    "id": "d10.fields.terraces",
+    "zone": "umbral-fields",
+    "tags": ["grazing"],
+    "name": "The Moss Terraces",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "West of the common the floor climbs in worked terraces against the cavern wall, each step furred with a tended, even crop of luminous fungus and hung with long curtains of weeping chasm-moss that the deep-folk train down the wet stone and crop for its silk. The light here is soft and damp and green, and the rot at the foot of the terraces is rich: pale grubs chew slow trails through it, the quiet cleaners doing here in the kept calm what they do under any glow. A stonebug grinds among them, unhurried, and the lightbugs drift in over the steps and out again. The common lies back east.",
+    "exits": { "east": "d10.fields.commons" },
+    "fixtures": ["weeping-moss-curtain", "pale-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "grub", "max": 4, "respawn": 120 },
+      { "mob": "stonebug", "max": 1, "respawn": 200 },
+      { "mob": "elder-stonebug", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d10.fields.channel": {
+    "id": "d10.fields.channel",
+    "zone": "umbral-fields",
+    "tags": ["water"],
+    "name": "The Tended Channel",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "East of the common a clear stream wells up cold from a cleft in the rock and runs in a worked channel cut straight and true through the lit ground — the deep-folk's water, led where they want it to feed the beds. It is not the drowned black of the warren but living water, breathing a faint glow off the fungus crowding its banks, and lightbugs come down to drift the surface and lift away again. The channel runs south, gathering, toward the broad shine of a kept lake. The common lies back west.",
+    "exits": { "west": "d10.fields.commons", "south": "d10.fields.lake" },
+    "fixtures": ["pale-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 2, "respawn": 150 },
+      { "mob": "blind-cave-fish", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d10.fields.lake": {
+    "id": "d10.fields.lake",
+    "zone": "umbral-fields",
+    "tags": ["water"],
+    "name": "The Keeper's Lake",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The channel opens into a broad, still lake held in a basin of worked stone, lit blue-green by the crop crowding its banks and by the lightbugs that drift low over the water. This is the kept lake, the bottom of the deep-folk's water and the richest of it: pale blind cave-fish hang thick in the cold shallows, and a patient hand with a baited line — the grubs the terraces breed are the surest bait — could take a good few. At the lake's far end the water gathers, narrows, and slides away into a black cleft in the cavern wall, gone down into the rock to wherever the deep takes it, and does not come back. The channel runs back north toward the common.",
+    "exits": { "north": "d10.fields.channel" },
+    "fixtures": ["keepers-lake"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "blind-cave-fish", "max": 4, "respawn": 120 },
+      { "mob": "lightbug", "max": 2, "respawn": 150 }
     ]
   },
   "d5.fault.deep": {
