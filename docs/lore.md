@@ -96,7 +96,9 @@ A subterranean humanoid race native to the Abyss — there long before the Rush.
 - **Settlements:** Umbral **villages** lie deeper in the Abyss. The first Umbral a
   delver meets on the descent is **Mallki the qhatuq** (trader), who keeps a
   lamp-lit hollow and a tended fungus garden beside the underground river of the
-  third floor.
+  third floor. Far below, past the warded sanctuary and its kept fields, the deepest
+  known village was **lost to the dark** (see *The Hollowing*) — a place the surviving
+  Umbrals ward themselves away from and do not speak of.
 - **Language:** the Umbral tongue draws on **Quechua** roots for its flavour —
   soft, rounded, sparse. A few words surface in their speech and place-names
   (*qhatuq* — trader; *paqcha* — waterfall; *yaku-runa* — "water-folk", their name
@@ -114,6 +116,56 @@ degenerate kin: tall, gaunt, grey, light-pained things that speak only broken sc
 of a once-shared tongue. They are what the deep does to the Umbrals' own — a tragedy
 the surface Umbrals do not speak of. The friendly Umbrals near the top and these
 mutated deep-dwellers are the **same people at two ends of glimmer's influence.**
+
+### The Hollowing (the dark-taken)
+
+Where glimmer works on the **body**, the deep's own dark works on the **self**. Spend
+too long in the true dark of the Abyss — light gone, and not relit — and the dark
+begins to *take* you. It is slow, and it is one-way. This is **the Hollowing**, and it
+claims Umbral and human alike: the lost prospector whose torch died far down is as fair
+a prize for the dark as any deep-dweller. These are the **"things the dark makes"** that
+the deep Umbrals ward their kept places against.
+
+It comes in stages — the same way the friendly Umbral and the Mutated are one people at
+two ends:
+
+1. **The husk.** The body still holds, but the self is thinning, memory down to dim,
+   fraying echoes. The dark-taken go on through the motions of the life they had —
+   working a cold forge, gathering at a dead hearth, waiting at a door — reacting only
+   dimly, and only when disturbed, or when light comes near.
+2. **The fading.** The dark begins to eat the body itself: a hand gone to shadow, a face
+   going featureless, edges that no longer hold. Memory narrows to a single repeated
+   gesture.
+3. **The shadow.** Body and memory both gone. What remains is a **living shadow** —
+   mindless, and hungry only for light. The living shadows of the mid-deep (see the
+   threat ladder) are the end of this road; this is the long, sad history behind them.
+
+The dark-taken **drink light** and are **harmed by bright light** — the deep's own
+workings, made flesh and then made un-flesh (their feeding is *Drink the Light*; carrying
+a bright lamp into their dark both reveals them and wounds them).
+
+**Why the dark takes some and not others is unknown**, and whether it is the same force
+as glimmer's warping of the body or a different hand entirely, no one who has gone far
+enough to learn has come back to say (see *Deliberately unknown*). Content may **gesture**
+at the Hollowing as the dark's own slow work; it must never **explain** it.
+
+#### The lost village
+
+Deepest of the worked places — below the warded gate beneath the Umbral fields — lies an
+**Umbral village the dark took whole**: streets of close-set stone, lamp-niches long
+cold, reliefs cut by hands that are now shadows on their own walls. Nothing slaughtered
+it; the Hollowing thinned it out, household by household, until none were left to leave.
+It is **abandoned** by the living and **inhabited** by its own dead — husks still
+shuffling through their chores, faded things half-gone at the edges, and mindless shadows
+pooled in the dark corners: the whole slow arc of the Hollowing under one roof. The
+surface Umbrals know of it and **will not speak of it**; the sanctuary and its wards above
+stand, in part, against what the village became — and it is the reason a warded gate stands
+shut. The largest worked-stone complex in the deep, kept by no one, kept *out* by the
+living.
+
+*(Place-name provisional, pending sign-off — an Umbral/Quechua name in the vein of the
+existing* qhatuq / paqcha / yaku-runa, *e.g.* **Tuta Llaqta** *— "night-town." See the
+language note under The Umbrals.)*
 
 ## The Deep & its ecosystem
 
@@ -173,8 +225,11 @@ it carries its own light with it.
 A legible progression for hanging future content on:
 
 1. **Surface deep** — vermin and lone predators (rats, bats, crawlers, lurkers).
-2. **Mid-deep** — **living shadows** and the first mutated horrors; light-vulnerable.
-3. **Deeper** — **hostile/mutated Umbral holdouts** (the deep-dwellers).
+2. **Mid-deep** — **living shadows** (the end-stage of the Hollowing — *see above*) and
+   the first mutated horrors; light-vulnerable.
+3. **Deeper** — **hostile/mutated Umbral holdouts** (the deep-dwellers), and below them
+   the **lost village** of the dark-taken — husks, fading things, and pooled shadows in
+   the streets of a settlement the Hollowing thinned to nothing.
 4. **The deep myth** — the **Glimmer Dragon**: an apex creature so steeped in glimmer
    it has become part-mineral. The Rush's tallest tale; possibly real.
 
@@ -186,6 +241,8 @@ them:
 - What glimmer truly is, and what the **Dark Star** is.
 - How deep the Abyss goes, and what waits at the bottom.
 - Whether the Glimmer Dragon is real.
+- What the dark is, why the **Hollowing** takes some and spares others, and whether it is
+  the same force as glimmer's mutation of the body or a different hand entirely.
 
 ## Consistency rules for content authors
 
@@ -194,5 +251,8 @@ them:
   cause — don't conflate them.
 - Umbrals are friendly-but-distant near the top; the deep twists them. Worked stone
   and wall-reliefs imply Umbral hands.
+- **Glimmer warps the body; the dark Hollows the self.** Living shadows and the husks of
+  the lost village are **dark-taken**, not glimmer-mutated — keep the two causes distinct
+  even as you let them rhyme, and never state which (if either) is behind the other.
 - Never assert glimmer's true nature or the Dark Star as fact — only as legend.
 - No "great delve" as a fixed past event (Maeve's bio to be softened accordingly).

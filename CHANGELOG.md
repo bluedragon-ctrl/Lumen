@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Lore — the Hollowing and the lost village.** `docs/lore.md` now records the **second deep
+  fate** alongside glimmer-mutation: where glimmer warps the *body* (the Mutated), the deep's own
+  dark slowly takes the *self* — **the Hollowing**, a one-way decline in three stages (**husk** with
+  dim memories → **fading** body → mindless **living shadow**) that claims Umbral and human alike.
+  This gives the threat ladder's existing **living shadows** an origin and names the **"things the
+  dark makes"** the deep Umbrals ward against. Adds **the lost village** — an Umbral settlement the
+  Hollowing thinned to nothing, the dark-taken still going through the motions in its streets — sited
+  below the shut warded gate beneath the Umbral fields. Whether the dark and glimmer are one force or
+  two is left a **deliberate mystery**. Updates the threat ladder, the Umbrals' settlements note,
+  *Deliberately unknown*, and the consistency rules; village place-name left provisional pending
+  sign-off.
 - **Depth 8 — the Sour Midden: a 6-room slug dungeon off the sanctuary.** The Centipede Run's
   previously-unmapped south seam (`d9.sanctuary.run`) now opens into a sealed depth-8 charnel pit
   (zone `sour-midden`) where the deep-folk gave their dead to the cleaner-slugs — and the gluttony
