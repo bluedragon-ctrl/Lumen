@@ -218,7 +218,7 @@ function get(state, player, arg, ctx) {
   const rt = state.rooms[player.location];
   if (!canSee(player.perception, rt.light)) return [{ type: "error", text: "It is too dark to find anything." }];
   // Undiscovered hidden items aren't pickable by name — you must `search` first.
-  const visible = rt.items.filter((i) => itemVisibleTo(player, i));
+  const visible = rt.items.filter((i) => itemVisibleTo(state, player, i));
   const { all, keyword } = parseTarget(arg);
   // Take a single floor instance into purse (currency) or pack; returns a label
   // for the picked-up summary, pushing any quest messages onto `qmsgs`.
