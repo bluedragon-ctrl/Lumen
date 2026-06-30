@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a seep to drink from, and a striking oil-lamp, reachable only by its hidden crack so nothing
   wanders in; **The Slug Grotto** (hidden off Silt Crawl, Perception 6) — a faintly-lit fungus
   pocket of glowing pale-caps and witchglow grazed by five scour-slugs, around the rotting wreck
-  of a camp that didn't last; a one-way **flooded escape** behind the Pale Mother's nest dropping
+  of a camp that didn't last (a torch and a regeneration draught lie hidden in the gear, Perception 7); a one-way **flooded escape** behind the Pale Mother's nest dropping
   out at the cache (Perception 7); a **silt-buried prospector's cache** of lamp-oil and shards
   under the Cistern (Perception 6); a **hidden glimmer vein** in the tainted wall of the Backwash
   (Perception 7); and a **concealed Umbral glyph-panel** behind the Waking Reliefs (Perception 6)

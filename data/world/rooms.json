@@ -1502,7 +1502,10 @@
     "description": "A seam in the silt-crawl wall, easy to crawl past in the dark, opens into a low domed grotto — and after so long blind, the faint glow of it stops you where you stand. Pale mushrooms crowd the damp seams of the wall, each breathing a weak, steady light, and a great fan of witchglow spreads cold and green across the far rock, enough together to see by at last. Grey scour-slugs the length of a forearm haul themselves over the stone among the beds, grazing the fungus and leaving clean tracks behind, blind and untroubled by the light. Someone tried to make this place a camp once: a scatter of spilled gear lies rotting in a corner — a burst pack, a snapped pole, a single boot, a fire never lit — left where it dropped, with no bones to say whether they walked out or only the slugs cleaned up after. The crawl runs back south to the silt.",
     "exits": { "south": "d8.silt" },
     "fixtures": ["pale-cluster", "witchglow-cluster"],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "torch", "qty": 1, "respawn": 1800, "hidden": { "perception": 7 } },
+      { "template": "regeneration-draught", "qty": 1, "respawn": 1800, "hidden": { "perception": 7 } }
+    ],
     "spawns": [
       { "mob": "scour-slug", "max": 5, "respawn": 200 }
     ]
