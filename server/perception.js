@@ -23,9 +23,11 @@ function actorEmitLight(actor) {
 // --- Hidden features (search) ----------------------------------------------
 // A room feature (item, fixture, exit, mob) may carry a `hidden: { perception }`
 // block; it is omitted from a player's view until they `search` and meet the
-// requirement. Permanent finds (items/fixtures/exits) are recorded per-player as
-// stable discovery keys on `player.discovered`; mob reveals are ephemeral
-// (in-memory, current-visit only — see GameState.revealedMobs).
+// requirement. Permanent finds (fixtures/exits — the room's lasting secrets) are
+// recorded per-player as stable discovery keys on `player.discovered`. Hidden
+// *items* and mobs reveal ephemerally (in-memory, current-visit only — a stashed
+// item you don't pick up is forgotten the moment you leave; see
+// GameState.revealedItems / .revealedMobs).
 const discoveryKey = (roomId, kind, ident) => `${roomId}|${kind}|${ident}`;
 const isDiscovered = (player, key) => Array.isArray(player.discovered) && player.discovered.includes(key);
 
@@ -39,7 +41,11 @@ function effectivePerception(world, player, light) {
 
 // Visibility predicates — a hidden feature is shown only once discovered/revealed.
 // Reused by the room view (render.js) and command resolvers so filtering matches.
-const itemVisibleTo = (player, inst) => !inst.hidden || isDiscovered(player, inst.discoveryKey);
+const itemVisibleTo = (state, player, inst) => {
+  if (!inst.hidden) return true;
+  const set = state.revealedItems.get(player.id);
+  return !!(set && set.has(inst.id));
+};
 const fixtureVisibleTo = (player, inst) => !inst.hidden || isDiscovered(player, inst.discoveryKey);
 const mobVisibleTo = (state, player, mob) => {
   if (!mob.hidden) return true;

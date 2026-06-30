@@ -53,6 +53,7 @@ class GameState {
     this.playersByRoom = new Map(); // roomId -> Set(player instance); kept in sync with player.location
     this.rooms = {}; // roomId -> { mobs:[], items:[], light:int }
     this.revealedMobs = new Map(); // playerId -> Set(mob runtime id); ephemeral hidden-mob reveals
+    this.revealedItems = new Map(); // playerId -> Set(item runtime id); ephemeral hidden-item reveals (forgotten on leave)
     this.ownedCounts = new Map(); // `${roomId}|${mob}` -> living mobs from that spawner (see _countOwned)
     // The Tide (world-clock.js): the world's current phase, derived from `tick`
     // each tick. `tideOverride` pins it for admin testing (@tide), bypassing the
@@ -77,7 +78,7 @@ class GameState {
           inst.origin = { roomId: id, template: g.template, harvest: true }; // tags it for regrow tracking
           this.harvesters.push({ roomId: id, template: g.template, qty: g.qty != null ? g.qty : 1, respawn: g.respawn, timer: g.respawn });
         }
-        if (g.hidden) { inst.hidden = g.hidden; inst.discoveryKey = discoveryKey(id, "item", g.template); }
+        if (g.hidden) inst.hidden = g.hidden; // a stashed item — unseen until searched out, and re-hidden on leave
         this.rooms[id].items.push(inst);
       }
       for (const f of room.fixtures || []) {
@@ -963,19 +964,23 @@ class GameState {
     }
     this.players.delete(playerId);
     this.revealedMobs.delete(playerId); // drop ephemeral hidden-mob reveals on disconnect
+    this.revealedItems.delete(playerId); // …and any unpicked hidden-item reveals
     return events;
   }
 
-  /** Forget a player's ephemeral hidden-mob reveals (e.g. on leaving a room). */
+  /** Forget a player's ephemeral hidden-feature reveals — both lurking mobs and
+   *  unpicked stashed items re-hide (e.g. on leaving a room). */
   clearRevealedMobs(playerId) {
     this.revealedMobs.delete(playerId);
+    this.revealedItems.delete(playerId);
   }
 
   /**
    * `search` the current room: reveal every hidden feature whose requirement is met
    * by the player's effective Perception (attribute × light tier — so light matters).
-   * Permanent finds (items/fixtures/exits) are recorded on `player.discovered`;
-   * hidden mobs are revealed ephemerally (this visit only). Returns { found, any }.
+   * Lasting secrets (fixtures/exits) are recorded permanently on `player.discovered`;
+   * hidden items and mobs are revealed ephemerally (this visit only — a stashed item
+   * you leave behind must be searched out anew). Returns { found, any }.
    */
   search(player) {
     const roomId = player.location;
@@ -985,9 +990,12 @@ class GameState {
     if (!Array.isArray(player.discovered)) player.discovered = [];
     const found = [];
 
+    let items = this.revealedItems.get(player.id);
     for (const inst of rt.items) {
-      if (inst.hidden && !isDiscovered(player, inst.discoveryKey) && inst.hidden.perception <= eff) {
-        player.discovered.push(inst.discoveryKey);
+      if (!inst.hidden || inst.hidden.perception > eff) continue;
+      if (!items) { items = new Set(); this.revealedItems.set(player.id, items); }
+      if (!items.has(inst.id)) {
+        items.add(inst.id);
         found.push(this.world.items[inst.template].name);
       }
     }

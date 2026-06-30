@@ -118,6 +118,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bug-tallow for a small HP restore. Taught by *a book of cooking*.
 
 ### Changed
+- **Hidden items are no longer remembered — only the room's lasting secrets are.**
+  `search` still records found **exits** and **fixtures** permanently (a secret passage
+  or hidden lever stays found), but a hidden **item** you uncover and *leave behind* is
+  now forgotten the moment you leave the room — it reveals ephemerally, like a lurking
+  mob, and must be searched out again on your next visit. Pick it up and it's yours as
+  before.
 - **The chitin maul is now a high-variance crusher.** Re-tuned to give it a niche of
   its own between the steady iron sword and the hard-scaling iron mace: damage goes
   `1d8` → **`1d12`** and it swings slower (`actionCost` 14 → **17**), keeping its

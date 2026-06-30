@@ -255,11 +255,13 @@ plus a parallel `room.hiddenExits: { <dir>: { to, perception, name } }`. Hidden
 features are withheld from the room view and can't be targeted until `search`
 reveals them. `search` reveals everything whose requirement is met by **effective
 Perception** = the attribute × `hitChance(band, light)` (the combat light tiers), so
-light is required to search well; it costs ~one action of energy. Permanent finds
-(exits/fixtures/objects) are recorded on `player.discovered` (persisted); hidden
-**mobs** are revealed ephemerally in `GameState.revealedMobs` (cleared on leaving the
-room or disconnecting) and stay unseen *and inert* until a delver who has revealed
-them provokes them.
+light is required to search well; it costs ~one action of energy. The room's lasting
+secrets — hidden **exits** and **fixtures** — are recorded on `player.discovered`
+(persisted, so a found passage stays found). Hidden **items** and **mobs** reveal
+only ephemerally — in `GameState.revealedItems` / `.revealedMobs`, cleared on leaving
+the room or disconnecting — so a stashed item you don't pick up is forgotten and must
+be searched out again, and a lurking mob stays unseen *and inert* until a delver who
+has revealed it provokes it.
 
 ### Crafting
 

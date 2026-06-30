@@ -95,7 +95,7 @@ function buildRoomView(state, p) {
     }
   }
   const items = see
-    ? rt.items.filter((i) => itemVisibleTo(p, i)).map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
+    ? rt.items.filter((i) => itemVisibleTo(state, p, i)).map((i) => ({ id: i.id, name: w.items[i.template].name, template: i.template, qty: i.qty != null ? i.qty : undefined }))
     : [];
   const fixtures = see
     ? rt.fixtures.filter((f) => fixtureVisibleTo(p, f)).map((f) => {
@@ -246,7 +246,7 @@ function buildExamineView(state, p, q) {
   }
   if (see) {
     for (const i of rt.items) {
-      if (!itemVisibleTo(p, i)) continue;
+      if (!itemVisibleTo(state, p, i)) continue;
       const t = w.items[i.template];
       if (hit(i.id, t.name))
         return detailed
