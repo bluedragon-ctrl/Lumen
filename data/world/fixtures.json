@@ -305,5 +305,27 @@
     "description": "Not a coal forge like the surface keeps, but a squat hearth of fitted stone with a cradle of raw glimmer at its heart, breathing a low blue-white heat that throws no smoke. A worked-stone anvil stands beside it, its face inlaid with the rounded glyphs the deep-folk cut into everything they make. Mallki works chitin, glimmer, and bound steel here in the slow, patient way of his people — and it will serve a delver who has the knowing of a recipe and the makings to hand.",
     "type": "crafting",
     "station": "smithing"
+  },
+  "fulgurite-vein": {
+    "id": "fulgurite-vein",
+    "name": "a seam of fulgurite",
+    "keywords": ["fulgurite", "seam", "vein", "glass"],
+    "description": "A band of dark, glassy stone runs through the rock here, fused hard and smooth where the deep's old fires once licked the wall — fulgurite, in the deep-folk's word for it. It throws a delver's lamp back in a dull, oily sheen and breaks away in keen-edged shards under a patient arm. The Umbral come for it; what they make of it glows, though the raw stone never does.",
+    "type": "resource",
+    "mine": {
+      "charges": 3, "respawn": 300, "energy": 40,
+      "drops": [
+        { "template": "fulgurite", "qty": 1, "weight": 8 },
+        { "template": "fulgurite", "qty": 2, "weight": 2 }
+      ]
+    }
+  },
+  "glimmerglass-kiln": {
+    "id": "glimmerglass-kiln",
+    "name": "an Umbral kiln",
+    "keywords": ["kiln", "furnace", "umbral"],
+    "description": "A round, low-domed kiln of fitted stone with a cradle of raw glimmer banked at its heart, breathing the same smokeless blue-white heat the deep-folk coax from everything they work. It is hot enough to bring fulgurite to a fusing-glow without shattering it, and patient hands use it to bed glimmer into the glass — folding captive light into a dark pane that holds it for good. A delver with the knowing of a recipe and the makings to hand may work it the same way.",
+    "type": "crafting",
+    "station": "kiln"
   }
 }

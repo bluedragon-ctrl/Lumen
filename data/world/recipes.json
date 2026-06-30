@@ -103,6 +103,17 @@
     ],
     "output": { "template": "glimmersteel-bar", "qty": 1 }
   },
+  "fuse-glimmerglass": {
+    "id": "fuse-glimmerglass",
+    "name": "Glimmerglass Pane",
+    "station": "kiln",
+    "inputs": [
+      { "template": "fulgurite", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 2 }
+    ],
+    "shards": 4,
+    "output": { "template": "glimmerglass", "qty": 1 }
+  },
   "searing-flare": {
     "id": "searing-flare",
     "name": "Searing Flare",

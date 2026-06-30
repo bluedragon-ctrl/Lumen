@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Glimmerglass crafting.** A new material line: **fulgurite** (an uncommon raw glass
+  mined from a new **fulgurite seam**) is fused with **glimmer dust** to make **glimmerglass**,
+  a rare pane of dark glass veined with captive light. The fusing happens at a new crafting
+  station, **an Umbral kiln** (`station: "kiln"`), via the `Glimmerglass Pane` recipe
+  (1 fulgurite + 2 glimmer dust, 4 shards). Mallki sells the `schematic-glimmerglass` as a
+  **placeholder** — its real home, and the locations of the fulgurite seam, kiln, and the
+  glimmerglass recipe, come in an upcoming content pass. (Glimmerglass is the same material
+  the existing `glimmerglass-blade` is described as being ground from.)
 - **Depth 8 — the Sunken Warren: a 12-room maze beneath the gloom-warren.** A drowned
   lower warren that opens via a new `down` from **The Drowned Black** (`d7.lair`, past the
   Starving Dark): a looping maze of flooded cave and old Umbral stone, fully dark, with the
