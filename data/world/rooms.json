@@ -1517,10 +1517,120 @@
     "depth": 9,
     "ambientLight": 1,
     "description": "The black stair bottoms out, and for the first time in a long descent the dark draws back of its own accord. A cold blue-green glimmer-lamp burns in a niche of worked stone — kept, tended, alive — throwing a soft, heatless light over a low threshold chamber swept clean and laid with care. After the drowned warren and the clawed reliefs above, the quiet here is almost a sound of its own, and nothing of the dark you climbed through has followed you down past the warded stair. This is the edge of something the deep-folk still hold whole: a sanctuary cut into the deep rock, warded against the dark and the things the dark makes. An inner way leads deeper south, sealed for now behind a worked door that does not yet open. The stair climbs back north into the dark you came from.",
-    "exits": { "up": "d8.stair" },
+    "exits": { "up": "d8.stair", "south": "d9.sanctuary.hall" },
     "fixtures": ["umbral-coldlamp"],
     "groundItems": [],
     "spawns": []
+  },
+  "d9.sanctuary.hall": {
+    "id": "d9.sanctuary.hall",
+    "zone": "umbral-sanctuary",
+    "name": "The Warded Hall",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "South of the threshold the worked stone opens into a long hall, and here the warding the deep-folk cut is plain to see. Cold glimmer-lamps burn at intervals down its length, blue-white and heatless, and the relief between them is the old, sure hand — deep marks of warding and welcome running unbroken to either side, none of them clawed, none of them failing. The air is dry and still and clean of the wet-coal reek you climbed through; the dark does not come in here, and the gaunt things of the dark do not cross the cut. It is the first place in a long descent that was made to keep something safe rather than to keep something out. The threshold climbs back north; the hall opens south into a soft glow.",
+    "exits": { "north": "d9.sanctuary.landing", "south": "d9.sanctuary.shrine" },
+    "fixtures": ["umbral-coldlamp"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d9.sanctuary.shrine": {
+    "id": "d9.sanctuary.shrine",
+    "zone": "umbral-sanctuary",
+    "name": "The Umbral Shrine",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "The hall opens into a round, vaulted shrine at the heart of the kept place — and the light here is its own, a great knot of raw glimmer cradled in worked stone, breathing a steady blue-white glow that fills the chamber and pains nothing. This is the source of the warding you have walked through: a light the deep-folk set against the dark and the things the dark makes, and it has not gone out. The walls are carved end to end with the old hand — the deep-folk gathered and bowed at the foot of the glow — and a shallow font below the relief catches a clean thread of water seeping through the rock. Nothing of the warren reaches here. The dark you climbed through stops at the cut, and for the first time since the Rim you may set down your guard, drink, and gather yourself. Ways open east to a soft green glow and west toward still water; the hall climbs back north. And from the heart of the shrine, behind the glimmer-cradle, a broad black stair goes down — long and worn and sure, the old hand's work running on into a dark far below the kept place, deeper than anything you have yet dared. A worked slab seals its head for now and does not give; whatever the deep-folk kept down there, the way to it has not yet opened.",
+    "exits": { "north": "d9.sanctuary.hall", "east": "d9.sanctuary.garden", "west": "d9.sanctuary.cistern" },
+    "fixtures": ["umbral-coldlamp", "shrine-font", "witchglow-cluster"],
+    "groundItems": [
+      { "template": "shards", "qty": 14, "hidden": { "perception": 6 } }
+    ],
+    "spawns": []
+  },
+  "d9.sanctuary.garden": {
+    "id": "d9.sanctuary.garden",
+    "zone": "umbral-sanctuary",
+    "tags": ["grazing"],
+    "name": "The Glow Garden",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "East of the shrine the chamber widens into a tended garden of light — bed upon bed of pale mushrooms breathing their weak, steady glow, and a great fan of witchglow spread cold and green across the far wall, all of it crowding the warded light the way fungus crowds any glow in the deep. It has the look of something once kept and now only left to grow: old planting-rows gone soft at the edges, the deep-folk's work carried on by nothing but the dark's own slow gardening. Armoured grey stonebugs trundle the beds on patient mandibles, and squat thornbugs bristle between the fattest caps, none of them troubled by you — there is forage enough here, and the light keeps the hunters out. The shrine lies west; the beds carry on east into a lower hollow.",
+    "exits": { "west": "d9.sanctuary.shrine", "east": "d9.sanctuary.hollow" },
+    "fixtures": ["pale-cluster", "witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 2, "respawn": 200 },
+      { "mob": "thornbug", "max": 3, "respawn": 150 },
+      { "mob": "elder-stonebug", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d9.sanctuary.hollow": {
+    "id": "d9.sanctuary.hollow",
+    "zone": "umbral-sanctuary",
+    "tags": ["grazing"],
+    "name": "The Grub Hollow",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "The garden beds slope down into a damp, low hollow where the glow runs thin and the fungus grows soft and rotten-sweet. Pale grubs chew slow trails through the rot, and grey scour-slugs haul themselves over the stone leaving clean tracks behind, grazing whatever the beds let fall — the quiet cleaners at the bottom of the lit food web, doing here in the warded calm what they do everywhere there is light to feed under. A stonebug or two grinds among them, unhurried. There is nothing here that means you harm. The garden climbs back west, still water lies north, and a darker seam opens south where the warded light at last gives out.",
+    "exits": { "west": "d9.sanctuary.garden", "north": "d9.sanctuary.cistern", "south": "d9.sanctuary.run" },
+    "fixtures": ["pale-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "grub", "max": 4, "respawn": 120 },
+      { "mob": "scour-slug", "max": 3, "respawn": 200 },
+      { "mob": "stonebug", "max": 1, "respawn": 200 },
+      { "mob": "elder-stonebug", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d9.sanctuary.cistern": {
+    "id": "d9.sanctuary.cistern",
+    "zone": "umbral-sanctuary",
+    "tags": ["grazing", "water"],
+    "name": "The Kept Cistern",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "West of the shrine a still pool lies in a basin of worked stone, kept apart and kept clean — not the drowned black of the warren above but clear, cold water, walled round with the patient Umbral cutting and lit blue-white by a glimmer-lamp set in the rock above it. This is the deep-folk's own water, held separate from the great fall below; pale blind cave-fish drift the surface in slow, blind circles, and moss and lit fungus crowd the damp rim where a stonebug grazes the banks. Nothing has fouled it. The shrine lies east, the rim slopes south down toward the grub hollow, and at the pool's far end worked steps drop away toward a colder roar — the great fall, somewhere below.",
+    "exits": { "east": "d9.sanctuary.shrine", "south": "d9.sanctuary.hollow", "down": "d9.sanctuary.basin" },
+    "fixtures": ["pale-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "blind-cave-fish", "max": 3, "respawn": 150 },
+      { "mob": "stonebug", "max": 1, "respawn": 200 }
+    ]
+  },
+  "d9.sanctuary.basin": {
+    "id": "d9.sanctuary.basin",
+    "zone": "umbral-sanctuary",
+    "tags": ["water"],
+    "name": "The Plunge Basin",
+    "depth": 9,
+    "ambientLight": 0,
+    "description": "The stair from the kept cistern descends past the edge of the warded light into a wide, dark cavern loud with falling water — and as your eyes give up, the dark is not quite whole, for high overhead a hard, cold column of water comes down out of the black and hammers into a churning pool, and the spray of it carries a faint blue-white glow. This is the foot of the great fall: the same black water you watched break apart far above you from the chasm ledge, the Far Bank's lake come all the way down the throat of the world to land here at the bottom. Curtains of weeping chasm-moss hang from the wet rock above the pool, trailing their hair-fine tendrils into the spray and glowing cold in the dark, and where the water has scoured the rock face a thin seam of raw glimmer threads the broken stone. The shrine's light does not reach here, and the things that shun it have crept to the water's edge — pale blind salamanders basking in the damp, an eyeless tremor-mole reading the stone for footfall. The worn stair climbs back up toward the kept water and its glow.",
+    "exits": { "up": "d9.sanctuary.cistern" },
+    "fixtures": ["weeping-moss-curtain", "glimmer-seam"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-salamander", "max": 3, "respawn": 200 },
+      { "mob": "tremor-mole", "max": 1, "respawn": 400 },
+      { "mob": "blind-cave-fish", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d9.sanctuary.run": {
+    "id": "d9.sanctuary.run",
+    "zone": "umbral-sanctuary",
+    "name": "The Centipede Run",
+    "depth": 9,
+    "ambientLight": 0,
+    "description": "South of the hollow the warded light fails altogether and the worked stone gives way to a raw, dim run in the natural rock — the margin of the kept place, where the deep-folk's cutting stops and the dark begins again. The shrine's light does not reach this far, and so the hunters do: the dim-edge things that work wherever prey strays out of the glow. Whip-fast lengths of armoured segment pour over the rock on a hundred legs, antennae testing the air, fond of exactly this kind of border between the safe and the dark. They are the price of the edge. The hollow and its glow lie back north; the run carries on south into a dark that has not been mapped.",
+    "exits": { "north": "d9.sanctuary.hollow" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "shards", "qty": 8, "hidden": { "perception": 5 } }
+    ],
+    "spawns": [
+      { "mob": "cave-centipede", "max": 3, "respawn": 120 }
+    ]
   },
   "d5.fault.deep": {
     "id": "d5.fault.deep",

@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Depth 9 — the Umbral Sanctuary core: a 7-room warded haven.** The sealed inner door below
+  **The Sanctuary Threshold** (`d9.sanctuary.landing`) now opens **south** into the kept place
+  the deep-folk still hold whole (zone `umbral-sanctuary`). At its heart is **The Umbral Shrine**,
+  lit by a cold glimmer-lamp with a drinkable font — the source of the warding: no hostile spawns,
+  and the warren's dark is zone-bounded above, so the shrine and its lit rooms read as a true safe
+  haven against the depth-7/8 monsters. The calm core is deliberately gentle: **The Glow Garden**,
+  **The Grub Hollow**, and **The Kept Cistern** are all `grazing` rooms where stonebugs, thornbugs,
+  grubs, scour-slugs and blind cave-fish forage, patrolled by **two elder stonebugs** — a new
+  `helper`/`pursues` grazer (modelled on the Old Grinder) that puts its bulk between a threat and
+  the lesser bugs and has a 40% chance to drop a **slab of dense chitin**. Two small lakes anchor
+  the edges: the **Kept Cistern** (a clean, lit, separate pool) and the dark **Plunge Basin** —
+  the foot of the great fall, the same Far Bank water seen far overhead from the d8 Chasm Ledge,
+  hung with **weeping chasm-moss** (a `gloom-silk` source) and home to pale salamanders and a
+  tremor-mole at the unlit water's edge. The one hostile room, **The Centipede Run**, sits on the
+  southern margin where the warded light gives out — cave centipedes, and an unmapped dark beyond
+  as a hook for later. From the shrine itself a broad black stair descends, **sealed for now**, the
+  warded way down toward the next depth (room below not yet built).
 - **Glimmerglass crafting.** A new material line: **fulgurite** (an uncommon raw glass
   mined from a new **fulgurite seam**) is fused with **glimmer dust** to make **glimmerglass**,
   a rare pane of dark glass veined with captive light. The fusing happens at a new crafting

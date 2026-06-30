@@ -874,6 +874,36 @@
       { "template": "crystal", "chance": 0.5 }
     ]
   },
+  "elder-stonebug": {
+    "id": "elder-stonebug",
+    "faction": "fauna",
+    "name": "an elder stonebug",
+    "description": "A stonebug grown old and huge in the warded quiet, its overlapping grey plate darkened and mineral-stained along the seams where decades of grinding ore-rich rock have worked into the shell. It grazes the beds at the head of its kind and keeps a slow watch over them — and when one of the lesser bugs is set upon, it does not curl away but turns, plates grinding, and puts its bulk between the threat and its brood.",
+    "maxHp": 56,
+    "speed": 7,
+    "armour": 5,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 12, "intellect": 0, "wits": 3, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "wander",
+    "hostile": false,
+    "helper": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "xp": 22,
+    "attack": { "damage": "2d4", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 6 },
+      { "type": "emote", "weight": 2, "messages": ["grazes the beds with slow, grinding mandibles", "trundles a deliberate half-circle, plates scraping stone", "settles between the lesser bugs and goes still as a boulder"] },
+      { "type": "wander", "weight": 1, "verb": "grinds slowly off through the beds", "scope": "zone", "requireTags": ["grazing"] }
+    ],
+    "loot": [
+      { "template": "chitin-plate", "chance": 1 },
+      { "template": "bug-meat", "chance": 1 },
+      { "template": "dense-chitin-plate", "chance": 0.4 }
+    ]
+  },
   "pallid-hunter": {
     "id": "pallid-hunter",
     "name": "a pallid hunter",
