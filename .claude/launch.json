@@ -25,6 +25,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/depth-viewer/depth-viewer.js"],
       "port": 3942
+    },
+    {
+      "name": "map-3d",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/map-3d/map-3d.js"],
+      "port": 3943
     }
   ]
 }

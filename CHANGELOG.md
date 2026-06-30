@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **3D world map viewer (`tools/map-3d/`).** A local, read-only, browser-based 3D model of the
+  whole world: every room is a node labelled with its **name and id**, exits are edges, and depth
+  is the vertical axis (warm lantern-gold at the surface fading to cold abyssal blue deep down).
+  Orbit by dragging, zoom with the wheel, pan with right-/Shift-drag; hover a room for its name,
+  id, depth, zone, and exits. It always reads **current** data — `npm run view-map` (or
+  double-click `tools/map-3d/start.bat`, port 3943) serves it and re-reads `rooms.json` on each
+  reload. Dependency-free (a tiny vanilla `<canvas>` 3D engine — no Three.js, no CDN), so
+  `node tools/map-3d/map-3d.js --build` bakes the live data into a single self-contained
+  `lumen-map.html` you can open offline.
 - **Depth 8 — the Sour Midden: a 6-room slug dungeon off the sanctuary.** The Centipede Run's
   previously-unmapped south seam (`d9.sanctuary.run`) now opens into a sealed depth-8 charnel pit
   (zone `sour-midden`) where the deep-folk gave their dead to the cleaner-slugs — and the gluttony

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lumen — 3D World Map</title>
+<style>
+  :root {
+    --bg: #0a0c12;
+    --panel: rgba(16, 20, 30, 0.86);
+    --ink: #d8dde8;
+    --muted: #8a93a6;
+    --line: #2a3142;
+    --accent: #ffcf6b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", system-ui, sans-serif; }
+  #stage { display: block; width: 100vw; height: 100vh; cursor: grab; touch-action: none; }
+  #stage.dragging { cursor: grabbing; }
+
+  .panel { position: fixed; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; backdrop-filter: blur(6px); }
+
+  #hud { top: 14px; left: 14px; max-width: 320px; }
+  #hud h1 { margin: 0 0 2px; font-size: 16px; letter-spacing: .3px; }
+  #hud .sub { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+  #hud .row { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0; }
+  #hud label { color: var(--ink); user-select: none; cursor: pointer; }
+  #hud input[type=range] { width: 130px; accent-color: var(--accent); }
+  #hud .btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  #hud button { background: #1b2233; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+  #hud button:hover { border-color: var(--accent); color: var(--accent); }
+  #hud .hint { color: var(--muted); font-size: 11px; margin-top: 10px; line-height: 1.5; }
+
+  #legend { bottom: 14px; left: 14px; font-size: 11px; max-width: 220px; }
+  #legend .scale { display: flex; height: 10px; border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
+  #legend .scale i { flex: 1; }
+  #legend .ends { display: flex; justify-content: space-between; color: var(--muted); }
+
+  #tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 10px; font-size: 12px; max-width: 280px; display: none; z-index: 5;
+    box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  #tip .t-name { color: var(--accent); font-weight: 600; }
+  #tip .t-id { color: var(--muted); font-family: ui-monospace, "Consolas", monospace; font-size: 11px; }
+  #tip .t-meta { color: var(--ink); margin-top: 4px; }
+  #tip .t-exits { color: var(--muted); margin-top: 3px; }
+
+  #status { bottom: 14px; right: 14px; color: var(--muted); font-size: 11px; }
+  #err { top: 50%; left: 50%; transform: translate(-50%,-50%); max-width: 420px; display: none;
+    border-color: #6b2b2b; }
+  #err b { color: #ff8a8a; }
+</style>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <div id="hud" class="panel">
+    <h1>Lumen — 3D World Map</h1>
+    <div class="sub" id="subtitle">loading…</div>
+    <div class="row">
+      <input type="checkbox" id="showNames" checked />
+      <label for="showNames">Room names</label>
+    </div>
+    <div class="row">
+      <input type="checkbox" id="showIds" checked />
+      <label for="showIds">Room IDs</label>
+    </div>
+    <div class="row">
+      <input type="checkbox" id="spin" />
+      <label for="spin">Auto-rotate</label>
+    </div>
+    <div class="row">
+      <label for="labelDist" style="color:var(--muted)">Label range</label>
+      <input type="range" id="labelDist" min="0" max="100" value="60" />
+    </div>
+    <div class="btns">
+      <button id="reset">Reset view</button>
+      <button id="top">Top-down</button>
+      <button id="reload">Reload data</button>
+    </div>
+    <div class="hint">
+      Drag to orbit · Wheel to zoom · Right-drag (or Shift-drag) to pan ·
+      Hover a room for details.
+    </div>
+  </div>
+
+  <div id="legend" class="panel">
+    Depth (descent)
+    <div class="scale" id="legendScale"></div>
+    <div class="ends"><span id="legMin">surface</span><span id="legMax">deep</span></div>
+  </div>
+
+  <div id="tip"></div>
+  <div id="status" class="panel"></div>
+  <div id="err" class="panel"><b>Could not load world data.</b><div id="errMsg"></div></div>
+
+<script>
+"use strict";
+/* ───────────────────────────── Lumen 3D map ─────────────────────────────
+ * Dependency-free: a tiny canvas-2D 3D engine (orbit camera + perspective
+ * projection). Rooms are laid out by walking exit directions per depth-layer,
+ * with depth driving the vertical axis. No external libraries, so this page
+ * runs offline / as a standalone file. Data comes either from a baked-in
+ * window.LUMEN_WORLD (standalone build) or from /api/world (live server).
+ * ------------------------------------------------------------------------ */
+
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d");
+const tip = document.getElementById("tip");
+
+// ── Camera (orbit) ──────────────────────────────────────────────────────
+const cam = { yaw: -0.6, pitch: 0.5, dist: 900, target: { x: 0, y: 0, z: 0 }, fov: 720 };
+const DEFAULT_CAM = JSON.parse(JSON.stringify(cam));
+let dpr = 1, W = 0, H = 0;
+
+// ── Layout constants ────────────────────────────────────────────────────
+const CELL = 90;        // horizontal grid spacing between rooms in a layer
+const LAYER = 220;      // vertical spacing between depths
+const NODE_R = 7;       // base node radius (world units → screen via depth scale)
+
+// Compass → horizontal grid offset (north = away/-z, east = +x).
+const DIR = {
+  north: { x: 0, z: -1 }, south: { x: 0, z: 1 },
+  east:  { x: 1, z: 0 },  west:  { x: -1, z: 0 },
+};
+
+let WORLD = null;   // raw rooms map
+let NODES = [];     // [{id, name, depth, x,y,z, exits:[{dir,to,hidden}], _sx,_sy,_sz,_scale,_vis}]
+let NODE_BY_ID = {};
+let EDGES = [];     // [{a, b, hidden}]
+let depthMin = 0, depthMax = 0;
+
+// ───────────────────────────── data load ─────────────────────────────────
+async function loadWorld() {
+  if (window.LUMEN_WORLD) return window.LUMEN_WORLD;           // baked standalone
+  const res = await fetch("/api/world", { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || "server error");
+  return data.rooms;
+}
+
+function showError(msg) {
+  document.getElementById("err").style.display = "block";
+  document.getElementById("errMsg").textContent = String(msg);
+}
+
+// ─────────────────────── layout: rooms → 3D positions ────────────────────
+// BFS from the surface; within a depth-layer we accumulate compass offsets,
+// snapping each room to a free grid cell so rooms don't stack. Crossing to a
+// different depth re-anchors the new layer roughly under the connection.
+function buildLayout(rooms) {
+  WORLD = rooms;
+  const ids = Object.keys(rooms);
+  if (!ids.length) throw new Error("no rooms in data");
+
+  depthMin = Infinity; depthMax = -Infinity;
+  for (const id of ids) {
+    const d = rooms[id].depth | 0;
+    if (d < depthMin) depthMin = d;
+    if (d > depthMax) depthMax = d;
+  }
+
+  // Collect every exit (visible + hidden) as a directed link we can walk.
+  function exitsOf(room) {
+    const out = [];
+    for (const [dir, to] of Object.entries(room.exits || {})) out.push({ dir, to, kind: "open" });
+    for (const [dir, h] of Object.entries(room.hiddenExits || {})) {
+      const to = (h && typeof h === "object") ? h.to : h;
+      if (to) out.push({ dir, to, kind: "hidden" });
+    }
+    for (const [dir, d] of Object.entries(room.doorExits || {})) {
+      if (d && d.to) out.push({ dir, to: d.to, kind: "door" });
+    }
+    return out;
+  }
+
+  const placed = {};                 // id → {x,z} (grid units, per layer)
+  const occupied = {};               // "depth|gx|gz" → true
+  const taken = (d, gx, gz) => occupied[d + "|" + gx + "|" + gz];
+  function claim(d, gx, gz) {
+    // spiral out to the nearest free cell at this depth
+    if (!taken(d, gx, gz)) { occupied[d + "|" + gx + "|" + gz] = true; return { x: gx, z: gz }; }
+    for (let r = 1; r < 60; r++) {
+      for (let dx = -r; dx <= r; dx++) for (let dz = -r; dz <= r; dz++) {
+        if (Math.abs(dx) !== r && Math.abs(dz) !== r) continue; // ring only
+        if (!taken(d, gx + dx, gz + dz)) { occupied[d + "|" + (gx + dx) + "|" + (gz + dz)] = true; return { x: gx + dx, z: gz + dz }; }
+      }
+    }
+    occupied[d + "|" + gx + "|" + gz] = true; return { x: gx, z: gz };
+  }
+
+  // Choose a root: the shallowest room (prefer a canonical plaza/landing).
+  const root = rooms["d0.plaza"] ? "d0.plaza"
+    : ids.slice().sort((a, b) => (rooms[a].depth | 0) - (rooms[b].depth | 0))[0];
+
+  const queue = [];
+  function seed(id, gx, gz) {
+    if (placed[id]) return;
+    placed[id] = claim(rooms[id].depth | 0, gx, gz);
+    queue.push(id);
+  }
+  seed(root, 0, 0);
+
+  while (queue.length) {
+    const id = queue.shift();
+    const room = rooms[id];
+    const here = placed[id];
+    const d = room.depth | 0;
+    for (const { to } of exitsOf(room)) {
+      if (!rooms[to] || placed[to]) continue;
+      const nd = rooms[to].depth | 0;
+      let gx = here.x, gz = here.z;
+      if (nd === d) {
+        // same layer: offset by the compass direction if it's a planar one
+        const off = DIR[exitDirTo(room, to)];
+        if (off) { gx += off.x; gz += off.z; }
+      }
+      // different depth (up/down/cross): keep x/z, the layer gap separates them
+      placed[to] = claim(nd, gx, gz);
+      queue.push(to);
+    }
+  }
+
+  // Any rooms unreachable from root (shouldn't happen — validator enforces it):
+  // drop them onto their own offset shelf so they still appear.
+  let shelf = 0;
+  for (const id of ids) {
+    if (placed[id]) continue;
+    placed[id] = claim(rooms[id].depth | 0, 100 + (shelf % 10), 100 + Math.floor(shelf / 10));
+    shelf++;
+  }
+
+  // Materialise nodes in world space, centring each layer on its centroid.
+  const byDepth = {};
+  for (const id of ids) (byDepth[rooms[id].depth | 0] ||= []).push(id);
+  const centroid = {};
+  for (const [d, list] of Object.entries(byDepth)) {
+    let sx = 0, sz = 0;
+    for (const id of list) { sx += placed[id].x; sz += placed[id].z; }
+    centroid[d] = { x: sx / list.length, z: sz / list.length };
+  }
+
+  NODES = []; NODE_BY_ID = {};
+  for (const id of ids) {
+    const room = rooms[id];
+    const d = room.depth | 0;
+    const c = centroid[d];
+    const node = {
+      id, name: room.name || id, depth: d, zone: room.zone || "",
+      x: (placed[id].x - c.x) * CELL,
+      y: -(d - depthMin) * LAYER,
+      z: (placed[id].z - c.z) * CELL,
+      exits: exitsOf(room),
+    };
+    NODES.push(node); NODE_BY_ID[id] = node;
+  }
+
+  // Edges (dedupe undirected pairs; the most "open" kind on either direction wins
+  // for styling — a plain exit beats a door beats a hidden way).
+  const rank = { open: 2, door: 1, hidden: 0 };
+  const seen = {}; EDGES = [];
+  for (const n of NODES) {
+    for (const ex of n.exits) {
+      const m = NODE_BY_ID[ex.to];
+      if (!m) continue;
+      const key = n.id < m.id ? n.id + "→" + m.id : m.id + "→" + n.id;
+      if (seen[key]) {
+        if (rank[ex.kind] > rank[seen[key].kind]) seen[key].kind = ex.kind;
+        continue;
+      }
+      const edge = { a: n, b: m, kind: ex.kind };
+      seen[key] = edge; EDGES.push(edge);
+    }
+  }
+
+  // Frame the whole structure.
+  const span = LAYER * Math.max(1, depthMax - depthMin);
+  cam.dist = Math.max(600, span * 1.2 + 400);
+  cam.target = { x: 0, y: -span / 2, z: 0 };
+  Object.assign(DEFAULT_CAM, JSON.parse(JSON.stringify(cam)));
+
+  document.getElementById("subtitle").textContent =
+    NODES.length + " rooms · depths " + depthMin + "–" + depthMax;
+  document.getElementById("legMin").textContent = "d" + depthMin;
+  document.getElementById("legMax").textContent = "d" + depthMax;
+  buildLegend();
+}
+
+function exitDirTo(room, to) {
+  for (const [dir, t] of Object.entries(room.exits || {})) if (t === to) return dir;
+  for (const [dir, h] of Object.entries(room.hiddenExits || {})) {
+    const ht = (h && typeof h === "object") ? h.to : h;
+    if (ht === to) return dir;
+  }
+  for (const [dir, d] of Object.entries(room.doorExits || {})) {
+    if (d && d.to === to) return dir;
+  }
+  return null;
+}
+
+// ───────────────────────────── colour by depth ───────────────────────────
+function depthColor(d) {
+  const span = Math.max(1, depthMax - depthMin);
+  const t = (d - depthMin) / span;            // 0 surface → 1 deep
+  // warm lantern gold at the surface → cold abyssal blue/violet deep
+  const h = 45 + t * 215;                     // 45° (gold) → 260° (violet-blue)
+  const s = 70 - t * 15;
+  const l = 62 - t * 22;
+  return `hsl(${h.toFixed(0)}, ${s.toFixed(0)}%, ${l.toFixed(0)}%)`;
+}
+function buildLegend() {
+  const el = document.getElementById("legendScale");
+  el.innerHTML = "";
+  const steps = Math.max(2, depthMax - depthMin + 1);
+  for (let i = 0; i < steps; i++) {
+    const span = document.createElement("i");
+    span.style.background = depthColor(depthMin + i);
+    el.appendChild(span);
+  }
+}
+
+// ───────────────────────────── projection ────────────────────────────────
+function project(p) {
+  // translate to camera target, rotate by yaw (around Y) then pitch (around X),
+  // push back by distance, perspective-divide.
+  let x = p.x - cam.target.x, y = p.y - cam.target.y, z = p.z - cam.target.z;
+  const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+  let x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+  const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  let y1 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
+  const depth = z2 + cam.dist;                // camera looks down +Z after transform
+  if (depth <= 1) return { vis: false };
+  const scale = cam.fov / depth;
+  return { sx: W / 2 + x1 * scale, sy: H / 2 - y1 * scale, sz: depth, scale, vis: true };
+}
+
+// ───────────────────────────── render ────────────────────────────────────
+let showNames = true, showIds = true, labelDist = 60, hovered = null;
+
+function frame() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  // project all nodes
+  for (const n of NODES) {
+    const pr = project(n);
+    n._sx = pr.sx; n._sy = pr.sy; n._sz = pr.sz; n._scale = pr.scale; n._vis = pr.vis;
+  }
+
+  // edges (painter's order: far first). Use midpoint depth.
+  const edges = EDGES.filter(e => e.a._vis && e.b._vis)
+    .sort((p, q) => ((q.a._sz + q.b._sz) - (p.a._sz + p.b._sz)));
+  for (const e of edges) {
+    const near = (e.a._sz + e.b._sz) / 2;
+    const fade = Math.max(0.06, Math.min(0.5, 600 / near));
+    if (e.kind === "hidden") {        // secret way — violet, dotted
+      ctx.strokeStyle = `rgba(168,130,214,${fade})`; ctx.lineWidth = 1; ctx.setLineDash([3, 5]);
+    } else if (e.kind === "door") {   // door fixture — amber, dashed
+      ctx.strokeStyle = `rgba(220,170,90,${fade + 0.1})`; ctx.lineWidth = 1.4; ctx.setLineDash([7, 4]);
+    } else {                          // plain exit — cool blue, solid
+      ctx.strokeStyle = `rgba(140,160,200,${fade})`; ctx.lineWidth = 1.2; ctx.setLineDash([]);
+    }
+    ctx.beginPath(); ctx.moveTo(e.a._sx, e.a._sy); ctx.lineTo(e.b._sx, e.b._sy); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // nodes (far first so near draw on top)
+  const order = NODES.filter(n => n._vis).sort((a, b) => b._sz - a._sz);
+  const labelCut = cam.dist * (0.2 + labelDist / 100 * 1.6); // smaller range → only nearest labelled
+  for (const n of order) {
+    const r = Math.max(2.2, NODE_R * n._scale * 18);
+    const col = depthColor(n.depth);
+    const isHover = n === hovered;
+
+    // soft glow
+    const g = ctx.createRadialGradient(n._sx, n._sy, 0, n._sx, n._sy, r * 2.4);
+    g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.globalAlpha = isHover ? 0.55 : 0.28;
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(n._sx, n._sy, r * 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // core
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(n._sx, n._sy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = isHover ? "#fff" : "rgba(0,0,0,.5)";
+    ctx.lineWidth = isHover ? 2 : 1;
+    ctx.stroke();
+
+    // labels
+    const want = isHover || (n._sz < labelCut);
+    if (want && (showNames || showIds)) {
+      const fs = Math.max(9, Math.min(15, 11 * n._scale * 20));
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      let ly = n._sy + r + 2;
+      if (showNames) {
+        ctx.font = (isHover ? "600 " : "") + fs + "px 'Segoe UI', sans-serif";
+        labelWithHalo(n.name, n._sx, ly, isHover ? "#ffe7ad" : "#e6ebf5", fs);
+        ly += fs + 1;
+      }
+      if (showIds) {
+        const ifs = Math.max(8, fs - 2);
+        ctx.font = ifs + "px ui-monospace, Consolas, monospace";
+        labelWithHalo(n.id, n._sx, ly, "#9aa6bd", ifs);
+      }
+    }
+  }
+}
+
+function labelWithHalo(text, x, y, color, fs) {
+  ctx.lineJoin = "round";
+  ctx.lineWidth = Math.max(2, fs / 4);
+  ctx.strokeStyle = "rgba(6,8,14,0.9)";
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+}
+
+// Render on demand: the page sits idle (0% CPU) until the camera or options
+// change. On-demand draws are synchronous (so they paint even in a background /
+// headless tab, where requestAnimationFrame is throttled); rAF is used only to
+// drive the continuous auto-rotate animation.
+let autoSpin = false, rafPending = false;
+function requestRender() {
+  if (autoSpin) { if (!rafPending) { rafPending = true; requestAnimationFrame(loop); } }
+  else frame();
+}
+function loop() {
+  rafPending = false;
+  if (!autoSpin) return;
+  cam.yaw += 0.0035;
+  frame();
+  rafPending = true; requestAnimationFrame(loop);
+}
+
+// ───────────────────────────── interaction ───────────────────────────────
+let drag = null;
+canvas.addEventListener("pointerdown", (e) => {
+  canvas.setPointerCapture(e.pointerId);
+  drag = { x: e.clientX, y: e.clientY, pan: e.button === 2 || e.shiftKey };
+  canvas.classList.add("dragging");
+});
+canvas.addEventListener("pointermove", (e) => {
+  if (drag) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.pan) {
+      const k = cam.dist / cam.fov;
+      const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+      cam.target.x -= (dx * cy) * k;
+      cam.target.z -= (dx * sy) * k;
+      cam.target.y += dy * k;
+    } else {
+      cam.yaw += dx * 0.005;
+      cam.pitch += dy * 0.005;
+      cam.pitch = Math.max(-1.5, Math.min(1.5, cam.pitch));
+    }
+    requestRender();
+    return;
+  }
+  updateHover(e.clientX, e.clientY);
+});
+canvas.addEventListener("pointerup", (e) => { drag = null; canvas.classList.remove("dragging"); });
+canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  cam.dist *= (1 + Math.sign(e.deltaY) * 0.12);
+  cam.dist = Math.max(120, Math.min(20000, cam.dist));
+  requestRender();
+}, { passive: false });
+
+function updateHover(mx, my) {
+  // nearest node whose (padded) disc the cursor is inside; nearest centre wins
+  // ties so the room directly under the cursor is the one picked.
+  let best = null, bestD = Infinity;
+  for (const n of NODES) {
+    if (!n._vis) continue;
+    const dx = n._sx - mx, dy = n._sy - my;
+    const d2 = dx * dx + dy * dy;
+    const r = Math.max(6, NODE_R * n._scale * 18) + 5;
+    if (d2 <= r * r && d2 < bestD) { best = n; bestD = d2; }
+  }
+  if (best !== hovered) { hovered = best; requestRender(); }
+  if (best) {
+    const mark = { open: "", hidden: "*", door: "🚪" };
+    const exShown = best.exits.map(x => x.dir + (mark[x.kind] || "")).join(", ") || "none";
+    tip.innerHTML =
+      `<div class="t-name">${esc(best.name)}</div>` +
+      `<div class="t-id">${esc(best.id)}</div>` +
+      `<div class="t-meta">depth ${best.depth}${best.zone ? " · " + esc(best.zone) : ""}</div>` +
+      `<div class="t-exits">exits: ${esc(exShown)}</div>`;
+    tip.style.display = "block";
+    tip.style.left = Math.min(mx + 14, innerWidth - 290) + "px";
+    tip.style.top = (my + 14) + "px";
+  } else {
+    tip.style.display = "none";
+  }
+}
+function esc(s) { return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+
+// ───────────────────────────── controls wiring ───────────────────────────
+document.getElementById("showNames").onchange = (e) => { showNames = e.target.checked; requestRender(); };
+document.getElementById("showIds").onchange = (e) => { showIds = e.target.checked; requestRender(); };
+document.getElementById("spin").onchange = (e) => { autoSpin = e.target.checked; requestRender(); };
+document.getElementById("labelDist").oninput = (e) => { labelDist = +e.target.value; requestRender(); };
+document.getElementById("reset").onclick = () => { Object.assign(cam, JSON.parse(JSON.stringify(DEFAULT_CAM))); requestRender(); };
+document.getElementById("top").onclick = () => { cam.yaw = 0; cam.pitch = 1.45; requestRender(); };
+document.getElementById("reload").onclick = () => init(true);
+
+// ───────────────────────────── boot ──────────────────────────────────────
+function resize() {
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + "px"; canvas.style.height = H + "px";
+  requestRender();
+}
+window.addEventListener("resize", resize);
+
+let started = false;
+async function init(reload) {
+  try {
+    document.getElementById("err").style.display = "none";
+    const rooms = await loadWorld();
+    buildLayout(rooms);
+    const src = window.LUMEN_WORLD ? "baked-in (standalone build)" : "/api/world (live)";
+    document.getElementById("status").textContent = "source: " + src;
+    if (!started) { started = true; resize(); }
+    requestRender();
+  } catch (e) {
+    showError(e.message + (window.LUMEN_WORLD ? "" : " — is the server running? (npm run view-map)"));
+  }
+}
+resize();
+init(false);
+</script>
+</body>
+</html>

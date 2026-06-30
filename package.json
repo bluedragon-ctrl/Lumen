@@ -13,7 +13,8 @@
     "edit-items": "node tools/item-editor/item-editor.js",
     "edit-recipes": "node tools/recipe-editor/recipe-editor.js",
     "edit-spawns": "node tools/spawn-editor/spawn-editor.js",
-    "view-depths": "node tools/depth-viewer/depth-viewer.js"
+    "view-depths": "node tools/depth-viewer/depth-viewer.js",
+    "view-map": "node tools/map-3d/map-3d.js"
   },
   "engines": {
     "node": ">=18"
