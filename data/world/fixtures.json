@@ -149,6 +149,13 @@
     "type": "resource",
     "fish": { "template": "cave-fish", "yield": 1, "charges": 6, "respawn": 120, "energy": 20, "bait": "grub", "catchChance": 0.8 }
   },
+  "keepers-lake": {
+    "id": "keepers-lake",
+    "name": "the kept lake",
+    "description": "A broad, still lake held in a basin of worked stone, kept and stocked by the deep-folk and lit blue-green by the crop crowding its banks. Pale blind cave-fish hang thick in the cold shallows, untroubled and unfished but by a patient hand — the fat grubs the terraces breed are the surest bait.",
+    "type": "resource",
+    "fish": { "template": "cave-fish", "yield": 1, "charges": 6, "respawn": 120, "energy": 20, "bait": "grub", "catchChance": 0.85 }
+  },
   "umbral-garden-beds": {
     "id": "umbral-garden-beds",
     "name": "the garden beds",
