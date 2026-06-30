@@ -986,6 +986,15 @@
     "value": 3,
     "stackable": true
   },
+  "caustic-gland": {
+    "id": "caustic-gland",
+    "name": "a caustic gland",
+    "description": "A tough, fist-sized bladder cut whole from a glut-slug, still taut with the concentrated sour slime the creature weeps. The skin of it resists, then gives all at once — and what it holds fumes and bites at the air, far stronger than the clean binder its lesser kin make. An etcher's prize: a rare reagent for anything that must eat through stone or steel.",
+    "type": "material",
+    "weight": 1,
+    "value": 14,
+    "stackable": true
+  },
   "grub": {
     "id": "grub",
     "name": "a dead grub",

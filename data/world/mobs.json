@@ -698,6 +698,73 @@
     ],
     "loot": [{ "template": "slug-slime", "chance": 1 }]
   },
+  "glut-slug": {
+    "id": "glut-slug",
+    "name": "a glut-slug",
+    "keywords": ["glut", "slug", "gorged"],
+    "description": "A scour-slug gorged past all reason — bloated to the size of a hog on the endless dead of the midden, its grey hide stretched thin and weeping a clear, stinging slime that fumes where it drips and etches pale scars into the stone. The dark the warding never reached has worked into it: it no longer waits for the dead but humps itself toward anything warm and living, and the slime it leaves is no longer clean but sour, eating at whatever it touches.",
+    "maxHp": 38,
+    "speed": 8,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 10, "intellect": 0, "wits": 2, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "lightBane": { "above": 3, "damage": "1d3" },
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 16,
+      "onHit": [
+        { "type": "damage-over-time", "name": "acid-burn", "damage": "1d3", "duration": 5, "chance": 1 }
+      ]
+    },
+    "xp": 18,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["humps itself blindly toward your warmth, slime fuming", "drags its bulk over the stone, etching a sour, smoking track", "swells and contracts, weeping caustic slime from every seam"] }
+    ],
+    "loot": [
+      { "template": "slug-slime", "chance": 1 },
+      { "template": "caustic-gland", "chance": 0.35 }
+    ]
+  },
+  "great-glut": {
+    "id": "great-glut",
+    "name": "the Great Glut",
+    "keywords": ["great", "glut", "slug", "boss"],
+    "description": "The thing at the bottom of the midden was a slug once. Now it is a hill of grey, glistening flesh that fills its pit wall to wall, swollen over ages on everything the deep gave up to it, its hide split and re-healed in glassy ridges and running everywhere with the same sour, smoking slime its lesser kin weep — but here in a flood, pooling and hissing on the stone. It has no eyes and needs none; it knows the warmth of you, and the whole vast bulk of it turns, slow and certain, and begins to come. Whatever the deep-folk meant this pit to clean, it long ago stopped cleaning and started keeping.",
+    "maxHp": 150,
+    "speed": 6,
+    "armour": 4,
+    "ward": 0,
+    "attributes": { "might": 10, "vitality": 20, "intellect": 0, "wits": 2, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
+    "behavior": "guard",
+    "hostile": true,
+    "lightBane": { "above": 4, "damage": "1d4" },
+    "attack": {
+      "damage": "2d6",
+      "actionCost": 14,
+      "onHit": [
+        { "type": "damage-over-time", "name": "caustic-burn", "damage": "2d3", "duration": 6, "chance": 1 }
+      ]
+    },
+    "xp": 85,
+    "shards": "4d6",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["heaves its bulk forward, a tide of smoking slime fanning out before it", "splits along an old ridge and reseals, weeping a fresh flood of caustic ooze", "presses its blind, dripping front toward your warmth"] }
+    ],
+    "loot": [
+      { "template": "slug-slime", "chance": 1 },
+      { "template": "caustic-gland", "chance": 1 },
+      { "template": "crystal", "chance": 0.4 }
+    ]
+  },
   "cave-centipede": {
     "id": "cave-centipede",
     "name": "a cave centipede",
