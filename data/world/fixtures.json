@@ -257,6 +257,12 @@
     "type": "scenery",
     "restore": { "hp": 2, "mana": 2 }
   },
+  "umbral-glyph-panel": {
+    "id": "umbral-glyph-panel",
+    "name": "a hidden glyph-panel",
+    "description": "A slab of the gallery wall set so cunningly into the relief that only a searching eye catches the seam — a panel the deep-folk meant to be found by their own and no one else. Behind it the carving changes utterly: not the clawed ruin of the failing work outside but the old, sure hand, cut deep and clean. It shows a stair going down past warding-marks into a kept place — a sanctuary sealed against the dark and the things the dark unmakes — and the deep-folk as they once were at the foot of it, gathered and waiting. Whatever broke the watchers above, this was carved before it, by hands that still hoped. Loose stones and the dust of ages lie at its foot.",
+    "type": "scenery"
+  },
   "glimmer-vein": {
     "id": "glimmer-vein",
     "name": "a glimmer vein",
