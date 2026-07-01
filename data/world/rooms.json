@@ -46,10 +46,10 @@
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Rim Market",
-    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a rutted lane of prospectors' lodgings runs east toward the town's landward gate, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.mageshed", "south": "d0.claims" },
+    "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.street", "south": "d0.claims" },
     "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 120 }]
@@ -159,10 +159,10 @@
     "id": "d0.mageshed",
     "zone": "rim",
     "name": "The Mage's Shed",
-    "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The market lane lies back west.",
+    "description": "A timber shed set a little apart from the lodging-lane's clamour, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The prospectors' lane lies back north, the market beyond it.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "west": "d0.market" },
+    "exits": { "north": "d0.street" },
     "fixtures": ["alchemist-bench", "trapdoor", "lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 120 }]
@@ -178,6 +178,32 @@
     "fixtures": ["ward-ring", "vesper-field-journal"],
     "groundItems": [],
     "spawns": [{ "mob": "wisp", "max": 1, "respawn": 120 }]
+  },
+  "d0.street": {
+    "id": "d0.street",
+    "zone": "rim",
+    "tags": ["patrol"],
+    "name": "Prospectors' Walk",
+    "description": "A rutted dirt street running east off the market, both sides crowded with the leaning plank-and-tarpaulin sheds where the prospectors doss between delves — bunks stacked three high, wet gear steaming on lines, the low murmur of folk who came down with the Rush and never went back up. This is where the Rim actually sleeps. The market stalls lie back west, Vesper's shed sits apart to the south, and the street runs on east to the town's landward gate.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "west": "d0.market", "south": "d0.mageshed", "east": "d0.roadgate" },
+    "fixtures": ["lamp"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d0.roadgate": {
+    "id": "d0.roadgate",
+    "zone": "rim",
+    "tags": ["patrol"],
+    "name": "The Landward Gate",
+    "description": "The street gives out at the settlement's landward wall, where a heavy iron gate stands chained and padlocked across the old road — the way the Rush first came down, and the only way overland back out to the wider world. It hasn't been swung open in a long while: the chain is orange with rust, and the lane beyond lies dark and untravelled. For now there is nowhere to go but back west, into the lamplight.",
+    "depth": 0,
+    "ambientLight": 2,
+    "exits": { "west": "d0.street" },
+    "fixtures": ["lamp"],
+    "groundItems": [],
+    "spawns": []
   },
   "d0.workshop": {
     "id": "d0.workshop",

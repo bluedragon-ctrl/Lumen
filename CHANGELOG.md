@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Rim town map groundwork — two new patrolled rooms.** Added **Prospectors' Walk**
+  (`d0.street`), a lodging-lane of prospectors' sheds inserted east of the Rim Market, and
+  **The Landward Gate** (`d0.roadgate`) beyond it — a locked iron gate barring the old road out
+  of the settlement (flavour only, no exit through it yet). The **Mage's Shed** (`d0.mageshed`)
+  now hangs **south** off the Walk rather than directly off the market; the Warded Cellar link is
+  unchanged. Both new rooms carry the `patrol` tag so they fall inside Hale's beat. Enabling
+  geography for the shallow-layer side-area cluster (see `docs/side-areas.md` #0); no monster
+  content added.
 - **Side-areas idea backlog (`docs/side-areas.md`).** A living design list of proposed optional
   side pockets / mini-dungeons keyed to the threat ladder — bat spire, hollowed prospector camp,
   glimmer-mutated fauna, tremor-mole lair, human bandit camp, submerged rooms, and a living-fungi

@@ -21,7 +21,13 @@
 ---
 
 ## 0. Shallow-Layer Map Extension (d0–d1) — the foundation
-- **Depth:** 0–1 · **Theme:** connective geography · **Lift:** JSON · **Verdict:** ✅ prerequisite
+- **Depth:** 0–1 · **Theme:** connective geography · **Lift:** JSON · **Verdict:** ✅ prerequisite · **In progress**
+- **Groundwork laid (Rim town, d0):** added **Prospectors' Walk** (`d0.street`) east of the
+  market — a lodging-lane of prospectors' sheds — and **The Landward Gate** (`d0.roadgate`) beyond
+  it, a chained iron gate onto the old road out of town (flavour only, no exit through yet, room
+  reserved for later content). The **Mage's Shed** now hangs south off the Walk. Both new rooms are
+  `patrol`-tagged (inside Hale's beat). This fleshes out the town and gives the frontier an
+  established "edge" to push wild content past. *(Names provisional pending sign-off.)*
 - **Not a monster area — the enabling work for the shallow cluster (#1, #4, #5).**
   The d0–2 side areas all compete for the same scarce shallow real estate, and d1
   is already dense (Bat Roost, Sporechoke → Centipede Nest, the rat nest, the
