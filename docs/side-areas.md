@@ -173,12 +173,14 @@
 - **Enemy roster (new `outlaw` faction).** Registered `outlaw` in `server/config.js` +
   `server/factions.js` (`enemy` to `player` and the `rim` watch that would clear them; `neutral`
   to fauna/wild/umbral — the camp squats *among* the vermin, not against it). Four mobs:
-  **camp sentry** and **outlaw prospector** (coordinated melee, `pursues` a fleeing delver
-  through the camp), **the Foreman** (a `guard` melee captain who holds his cut and does not
-  chase; drops **the Foreman's brigandine**), and **the camp warder** (a hedge-mage who lights
+  **camp sentry** and **outlaw prospector** (melee brawlers), **the Foreman** (a `guard` melee
+  captain; drops **the Foreman's brigandine**), and **the camp warder** (a hedge-mage who lights
   the camp and fights from range with Witchfire/Spark and a self-cast Mage Armour; drops **a
-  warder's staff**). Sentries/prospectors drop iron weapons at a low chance. No new mob-uses-items
-  code was needed — the roster is built entirely on existing `attack`/`cast`/`pursues`/`guard`.
+  warder's staff**). The whole crew fights as a **coordinated unit** — every outlaw is a `helper`
+  (assist: attack one and its roommates pile on) and `pursues` up to **3 rooms** (a fleeing delver
+  is run down through the camp and out into the approach, the Foreman included). Sentries/prospectors
+  drop iron weapons at a low chance. No new mob-uses-items code was needed — the roster is built
+  entirely on existing `helper`/`pursues`/`attack`/`cast`/`guard`.
 - **Light inverts the bat spire.** These are living humans who *keep* light: cook-fires and lamps
   make the camp a **lit pocket** (`ambientLight 1`) in the dark approach, and the warder himself
   `emitsLight`. The tell that something organized holds this ground — the opposite of the

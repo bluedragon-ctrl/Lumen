@@ -15,10 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   outlaws, **The Foreman's Cut** (`d1.foremans-cut`, the boss's rich seam), and **The Warder's
   Nook** (`d1.nook`, off the commons). Four new mobs on a **new `outlaw` faction** (`enemy` to
   both the player and the `rim` watch, `neutral` to the deep's own things): the **camp sentry**
-  and **outlaw prospector** (coordinated melee that pursue a fleeing delver through the camp),
-  **the Foreman** (a `guard`-behaviour melee captain who holds his cut and does not chase), and
-  **the camp warder** (a hedge-mage who lights the camp and fights from range with Witchfire,
-  Spark and a self-cast Mage Armour). Light **inverts** the bat spire's rule: these are living
+  and **outlaw prospector** (melee brawlers), **the Foreman** (a `guard`-behaviour melee captain,
+  drops the brigandine), and **the camp warder** (a hedge-mage who lights the camp and fights
+  from range with Witchfire, Spark and a self-cast Mage Armour). The whole crew is a
+  **coordinated unit** — every outlaw `assist`s (attack one and its roommates pile on) and
+  `pursues` (a fleeing delver is chased up to three rooms, the Foreman included), so the camp
+  fights as a rallying whole rather than a set of isolated encounters. Light **inverts** the bat
+  spire's rule: these are living
   humans who *keep* light — cook-fires and lamps make the camp a lit pocket in the dark, a tell
   that something organized holds this ground. New drops: **the Foreman's brigandine** (a
   flexible body armour that rivals the iron cuirass without dulling a delver's wits) and **a
