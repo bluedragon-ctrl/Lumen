@@ -1428,6 +1428,66 @@
     "sellValue": 40,
     "stackable": true
   },
+  "grave-wardens-spear": {
+    "id": "grave-wardens-spear",
+    "rarity": "rare",
+    "name": "a grave-warden's spear",
+    "keywords": ["spear", "lance", "grave-warden", "warden", "keeper", "glimmer", "umbral"],
+    "description": "The long spear the Aya-Keeper carried among its graves — a haft of black deep-stone tipped not with iron but with a spike of frozen light, glimmer dragged up out of the shards and held in a cold, unmelting point the way the keeper held its whole ruined self together. It is a warden's weapon, made to keep a threshold rather than take a field: it strikes seldom but true, the frozen tip biting for the gap in any guard, and where it lands it leaves the same grave-cold that walks in the husks. Balanced for a keen eye more than a strong arm.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 150,
+    "weapon": {
+      "damage": { "magical": "1d8" },
+      "actionCost": 13,
+      "crit": 0.12,
+      "scale": { "attr": "perception", "per": 3 },
+      "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+    }
+  },
+  "aya-keepers-vestments": {
+    "id": "aya-keepers-vestments",
+    "rarity": "rare",
+    "name": "the Aya-Keeper's vestments",
+    "keywords": ["vestments", "vestment", "robe", "keeper", "aya", "warden", "umbral"],
+    "description": "The layered grey vestments the Aya-Keeper wore over its long tending — deep-folk ritual cloth, glyph-worked and hung with the cold, and cut loose and light so a glimmer-singer could turn and gesture and slip a blow without ever being weighed down. They lie almost weightless on the shoulders, quicken the wits of whoever wears them the way they must once have steadied the keeper's failing mind, and hold a patient warding cold in every thread. A blade finds little to bite, but a body that stays light on its feet inside them is a hard thing to pin.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 1,
+    "value": 165,
+    "armour": { "armour": 1, "ward": 2, "maxMana": 5, "speedPenalty": 0, "attrMod": { "wits": 2 } }
+  },
+  "mantle-of-interred-night": {
+    "id": "mantle-of-interred-night",
+    "rarity": "epic",
+    "name": "a mantle of interred night",
+    "keywords": ["mantle", "cloak", "night", "interred", "shadow", "supay", "umbral"],
+    "description": "A mantle woven of the dark that Supay wore for a skin — living shadow drawn out cold and worked into a cloth that drinks the light off its own folds, so it hangs on the shoulders as a starless black the eye slides from. It lies heavy against hostile magic, heavier than any weave of mere silk, and the interred dark in it feeds a caster's well from within, a slow cold trickle that never quite runs dry. To wear it is to carry a little of the crypt's hunger, and to think the clearer for it.",
+    "type": "armour",
+    "slot": "cloak",
+    "weight": 0,
+    "value": 190,
+    "armour": { "ward": 3, "manaRegen": 0.125, "attrMod": { "intellect": 2 } }
+  },
+  "staff-of-drinking-dark": {
+    "id": "staff-of-drinking-dark",
+    "rarity": "epic",
+    "name": "a staff of drinking dark",
+    "keywords": ["staff", "rod", "focus", "drinking", "dark", "shadow", "supay", "umbral"],
+    "description": "The focus Supay drew its unmakings through — a rod of black deep-stone with a knot of the interred night bound cold at its head, and it is never quite still in the hand. Held while casting it deepens the well a caster draws from and steadies the will against the dark's own pull; and where it strikes it does what the thing that made it did, drinking a little of the warmth out of the wound and feeding it back cold to the hand on the haft. A caster's weapon, and a hungry one.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 220,
+    "weapon": {
+      "damage": { "magical": "1d6" },
+      "actionCost": 12,
+      "scale": { "attr": "intellect", "per": 3 },
+      "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
+    },
+    "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
+  },
   "book-of-shadow-binding": {
     "id": "book-of-shadow-binding",
     "name": "the Book of Shadow-Binding",

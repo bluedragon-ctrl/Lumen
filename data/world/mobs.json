@@ -1479,7 +1479,9 @@
       { "template": "glyph-silk", "chance": 0.5 },
       { "template": "crystal", "chance": 0.1 },
       { "template": "shadow-shard", "chance": 0.5 },
-      { "template": "shadow-heart", "chance": 0.2 }
+      { "template": "shadow-heart", "chance": 0.2 },
+      { "template": "grave-wardens-spear", "chance": 0.2 },
+      { "template": "aya-keepers-vestments", "chance": 0.2 }
     ]
   },
   "interred-dark": {
@@ -1513,7 +1515,9 @@
     ],
     "loot": [
       { "template": "shadow-heart", "chance": 1 },
-      { "template": "crystal", "chance": 0.25 }
+      { "template": "crystal", "chance": 0.25 },
+      { "template": "mantle-of-interred-night", "chance": 0.2 },
+      { "template": "staff-of-drinking-dark", "chance": 0.2 }
     ]
   }
 }

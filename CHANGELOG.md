@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   text in both rooms updated to suit.
 
 ### Added
+- **Necropolis boss equipment — four unique drops.** The two necropolis bosses now drop
+  best-in-slot gear (20% each). The **Aya-Keeper** drops **a grave-warden's spear**
+  (`grave-wardens-spear`, rare — magical `1d8`, Perception-scaled, high innate crit `0.12`, with a
+  grave-chill burn on hit) and **the Aya-Keeper's vestments** (`aya-keepers-vestments`, rare body —
+  light caster-warden cloth: `armour 1, ward 2, maxMana 5` and `wits +2`, which the engine turns
+  into extra Ward *and* dodge). **Supay** drops **a mantle of interred night**
+  (`mantle-of-interred-night`, epic `cloak` — `ward 3, manaRegen 0.125, intellect +2`) and **a staff
+  of drinking dark** (`staff-of-drinking-dark`, epic caster focus — magical `1d6`, Intellect-scaled,
+  `intellect +2, maxMana 6`, life-drain on hit). Names provisional, pending sign-off.
 - **Depth 8 — the Umbral Necropolis: an 8-room side-dungeon of the dark-taken dead.** North of
   the ward-post the bridge lands in a Quechua-inspired underground necropolis (zone
   `umbral-necropolis`), the most dangerous place mapped so far — pitched harder than the depth 7/8
