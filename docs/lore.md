@@ -67,7 +67,7 @@ explain it (see *Deliberately unknown*).
 
 A gold-rush, in everything but the metal. Word of glimmer has drawn
 fortune-seekers, sellswords, alchemists, and the desperate from across the world to
-prospect the Abyss. **Delvers are prospectors** — think claims, rich-seam rumours,
+prospect the Abyss. **Delvers are prospectors** — think permits, rich-seam rumours,
 boomtown prices, sudden fortunes, and the many who never come back up. This framing
 should colour the tone of all surface content.
 
@@ -77,9 +77,10 @@ The rough boomtown at the mouth of the Abyss, the last settlement before the dar
 where prospectors gather, trade in shards, resupply, and stage expeditions. Trades
 in light, rope, steel, broth, and tallow. Established figures: **Maeve** (innkeeper),
 **Garrick** (sour quartermaster), **Tobin** (half-mad tinker-smith), **Fenn**
-(self-appointed claims-recorder — nobody appointed him, but no claim is real until
-it crosses his counter), **Hale** (watchman — an ex-sellsword paid in shards by the
-traders to walk the village and be seen; the Rim has no formal law).
+(self-appointed reeve — nobody appointed him, but he licenses the descent and the
+digging, keeps the register of who goes below, and is the nearest thing to law the
+Rim's edge has below the gate), **Hale** (watchman — an ex-sellsword paid in shards
+by the traders to walk the village and be seen; the Rim has no formal law).
 
 ## The Umbrals
 
@@ -246,7 +247,7 @@ them:
 
 ## Consistency rules for content authors
 
-- Surface = prospector boomtown tone (claims, rumours, fortunes, the lost).
+- Surface = prospector boomtown tone (permits, rich-seam rumours, fortunes, the lost).
 - Light relationship is **ecological**; glimmer mutation is a **separate magical**
   cause — don't conflate them.
 - Umbrals are friendly-but-distant near the top; the deep twists them. Worked stone

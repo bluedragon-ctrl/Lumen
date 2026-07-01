@@ -480,9 +480,9 @@
   "rim-recorder": {
     "id": "rim-recorder",
     "faction": "rim",
-    "name": "Fenn the claims-recorder",
-    "keywords": ["fenn", "recorder", "claims", "clerk"],
-    "description": "A narrow, ink-stained man behind a counter polished smooth by shard payments, wire-pinched lenses low on his nose and a ledger chained to the desk. Nobody appointed him; he simply started writing things down when the Rush began, and now no claim at the Rim is real until it crosses his counter. He knows who owns every claimed seam below — and which owners stopped coming up.",
+    "name": "Fenn the reeve",
+    "keywords": ["fenn", "reeve", "recorder", "clerk"],
+    "description": "A narrow, ink-stained man behind a counter polished smooth by shard payments, wire-pinched lenses low on his nose and a ledger chained to the desk. Nobody appointed him; he simply started writing things down when the Rush began — who went below, who came back, who owed what — and by keeping the only record of it he became the nearest thing to law the Rim's edge has. He licenses the descent and the digging, takes his fees, settles what disputes he can, and keeps the roll of the ones who stopped coming up. Below the gate, where Hale's lamp won't walk, Fenn's word is the only order there is.",
     "maxHp": 16,
     "speed": 12,
     "armour": 0,
@@ -493,24 +493,24 @@
     "hostile": false,
     "actions": [
       { "type": "idle", "weight": 12 },
-      { "type": "emote", "weight": 1, "messages": ["dips his pen and scratches a long entry into the ledger", "squares a stack of claim papers edge to edge", "stamps a document with a small lead seal, twice", "runs a finger down a column of names, lips moving", "blots the ledger and frowns at the smudge"] },
+      { "type": "emote", "weight": 1, "messages": ["dips his pen and scratches a long entry into the ledger", "squares a stack of permits edge to edge", "stamps a document with a small lead seal, twice", "runs a finger down a column of names, lips moving", "blots the ledger and frowns at the smudge"] },
       { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["weights the ledger open and pulls his desk-lamp close against the dark", "lights the reading-candle, then a second beside it, frowning", "mutters that the dark is no excuse to fall behind on the entries", "trims the wick higher and squints at the failing light"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
         { "if": { "delivery": true }, "messages": [
           { "target": "looks up sharply: \"You carry something owed to this office, I believe. Proof on the counter; payment follows.\"", "room": "looks up sharply and beckons {name} to the counter." }
         ] },
         { "if": { "hpBelow": 0.4 }, "messages": [
-          { "target": "peers over his lenses: \"Do try not to die with claims outstanding. The paperwork is substantial.\"", "room": "peers at {name}'s wounds over his lenses." }
+          { "target": "peers over his lenses: \"Do try not to die with fees outstanding. The paperwork is substantial.\"", "room": "peers at {name}'s wounds over his lenses." }
         ] },
         { "if": { "slotEmpty": "body" }, "messages": [
-          { "target": "notes your bare back with a sniff: \"Unarmoured. I'll pencil your claim as 'short-term'.\"", "room": "makes a small note while eyeing {name}'s bare back." }
+          { "target": "notes your bare back with a sniff: \"Unarmoured. I'll enter your descent as 'short-term'.\"", "room": "makes a small note while eyeing {name}'s bare back." }
         ] },
         { "if": { "equipped": "glimmersteel-sword" }, "messages": [
           { "target": "eyes your glimmersteel blade over his lenses: \"Fine metal. Registered where, exactly?\"", "room": "eyes {name}'s glimmersteel blade and reaches for his pen." }
         ] },
         { "messages": [
-          { "target": "squares a stack of claim papers: \"Registrations, disputes, transfers of deceased delvers' seams. Which is it?\"", "room": "squares his papers and looks at {name} expectantly." },
-          { "target": "dips his pen: \"Every claimed seam below has a name on it up here. Mostly dead ones.\"", "room": "tells {name}, primly, that every claimed seam below has a name on it." }
+          { "target": "squares a stack of permits: \"Descent-permits, dig-licenses, disputes, the roll of the missing. Which is it?\"", "room": "squares his papers and looks at {name} expectantly." },
+          { "target": "dips his pen: \"Every soul that goes below signs this register first. Most of the names I close myself.\"", "room": "tells {name}, primly, that every delver below is a name in his register." }
         ] }
       ] }
     ]
@@ -564,7 +564,7 @@
     "id": "camp-sentry",
     "name": "a camp sentry",
     "keywords": ["sentry", "guard", "lookout", "outlaw", "bandit"],
-    "description": "A hard-faced man in a patched leather coat, posted where the passage opens, a notched shortsword across his knees and a shuttered lamp at his boot. He came down with some rush or other, missed his fortune, and found that the men who jumped the good claims paid better and asked fewer questions. He watches the dark to the west the way a man watches for wolves — the delvers who come up this passage are the only weather he fears.",
+    "description": "A hard-faced man in a patched leather coat, posted where the passage opens, a notched shortsword across his knees and a shuttered lamp at his boot. He came down with some rush or other, missed his fortune, and found that the men who take the rich workings by force pay better and ask fewer questions. He watches the dark to the west the way a man watches for wolves — the delvers who come up this passage are the only weather he fears.",
     "maxHp": 15,
     "speed": 11,
     "armour": 1,
@@ -596,8 +596,8 @@
   "outlaw-prospector": {
     "id": "outlaw-prospector",
     "name": "an outlaw prospector",
-    "keywords": ["prospector", "outlaw", "bandit", "digger", "claim-jumper"],
-    "description": "A wiry, soot-grimed digger in cut-down mining kit, a pick reversed in his grip for a weapon and a claim-jumper's easy conscience about whose seam he's swinging it in. He and his fellows work this stolen ground hard and settle its shares by the knife when they must; a delver blundering in from the west is nothing to them but a purse that hasn't been emptied yet.",
+    "keywords": ["prospector", "outlaw", "bandit", "digger", "cutthroat"],
+    "description": "A wiry, soot-grimed digger in cut-down mining kit, a pick reversed in his grip for a weapon and an outlaw's easy conscience about whose ground he's swinging it in. He and his fellows work this stolen ground hard and settle its shares by the knife when they must; a delver blundering in from the west is nothing to them but a purse that hasn't been emptied yet.",
     "maxHp": 16,
     "speed": 10,
     "armour": 1,
@@ -616,7 +616,7 @@
     "actions": [
       { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 3 },
-      { "type": "emote", "weight": 2, "messages": ["hefts his pick and grins, gap-toothed", "jerks his head at the intruder — \"claim's took, friend\"", "wipes ore-grime from his eyes and squares up", "whistles sharp, calling the others over"] }
+      { "type": "emote", "weight": 2, "messages": ["hefts his pick and grins, gap-toothed", "jerks his head at the intruder — \"ground's took, friend\"", "wipes ore-grime from his eyes and squares up", "whistles sharp, calling the others over"] }
     ],
     "loot": [
       { "template": "prospectors-hatchet", "chance": 0.1 },
@@ -630,7 +630,7 @@
     "id": "foreman",
     "name": "the Foreman",
     "keywords": ["foreman", "boss", "captain", "leader", "outlaw", "bandit"],
-    "description": "The man who runs this jumped claim — broad as a door and near as hard to move, in a riveted brigandine he had beaten together down here from worn-out pick-heads. He was a real foreman once, on a real claim, until he reckoned the shorter road to wealth was taking other men's. He holds the richest seam in the camp with a heavy pick and the plain understanding that everything down here, the men who work it included, is his to spend. When the camp raises the alarm he comes down on the intruder like a fall of rock, and follows them out of it.",
+    "description": "The man who runs this seized working — broad as a door and near as hard to move, in a riveted brigandine he had beaten together down here from worn-out pick-heads. He was a real foreman once, on an honest working, until he reckoned the shorter road to wealth was taking other men's. He holds the richest seam in the camp with a heavy pick and the plain understanding that everything down here, the men who work it included, is his to spend. When the camp raises the alarm he comes down on the intruder like a fall of rock, and follows them out of it.",
     "maxHp": 50,
     "speed": 11,
     "armour": 3,

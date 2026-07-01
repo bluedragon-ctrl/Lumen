@@ -76,15 +76,15 @@
   "fenn-quiet-claim": {
     "id": "fenn-quiet-claim",
     "name": "Quiet Too Long",
-    "description": "A seam on the fourth level is registered to one Marl Wender, three seasons quiet. Fenn's ledger wants certainty before he crosses the name out.",
+    "description": "Marl Wender signed down to the fourth level three seasons ago and never signed back up. Fenn's register wants certainty before he closes the name.",
     "start": {
       "trigger": "talk",
       "npc": "rim-recorder",
-      "offerText": "Fenn opens the chained ledger to a page near the back and taps a name underlined twice. \"Wender, M. A seam on the fourth level, three seasons quiet. The ledger wants certainty before I cross a man out. Every registered delver wears a claim-tag below — find his, wherever he ended, and lay it on this counter. Start where the water ends up. The lake keeps most of what the deep takes.\""
+      "offerText": "Fenn opens the chained ledger to a page near the back and taps a name underlined twice. \"Wender, M. Signed down to the fourth level, three seasons gone, and never signed back up. The register wants certainty before I close a name. Every delver I register wears a tag below — find his, wherever he ended, and lay it on this counter. Start where the water ends up. The lake keeps most of what the deep takes.\""
     },
     "steps": [
-      { "collect": "delver-claim-tag", "count": 1, "text": "Find Marl Wender's claim-tag, wherever the deep left him" },
-      { "deliver": "delver-claim-tag", "count": 1, "npc": "rim-recorder", "text": "Lay the claim-tag on Fenn's counter" }
+      { "collect": "delver-claim-tag", "count": 1, "text": "Find Marl Wender's tag, wherever the deep left him" },
+      { "deliver": "delver-claim-tag", "count": 1, "npc": "rim-recorder", "text": "Lay the tag on Fenn's counter" }
     ],
     "rewards": {
       "xp": 60,
@@ -210,11 +210,11 @@
   "fenn-prospectors-bane": {
     "id": "fenn-prospectors-bane",
     "name": "The Prospectors' Bane",
-    "description": "Registered prospectors working the seams east of the warren have stopped coming up — a jumped-claim crew below is robbing and killing honest diggers. Fenn wants the crew broken and their leader put down so the ground is safe to work again.",
+    "description": "Registered prospectors working the seams east of the warren have stopped coming up — an outlaw crew that seized a working below is robbing and killing honest diggers. Fenn wants the crew broken and their leader put down so the ground is safe to work again.",
     "start": {
       "trigger": "talk",
       "npc": "rim-recorder",
-      "offerText": "Fenn turns the ledger toward you and taps a column of names, each with a date beside it and nothing written after. \"Prospectors. Registered, paid their fees, went down to work the seams east of the warren — and stopped coming up. This is no quiet-too-long; I know the dark's hand when I see it, and this isn't it. There's a crew jumped a claim down there, and they've taken to robbing and killing honest diggers for the little they carry. I can't send Hale below the gate, and no prospector will go back while that lot hold the ground. Break them — thin the crew and put down the one they call the Foreman — so a man can swing a pick down there and live to spend what he digs. Do that, and the office will see you well paid.\""
+      "offerText": "Fenn turns the ledger toward you and taps a column of names, each with a date beside it and nothing written after. \"Prospectors. Registered, paid their fees, went down to work the seams east of the warren — and stopped coming up. This is no quiet-too-long; I know the dark's hand when I see it, and this isn't it. There's a crew seized a working down there, and they've taken to robbing and killing honest diggers for the little they carry. I can't send Hale below the gate, and no prospector will go back while that lot hold the ground. Break them — thin the crew and put down the one they call the Foreman — so a man can swing a pick down there and live to spend what he digs. Do that, and the office will see you well paid.\""
     },
     "steps": [
       { "kill": "outlaw-prospector", "count": 4, "text": "Thin the outlaw crew preying on honest prospectors east of the warren" },
