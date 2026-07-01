@@ -652,7 +652,6 @@
       { "type": "emote", "weight": 2, "messages": ["bellows for the camp to close ranks", "hefts his pick and rolls his shoulders, unhurried", "spits: \"Another one come to die rich\"", "shoulders his pick and comes on, unhurried and certain"] }
     ],
     "loot": [
-      { "template": "foremans-tally", "chance": 1 },
       { "template": "foremans-brigandine", "chance": 0.5 },
       { "template": "prospectors-hatchet", "chance": 0.25 },
       { "template": "acid-bomb", "chance": 0.2 }

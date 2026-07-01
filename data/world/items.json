@@ -139,17 +139,6 @@
     "weapon": { "damage": { "magical": "1d4" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 } },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 3 }
   },
-  "foremans-tally": {
-    "id": "foremans-tally",
-    "name": "the Foreman's tally",
-    "keywords": ["tally", "ledger", "claim", "forged", "foreman"],
-    "description": "A greasy fold of hide-paper the Foreman kept on him, columned in a heavy, unlettered hand: a claim-number that matches nothing on the rolls, a seam's yield tallied out in stolen shifts, and a claim-mark inked over and over, as though practice could make it real. It is the forged account of a seam taken by force — worth nothing to anyone but the recorder whose ledger it insults.",
-    "type": "material",
-    "filterGroup": "other",
-    "weight": 0,
-    "value": 0,
-    "stackable": false
-  },
   "umbral-mind-charm": {
     "id": "umbral-mind-charm",
     "rarity": "rare",

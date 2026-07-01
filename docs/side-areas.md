@@ -182,12 +182,12 @@
   drop, at a low chance, a camp's ordinary supplies — an iron weapon, lamp-oil, a torch, or simple
   cooked food. No new mob-uses-items code was needed — the roster is built
   entirely on existing `helper`/`pursues`/`attack`/`cast`/`guard`.
-- **Quest hook — _The Forged Tally_ (`fenn-forged-tally`).** Fenn the recorder (`rim-recorder`)
-  offers a talk-triggered kill-and-return quest: slay the Foreman and lay his **forged
-  claims-tally** (`foremans-tally`, a guaranteed drop) on Fenn's counter to have the jumped claim
-  struck from the rolls. Mirrors his existing `fenn-quiet-claim` structure and pays off the
-  "claims-tally that no office ever stamped" written into `d1.crook`. Gives the camp a reason to
-  exist beyond XP, and ties the new area back to a surface NPC.
+- **Quest hook — _The Prospectors' Bane_ (`fenn-prospectors-bane`).** Fenn the recorder
+  (`rim-recorder`) offers a talk-triggered protection quest: registered prospectors working the
+  eastern seams have stopped coming up, so thin the outlaw crew (kill 4 `outlaw-prospector`) and
+  put down the **Foreman** to make the ground safe for honest diggers again. Rewards 80 xp + 50
+  shards. Fits Fenn's ledger-keeper role (he already frets over names gone quiet), gives the camp
+  a reason to exist beyond XP, and ties the new area back to a surface NPC.
 - **Light inverts the bat spire.** These are living humans who *keep* light: cook-fires and lamps
   make the camp a **lit pocket** (`ambientLight 1`) in the dark approach, and the warder himself
   `emitsLight`. The tell that something organized holds this ground — the opposite of the

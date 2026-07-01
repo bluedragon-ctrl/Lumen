@@ -29,11 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **regeneration draught**, so the camp fields potions and thrown weapons of its own. Sentries and
   prospectors also drop, at a low chance, the
   ordinary supplies of a camp squatting in the dark — an iron weapon, a flask of lamp-oil, a
-  torch, or a bit of cooked camp food. **New quest — _The Forged Tally_:** Fenn the recorder
-  (`rim-recorder`) sends a delver to kill the Foreman and bring back the crew's forged
-  claims-tally (a guaranteed drop) so the jumped claim can be struck from the rolls — paying off
-  the "claims-tally that no office ever stamped" already written into `d1.crook`. Rewards xp +
-  shards.
+  torch, or a bit of cooked camp food. **New quest — _The Prospectors' Bane_:** Fenn the recorder
+  (`rim-recorder`) notices registered prospectors working the eastern seams have stopped coming
+  up — the jumped-claim crew is robbing and killing honest diggers — and sends a delver to thin
+  the outlaws and put down the Foreman so the ground is safe to work again. Rewards xp + shards.
 - **The Bat Spire — a vertical bat-choked mini-dungeon (`docs/side-areas.md` #1).** Built the
   full shaft off **The Foot of the Spire** (`d1.spire.foot`): two rooms **down** into the reeking
   base — **The Gullet** (`d1.spire.gullet`) and **The Sink** (`d1.spire.sink`) with a dead-end

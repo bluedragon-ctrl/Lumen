@@ -207,18 +207,18 @@
       "items": [{ "template": "glimmerglass-blade" }]
     }
   },
-  "fenn-forged-tally": {
-    "id": "fenn-forged-tally",
-    "name": "The Forged Tally",
-    "description": "A seam east of the rat-warren is being worked by an outlaw crew keeping their own forged claims-tally on it. Fenn wants the man who runs them stopped and the false tally brought in to strike the claim.",
+  "fenn-prospectors-bane": {
+    "id": "fenn-prospectors-bane",
+    "name": "The Prospectors' Bane",
+    "description": "Registered prospectors working the seams east of the warren have stopped coming up — a jumped-claim crew below is robbing and killing honest diggers. Fenn wants the crew broken and their leader put down so the ground is safe to work again.",
     "start": {
       "trigger": "talk",
       "npc": "rim-recorder",
-      "offerText": "Fenn sets down his pen. \"There's a seam east of the rat-warren that shows on no page of mine, and a man down there keeping his own tally on it — a claim-number, a yield, a claim-mark, all in a hand that never crossed this counter. A forged account is still an account, and I have seen ground bought and sold on less. I can't send Hale below the gate, and the traders' board won't post a thing with no bounty behind it. So I'll put it to you. Put an end to the one they call the Foreman, and lay his false tally on my counter — I'll strike the claim from consideration, and see you paid for the trouble.\""
+      "offerText": "Fenn turns the ledger toward you and taps a column of names, each with a date beside it and nothing written after. \"Prospectors. Registered, paid their fees, went down to work the seams east of the warren — and stopped coming up. This is no quiet-too-long; I know the dark's hand when I see it, and this isn't it. There's a crew jumped a claim down there, and they've taken to robbing and killing honest diggers for the little they carry. I can't send Hale below the gate, and no prospector will go back while that lot hold the ground. Break them — thin the crew and put down the one they call the Foreman — so a man can swing a pick down there and live to spend what he digs. Do that, and the office will see you well paid.\""
     },
     "steps": [
-      { "kill": "foreman", "count": 1, "text": "Kill the Foreman, who holds the jumped claim east of the warren" },
-      { "deliver": "foremans-tally", "count": 1, "npc": "rim-recorder", "text": "Lay the forged tally on Fenn's counter" }
+      { "kill": "outlaw-prospector", "count": 4, "text": "Thin the outlaw crew preying on honest prospectors east of the warren" },
+      { "kill": "foreman", "count": 1, "text": "Put down the Foreman, the crew's leader" }
     ],
     "rewards": {
       "xp": 80,
