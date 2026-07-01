@@ -5,7 +5,50 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Sanctuary→Midden connection now respects depth.** The link between `d9.sanctuary.run`
+  (depth 9) and `d8.midden.seam` (depth 8) used horizontal `south`/`north` exits across a depth
+  boundary; since depth 8 is shallower, the seam is now reached **up** from the run and the run
+  **down** from the seam (matching the seam's "climbs, worming up" flavour). Directional flavour
+  text in both rooms updated to suit.
+
 ### Added
+- **Depth 8 — the Umbral Necropolis: an 8-room side-dungeon of the dark-taken dead.** North of
+  the ward-post the bridge lands in a Quechua-inspired underground necropolis (zone
+  `umbral-necropolis`), the most dangerous place mapped so far — pitched harder than the depth 7/8
+  areas. A dead second warding (**The Grave-Gate**, `d8.necropolis.gate`) gives onto **The Bone
+  Causeway** (`d8.necropolis.causeway`), the **Niche-Walls** dead-end lurker den
+  (`d8.necropolis.niches`), the open **Ancestor Plaza** of chullpa towers (`d8.necropolis.plaza`),
+  the **Ossuary** (`d8.necropolis.ossuary`), the **Silent Procession** (`d8.necropolis.procession`),
+  the **Tomb-Foot** (`d8.necropolis.vault`), and — up a ladder into the sealed tomb — **The Sealed
+  Crypt** (`d8.necropolis.crypt`). **Negative light** deepens toward the tomb (causeway/niches/
+  ossuary/procession at `-1`, the crypt at `-2`), and the crypt carries an **offensive room effect**
+  that drinks hp + mana each tick while it is dark. New enemies (all dark-taken, harmed by bright
+  light — reusing the existing `snuff`/`drink-light`/`gloom-bolt`/`glimmer-spike`/`glimmerskin`
+  spells, no new spells): the shambling **grave-husk** and heavier **bound husk** (Hollowing
+  husks — emptied Umbral dead), the hidden ambushing **crypt-lurker** (a light-drinking shade that
+  waits in the niches), the **Aya-Keeper** mini-boss (a fading Umbral gravekeeper that raises husks
+  and guards the ladder), and **Supay, the Interred Night**, the crypt boss — the strongest creature
+  in the game (185 HP), a living shadow the sealed tomb bred, kin to the Starving Dark. Adds three
+  scenery fixtures (`broken-ward`, `grave-niches`, `chullpa-tower`). Adds two craft materials:
+  **dark cinder** (`dark-cinder`, a common dark reagent — the snuffed remnant of a dark-taken body;
+  drops from the necropolis husks, crypt-lurker, and Aya-Keeper for now, and is designed to extend
+  to the wider shadow-touched family later) and **glyph-silk** (`glyph-silk`, an uncommon
+  glyph-inscribed gloom-silk ritual/burial cloth — dropped by the bound husk and Aya-Keeper and
+  hidden in the Niche-Walls, and forward-designed to be weave-craftable and to appear in future
+  ritual/burial contexts). The Aya-Keeper also has a 20% `shadow-heart`; Supay drops one outright.
+  Other drops reuse existing `crystal`/`shadow-shard`/`shadow-heart`/`shards`. Necropolis, creature,
+  and material **names are provisional, pending sign-off.**
+- **Depth 8 — the Chasm Bridge: a 3-room span to a coming necropolis.** The Chasm Ledge
+  (`d8.ledge`) is no longer a dead-end: a long hanging bridge of glimmer-wire and Umbral plank
+  now runs **north** across the abyss (zone `chasm-bridge`). **The Span** (`d8.span`) is the
+  mid-bridge vista — suspended in the roaring dark beside the great fall, flame drowned by spray,
+  lit only by the far moss-glow high up the shaft. **The Ward-Post** (`d8.wardpost`) is the far
+  bridgehead: a lit, warded haven (`ambientLight 1`, no douse) where the deep-folk set a cold
+  glimmer-lamp and a ring of glimmer-stakes "against the dark, and the things the dark makes" —
+  the same warding that keeps the sanctuary above, standing here at the edge of the kept places.
+  Its north way waits, unopened, on the **umbral necropolis** to come (a distinct side-dungeon,
+  designed next). Adds a reusable **`glimmer-ward`** scenery fixture (emits light).
 - **New equipment slot — `cloak`.** Adds a back/mantle slot alongside the existing worn slots
   (seeded empty in the new-player template so `unequip cloak` works from a fresh character), and a
   first item for it: **a gloom-silk cloak** (uncommon, **+2 Ward**), woven whole from gloom-silk in
@@ -23,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   *Deliberately unknown*, and the consistency rules; village place-name left provisional pending
   sign-off.
 - **Depth 8 — the Sour Midden: a 6-room slug dungeon off the sanctuary.** The Centipede Run's
-  previously-unmapped south seam (`d9.sanctuary.run`) now opens into a sealed depth-8 charnel pit
+  previously-unmapped seam (`d9.sanctuary.run`) now opens into a sealed depth-8 charnel pit
   (zone `sour-midden`) where the deep-folk gave their dead to the cleaner-slugs — and the gluttony
   went sour. **The Sour Seam** climbs in to the reek; **The Reeking Midden** is a bone-heaped
   charnel swarming with harmless grazing **scour-slugs** (with a searchable **fulgurite** shard,

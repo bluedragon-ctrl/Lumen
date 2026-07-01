@@ -1342,5 +1342,178 @@
       { "template": "glimmerspine-spear", "chance": 0.25 },
       { "template": "glimmer-lash", "chance": 0.25 }
     ]
+  },
+  "grave-husk": {
+    "id": "grave-husk",
+    "name": "a grave-husk",
+    "keywords": ["husk", "grave-husk", "dead", "aya", "undead"],
+    "description": "An Umbral that the dark finished with and stood back up. The self is long gone — this is only the emptied body the Hollowing left behind, grey skin drawn tight over a frame gone gaunt and crooked, the soft deep-glow under it snuffed to a cold, dead nothing. It shuffles out of the graves in slow, lurching steps, wide raw eyes fixed on nothing and everything, and comes for the one warm thing in the dark. It does not hunger the way a beast does. It only reaches, the way the dark that made it reaches, and what little light you carry stings the dead flesh raw.",
+    "maxHp": 26,
+    "speed": 9,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 7, "vitality": 9, "intellect": 0, "wits": 2, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "hunt",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 14,
+      "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d2", "duration": 4, "chance": 1 }]
+    },
+    "xp": 20,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["lurches a step nearer, dead eyes fixed on your warmth", "reaches with grey, crook-fingered hands and closes on nothing", "works its slack jaw around a word it no longer remembers", "shudders, and the cold pours off it"] }
+    ],
+    "loot": [
+      { "template": "dark-cinder", "chance": 0.6 },
+      { "template": "shadow-shard", "chance": 0.05 }
+    ]
+  },
+  "bound-husk": {
+    "id": "bound-husk",
+    "name": "a bound husk",
+    "keywords": ["husk", "bound-husk", "wrapped", "ancestor", "aya", "undead"],
+    "description": "One of the old dead, drawn up whole from the deep niches where the deep-folk once laid their honoured ones to keep — bound tight in wrappings gone black and stiff, and cased where the wrappings failed in a rind of the cold dark itself, layered on like a second hide over ages of lying in it. The Hollowing worked slower on these, and left more standing: the frame is broad and heavy still, and the dark that fills it now has crusted the old flesh into something a blade turns on. It comes on without hurry and without stopping, and where its lesser kin reach with dead hands this one strikes to break.",
+    "maxHp": 42,
+    "speed": 9,
+    "armour": 4,
+    "ward": 1,
+    "attributes": { "might": 8, "vitality": 12, "intellect": 0, "wits": 3, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "hunt",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "lightBane": { "above": 3, "damage": "1d2" },
+    "attack": {
+      "damage": "1d8",
+      "actionCost": 14,
+      "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+    },
+    "xp": 30,
+    "shards": "2d4",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["drags itself forward, black wrappings trailing from a heavy frame", "raises a wrapped arm cased in cold dark and brings it down", "grinds a slow half-turn, the rind of dark cracking and resealing over the old flesh", "stands utterly still a moment, as if remembering it was once kept"] }
+    ],
+    "loot": [
+      { "template": "dark-cinder", "chance": 0.6 },
+      { "template": "glyph-silk", "chance": 0.35 },
+      { "template": "crystal", "chance": 0.15 },
+      { "template": "shadow-shard", "chance": 0.05 }
+    ]
+  },
+  "crypt-lurker": {
+    "id": "crypt-lurker",
+    "name": "a crypt-lurker",
+    "keywords": ["lurker", "crypt-lurker", "shade", "aya", "niche"],
+    "description": "Not one of the standing dead but the dark that keeps them company — a long, folded thing of shadow and dry sinew wedged back in a grave-niche or pressed flat to the ceiling of a tomb, so still and so lightless that the eye passes over it as more empty dark. It waits where the dead are thickest, reading the black by tremor and the warmth of blood, and it will hang there unmoving until a delver's light strays close enough. Then it comes down without a sound. Bright light finds it out and sears the shadow-sinew raw, so it clings to the deepest dark it can find — and in the necropolis, the dark is deep.",
+    "maxHp": 44,
+    "speed": 12,
+    "armour": 2,
+    "ward": 2,
+    "attributes": { "might": 9, "vitality": 9, "intellect": 3, "wits": 7, "perception": 9 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 2 },
+    "behavior": "lurk",
+    "hostile": true,
+    "ambush": true,
+    "pursues": true,
+    "pursueRange": 3,
+    "emitsLight": -1,
+    "lightBane": { "above": 2, "damage": "1d3" },
+    "attack": {
+      "damage": "1d8",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+    },
+    "xp": 28,
+    "shards": "2d4",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["shifts its grip in the niche, a deeper dark against the dark", "unfolds a length of shadow-sinew, then stills", "draws the cold in close about itself and waits", "watches from the black, unblinking and unlit"] }
+    ],
+    "loot": [
+      { "template": "dark-cinder", "chance": 0.4 },
+      { "template": "crystal", "chance": 0.25 }
+    ]
+  },
+  "aya-keeper": {
+    "id": "aya-keeper",
+    "name": "the Aya-Keeper",
+    "keywords": ["keeper", "aya-keeper", "gravekeeper", "warden", "umbral"],
+    "description": "It kept this place once, and in a broken, ruined way it keeps it still — a deep-folk glimmer-singer the Hollowing has taken most of the way down, further gone than the lost apprentice above but not yet the whole way to shadow. It stands taller than a man and wrong, grey and gaunt, the soft deep-glow guttering under a skin gone slack, and it moves among the graves with the ghost of an old tending in its hands. Where a delver sees only the standing dead, the Aya-Keeper sees its charges: it sets a clawed hand to a fallen husk and drags the cold dark up through it until the dead thing shudders and stands, and it flings the gathered black at anything that would disturb the ones it keeps. It mouths broken scraps of the rounded Umbral tongue over its work — a word for the dead, a word for a name — worn loose of all meaning. It will not leave the graves. It will not let you profane them either.",
+    "maxHp": 120,
+    "speed": 12,
+    "armour": 4,
+    "ward": 3,
+    "attributes": { "might": 8, "vitality": 13, "intellect": 7, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "lightBane": { "above": 6, "damage": "1d3" },
+    "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
+    "xp": 80,
+    "shards": "5d4",
+    "actions": [
+      { "type": "summon", "weight": 4, "mob": "grave-husk", "count": 1, "max": 3, "verb": "sets a clawed hand to a fallen husk and drags the cold dark up through it, until the dead thing shudders and climbs to its feet" },
+      { "type": "cast", "weight": 4, "spell": "gloom-bolt" },
+      { "type": "cast", "weight": 3, "spell": "glimmerskin" },
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": ["shields its guttering eyes and hisses, though your light is faint", "mouths a soft, rounded word over the graves in the Umbral tongue, then loses the thread", "passes a clawed hand across a wrapped husk, as if setting it right", "draws the cold dark of the necropolis in close, and the graves seem to lean toward it"] }
+    ],
+    "loot": [
+      { "template": "dark-cinder", "chance": 0.5 },
+      { "template": "glyph-silk", "chance": 0.5 },
+      { "template": "crystal", "chance": 0.1 },
+      { "template": "shadow-shard", "chance": 0.5 },
+      { "template": "shadow-heart", "chance": 0.2 }
+    ]
+  },
+  "interred-dark": {
+    "id": "interred-dark",
+    "name": "Supay, the Interred Night",
+    "keywords": ["supay", "interred", "night", "dark", "shadow", "boss"],
+    "description": "Whatever was laid in the great crypt at the top of the necropolis is not laid there anymore. The dark of this place did not merely take an Umbral, as it took the husks below — it gathered in the sealed tomb over an age of lightless keeping, drank down the one interred there, and stood up wearing the shape of the deep's oldest fear. It is kin to the Starving Dark of the shallow warren, but that thing was a hole in the light newly opened; this is the same appetite grown vast and patient in a sealed grave, wound through with the frozen glimmer of the one it unmade. The eye cannot hold it — a coil of living black that leans a killing cold on the skin, and where it moves the crypt goes darker still. Bright light unmakes it, sears it thin and screaming-silent, so it drinks the chamber dry and closes in a dark of its own making. The deep-folk sealed this crypt and warded the way to it, and lit the ward-post at the bridge's end, and it was never enough. It is the thing the wardings were set against. It has been waiting a very long time to be let out.",
+    "maxHp": 185,
+    "speed": 11,
+    "armour": 5,
+    "ward": 3,
+    "attributes": { "might": 10, "vitality": 20, "intellect": 8, "wits": 7, "perception": 10 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 0 },
+    "emitsLight": -1,
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "lightBane": { "above": 0, "damage": "1d4" },
+    "attack": { "damage": "1d10", "bonus": 2, "actionCost": 13 },
+    "xp": 120,
+    "shards": "6d6",
+    "actions": [
+      { "type": "cast", "weight": 4, "spell": "drink-light" },
+      { "type": "cast", "weight": 4, "spell": "snuff" },
+      { "type": "cast", "weight": 4, "spell": "gloom-bolt" },
+      { "type": "summon", "weight": 3, "mob": "void-shadow", "count": 1, "max": 2, "verb": "peels a shred of itself loose, and a lesser dark unfolds from the black to hunt beside it" },
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": ["folds in on itself, and the killing cold of the crypt deepens", "shifts — a darker dark sliding across the dark, threaded through with cold frozen light", "leans toward your light like a thing that has been starved of it for an age", "goes utterly still, and the whole crypt holds its breath"] }
+    ],
+    "loot": [
+      { "template": "shadow-heart", "chance": 1 },
+      { "template": "crystal", "chance": 0.25 }
+    ]
   }
 }

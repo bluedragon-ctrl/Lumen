@@ -1347,14 +1347,177 @@
     "name": "The Chasm Ledge",
     "depth": 8,
     "ambientLight": 0,
-    "description": "The ledge climbs along the falling water onto a lip of wet stone above a chasm so deep your light, if you had any, would not find its bottom — and here the spray puts your flame out and holds it out, so you stand in the roaring dark. But the dark is not whole. Far, far up the shaft, past more fallen floors than you care to count, a single thread of pale water catches a light you cannot reach: a faint blue-white glimmer of moss-glow on spray, high and cold and impossibly distant. You would swear it for the black lake spilling over the Far Bank, the same water you walked beside an age of descent ago — fallen all this way down the throat of the world to break apart somewhere in the dark above your head. There is nowhere to go but back south, down the ledge.",
-    "exits": { "south": "d8.plungefoot" },
+    "description": "The ledge climbs along the falling water onto a lip of wet stone above a chasm so deep your light, if you had any, would not find its bottom — and here the spray puts your flame out and holds it out, so you stand in the roaring dark. But the dark is not whole. Far, far up the shaft, past more fallen floors than you care to count, a single thread of pale water catches a light you cannot reach: a faint blue-white glimmer of moss-glow on spray, high and cold and impossibly distant. You would swear it for the black lake spilling over the Far Bank, the same water you walked beside an age of descent ago — fallen all this way down the throat of the world to break apart somewhere in the dark above your head. And the ledge does not dead-end after all: bolted into the wet lip of it, a long hanging bridge of glimmer-wire and black Umbral plank runs out north across the chasm, swaying under the fall's cold breath until the dark takes it. The way back drops south down the ledge; the bridge goes north, out over nothing.",
+    "exits": { "south": "d8.plungefoot", "north": "d8.span" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [],
     "effects": [
       { "trigger": "enter", "action": { "douse": true },
         "message": "Cold blown spray off the chasm snuffs your flame, and the roaring dark closes in." }
+    ]
+  },
+  "d8.span": {
+    "id": "d8.span",
+    "zone": "chasm-bridge",
+    "tags": ["water"],
+    "name": "The Span",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "Out on the bridge the world falls away on every side. The planks sway underfoot on their glimmer-wire, slick with the fall's spray, and the great column of water comes down close on your right hand — a hard, cold pillar out of the high dark, thundering past into a drop your light will never sound. There is nothing here but the roar and the sway and the vast wet space of the shaft all around you, and far, far overhead that one thread of blue-white moss-glow on the falling water, cold and impossibly high. Halfway across, and the dark on the far side is not like the dark behind: it is thicker, and it waits. The near end of the bridge climbs back south to the ledge; the planks run on north.",
+    "exits": { "south": "d8.ledge", "north": "d8.wardpost" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [],
+    "effects": [
+      { "trigger": "enter", "action": { "douse": true },
+        "message": "Cold spray off the falling water drowns your flame, and the roaring dark closes in." }
+    ]
+  },
+  "d8.wardpost": {
+    "id": "d8.wardpost",
+    "zone": "chasm-bridge",
+    "name": "The Ward-Post",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "The bridge lands at last on a shelf of worked stone, and here — out over the abyss, at the very end of the deep-folk's reach — someone set a ward and never took it down. A cold glimmer-lamp burns in a carved cradle, blue-white and steady, and around it the old hand has scored the warding-lines and pinned them with stakes of raw glimmer, all of it faced north into the dark. It is the same light that fills the sanctuary far above, set here to the same purpose: against the dark, and the things the dark makes. Within the ring the air is dry and still, and you may stand in your own shadow again. Beyond it the ground rises north into close-set stone and a colder black, and the wards lean that way, holding, against whatever keeps to the graves. The bridge sways back south over the chasm; north, the warded light gives out.",
+    "exits": { "south": "d8.span", "north": "d8.necropolis.gate" },
+    "fixtures": ["umbral-coldlamp", "glimmer-ward"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d8.necropolis.gate": {
+    "id": "d8.necropolis.gate",
+    "zone": "umbral-necropolis",
+    "name": "The Grave-Gate",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "Past the ward-post's light the rising ground levels into a threshold of worked stone, and here the deep-folk set their last edge against this place — a second warding cut into the sill, twin to the one that still burns behind you. This one is dead. The glimmer-stakes are drawn or snuffed, the chalked lines scuffed to grey, and the dark has long since come back over it and settled in to stay. Beyond the dead line the air changes: colder, older, dry as a shut room, and heavy with the sense of a great many things kept close and gone quiet. Rows of low grave-niches begin in the walls to either hand, most of them gaping empty. Something shuffles in the black ahead, slow and without hurry, and does not much mind your coming. The warded light lies back south; north the ground opens into the graves.",
+    "exits": { "south": "d8.wardpost", "north": "d8.necropolis.causeway" },
+    "fixtures": ["broken-ward", "grave-niches"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "grave-husk", "max": 2, "respawn": 120 }
+    ]
+  },
+  "d8.necropolis.causeway": {
+    "id": "d8.necropolis.causeway",
+    "zone": "umbral-necropolis",
+    "name": "The Bone Causeway",
+    "depth": 8,
+    "ambientLight": -1,
+    "description": "The floor narrows to a raised bank of fitted stone that runs on north between two sunken fields of the dead — a causeway lifted above the graves so the living once need not walk among them. That care is long spent. To either side, below the lip of the bank, the dark lies deeper than dark, and out of it the standing husks come, hauling themselves up the low walls in slow, patient numbers, drawn to the one warmth crossing their ground. The dead here are the old dead, drawn up whole and heavy from the deep niches, and they do not scatter and do not stop. The gate lies back south; the causeway runs north toward a wider black, and a low seam breaks off west into the niche-walls.",
+    "exits": { "south": "d8.necropolis.gate", "north": "d8.necropolis.plaza", "west": "d8.necropolis.niches" },
+    "fixtures": ["grave-niches"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "grave-husk", "max": 3, "respawn": 100 },
+      { "mob": "bound-husk", "max": 1, "respawn": 250 }
+    ]
+  },
+  "d8.necropolis.niches": {
+    "id": "d8.necropolis.niches",
+    "zone": "umbral-necropolis",
+    "name": "The Niche-Walls",
+    "depth": 8,
+    "ambientLight": -1,
+    "description": "The west seam opens into a dead-end vault where the grave-niches are cut deepest and thickest — the walls honeycombed floor to ceiling with them, tier on tier of shallow dark mouths, the whole chamber a wall of graves closing overhead. It is the stillest place in the necropolis and the worst. The wrapped dead lie undisturbed here, folded in their niches as they were laid, and among them, folded just the same, are things that are not dead and not still — the dark keeps its hunters where the dead are thickest, wedged back in the niches and pressed flat to the ceiling, unlit and unmoving until your light strays too close. The only way out is back east to the causeway.",
+    "exits": { "east": "d8.necropolis.causeway" },
+    "fixtures": ["grave-niches"],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } },
+      { "template": "glyph-silk", "qty": 1, "respawn": 1800, "hidden": { "perception": 6 } },
+      { "template": "shards", "qty": 12, "hidden": { "perception": 6 } }
+    ],
+    "spawns": [
+      { "mob": "crypt-lurker", "max": 2, "respawn": 250, "hidden": { "perception": 6 } },
+      { "mob": "grave-husk", "max": 1, "respawn": 150 }
+    ]
+  },
+  "d8.necropolis.plaza": {
+    "id": "d8.necropolis.plaza",
+    "zone": "umbral-necropolis",
+    "name": "The Ancestor Plaza",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The causeway lets out into a wide open ground, the heart of the necropolis — a plaza of worn flagstones ringed with squat stone towers, chullpas raised for the honoured dead to keep watch over their kin from within. Here the space opens out and the ceiling lifts away into a dark your light cannot find, and for a moment there is room to breathe and set your back to something. But the low doors of the chullpas are black open mouths, the flagstones are scattered with the grey offerings the deep-folk once left their dead, and nothing keeps watch from the towers now but the dark itself. The husks drift across the plaza without purpose until they find your warmth. The causeway runs back south; north a walled way leads deeper, toward a low reek of old bone.",
+    "exits": { "south": "d8.necropolis.causeway", "north": "d8.necropolis.ossuary" },
+    "fixtures": ["chullpa-tower", "grave-niches"],
+    "groundItems": [
+      { "template": "shards", "qty": 18, "hidden": { "perception": 6 } }
+    ],
+    "spawns": [
+      { "mob": "grave-husk", "max": 3, "respawn": 100 },
+      { "mob": "bound-husk", "max": 1, "respawn": 250 },
+      { "mob": "crypt-lurker", "max": 1, "respawn": 300, "hidden": { "perception": 6 } }
+    ]
+  },
+  "d8.necropolis.ossuary": {
+    "id": "d8.necropolis.ossuary",
+    "zone": "umbral-necropolis",
+    "name": "The Ossuary",
+    "depth": 8,
+    "ambientLight": -1,
+    "description": "North of the plaza the walls close in and the way becomes a long, low store of bone. When the deep niches filled, the deep-folk laid their oldest dead here in heaps and courses, skull upon skull and long-bone stacked like cordwood, tier on tier into a dark that gives back nothing. The air is thick with the dry, cold reek of it. This is where the dead are densest, and so this is where the most of them stand: bound husks haul themselves out of the courses where they were stacked, and the dark between the heaps holds things that were never bones at all. The plaza lies back south; a walled processional runs on north, straight and deliberate, toward whatever the whole necropolis was built to face.",
+    "exits": { "south": "d8.necropolis.plaza", "north": "d8.necropolis.procession" },
+    "fixtures": ["bone-pile", "grave-niches"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "bound-husk", "max": 2, "respawn": 250 },
+      { "mob": "grave-husk", "max": 2, "respawn": 120 },
+      { "mob": "crypt-lurker", "max": 1, "respawn": 300, "hidden": { "perception": 6 } }
+    ]
+  },
+  "d8.necropolis.procession": {
+    "id": "d8.necropolis.procession",
+    "zone": "umbral-necropolis",
+    "name": "The Silent Procession",
+    "depth": 8,
+    "ambientLight": -1,
+    "description": "The way straightens into a walled processional, a long dark aisle raised for the carrying of the dead — the stone underfoot worn smooth by feet that stopped coming an age ago, the walls to either hand close and blind. There is a purpose to it that the rest of the necropolis lacks: everything here points north, toward the far end of the aisle, where the ground gathers itself and rises to the foot of a great sealed tomb. The dead stand sparse along the procession, as if even the husks keep back from what waits at its head. The ossuary lies back south; ahead the aisle ends at the tomb-foot.",
+    "exits": { "south": "d8.necropolis.ossuary", "north": "d8.necropolis.vault" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "bound-husk", "max": 2, "respawn": 250 },
+      { "mob": "grave-husk", "max": 1, "respawn": 150 }
+    ]
+  },
+  "d8.necropolis.vault": {
+    "id": "d8.necropolis.vault",
+    "zone": "umbral-necropolis",
+    "name": "The Tomb-Foot",
+    "depth": 8,
+    "ambientLight": 0,
+    "description": "The procession ends at the foot of the greatest tomb of all — a chullpa raised head and shoulders above the rest, set apart at the head of the necropolis and reached by a steep stone ladder that climbs the tower's face to a single low door high in the dark above. This is the threshold the whole place was built around, and it is not unkept. The Aya-Keeper holds it: a deep-folk glimmer-singer the Hollowing all but finished, still moving among the graves with the ghost of an old tending, raising the dead where they fall and turning the gathered dark on anything that would climb to the sealed door. It will not let you pass while it stands. The procession lies back south; the ladder climbs up into the crypt above.",
+    "exits": { "south": "d8.necropolis.procession", "up": "d8.necropolis.crypt" },
+    "fixtures": ["chullpa-tower"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "aya-keeper", "max": 1, "respawn": 1800 },
+      { "mob": "grave-husk", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d8.necropolis.crypt": {
+    "id": "d8.necropolis.crypt",
+    "zone": "umbral-necropolis",
+    "name": "The Sealed Crypt",
+    "depth": 8,
+    "ambientLight": -2,
+    "description": "The ladder brings you up through the low door into the sealed heart of the tomb — and the dark here is the deep kind, the kind that leans on the skin and drinks a flame and gives nothing back, worse than any dark below it. The deep-folk raised this crypt highest of all and sealed it and warded the whole long way to it: the graves, the procession, the ward-post out over the abyss, all of it set facing this one door. It was never enough. Whatever they interred here drank down the dark of an age of lightless keeping and stood up wearing it, and it has been waiting in the black at the top of the world's oldest grave for the wardings to fail and a warmth to climb the ladder. It knows you are here. The killing cold gathers, and the only way back is down.",
+    "exits": { "down": "d8.necropolis.vault" },
+    "fixtures": ["chullpa-tower"],
+    "groundItems": [
+      { "template": "crystal", "qty": 1, "respawn": 1800, "hidden": { "perception": 7 } }
+    ],
+    "spawns": [
+      { "mob": "interred-dark", "max": 1, "respawn": 1800 }
+    ],
+    "effects": [
+      { "trigger": "tick", "when": { "lightBelow": 1 },
+        "action": { "damage": { "hp": "1d3", "mana": "1d2" } },
+        "message": "The killing dark of the crypt leans close and drinks the warmth and the will out of you.",
+        "roomMessage": "The dark presses in, cold and hungry." }
     ]
   },
   "d8.silt": {
@@ -1622,8 +1785,8 @@
     "name": "The Centipede Run",
     "depth": 9,
     "ambientLight": 0,
-    "description": "South of the hollow the warded light fails altogether and the worked stone gives way to a raw, dim run in the natural rock — the margin of the kept place, where the deep-folk's cutting stops and the dark begins again. The shrine's light does not reach this far, and so the hunters do: the dim-edge things that work wherever prey strays out of the glow. Whip-fast lengths of armoured segment pour over the rock on a hundred legs, antennae testing the air, fond of exactly this kind of border between the safe and the dark. They are the price of the edge. The hollow and its glow lie back north; the run carries on south, and from somewhere down it drifts a thin, sour reek — a clean place gone bad, the smell of rot worked over and over by something patient in the dark.",
-    "exits": { "north": "d9.sanctuary.hollow", "south": "d8.midden.seam" },
+    "description": "South of the hollow the warded light fails altogether and the worked stone gives way to a raw, dim run in the natural rock — the margin of the kept place, where the deep-folk's cutting stops and the dark begins again. The shrine's light does not reach this far, and so the hunters do: the dim-edge things that work wherever prey strays out of the glow. Whip-fast lengths of armoured segment pour over the rock on a hundred legs, antennae testing the air, fond of exactly this kind of border between the safe and the dark. They are the price of the edge. The hollow and its glow lie back north; the run climbs away up into a cramped seam, and out of it drifts a thin, sour reek — a clean place gone bad, the smell of rot worked over and over by something patient in the dark.",
+    "exits": { "north": "d9.sanctuary.hollow", "up": "d8.midden.seam" },
     "fixtures": [],
     "groundItems": [
       { "template": "shards", "qty": 8, "hidden": { "perception": 5 } }
@@ -1638,8 +1801,8 @@
     "name": "The Sour Seam",
     "depth": 8,
     "ambientLight": 0,
-    "description": "The unmapped dark at the foot of the Centipede Run is not, it turns out, unending — the seam doubles back and climbs, worming up through old sealed diggings into a pocket the deep-folk closed off and the warden's light never cleaned. The reek thickens as you go: a sour, eating stink, rot turned over and over until it has gone past rot into something that stings the eyes. The walls are scored everywhere with pale, smoking tracks where something caustic has hauled itself through, and grey scour-slugs graze the slime in the dark, blind and unbothered. Whatever this place was, the deep-folk gave their dead to it. The seam drops back north toward the run; it opens south into a wider, fouler dark.",
-    "exits": { "north": "d9.sanctuary.run", "south": "d8.midden.pit" },
+    "description": "The unmapped dark at the foot of the Centipede Run is not, it turns out, unending — the seam doubles back and climbs, worming up through old sealed diggings into a pocket the deep-folk closed off and the warden's light never cleaned. The reek thickens as you go: a sour, eating stink, rot turned over and over until it has gone past rot into something that stings the eyes. The walls are scored everywhere with pale, smoking tracks where something caustic has hauled itself through, and grey scour-slugs graze the slime in the dark, blind and unbothered. Whatever this place was, the deep-folk gave their dead to it. The seam drops back down toward the run; it opens south into a wider, fouler dark.",
+    "exits": { "down": "d9.sanctuary.run", "south": "d8.midden.pit" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
