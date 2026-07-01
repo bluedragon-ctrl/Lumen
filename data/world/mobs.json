@@ -210,7 +210,7 @@
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 2 },
-      { "type": "flee", "lightAbove": 3, "verb": "shrieks and reels away from the light", "scope": "zone" },
+      { "type": "flee", "lightAbove": 6, "verb": "shrieks and reels away from the light", "scope": "zone" },
       { "type": "emote", "weight": 2, "messages": ["clings and pulses, gorged and heavy", "bares a snub muzzle wet with red", "drops from the dark on leathery wings"] }
     ],
     "loot": [{ "template": "guano", "chance": 0.5 }]
