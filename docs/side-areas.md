@@ -147,10 +147,16 @@
     seized claim.
   - a fresh branch off the **d1.first** hub or the **d1** gallery — a **jumped /
     abandoned claim** the bandits squat, just past the watch's reach.
+- **Approach built (d1, no humans yet):** the corridor toward the camp now exists —
+  **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) run east off the
+  Rat Warren, two dark ambush-passages (existing `cave-lurker` + vermin). The Cut is dressed as
+  a **jumped claim** (worked ore seam, cold lean-to, unstamped tally) with fresh scuffs leading
+  further **east into a dark with no exit yet** — that stub is where the camp will open. This is
+  well below the gate and off Hale's beat, resolving the location concern in geography.
 - **Review:** Works; keep them mechanically distinct from #2 (living tactics vs.
   hollow going-through-the-motions). No PvP concern — that rule is player-vs-player;
-  hostile NPCs are fine. **Blocked on #0:** the shallow map needs room to breathe
-  before a whole camp lands here.
+  hostile NPCs are fine. **Approach corridor now laid (#0 groundwork);** the camp itself (the
+  human enemy roster) is the remaining work.
 
 ## 6. Submerged Rooms — gated aquatic pockets & a reason to climb back up
 - **Depth:** recipe deep (Umbral village, ~7–9) → pockets scattered in the river/lake zones (~4) and up · **Theme:** aquatic ambush · **Lift:** JSON + server · **Verdict:** 🔴 design pass first

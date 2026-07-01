@@ -274,13 +274,43 @@
     "id": "d1.warren",
     "zone": "abyss",
     "name": "The Rat Warren",
-    "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The only way out is back west to the gallery.",
+    "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The gallery lies back west; on the far side a gnawed crack squeezes away east into blacker rock.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "west": "d1.gallery" },
+    "exits": { "west": "d1.gallery", "east": "d1.squeeze" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 120 }]
+  },
+  "d1.squeeze": {
+    "id": "d1.squeeze",
+    "zone": "abyss",
+    "name": "The Long Squeeze",
+    "description": "A throat of rock barely shoulder-wide, gnawed and rubbed smooth, angling east away from the warren's reek. It is a long, blind crawl — the passage tightens and slackens and tightens again, and it runs so dark and so narrow that something patient could wedge itself up against the ceiling and simply wait. Cracked bone grinds underfoot. The warren lies back west; the squeeze grinds on east.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "d1.warren", "east": "d1.crook" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-lurker", "max": 1, "respawn": 600 },
+      { "mob": "giant-rat", "max": 2, "respawn": 120 }
+    ]
+  },
+  "d1.crook": {
+    "id": "d1.crook",
+    "zone": "abyss",
+    "name": "The Crooked Cut",
+    "description": "The squeeze kinks open into a crooked cut where the tool-marks aren't the rats' work — a seam hacked at with a hand-pick, a lean-to knocked together from scavenged planks, a fire-ring gone grey and cold, and initials scratched over a claims-tally that no office ever stamped. Someone has jumped this ground and works it well out of the watch's sight; whoever they are, they aren't here now. Fresh scuffs lead on east, into a dark the lamplight can't reach. The squeeze goes back west.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "d1.squeeze" },
+    "fixtures": ["iron-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-lurker", "max": 1, "respawn": 600 },
+      { "mob": "cave-centipede", "max": 1, "respawn": 300 }
+    ]
   },
   "d1.drift": {
     "id": "d1.drift",

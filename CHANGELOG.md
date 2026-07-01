@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Eastward passages off the Rat Warren — the approach to a future bandit camp.** Added
+  **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) east of `d1.warren`:
+  two dark, shoulder-wide crawl-passages. Both hold an ambushing `cave-lurker`; the Squeeze adds
+  warren-overflow `giant-rat`s and the Cut a `cave-centipede`. The Cut is dressed as a **jumped
+  claim** — a hand-worked ore seam (`iron-vein`), a cold lean-to, an unstamped claims-tally —
+  with fresh scuffs leading further east (no exit built yet; reserved for the bandit camp,
+  `docs/side-areas.md` #5). Environmental storytelling only — **no human enemies yet.**
 - **Rim town map groundwork — two new patrolled rooms.** Added **Prospectors' Walk**
   (`d0.street`), a lodging-lane of prospectors' sheds inserted east of the Rim Market, and
   **The Landward Gate** (`d0.roadgate`) beyond it — a locked iron gate barring the old road out
