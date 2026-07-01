@@ -206,5 +206,23 @@
       "shards": 20,
       "items": [{ "template": "glimmerglass-blade" }]
     }
+  },
+  "fenn-forged-tally": {
+    "id": "fenn-forged-tally",
+    "name": "The Forged Tally",
+    "description": "A seam east of the rat-warren is being worked by an outlaw crew keeping their own forged claims-tally on it. Fenn wants the man who runs them stopped and the false tally brought in to strike the claim.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-recorder",
+      "offerText": "Fenn sets down his pen. \"There's a seam east of the rat-warren that shows on no page of mine, and a man down there keeping his own tally on it — a claim-number, a yield, a claim-mark, all in a hand that never crossed this counter. A forged account is still an account, and I have seen ground bought and sold on less. I can't send Hale below the gate, and the traders' board won't post a thing with no bounty behind it. So I'll put it to you. Put an end to the one they call the Foreman, and lay his false tally on my counter — I'll strike the claim from consideration, and see you paid for the trouble.\""
+    },
+    "steps": [
+      { "kill": "foreman", "count": 1, "text": "Kill the Foreman, who holds the jumped claim east of the warren" },
+      { "deliver": "foremans-tally", "count": 1, "npc": "rim-recorder", "text": "Lay the forged tally on Fenn's counter" }
+    ],
+    "rewards": {
+      "xp": 80,
+      "shards": 50
+    }
   }
 }
