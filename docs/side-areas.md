@@ -69,20 +69,39 @@
   the **self-loss (the dark / Hollowing)** — the two rhyme but the lore forbids
   stating either is behind the other.
 
-## 4. Tremor-Mole Lair — burrowers & "light doesn't matter here"
-- **Depth:** ~2–3 · **Theme:** tremor-moles / burrowers · **Lift:** JSON + server · **Verdict:** ⚠️
-- `tremor-mole` and `old-grinder` already exist (a natural boss). A burrow-warren of
-  blind diggers with ambush-from-below and cave-in hazards.
-- **The caveat:** as a plain burrower pit it's the **lowest-variety** idea — it
-  overlaps the tremor/ambush niche the gloom-crawler and cave-lurker already cover.
-  It gets *interesting* if built around turning the signature system **off**: blind
-  hunters that aggro on the player's **actions** (movement, combat, casting) and
-  **ignore light entirely**, so carrying a lamp neither helps nor hurts. That makes
-  it high-variety by subtraction — and a natural lesson in why light mattered
-  everywhere else.
-- **Loot hook:** a stealth / quiet-movement material line (padded boots, muffling gear).
-- **Review:** Worth doing **only** with the light-indifferent hook; otherwise it's a
-  reskin. Needs a small server change (action-based aggro instead of light-based).
+## 4. Tremor-Mole Burrow — giving a wasted creature a home
+- **Depth:** ~2–3 · **Theme:** tremor-moles / burrowers · **Lift:** JSON (server = optional stretch) · **Verdict:** ✅
+- **Problem it fixes:** `tremor-mole` is near-invisible today. It spawns in just two
+  rooms (one near the top, one at the deep waterfall), has **empty loot**, does
+  nothing memorable, and **flees at `lightAbove: 1`** — the faintest light sends it
+  digging, so a delver carrying any real light never actually *sees* one. The
+  creature is designed to be missed.
+- **The refinement — give the species an ecology and a home:**
+  - **Bold young (commonly visible):** a `young-tremor-mole` variant that is *not*
+    light-shy — curious pups that surface and investigate rather than digging away
+    (raise/remove the flee threshold, or make them `skittish` instead of `flee`).
+    Seed them along the early descent so the creature is finally *seen* and becomes
+    a recognisable part of the top-floor fauna.
+  - **The burrow (the lair):** a small dark mini-dungeon of dug tunnels branching off
+    the descent. Deeper in: **elder moles** (tougher, still light-shy — they dig away
+    and ambush from fresh holes), broods of young, and at the heart a **breeding pair
+    — a sire and dam** who *hold the nest* and do **not** flee light (a `guard` pair,
+    the way Gnaw and the broodmothers hold their nests).
+- **Light twist (emergent — no new code):** the tension is already latent in the
+  base design — moles flee light, but you need light to see. In the burrow that
+  becomes the whole puzzle: **carry light and the adults dig away before you can pin
+  them; go dark and they surface to fight but you can't see them.** The guarding pair
+  is the exception that gives the fight teeth.
+- **Loot hook / reason to go:** moles that gnaw ore-rich rock → small shards/crystal
+  lodged in the gizzard (echoing the Old Grinder's glimmer-gut), a **pale-mole hide**
+  (a quiet-movement / stealth material), and digging-claws (a mattock/tool line). The
+  pair drops the best of it.
+- **Review:** This is the version to build — it turns a dead creature into a legible
+  mini-ecology and is **mostly JSON** (new young/elder/pair mob defs, one small burrow
+  zone; reuses `guard` + `flee`-on-light + `summon`, all of which exist). The exotic
+  "light-indifferent, aggro-on-movement" hook from the first draft is now an
+  **optional stretch**, not required. *(Note: the Old Grinder is an ancient stonebug,
+  not a mole — the lair needs its own sire/dam pair.)*
 
 ## 5. Human Bandit Camp — the living-human enemy class
 - **Depth:** ~0–2 · **Theme:** hostile living humans · **Lift:** JSON (+ optional server) · **Verdict:** ⚠️
@@ -129,7 +148,7 @@
 
 - **New mechanics needed (server work), smallest → largest:**
   1. Mob use of items/abilities — flares & potions (#2, #5).
-  2. Action-based (light-indifferent) aggro (#4).
+  2. Action-based (light-indifferent) aggro — **optional stretch for #4**, not required.
   3. Submerged-room flag + breath/effect entry gate (#6) — the big one.
 - **Reuses existing systems (no new code):** `summon` waves, `lightAggro` /
   `lightBane` / `flee`-on-light, `emitsLight` fixtures, `damage-over-time` + `onHit`
