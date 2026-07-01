@@ -57,7 +57,7 @@ function craft(state, player, arg, ctx) {
 // armour → trinket → light), then consumables, then raw materials, then the
 // rest. Keeps the list reading top-to-bottom from "things you wield" to "things
 // you stockpile" rather than in arbitrary definition order.
-const CRAFT_SLOT_ORDER = ["hand", "body", "head", "neck", "finger", "light"];
+const CRAFT_SLOT_ORDER = ["hand", "body", "head", "cloak", "neck", "finger", "light"];
 function craftSortKey(item) {
   const s = CRAFT_SLOT_ORDER.indexOf(item.slot);
   if (s >= 0) return s;

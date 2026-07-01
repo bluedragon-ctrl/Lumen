@@ -11,7 +11,7 @@
     { "template": "short-sword" },
     { "template": "torch", "fuel": 200 }
   ],
-  "startEquipment": { "hand": null, "body": null, "head": null, "neck": null, "finger": null, "light": null },
+  "startEquipment": { "hand": null, "body": null, "head": null, "cloak": null, "neck": null, "finger": null, "light": null },
   "knownRecipes": ["smelt-iron", "smelt-silver", "forge-iron-dagger"],
   "knownSpells": []
 }

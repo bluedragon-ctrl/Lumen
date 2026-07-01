@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **New equipment slot — `cloak`.** Adds a back/mantle slot alongside the existing worn slots
+  (seeded empty in the new-player template so `unequip cloak` works from a fresh character), and a
+  first item for it: **a gloom-silk cloak** (uncommon, **+2 Ward**), woven whole from gloom-silk in
+  the deep-folk method. The **`weave-gloom-silk-cloak`** recipe (2 gloom-silk, at the alchemy bench)
+  is taught by Mallki's **Umbral weaving-method** book, so it's available from the umbral trader.
 - **Lore — the Hollowing and the lost village.** `docs/lore.md` now records the **second deep
   fate** alongside glimmer-mutation: where glimmer warps the *body* (the Mutated), the deep's own
   dark slowly takes the *self* — **the Hollowing**, a one-way decline in three stages (**husk** with
