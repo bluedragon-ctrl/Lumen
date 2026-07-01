@@ -471,6 +471,16 @@
     "shards": 3,
     "output": { "template": "gloom-silk-hood", "qty": 1 }
   },
+  "weave-gloom-silk-cloak": {
+    "id": "weave-gloom-silk-cloak",
+    "name": "Gloom-silk Cloak",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "gloom-silk", "qty": 2 }
+    ],
+    "shards": 3,
+    "output": { "template": "gloom-silk-cloak", "qty": 1 }
+  },
   "forge-hungering-dagger": {
     "id": "forge-hungering-dagger",
     "name": "Hungering Dagger",

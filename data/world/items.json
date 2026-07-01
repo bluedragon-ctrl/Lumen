@@ -1324,12 +1324,12 @@
   "umbral-weaving-method": {
     "id": "umbral-weaving-method",
     "name": "an Umbral weaving-method",
-    "description": "A folded length of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the drawing of gloom-silk into cloth, the cutting of the robe and the cowl, the plaiting of a barbed lash, the working of a thread of cold glimmer through the weave. No words, only the sequence of steps. Study it to fix the methods in memory.",
+    "description": "A folded length of cured gut-skin marked in Mallki's careful hand and the rounded glyphs of the deep-folk — the drawing of gloom-silk into cloth, the cutting of the robe, the cowl and the cloak, the plaiting of a barbed lash, the working of a thread of cold glimmer through the weave. No words, only the sequence of steps. Study it to fix the methods in memory.",
     "type": "book",
     "weight": 0,
     "value": 70,
     "stackable": true,
-    "teaches": { "recipes": ["weave-gloom-silk-robe", "weave-gloom-silk-hood", "weave-weeping-lash"] }
+    "teaches": { "recipes": ["weave-gloom-silk-robe", "weave-gloom-silk-hood", "weave-gloom-silk-cloak", "weave-weeping-lash"] }
   },
   "weeping-chasm-moss": {
     "id": "weeping-chasm-moss",
@@ -1373,6 +1373,18 @@
     "weight": 0,
     "value": 80,
     "armour": { "armour": 1, "ward": 1, "maxMana": 3, "speedPenalty": 0 }
+  },
+  "gloom-silk-cloak": {
+    "id": "gloom-silk-cloak",
+    "rarity": "uncommon",
+    "name": "a gloom-silk cloak",
+    "keywords": ["cloak", "mantle", "gloom-silk", "gloomsilk", "cloth", "umbral"],
+    "description": "A long mantle of gloom-silk that falls from the shoulders in cold, faintly luminous folds, its hem drawn heavy with a doubled weave so it settles close and turns with the body rather than catching the dark. It offers a blade nothing to bite, but the deep-made cloth lies thick against hostile magic — the wards worked patient into every thread. Umbral weaving, cut to hang behind the robe.",
+    "type": "armour",
+    "slot": "cloak",
+    "weight": 0,
+    "value": 90,
+    "armour": { "ward": 2 }
   },
   "shadow-heart": {
     "id": "shadow-heart",
