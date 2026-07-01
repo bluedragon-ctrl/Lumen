@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Side-areas idea backlog (`docs/side-areas.md`).** A living design list of proposed optional
+  side pockets / mini-dungeons keyed to the threat ladder — bat spire, hollowed prospector camp,
+  glimmer-mutated fauna, tremor-mole lair, human bandit camp, submerged rooms, and a living-fungi
+  area — each with a lore/mechanics review, implementation lift, and light-system twist. Backlog
+  only; no game content added yet, all names provisional pending sign-off.
 - **Rarity is now hinted in the player panel's Equipment and Inventory lists.** Non-common item
   names are tinted with the same rarity palette used by the room item chips and the Inspect
   badge (uncommon/rare/epic/legendary); Common stays neutral.
