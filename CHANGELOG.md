@@ -5,6 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Rarity is now hinted in the player panel's Equipment and Inventory lists.** Non-common item
+  names are tinted with the same rarity palette used by the room item chips and the Inspect
+  badge (uncommon/rare/epic/legendary); Common stays neutral.
+
 ### Fixed
 - **Sanctuary→Midden connection now respects depth.** The link between `d9.sanctuary.run`
   (depth 9) and `d8.midden.seam` (depth 8) used horizontal `south`/`north` exits across a depth

@@ -296,6 +296,12 @@ body {
 .list li { padding: 2px 0; display: flex; justify-content: space-between; gap: 8px; }
 .list li .sub { color: var(--muted); font-size: 12px; }
 .list li.empty { color: var(--muted); font-style: italic; }
+/* Rarity tint on inventory/equipment names — same palette as the item chips
+   and the Inspect badge (Common stays neutral, no rule). */
+.list li .item-name.rarity-uncommon { color: var(--rarity-uncommon); }
+.list li .item-name.rarity-rare { color: var(--rarity-rare); }
+.list li .item-name.rarity-epic { color: var(--rarity-epic); }
+.list li .item-name.rarity-legendary { color: var(--rarity-legendary); }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .state-chip { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--hostile); color: var(--hostile); }
 .state-chip.good { border-color: var(--accent); color: var(--accent); }
