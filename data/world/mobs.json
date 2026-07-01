@@ -189,6 +189,57 @@
     ],
     "loot": []
   },
+  "blood-bat": {
+    "id": "blood-bat",
+    "name": "a blood bat",
+    "keywords": ["blood", "bat"],
+    "description": "Bigger than its cave-kin and wrong-coloured with it — a dark, heavy flutter with a snub, wet muzzle and a mouthful of hooked fangs. It does not merely harry; it fastens on, and drinks. Whole colonies of them hang in the spire's dark heights, and they do not love the light.",
+    "maxHp": 12,
+    "speed": 10,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 4, "intellect": 0, "wits": 7, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "hunt",
+    "hostile": true,
+    "helper": true,
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "lightBane": { "above": 10, "damage": "1d2" },
+    "xp": 8,
+    "shards": "1d3",
+    "actions": [
+      { "type": "attack", "weight": 5 },
+      { "type": "idle", "weight": 2 },
+      { "type": "flee", "lightAbove": 6, "verb": "shrieks and reels away from the light", "scope": "zone" },
+      { "type": "emote", "weight": 2, "messages": ["clings and pulses, gorged and heavy", "bares a snub muzzle wet with red", "drops from the dark on leathery wings"] }
+    ],
+    "loot": [{ "template": "guano", "chance": 0.5 }]
+  },
+  "night-wing": {
+    "id": "night-wing",
+    "name": "Night Wing",
+    "keywords": ["night", "wing", "nightwing"],
+    "description": "The thing the whole spire hangs around — a bat grown vast and ancient in the dark, wings the span of a spread cloak, its old hide seamed with scar. It roosts head-down at the heart of the reeking vault and will not suffer the colony disturbed. Rouse it, and the dark itself seems to peel off the walls and come for you on a thousand wings.",
+    "maxHp": 42,
+    "speed": 12,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 9, "intellect": 2, "wits": 6, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": { "damage": "1d6", "actionCost": 12 },
+    "lightBane": { "above": 10, "damage": "1d3" },
+    "xp": 32,
+    "shards": "2d6",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["unfurls to its full, dreadful span", "screams, and the vault answers in a thousand squeaks", "drops head-first and pulls up in a rush of foul wind"] },
+      { "type": "summon", "weight": 3, "mob": "cave-bat", "count": 2, "max": 4, "verb": "shrieks, and the roost above splits open into a diving, wheeling swarm" }
+    ],
+    "loot": [{ "template": "crystal", "chance": 0.4 }, { "template": "guano", "chance": 1 }]
+  },
   "gnaw": {
     "id": "gnaw",
     "name": "Gnaw, the Brood-Mother",

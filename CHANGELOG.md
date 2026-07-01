@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Bat Spire — a vertical bat-choked mini-dungeon (`docs/side-areas.md` #1).** Built the
+  full shaft off **The Foot of the Spire** (`d1.spire.foot`): two rooms **down** into the reeking
+  base — **The Gullet** (`d1.spire.gullet`) and **The Sink** (`d1.spire.sink`) with a dead-end
+  **Guano Sump** (`d1.spire.sump`) off it — and three **up** toward daylight — **The Chimney**
+  (`d1.spire.climb`), **The Hanging Gallery** (`d1.spire.gallery`), and **The Open Crown**
+  (`d1.spire.crown`). The Crown breaks into open air on the mountain's flank (`ambientLight 3`):
+  a still daylight vista over wild pine and bare peaks with no sign of civilization — a deliberate
+  break in the always-downward descent, and a light-safe breather. Off the Gallery, **The Brood
+  Vault** (`d1.spire.roost`) is the lightless lair of the mini-boss. Two new mobs: the **blood
+  bat** (a blood-draining mid-tier flier that shuns light and routs to a searing flare) and
+  **Night Wing** (the brood-matriarch boss — `guard` behaviour, summons `cave-bat` waves, holds
+  its ground under light and will not rout). Bats dislike light but are not readily harmed by it:
+  `lightBane` only bites at searing intensity (10+). New drop: **bat guano** (`guano`), a
+  saltpetre-bearing material foreshadowing a later alchemy line. Light inverts the usual pressure
+  here — the dark swarms you, and bright light scatters the swarm rather than killing it.
+  **Secrets:** the Crown is the cave-mouth out onto the high mountainside; a hidden **via ferrata**
+  (iron rungs and cable, `perception 5`) climbs from it to **The Summit** (`d1.spire.summit`) — a
+  fully-outside reward vista on the roof of the mountain, sky and peaks in every direction. Three
+  minor finds are hidden across the shaft for a searching eye: a spilled purse of shards in the
+  Gullet (`perception 3`), a delver's flask of lamp-oil in the Guano Sump (`perception 4`), and a
+  dropped torch in the Hanging Gallery (`perception 4`).
 - **Foot of the Bat Spire — the shallow entry to a future vertical shaft.** Added
   **The Bending Cave** (`d1.spire.approach`) west of `d1.roost` — a quiet cave-traversal beat —
   and **The Foot of the Spire** (`d1.spire.foot`) north of it: the base of a natural flue that
