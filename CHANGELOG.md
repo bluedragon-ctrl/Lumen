@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Foot of the Bat Spire — the shallow entry to a future vertical shaft.** Added
+  **The Bending Cave** (`d1.spire.approach`) west of `d1.roost` — a quiet cave-traversal beat —
+  and **The Foot of the Spire** (`d1.spire.foot`) north of it: the base of a natural flue that
+  climbs to a coin of grey daylight far above (`ambientLight 2`), where the way onward is a climb
+  up into the dark. Enabling geography for the multi-level bat spire (`docs/side-areas.md` #1);
+  the spire proper and its bat roster are a later run — no new mobs added here.
 - **Eastward passages off the Rat Warren — the approach to a future bandit camp.** Added
   **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) east of `d1.warren`:
   two dark, shoulder-wide crawl-passages. Both hold an ambushing `cave-lurker`; the Squeeze adds

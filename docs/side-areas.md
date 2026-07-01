@@ -45,7 +45,12 @@
   (#1) and tremor burrow (#4) somewhere to open from.
 
 ## 1. Bat Spire — swarm & light-as-weapon
-- **Depth:** ~0–2 · **Theme:** cave-bats · **Lift:** JSON · **Verdict:** ✅ · **Seed exists:** `d1.roost`
+- **Depth:** ~0–2 · **Theme:** cave-bats · **Lift:** JSON · **Verdict:** ✅ · **Seed exists:** `d1.roost` · **Foot built**
+- **Entry built (d1, no bats yet):** **The Bending Cave** (`d1.spire.approach`) runs west off the
+  roost to **The Foot of the Spire** (`d1.spire.foot`) — the base of a natural flue climbing to a
+  coin of grey daylight far above (`ambientLight 2`; the shaft runs "up the outside of the world,"
+  which is where the light comes from). Its **up** way into the spire proper is described but not
+  built — that vertical, multi-level bat dungeon (and its roster) is a **separate run.**
 - Multi-level bat-focused mini-dungeon. `cave-bat` exists but is a lone nuisance;
   here the *swarm* is the point. **`d1.roost` ("The Bat Roost") already exists** — an
   upward reeking vault with a fissure of grey light and a colony that wheels when
