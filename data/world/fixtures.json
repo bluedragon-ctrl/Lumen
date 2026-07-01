@@ -190,6 +190,31 @@
     "type": "switch",
     "switch": { "emitsLight": 4, "on": true }
   },
+  "glimmer-ward": {
+    "id": "glimmer-ward",
+    "name": "a warding of glimmer-stakes",
+    "description": "Lines scored deep into the worked stone and chalked pale, pinned at their turns with stakes of raw glimmer that breathe a low, steady blue-white light. It is the deep-folk's oldest guard — a bound edge of light set against the dark and the things the dark makes, holding at the very limit of the kept places. Within it the dark does not gather; beyond it, it waits.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
+  "broken-ward": {
+    "id": "broken-ward",
+    "name": "a broken warding",
+    "description": "The twin of the guard at the bridge's end, and long dead. The same lines were scored into this threshold stone once and pinned with stakes of raw glimmer — but the stakes are drawn or snuffed, sockets gaping empty, the chalked lines scuffed to grey ghosts underfoot, and where the light once held the dark has come back in and settled. Whatever the deep-folk set this edge against, it is on this side of it now. The warding gives no light at all.",
+    "type": "scenery"
+  },
+  "grave-niches": {
+    "id": "grave-niches",
+    "name": "a wall of grave-niches",
+    "description": "The worked rock is cut floor to ceiling with row upon row of shallow niches, each just large enough to fold a body into — the deep-folk's old way of keeping their dead close, wrapped and set in the wall to lie in the dark they came from. Most gape empty now, their keepings long since stood up and shuffled off. A few still hold their wrapped shapes, black and stiff and silent; and here and there a deeper niche holds nothing the eye can name, only a dark that seems to fold back further than the stone should allow.",
+    "type": "scenery"
+  },
+  "chullpa-tower": {
+    "id": "chullpa-tower",
+    "name": "a chullpa, a tower of the dead",
+    "description": "A squat tower of fitted stone stands among the graves, taller than a man and windowless but for a single low door facing the dark — a house raised for the honoured dead, that they might keep watch over their kin below from within it rather than beneath the ground. The deep-folk built it with the same close, seamless craft as the sanctuary far above, and time has not loosened a stone of it. But the low door is a mouth of pure black, and nothing that should be keeping watch keeps it now.",
+    "type": "scenery"
+  },
   "weeping-moss-curtain": {
     "id": "weeping-moss-curtain",
     "name": "a curtain of weeping chasm-moss",

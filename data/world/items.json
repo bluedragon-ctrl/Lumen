@@ -1394,6 +1394,28 @@
     "sellValue": 48,
     "stackable": true
   },
+  "dark-cinder": {
+    "id": "dark-cinder",
+    "name": "a dark cinder",
+    "keywords": ["dark", "cinder", "gloom", "ash", "residue"],
+    "description": "A cold, weightless clot of black that crumbles like a burnt-out ember and never warms in the hand — what the dark leaves behind when a thing it has taken is finally put down. In life the deep-folk carry a soft glow beneath the skin; the Hollowing snuffs it, and this is the snuffed remnant, the ash of a light that went out long before the body did. It drinks the last warmth from your fingers and gives back only cold. The deep's alchemists reckon it the base of every dark working — common as grave-dust wherever the taken walk, and good for little on its own.",
+    "type": "material",
+    "weight": 0,
+    "value": 5,
+    "stackable": true
+  },
+  "glyph-silk": {
+    "id": "glyph-silk",
+    "rarity": "uncommon",
+    "name": "a bolt of glyph-silk",
+    "keywords": ["glyph-silk", "glyph", "silk", "cloth", "shroud", "ritual"],
+    "description": "A length of gloom-silk gone stiff and dark with age, every hand's-breadth of it inscribed in the rounded glyphs of the deep-folk — the glimmer-singers' ritual cloth, woven for the workings that matter and, chief among them, the wrapping of their honoured dead. The faint luminescence of the raw silk is all but drunk out of it here, the glyphs showing only as a colder black against the black, and the dark clings to the weave the way it clings to the ones it wraps. Cut whole from a bound husk or lifted from a grave-niche, it is the deep-folk's ritual work made portable — and a weaver who learns the glyphs could, in time, inscribe their own.",
+    "type": "material",
+    "weight": 1,
+    "value": 55,
+    "sellValue": 40,
+    "stackable": true
+  },
   "book-of-shadow-binding": {
     "id": "book-of-shadow-binding",
     "name": "the Book of Shadow-Binding",
