@@ -386,7 +386,7 @@
     "ambientLight": 1,
     "exits": { "up": "d1.spire.foot", "down": "d1.spire.sink" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [{ "template": "shards", "qty": 10, "hidden": { "perception": 3 } }],
     "spawns": [{ "mob": "cave-bat", "max": 2, "respawn": 90 }]
   },
   "d1.spire.sink": {
@@ -410,7 +410,7 @@
     "ambientLight": 0,
     "exits": { "east": "d1.spire.sink" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [{ "template": "lamp-oil", "qty": 1, "hidden": { "perception": 4 } }],
     "spawns": [{ "mob": "blood-bat", "max": 1, "respawn": 180 }, { "mob": "cave-bat", "max": 2, "respawn": 90 }]
   },
   "d1.spire.climb": {
@@ -434,7 +434,7 @@
     "ambientLight": 2,
     "exits": { "down": "d1.spire.climb", "up": "d1.spire.crown", "west": "d1.spire.roost" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [{ "template": "torch", "qty": 1, "hidden": { "perception": 4 } }],
     "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 90 }, { "mob": "blood-bat", "max": 1, "respawn": 180 }]
   },
   "d1.spire.roost": {
@@ -453,10 +453,23 @@
     "id": "d1.spire.crown",
     "zone": "abyss",
     "name": "The Open Crown",
-    "description": "The spire breaks at last into open air. A ragged rent in the mountain's flank lets in a flood of honest daylight — the first you have seen since the descent — and a cold, clean wind that scours the roost-stink away. Through the gap the world lies spread and impossibly far: dark ranks of pine falling away down the slopes, bare grey peaks stacked blue into the haze beyond, and not a wall, a lamp, or a wisp of chimney-smoke anywhere in all that wild green distance. No road runs here. There is no way on and no way down but back into the dark; but for a moment there is sky, and it is enough.",
+    "description": "The spire's mouth breaks out of the rock and onto the bare shoulder of the mountain — you step from the cave into open air, high on a wind-scoured flank of grey stone with the whole sky wide overhead. The world lies spread and impossibly far below: dark ranks of pine falling away down the slopes, bare peaks stacked blue into the haze, and not a wall, a lamp, or a wisp of chimney-smoke anywhere in all that wild green distance. The cave-mouth drops back down into the dark and the wings behind you. The rock above rears sheer toward the true summit — no path up it that the eye finds easily, though a careful search of the face might turn one up.",
     "depth": 1,
     "ambientLight": 3,
     "exits": { "down": "d1.spire.gallery" },
+    "hiddenExits": { "up": { "to": "d1.spire.summit", "perception": 5, "name": "a via ferrata — a line of ancient iron rungs and a rust-scaled cable bolted up the sheer face toward the summit" } },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d1.spire.summit": {
+    "id": "d1.spire.summit",
+    "zone": "abyss",
+    "name": "The Summit",
+    "description": "The via ferrata tops out on the very roof of the world — the bare, wind-hammered summit of the mountain, with nothing higher in any direction for as far as the eye can carry. The whole country wheels away below: range beyond range of blue peaks, the dark fur of forest in the valleys, the far silver thread of a river, cloud-shadows dragging slow across all of it. The wind is enormous and clean and cold enough to ache in the teeth. Somewhere far beneath your boots the dark is still waiting, and the delve, and the long way down — but not here. Here there is only sky, and the whole world laid out like a map, and the giddy knowledge of how far you have climbed to stand in the light. The iron rungs drop back down the face behind you.",
+    "depth": 1,
+    "ambientLight": 3,
+    "exits": { "down": "d1.spire.crown" },
     "fixtures": [],
     "groundItems": [],
     "spawns": []

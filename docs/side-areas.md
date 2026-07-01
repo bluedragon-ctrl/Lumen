@@ -57,6 +57,10 @@
   readily harmed by it — `lightBane` only bites at searing 10+. New drop: **guano** (saltpetre
   material, foreshadows the alchemy line). The up-to-daylight framing is **intentional** — a deliberate break in the
   always-downward descent and a hint of the world outside, which supersedes the naming caveat below.
+- **Secrets:** the Crown is the cave-mouth onto the high mountainside; a hidden via ferrata
+  (`perception 5`) climbs to **The Summit** (`d1.spire.summit`), a fully-outside reward vista.
+  Three minor hidden finds are scattered across the shaft (`perception 3–4`): shards in the Gullet,
+  lamp-oil in the Guano Sump, a torch in the Hanging Gallery.
 - Multi-level bat-focused mini-dungeon. `cave-bat` exists but is a lone nuisance;
   here the *swarm* is the point. **`d1.roost` ("The Bat Roost") already exists** — an
   upward reeking vault with a fissure of grey light and a colony that wheels when

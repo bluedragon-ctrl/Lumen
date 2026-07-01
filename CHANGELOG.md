@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lightBane` only bites at searing intensity (10+). New drop: **bat guano** (`guano`), a
   saltpetre-bearing material foreshadowing a later alchemy line. Light inverts the usual pressure
   here — the dark swarms you, and bright light scatters the swarm rather than killing it.
+  **Secrets:** the Crown is the cave-mouth out onto the high mountainside; a hidden **via ferrata**
+  (iron rungs and cable, `perception 5`) climbs from it to **The Summit** (`d1.spire.summit`) — a
+  fully-outside reward vista on the roof of the mountain, sky and peaks in every direction. Three
+  minor finds are hidden across the shaft for a searching eye: a spilled purse of shards in the
+  Gullet (`perception 3`), a delver's flask of lamp-oil in the Guano Sump (`perception 4`), and a
+  dropped torch in the Hanging Gallery (`perception 4`).
 - **Foot of the Bat Spire — the shallow entry to a future vertical shaft.** Added
   **The Bending Cave** (`d1.spire.approach`) west of `d1.roost` — a quiet cave-traversal beat —
   and **The Foot of the Spire** (`d1.spire.foot`) north of it: the base of a natural flue that
