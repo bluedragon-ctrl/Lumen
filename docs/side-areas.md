@@ -88,8 +88,8 @@
   *you*, drinks a potion mid-fight.
 - **Light twist:** first enemy that uses the player's own toolkit (light-as-weapon
   pointed back at you).
-- **Loot hook:** delver gear/schematics; a claims-ledger quest thread for Fenn (his
-  dialogue already knows "which owners stopped coming up").
+- **Loot hook:** delver gear/schematics; a register quest thread for Fenn the reeve (his
+  dialogue already keeps "the roll of the ones who stopped coming up").
 - **Review:** Strong and lore-perfect. Differentiate the husks from the Umbral
   Necropolis's — these are **human** and mid-stage, not the necropolis's deep
   end-stage. The boss's flare/potion use is the only piece that may want a small
@@ -145,8 +145,8 @@
   **optional stretch**, not required. *(Note: the Old Grinder is an ancient stonebug,
   not a mole — the lair needs its own sire/dam pair.)*
 
-## 5. Human Bandit Camp — the living-human enemy class
-- **Depth:** ~1–2 · **Theme:** hostile living humans · **Lift:** JSON (+ optional server) · **Verdict:** ⚠️ · **Depends on:** #0 (map extension)
+## 5. Human Bandit Camp — the living-human enemy class · BUILT
+- **Depth:** ~1–2 · **Theme:** hostile living humans · **Lift:** JSON + server (new faction) · **Verdict:** ✅ **BUILT** ("The Seized Working")
 - Claim-jumpers / deserters preying on delvers. Fits the frontier tone (the Rim has
   "no formal law"; Hale is the only watch). Introduces **sane, hostile humans**
   early — tactical fighters in armour, coordinated, who may use flares/potions.
@@ -159,19 +159,44 @@
   them" tension resolves by placement alone. Two ready seams to hang it off:
   - **`d0.fault` — "The Riven Yard,"** where *"the boomtown simply gives out"* on
     unfloored rock: the written edge-of-law, a natural mouth for a track down to a
-    seized claim.
-  - a fresh branch off the **d1.first** hub or the **d1** gallery — a **jumped /
-    abandoned claim** the bandits squat, just past the watch's reach.
-- **Approach built (d1, no humans yet):** the corridor toward the camp now exists —
-  **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) run east off the
-  Rat Warren, two dark ambush-passages (existing `cave-lurker` + vermin). The Cut is dressed as
-  a **jumped claim** (worked ore seam, cold lean-to, unstamped tally) with fresh scuffs leading
-  further **east into a dark with no exit yet** — that stub is where the camp will open. This is
-  well below the gate and off Hale's beat, resolving the location concern in geography.
-- **Review:** Works; keep them mechanically distinct from #2 (living tactics vs.
-  hollow going-through-the-motions). No PvP concern — that rule is player-vs-player;
-  hostile NPCs are fine. **Approach corridor now laid (#0 groundwork);** the camp itself (the
-  human enemy roster) is the remaining work.
+    seized working.
+  - a fresh branch off the **d1.first** hub or the **d1** gallery — a **seized /
+    abandoned working** the bandits squat, just past the watch's reach.
+- **BUILT — "The Seized Working" (`d1.flue` → `d1.diggings` → `d1.commons` → {`d1.foremans-cut`,
+  `d1.nook`}).** The camp opens **east off The Crooked Cut** (`d1.crook`), delivering on the
+  "fresh scuffs lead east into a dark with no exit yet" stub. Five rooms: **The Roasting Flue**
+  (entry, a lone sentry, a smelter whose chimney bores up to the surface as the crew's bolt-hole
+  — visible but not climbable, a future second-entrance hook), **The Stripped Face** and **The
+  Cutthroats' Commons** (common outlaws), **The Foreman's Cut** (the boss's rich seam), and **The
+  Warder's Nook** off the commons. Well below the gate and off Hale's beat — location concern
+  resolved by placement, exactly as planned.
+- **Enemy roster (new `outlaw` faction).** Registered `outlaw` in `server/config.js` +
+  `server/factions.js` (`enemy` to `player` and the `rim` watch that would clear them; `neutral`
+  to fauna/wild/umbral — the camp squats *among* the vermin, not against it). Four mobs:
+  **camp sentry** and **outlaw prospector** (melee brawlers), **the Foreman** (a `guard` melee
+  captain; drops **the Foreman's brigandine**), and **the camp warder** (a hedge-mage who lights
+  the camp and fights from range with Witchfire/Spark and a self-cast Mage Armour; drops **a
+  warder's staff**). The whole crew fights as a **coordinated unit** — every outlaw is a `helper`
+  (assist: attack one and its roommates pile on) and `pursues` up to **3 rooms** (a fleeing delver
+  is run down through the camp and out into the approach, the Foreman included). Sentries/prospectors
+  drop, at a low chance, a camp's ordinary supplies — an iron weapon, lamp-oil, a torch, or simple
+  cooked food. No new mob-uses-items code was needed — the roster is built
+  entirely on existing `helper`/`pursues`/`attack`/`cast`/`guard`.
+- **Quest hook — _The Prospectors' Bane_ (`fenn-prospectors-bane`).** Fenn the recorder
+  (`rim-recorder`) offers a talk-triggered protection quest: registered prospectors working the
+  eastern seams have stopped coming up, so thin the outlaw crew (kill 4 `outlaw-prospector`) and
+  put down the **Foreman** to make the ground safe for honest diggers again. Rewards 80 xp + 50
+  shards. Fits Fenn's ledger-keeper role (he already frets over names gone quiet), gives the camp
+  a reason to exist beyond XP, and ties the new area back to a surface NPC.
+- **Light inverts the bat spire.** These are living humans who *keep* light: cook-fires and lamps
+  make the camp a **lit pocket** (`ambientLight 1`) in the dark approach, and the warder himself
+  `emitsLight`. The tell that something organized holds this ground — the opposite of the
+  light-shy fauna everywhere else at this depth.
+- **Review:** Built and mechanically distinct from #2 as intended (living tactics vs. hollow
+  going-through-the-motions), and the new `outlaw` faction is the clean seam #2's dark-taken
+  humans can hang off later. No PvP concern — that rule is player-vs-player; hostile NPCs are fine.
+  Names (the Foreman, the camp warder, "The Seized Working") are provisional pending maintainer
+  sign-off.
 
 ## 6. Submerged Rooms — gated aquatic pockets & a reason to climb back up
 - **Depth:** recipe deep (Umbral village, ~7–9) → pockets scattered in the river/lake zones (~4) and up · **Theme:** aquatic ambush · **Lift:** JSON + server · **Verdict:** 🔴 design pass first

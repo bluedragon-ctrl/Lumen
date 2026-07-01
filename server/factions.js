@@ -21,6 +21,10 @@ function combatantFaction(actor, kind) {
 //   fauna  — peaceful wildlife/livestock    wild   — the deep's predators (default)
 //   umbral — the deep-dwelling Umbrals (Mallki & kin; hostile members gated by
 //            `hostile`, peaceful ones like the trader simply never act on it)
+//   outlaw — living, hostile humans (claim-jumpers/deserters preying on delvers).
+//            A sane, coordinated enemy class, `enemy` to both `player` and the
+//            `rim` watch that would clear them; `neutral` to the deep's own things
+//            (fauna/wild/umbral) — the camp squats among the vermin, not against it.
 // `enemy` only marks who *may* fight; whether a creature *starts* one is the
 // separate `hostile` flag. So fauna are `enemy` to `player` — non-hostile (they
 // never initiate and aren't hunted) but they fight back when farmed (a struck Old
@@ -29,11 +33,12 @@ function combatantFaction(actor, kind) {
 // on. umbral↔player is "enemy" so hostile Umbrals can engage delvers; non-hostile
 // Umbrals (the trader) stay inert and a peaceful enclave is just `hostile: false`.
 const FACTION_RELATIONS = {
-  player: { rim: "ally", fauna: "enemy", wild: "enemy", umbral: "enemy" },
-  rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral" },
-  fauna: { player: "enemy", rim: "ally", wild: "neutral", umbral: "neutral" },
-  wild: { player: "enemy", rim: "enemy", fauna: "neutral", umbral: "neutral" },
-  umbral: { player: "enemy", rim: "neutral", fauna: "neutral", wild: "neutral" },
+  player: { rim: "ally", fauna: "enemy", wild: "enemy", umbral: "enemy", outlaw: "enemy" },
+  rim: { player: "ally", fauna: "ally", wild: "enemy", umbral: "neutral", outlaw: "enemy" },
+  fauna: { player: "enemy", rim: "ally", wild: "neutral", umbral: "neutral", outlaw: "neutral" },
+  wild: { player: "enemy", rim: "enemy", fauna: "neutral", umbral: "neutral", outlaw: "neutral" },
+  umbral: { player: "enemy", rim: "neutral", fauna: "neutral", wild: "neutral", outlaw: "neutral" },
+  outlaw: { player: "enemy", rim: "enemy", fauna: "neutral", wild: "neutral", umbral: "neutral" },
 };
 /** How faction `a` regards faction `b`: "ally" | "enemy" | "neutral". */
 function factionRelation(a, b) {

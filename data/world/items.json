@@ -114,6 +114,31 @@
     "value": 26,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
   },
+  "foremans-brigandine": {
+    "id": "foremans-brigandine",
+    "rarity": "uncommon",
+    "name": "the Foreman's brigandine",
+    "keywords": ["brigandine", "coat", "jack", "foreman", "armour", "armor"],
+    "description": "A knee-length canvas jack the Foreman had made down here, its lining stiff with a mail of small iron plates riveted plate-to-plate in overlapping rows — the salvaged heads of a hundred worn-out picks, beaten flat and put to a harder use. It turns a blade nearly as well as a beaten cuirass, but the plates ride loose and articulated where a cuirass rides as one rigid shell, so a delver keeps his wind and his wits under it. Honest thieves' work, and warm.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 6,
+    "value": 55,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 3 }
+  },
+  "warders-staff": {
+    "id": "warders-staff",
+    "rarity": "uncommon",
+    "name": "a warder's staff",
+    "keywords": ["staff", "rod", "focus", "warder", "mage"],
+    "description": "A plain ash rod, worn smooth and dark at the grip, with a knuckle of raw glimmer-quartz lashed into a split at its head by turns of copper wire. The camp warder's own focus — a delver-mage's tool, from before whatever debt or grievance drove him down here to sell his light to outlaws. Held while casting it steadies the will and deepens the well a caster draws from, and it cracks a fair blow of its own where a spell won't serve.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 90,
+    "weapon": { "damage": { "magical": "1d4" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 } },
+    "armour": { "attrMod": { "intellect": 1 }, "maxMana": 3 }
+  },
   "umbral-mind-charm": {
     "id": "umbral-mind-charm",
     "rarity": "rare",
@@ -290,8 +315,8 @@
   },
   "delver-claim-tag": {
     "id": "delver-claim-tag",
-    "name": "a delver's claim-tag",
-    "description": "A thumb-length tag of stamped lead on a rotted cord, the kind every registered delver wears below — claim number on one face, the holder's mark on the other. This one reads WENDER, M., the stamp still crisp under a crust of lake-silt. Its owner has no further use for it; Fenn's ledger does.",
+    "name": "a delver's tag",
+    "description": "A thumb-length tag of stamped lead on a rotted cord, the kind the reeve issues to every delver he registers — a descent-number on one face, the bearer's name on the other. This one reads WENDER, M., the stamp still crisp under a crust of lake-silt. Its owner has no further use for it; Fenn's register does.",
     "type": "material",
     "filterGroup": "other",
     "weight": 0,
@@ -301,9 +326,9 @@
   },
   "quiet-claim-key": {
     "id": "quiet-claim-key",
-    "name": "the Quiet Claim's key",
-    "keywords": ["key", "claim", "iron"],
-    "description": "A heavy iron key, the office tag still wired to its bow: a claim-number, and below it, in Fenn's lead-pencil, the single word CONDEMNED. It opens the sealed adit north of the Prospectors' Road — the working the recorder's office struck from the active rolls after it was overrun, and has kept barred ever since. Fenn does not give it lightly.",
+    "name": "the condemned adit's key",
+    "keywords": ["key", "adit", "condemned", "iron"],
+    "description": "A heavy iron key, the office tag still wired to its bow: an adit-number, and below it, in Fenn's lead-pencil, the single word CONDEMNED. It opens the sealed adit north of the Prospectors' Road — the working the reeve's office condemned and barred after it was overrun, and has kept shut ever since. Fenn does not give it lightly.",
     "type": "material",
     "filterGroup": "other",
     "weight": 1,

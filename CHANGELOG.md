@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Seized Working — an outlaw prospector camp and Lumen's first living-human enemy class
+  (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
+  gate and off the watch's beat: five rooms of outlaws squatting a working they took by force — **The
+  Roasting Flue** (`d1.flue`, the entry, held by a lone sentry, where a smelter's chimney bores
+  up to the surface as the crew's bolt-hole — visible but not climbable), **The Stripped Face**
+  (`d1.diggings`) and **The Cutthroats' Commons** (`d1.commons`), both worked by common
+  outlaws, **The Foreman's Cut** (`d1.foremans-cut`, the boss's rich seam), and **The Warder's
+  Nook** (`d1.nook`, off the commons). Four new mobs on a **new `outlaw` faction** (`enemy` to
+  both the player and the `rim` watch, `neutral` to the deep's own things): the **camp sentry**
+  and **outlaw prospector** (melee brawlers), **the Foreman** (a `guard`-behaviour melee captain,
+  drops the brigandine), and **the camp warder** (a hedge-mage who lights the camp and fights
+  from range with Witchfire, Spark and a self-cast Mage Armour). The whole crew is a
+  **coordinated unit** — every outlaw `assist`s (attack one and its roommates pile on) and
+  `pursues` (a fleeing delver is chased up to three rooms, the Foreman included), so the camp
+  fights as a rallying whole rather than a set of isolated encounters. Light **inverts** the bat
+  spire's rule: these are living
+  humans who *keep* light — cook-fires and lamps make the camp a lit pocket in the dark, a tell
+  that something organized holds this ground. New drops: **the Foreman's brigandine** (a
+  flexible body armour that rivals the iron cuirass without dulling a delver's wits) and **a
+  warder's staff** (a caster's focus); the Foreman may also drop an **acid bomb** and the warder a
+  **regeneration draught**, so the camp fields potions and thrown weapons of its own. Sentries and
+  prospectors also drop, at a low chance, the
+  ordinary supplies of a camp squatting in the dark — an iron weapon, a flask of lamp-oil, a
+  torch, or a bit of cooked camp food. **New quest — _The Prospectors' Bane_:** Fenn the recorder
+  (`rim-recorder`) notices registered prospectors working the eastern seams have stopped coming
+  up — the outlaw crew that seized the working is robbing and killing honest diggers — and sends a delver to thin
+  the outlaws and put down the Foreman so the ground is safe to work again. Rewards xp + shards.
 - **The Bat Spire — a vertical bat-choked mini-dungeon (`docs/side-areas.md` #1).** Built the
   full shaft off **The Foot of the Spire** (`d1.spire.foot`): two rooms **down** into the reeking
   base — **The Gullet** (`d1.spire.gullet`) and **The Sink** (`d1.spire.sink`) with a dead-end
@@ -36,8 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Eastward passages off the Rat Warren — the approach to a future bandit camp.** Added
   **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) east of `d1.warren`:
   two dark, shoulder-wide crawl-passages. Both hold an ambushing `cave-lurker`; the Squeeze adds
-  warren-overflow `giant-rat`s and the Cut a `cave-centipede`. The Cut is dressed as a **jumped
-  claim** — a hand-worked ore seam (`iron-vein`), a cold lean-to, an unstamped claims-tally —
+  warren-overflow `giant-rat`s and the Cut a `cave-centipede`. The Cut is dressed as a **seized
+  working** — a hand-worked ore seam (`iron-vein`), a cold lean-to, an unstamped work-tally —
   with fresh scuffs leading further east (no exit built yet; reserved for the bandit camp,
   `docs/side-areas.md` #5). Environmental storytelling only — **no human enemies yet.**
 - **Rim town map groundwork — two new patrolled rooms.** Added **Prospectors' Walk**
@@ -265,7 +292,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `config.TIDE.predator`.
 - **Settled NPCs now have lamps, keeping their rooms safe through the Tide.** Every
   non-wandering Rim and Umbral NPC's room now holds a lamp that lifts its light to
-  at least 1 during the Tide: the six Rim shops/halls (inn, market, claims office,
+  at least 1 during the Tide: the six Rim shops/halls (inn, market, reeve's office,
   hatchery, mage's shed, workshop) gain the descent's iron lamp, lit by their keeper
   as the dark closes in. Their base ambient is lowered to 3 (the hatchery to 0, left
   to its captive lightbugs) so the lamp, the patrolling watchman's lamp, and the
@@ -399,6 +426,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   light now counts as visible; a shadow in the void reads as an unseen "something"
   until you bring light to it. (No other mob emits negative light, so nothing else
   changes.)
+
+### Changed
+- **Fenn reframed from claims-recorder to _reeve_.** The Rim has no claim-reservation
+  system, so Fenn no longer administers mining claims. He is now the self-appointed
+  **reeve** — a local administrator and part-sheriff who licenses the descent and the
+  digging, takes his fees, settles disputes, and keeps the register of who goes below
+  and who never comes up; below the gate, where Hale's watch won't walk, his word is the
+  only order there is. Reworded his mob entry and dialogue, **The Reeve's Office**
+  (`d0.claims`, formerly The Claims Office), the chained ledger and notice board, the
+  sealed condemned-adit door, the delver's tag and condemned-adit key items, and Fenn's
+  quests (**Quiet Too Long** and the new **The Prospectors' Bane**) accordingly. Also
+  de-claimed the outlaw camp's flavour (now a *seized working*) and the three surface-tone
+  lines in `docs/lore.md`. Internal ids (`d0.claims`, `delver-claim-tag`, `quiet-claim-key`,
+  `sealed-claim-door`, `claims-ledger`) are unchanged to avoid breaking references; only
+  player-facing text moved. The deep `d2.claim.*` "a dying prospector staked his last claim"
+  rooms are left as personal prospector romance, not an office reservation.
 
 ## [0.2.0] - 2026-06-23
 ### Added

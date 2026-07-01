@@ -46,7 +46,7 @@
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Rim Market",
-    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a rutted lane of prospectors' lodgings runs east toward the town's landward gate, and a plank-and-canvas claims office leans against the lane's south side.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a rutted lane of prospectors' lodgings runs east toward the town's landward gate, and a plank-and-canvas registry office leans against the lane's south side.",
     "depth": 0,
     "ambientLight": 3,
     "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.street", "south": "d0.claims" },
@@ -58,8 +58,8 @@
     "id": "d0.claims",
     "zone": "rim",
     "tags": ["patrol"],
-    "name": "The Claims Office",
-    "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with claim papers climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and claims — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every claimed seam below — crossed out, contested, or quiet too long. The market lane lies back north.",
+    "name": "The Reeve's Office",
+    "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with permits and licenses climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and notices — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every soul who went below — come up and gone, or quiet too long. The market lane lies back north.",
     "depth": 0,
     "ambientLight": 3,
     "exits": { "north": "d0.market" },
@@ -301,15 +301,86 @@
     "id": "d1.crook",
     "zone": "abyss",
     "name": "The Crooked Cut",
-    "description": "The squeeze kinks open into a crooked cut where the tool-marks aren't the rats' work — a seam hacked at with a hand-pick, a lean-to knocked together from scavenged planks, a fire-ring gone grey and cold, and initials scratched over a claims-tally that no office ever stamped. Someone has jumped this ground and works it well out of the watch's sight; whoever they are, they aren't here now. Fresh scuffs lead on east, into a dark the lamplight can't reach. The squeeze goes back west.",
+    "description": "The squeeze kinks open into a crooked cut where the tool-marks aren't the rats' work — a seam hacked at with a hand-pick, a lean-to knocked together from scavenged planks, a fire-ring gone grey and cold, and initials scratched over a work-tally the reeve never saw. Someone has seized this ground and works it well out of the watch's sight; whoever they are, they aren't here now. Fresh scuffs lead on east, into a dark the lamplight can't reach. The squeeze goes back west.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "west": "d1.squeeze" },
+    "exits": { "west": "d1.squeeze", "east": "d1.flue" },
     "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "cave-lurker", "max": 1, "respawn": 600 },
       { "mob": "cave-centipede", "max": 1, "respawn": 300 }
+    ]
+  },
+  "d1.flue": {
+    "id": "d1.flue",
+    "zone": "abyss",
+    "name": "The Roasting Flue",
+    "description": "The scuffed passage gives onto a low, smoke-stained vault where the outlaws roast the ore they steal. A squat stone smelter stands against one wall, and above it a chimney-flue has been bored straight up through the rock and out of sight — the crew's own bolt-hole to the surface, a sooted black throat too sheer and too high for any hand not rigged to climb it. A sentry keeps this mouth, where the tunnel comes up dark out of the west. Firelight and the reek of hot metal fill the room; the camp lies on east.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "west": "d1.crook", "east": "d1.diggings" },
+    "fixtures": ["smelter"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "camp-sentry", "max": 1, "respawn": 300 }
+    ]
+  },
+  "d1.diggings": {
+    "id": "d1.diggings",
+    "zone": "abyss",
+    "tags": ["grazing"],
+    "name": "The Stripped Face",
+    "description": "A raw ore face the crew works in shifts — a rust-red seam hacked and prised, pale where fresh rock has just come away, with tools and a guttering work-lamp left wherever they were dropped. Spoil heaps of dead rock crowd the walls and the floor is churned to grit. Whoever holds this ground is stripping it fast and without care, taking the easy metal and leaving the rest. The roasting-flue is back west; the camp proper opens east.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "west": "d1.flue", "east": "d1.commons" },
+    "fixtures": ["iron-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "outlaw-prospector", "max": 2, "respawn": 240 }
+    ]
+  },
+  "d1.commons": {
+    "id": "d1.commons",
+    "zone": "abyss",
+    "name": "The Cutthroats' Commons",
+    "description": "The heart of the camp — a wider chamber where the outlaws eat, sleep and quarrel. A fire-ring smoulders under a soot-caked pot, bedrolls and plundered kit lie heaped against the walls, and a battered lamp throws a warm, uneasy light over the lot of it. Scratched into a bench-leg near the fire is the crew's own tally, a rough account of stolen shares kept in a hand that answers to no office. Passages run west to the diggings, north to a nook set apart from the noise, and east to where the boss keeps the best of the seam.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "west": "d1.diggings", "north": "d1.nook", "east": "d1.foremans-cut" },
+    "fixtures": ["camp-firepit", "camp-lamp", "camp-bench"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "outlaw-prospector", "max": 2, "respawn": 240 }
+    ]
+  },
+  "d1.foremans-cut": {
+    "id": "d1.foremans-cut",
+    "zone": "abyss",
+    "name": "The Foreman's Cut",
+    "description": "The richest ground in the camp, and the Foreman keeps it for himself — a broad chamber where a fat seam of ore and a thread of silver run through the rock, worked with better tools than the diggers are given and lit against the dark by a lamp of its own. Ingots and a strongbox of gathered shards sit within arm's reach of where the big man plants himself. There is only the one way in and out, west to the commons, and he stands square in the middle of it.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "west": "d1.commons" },
+    "fixtures": ["iron-vein", "silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "foreman", "max": 1, "respawn": 1800 }
+    ]
+  },
+  "d1.nook": {
+    "id": "d1.nook",
+    "zone": "abyss",
+    "name": "The Warder's Nook",
+    "description": "A cramped side-cell the camp's mage has taken for his own, set well apart from the diggers' noise — a pallet, a stub of tallow candle, a few water-stained books carried down from some brighter place, and a knot of cold conjured light hanging in the air that never quite gutters out. The others give the nook a wide berth, and the warder likes it that way. The commons lies back south.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "south": "d1.commons" },
+    "fixtures": ["camp-lamp"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "camp-warder", "max": 1, "respawn": 1800 }
     ]
   },
   "d1.drift": {

@@ -31,7 +31,7 @@ module.exports = {
   // "wild"). The *vocabulary* lives here so the data validator and the game
   // share one whitelist; how the sides regard one another (ally/enemy/neutral)
   // is game logic and lives in state.js `FACTION_RELATIONS`.
-  FACTIONS: ["player", "rim", "fauna", "wild", "umbral"],
+  FACTIONS: ["player", "rim", "fauna", "wild", "umbral", "outlaw"],
   DEFAULT_FACTION: "wild", // a mob with no authored faction fights for the wild
 
   // The Tide — the world clock (see server/world-clock.js). The abyss breathes

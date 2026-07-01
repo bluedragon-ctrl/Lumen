@@ -56,7 +56,7 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       // (wild|player|rim|fauna) overrides it so any side can be exercised live (a
       // "player" override also stamps ownerId = admin). A dev affordance, not
       // authored content.
-      const FACTION_OVERRIDES = ["wild", "player", "rim", "fauna", "umbral"];
+      const FACTION_OVERRIDES = ["wild", "player", "rim", "fauna", "umbral", "outlaw"];
       const [mobId, rawN, rawFaction] = arg.split(/\s+/);
       if (!mobId || !state.world.mobs[mobId])
         return [{ type: "error", text: `Usage: @spawn <mobId> [count] [${FACTION_OVERRIDES.join("|")}]. Unknown mob "${mobId || ""}".` }];
