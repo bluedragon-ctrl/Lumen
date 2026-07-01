@@ -45,12 +45,17 @@
   (#1) and tremor burrow (#4) somewhere to open from.
 
 ## 1. Bat Spire — swarm & light-as-weapon
-- **Depth:** ~0–2 · **Theme:** cave-bats · **Lift:** JSON · **Verdict:** ✅ · **Seed exists:** `d1.roost` · **Foot built**
-- **Entry built (d1, no bats yet):** **The Bending Cave** (`d1.spire.approach`) runs west off the
-  roost to **The Foot of the Spire** (`d1.spire.foot`) — the base of a natural flue climbing to a
-  coin of grey daylight far above (`ambientLight 2`; the shaft runs "up the outside of the world,"
-  which is where the light comes from). Its **up** way into the spire proper is described but not
-  built — that vertical, multi-level bat dungeon (and its roster) is a **separate run.**
+- **Depth:** ~0–2 · **Theme:** cave-bats · **Lift:** JSON · **Verdict:** ✅ · **Seed exists:** `d1.roost` · **BUILT**
+- **Built (d1):** the full shaft climbs/drops off **The Foot of the Spire** (`d1.spire.foot`) —
+  **down:** The Gullet (`d1.spire.gullet`) → The Sink (`d1.spire.sink`), with a dead-end **Guano
+  Sump** (`d1.spire.sump`); **up:** The Chimney (`d1.spire.climb`) → The Hanging Gallery
+  (`d1.spire.gallery`) → **The Open Crown** (`d1.spire.crown`, `ambientLight 3` — a sealed daylight
+  vista over wild woods and peaks, **no civilization in view**). Off the Gallery, **The Brood
+  Vault** (`d1.spire.roost`) is the lightless boss lair. New mobs: **blood-bat** (mid-tier
+  blood-drinker, flees bright light) and **Night Wing** (brood-matriarch boss — `guard`, summons
+  `cave-bat`, `lightBane` but no flee). New drop: **guano** (saltpetre material, foreshadows the
+  alchemy line). The up-to-daylight framing is **intentional** — a deliberate break in the
+  always-downward descent and a hint of the world outside, which supersedes the naming caveat below.
 - Multi-level bat-focused mini-dungeon. `cave-bat` exists but is a lone nuisance;
   here the *swarm* is the point. **`d1.roost` ("The Bat Roost") already exists** — an
   upward reeking vault with a fissure of grey light and a colony that wheels when

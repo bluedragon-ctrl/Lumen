@@ -237,6 +237,15 @@
     "value": 10,
     "stackable": true
   },
+  "guano": {
+    "id": "guano",
+    "name": "a lump of bat guano",
+    "description": "A crumbling, acrid clod scraped from a roost-floor — pale with old droppings and reeking of ammonia. Delvers who know their trade swear the saltpetre in it is worth gathering: cut and cured, it takes a spark like nothing else. For now it is mostly weight and stink, but a hedge-alchemist will still take it off your hands.",
+    "type": "material",
+    "weight": 1,
+    "value": 4,
+    "stackable": true
+  },
   "vial": {
     "id": "vial",
     "name": "an empty vial",
