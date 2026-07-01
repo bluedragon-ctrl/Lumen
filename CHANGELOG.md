@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Jumped Claim — an outlaw prospector camp and Lumen's first living-human enemy class
+  (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
+  gate and off the watch's beat: five rooms of claim-jumpers squatting a seized seam — **The
+  Roasting Flue** (`d1.flue`, the entry, held by a lone sentry, where a smelter's chimney bores
+  up to the surface as the crew's bolt-hole — visible but not climbable), **The Stripped Face**
+  (`d1.diggings`) and **The Cutthroats' Commons** (`d1.commons`), both worked by common
+  outlaws, **The Foreman's Cut** (`d1.foremans-cut`, the boss's rich seam), and **The Warder's
+  Nook** (`d1.nook`, off the commons). Four new mobs on a **new `outlaw` faction** (`enemy` to
+  both the player and the `rim` watch, `neutral` to the deep's own things): the **camp sentry**
+  and **outlaw prospector** (coordinated melee that pursue a fleeing delver through the camp),
+  **the Foreman** (a `guard`-behaviour melee captain who holds his cut and does not chase), and
+  **the camp warder** (a hedge-mage who lights the camp and fights from range with Witchfire,
+  Spark and a self-cast Mage Armour). Light **inverts** the bat spire's rule: these are living
+  humans who *keep* light — cook-fires and lamps make the camp a lit pocket in the dark, a tell
+  that something organized holds this ground. New drops: **the Foreman's brigandine** (a
+  flexible body armour that rivals the iron cuirass without dulling a delver's wits) and **a
+  warder's staff** (a caster's focus). Sentries and prospectors also drop honest iron weapons at
+  a low chance.
 - **The Bat Spire — a vertical bat-choked mini-dungeon (`docs/side-areas.md` #1).** Built the
   full shaft off **The Foot of the Spire** (`d1.spire.foot`): two rooms **down** into the reeking
   base — **The Gullet** (`d1.spire.gullet`) and **The Sink** (`d1.spire.sink`) with a dead-end

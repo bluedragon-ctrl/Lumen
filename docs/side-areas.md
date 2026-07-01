@@ -145,8 +145,8 @@
   **optional stretch**, not required. *(Note: the Old Grinder is an ancient stonebug,
   not a mole — the lair needs its own sire/dam pair.)*
 
-## 5. Human Bandit Camp — the living-human enemy class
-- **Depth:** ~1–2 · **Theme:** hostile living humans · **Lift:** JSON (+ optional server) · **Verdict:** ⚠️ · **Depends on:** #0 (map extension)
+## 5. Human Bandit Camp — the living-human enemy class · BUILT
+- **Depth:** ~1–2 · **Theme:** hostile living humans · **Lift:** JSON + server (new faction) · **Verdict:** ✅ **BUILT** ("The Jumped Claim")
 - Claim-jumpers / deserters preying on delvers. Fits the frontier tone (the Rim has
   "no formal law"; Hale is the only watch). Introduces **sane, hostile humans**
   early — tactical fighters in armour, coordinated, who may use flares/potions.
@@ -162,16 +162,32 @@
     seized claim.
   - a fresh branch off the **d1.first** hub or the **d1** gallery — a **jumped /
     abandoned claim** the bandits squat, just past the watch's reach.
-- **Approach built (d1, no humans yet):** the corridor toward the camp now exists —
-  **The Long Squeeze** (`d1.squeeze`) and **The Crooked Cut** (`d1.crook`) run east off the
-  Rat Warren, two dark ambush-passages (existing `cave-lurker` + vermin). The Cut is dressed as
-  a **jumped claim** (worked ore seam, cold lean-to, unstamped tally) with fresh scuffs leading
-  further **east into a dark with no exit yet** — that stub is where the camp will open. This is
-  well below the gate and off Hale's beat, resolving the location concern in geography.
-- **Review:** Works; keep them mechanically distinct from #2 (living tactics vs.
-  hollow going-through-the-motions). No PvP concern — that rule is player-vs-player;
-  hostile NPCs are fine. **Approach corridor now laid (#0 groundwork);** the camp itself (the
-  human enemy roster) is the remaining work.
+- **BUILT — "The Jumped Claim" (`d1.flue` → `d1.diggings` → `d1.commons` → {`d1.foremans-cut`,
+  `d1.nook`}).** The camp opens **east off The Crooked Cut** (`d1.crook`), delivering on the
+  "fresh scuffs lead east into a dark with no exit yet" stub. Five rooms: **The Roasting Flue**
+  (entry, a lone sentry, a smelter whose chimney bores up to the surface as the crew's bolt-hole
+  — visible but not climbable, a future second-entrance hook), **The Stripped Face** and **The
+  Cutthroats' Commons** (common outlaws), **The Foreman's Cut** (the boss's rich seam), and **The
+  Warder's Nook** off the commons. Well below the gate and off Hale's beat — location concern
+  resolved by placement, exactly as planned.
+- **Enemy roster (new `outlaw` faction).** Registered `outlaw` in `server/config.js` +
+  `server/factions.js` (`enemy` to `player` and the `rim` watch that would clear them; `neutral`
+  to fauna/wild/umbral — the camp squats *among* the vermin, not against it). Four mobs:
+  **camp sentry** and **outlaw prospector** (coordinated melee, `pursues` a fleeing delver
+  through the camp), **the Foreman** (a `guard` melee captain who holds his cut and does not
+  chase; drops **the Foreman's brigandine**), and **the camp warder** (a hedge-mage who lights
+  the camp and fights from range with Witchfire/Spark and a self-cast Mage Armour; drops **a
+  warder's staff**). Sentries/prospectors drop iron weapons at a low chance. No new mob-uses-items
+  code was needed — the roster is built entirely on existing `attack`/`cast`/`pursues`/`guard`.
+- **Light inverts the bat spire.** These are living humans who *keep* light: cook-fires and lamps
+  make the camp a **lit pocket** (`ambientLight 1`) in the dark approach, and the warder himself
+  `emitsLight`. The tell that something organized holds this ground — the opposite of the
+  light-shy fauna everywhere else at this depth.
+- **Review:** Built and mechanically distinct from #2 as intended (living tactics vs. hollow
+  going-through-the-motions), and the new `outlaw` faction is the clean seam #2's dark-taken
+  humans can hang off later. No PvP concern — that rule is player-vs-player; hostile NPCs are fine.
+  Names (the Foreman, the camp warder, "The Jumped Claim") are provisional pending maintainer
+  sign-off.
 
 ## 6. Submerged Rooms — gated aquatic pockets & a reason to climb back up
 - **Depth:** recipe deep (Umbral village, ~7–9) → pockets scattered in the river/lake zones (~4) and up · **Theme:** aquatic ambush · **Lift:** JSON + server · **Verdict:** 🔴 design pass first
