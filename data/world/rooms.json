@@ -46,10 +46,10 @@
     "zone": "rim",
     "tags": ["patrol"],
     "name": "The Rim Market",
-    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a mage's shed stands apart to the east, and a plank-and-canvas claims office leans against the lane's south side.",
+    "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a rutted lane of prospectors' lodgings runs east toward the town's landward gate, and a plank-and-canvas claims office leans against the lane's south side.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.mageshed", "south": "d0.claims" },
+    "exits": { "west": "d0.plaza", "north": "d0.hatchery", "east": "d0.street", "south": "d0.claims" },
     "fixtures": ["lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-shopkeeper", "max": 1, "respawn": 120 }]
@@ -159,10 +159,10 @@
     "id": "d0.mageshed",
     "zone": "rim",
     "name": "The Mage's Shed",
-    "description": "A timber shed set a little apart from the market noise, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The market lane lies back west.",
+    "description": "A timber shed set a little apart from the lodging-lane's clamour, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The prospectors' lane lies back north, the market beyond it.",
     "depth": 0,
     "ambientLight": 3,
-    "exits": { "west": "d0.market" },
+    "exits": { "north": "d0.street" },
     "fixtures": ["alchemist-bench", "trapdoor", "lamp"],
     "groundItems": [],
     "spawns": [{ "mob": "rim-mage", "max": 1, "respawn": 120 }]
@@ -178,6 +178,32 @@
     "fixtures": ["ward-ring", "vesper-field-journal"],
     "groundItems": [],
     "spawns": [{ "mob": "wisp", "max": 1, "respawn": 120 }]
+  },
+  "d0.street": {
+    "id": "d0.street",
+    "zone": "rim",
+    "tags": ["patrol"],
+    "name": "Prospectors' Walk",
+    "description": "A rutted dirt street running east off the market, both sides crowded with the leaning plank-and-tarpaulin sheds where the prospectors doss between delves — bunks stacked three high, wet gear steaming on lines, the low murmur of folk who came down with the Rush and never went back up. This is where the Rim actually sleeps. The market stalls lie back west, Vesper's shed sits apart to the south, and the street runs on east to the town's landward gate.",
+    "depth": 0,
+    "ambientLight": 3,
+    "exits": { "west": "d0.market", "south": "d0.mageshed", "east": "d0.roadgate" },
+    "fixtures": ["lamp"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d0.roadgate": {
+    "id": "d0.roadgate",
+    "zone": "rim",
+    "tags": ["patrol"],
+    "name": "The Landward Gate",
+    "description": "The street gives out at the settlement's landward wall, where a heavy iron gate stands chained and padlocked across the old road — the way the Rush first came down, and the only way overland back out to the wider world. It hasn't been swung open in a long while: the chain is orange with rust, and the lane beyond lies dark and untravelled. For now there is nowhere to go but back west, into the lamplight.",
+    "depth": 0,
+    "ambientLight": 2,
+    "exits": { "west": "d0.street" },
+    "fixtures": ["lamp"],
+    "groundItems": [],
+    "spawns": []
   },
   "d0.workshop": {
     "id": "d0.workshop",
@@ -248,13 +274,43 @@
     "id": "d1.warren",
     "zone": "abyss",
     "name": "The Rat Warren",
-    "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The only way out is back west to the gallery.",
+    "description": "A low, foul-smelling burrow gnawed into the rock, littered with shredded nesting and cracked bones. The dark is total here, and it seethes — the rats know these tunnels blind, and you do not. The gallery lies back west; on the far side a gnawed crack squeezes away east into blacker rock.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "west": "d1.gallery" },
+    "exits": { "west": "d1.gallery", "east": "d1.squeeze" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "giant-rat", "max": 3, "respawn": 120 }]
+  },
+  "d1.squeeze": {
+    "id": "d1.squeeze",
+    "zone": "abyss",
+    "name": "The Long Squeeze",
+    "description": "A throat of rock barely shoulder-wide, gnawed and rubbed smooth, angling east away from the warren's reek. It is a long, blind crawl — the passage tightens and slackens and tightens again, and it runs so dark and so narrow that something patient could wedge itself up against the ceiling and simply wait. Cracked bone grinds underfoot. The warren lies back west; the squeeze grinds on east.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "d1.warren", "east": "d1.crook" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-lurker", "max": 1, "respawn": 600 },
+      { "mob": "giant-rat", "max": 2, "respawn": 120 }
+    ]
+  },
+  "d1.crook": {
+    "id": "d1.crook",
+    "zone": "abyss",
+    "name": "The Crooked Cut",
+    "description": "The squeeze kinks open into a crooked cut where the tool-marks aren't the rats' work — a seam hacked at with a hand-pick, a lean-to knocked together from scavenged planks, a fire-ring gone grey and cold, and initials scratched over a claims-tally that no office ever stamped. Someone has jumped this ground and works it well out of the watch's sight; whoever they are, they aren't here now. Fresh scuffs lead on east, into a dark the lamplight can't reach. The squeeze goes back west.",
+    "depth": 1,
+    "ambientLight": 0,
+    "exits": { "west": "d1.squeeze" },
+    "fixtures": ["iron-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cave-lurker", "max": 1, "respawn": 600 },
+      { "mob": "cave-centipede", "max": 1, "respawn": 300 }
+    ]
   },
   "d1.drift": {
     "id": "d1.drift",
@@ -289,13 +345,37 @@
     "id": "d1.roost",
     "zone": "abyss",
     "name": "The Bat Roost",
-    "description": "The ceiling vanishes upward into a dark, reeking vault thick with the rustle and chitter of roosting bats. A fissure far above lets down a wan grey light. Disturbed, the colony wheels and dives in erratic loops. The First Dark is south; the fissure echoes to the east.",
+    "description": "The ceiling vanishes upward into a dark, reeking vault thick with the rustle and chitter of roosting bats. A fissure far above lets down a wan grey light. Disturbed, the colony wheels and dives in erratic loops. The First Dark is south, the fissure echoes to the east, and a low cave bends away west.",
     "depth": 1,
     "ambientLight": 1,
-    "exits": { "south": "d1.first", "east": "d1.fissure" },
+    "exits": { "south": "d1.first", "east": "d1.fissure", "west": "d1.spire.approach" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 90 }]
+  },
+  "d1.spire.approach": {
+    "id": "d1.spire.approach",
+    "zone": "abyss",
+    "name": "The Bending Cave",
+    "description": "A low, dry cave that bends away north from the roost, its floor worn smooth by long ages of trickling water since gone. It is a quiet stretch of rock — a place to pass through rather than linger, the bats' racket fading behind you to the east. Ahead, to the north, a faint grey paleness touches the walls where the passage opens out.",
+    "depth": 1,
+    "ambientLight": 1,
+    "exits": { "east": "d1.roost", "north": "d1.spire.foot" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d1.spire.foot": {
+    "id": "d1.spire.foot",
+    "zone": "abyss",
+    "name": "The Foot of the Spire",
+    "description": "Here the rock opens into the foot of a vast natural flue that climbs out of sight overhead — a chimney in the stone that runs, they say, clean up the outside of the world. Far, far above, a ragged coin of pale daylight hangs like a cold star, and its grey glow sifts all the way down to pool on the floor. Draughts moan in the shaft, carrying down the faint reek and leathery rustle of things roosting somewhere in the heights. The sure footing leads back south; the only way onward is a climb up into the dark and the wings.",
+    "depth": 1,
+    "ambientLight": 2,
+    "exits": { "south": "d1.spire.approach" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
   },
   "d1.tunnel": {
     "id": "d1.tunnel",
