@@ -25,8 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   humans who *keep* light — cook-fires and lamps make the camp a lit pocket in the dark, a tell
   that something organized holds this ground. New drops: **the Foreman's brigandine** (a
   flexible body armour that rivals the iron cuirass without dulling a delver's wits) and **a
-  warder's staff** (a caster's focus). Sentries and prospectors also drop honest iron weapons at
-  a low chance.
+  warder's staff** (a caster's focus); the Foreman may also drop an **acid bomb** and the warder a
+  **regeneration draught**, so the camp fields potions and thrown weapons of its own. Sentries and
+  prospectors also drop, at a low chance, the
+  ordinary supplies of a camp squatting in the dark — an iron weapon, a flask of lamp-oil, a
+  torch, or a bit of cooked camp food.
 - **The Bat Spire — a vertical bat-choked mini-dungeon (`docs/side-areas.md` #1).** Built the
   full shaft off **The Foot of the Spire** (`d1.spire.foot`): two rooms **down** into the reeking
   base — **The Gullet** (`d1.spire.gullet`) and **The Sink** (`d1.spire.sink`) with a dead-end

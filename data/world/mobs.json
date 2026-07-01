@@ -587,7 +587,10 @@
     ],
     "loot": [
       { "template": "iron-dagger", "chance": 0.1 },
-      { "template": "short-sword", "chance": 0.08 }
+      { "template": "short-sword", "chance": 0.08 },
+      { "template": "lamp-oil", "chance": 0.12 },
+      { "template": "torch", "chance": 0.1 },
+      { "template": "cooked-skewer", "chance": 0.1 }
     ]
   },
   "outlaw-prospector": {
@@ -617,7 +620,10 @@
     ],
     "loot": [
       { "template": "prospectors-hatchet", "chance": 0.1 },
-      { "template": "iron-dagger", "chance": 0.08 }
+      { "template": "iron-dagger", "chance": 0.08 },
+      { "template": "lamp-oil", "chance": 0.12 },
+      { "template": "torch", "chance": 0.1 },
+      { "template": "hearty-broth", "chance": 0.1 }
     ]
   },
   "foreman": {
@@ -647,7 +653,8 @@
     ],
     "loot": [
       { "template": "foremans-brigandine", "chance": 0.5 },
-      { "template": "prospectors-hatchet", "chance": 0.25 }
+      { "template": "prospectors-hatchet", "chance": 0.25 },
+      { "template": "acid-bomb", "chance": 0.2 }
     ]
   },
   "camp-warder": {
@@ -680,7 +687,8 @@
     ],
     "loot": [
       { "template": "warders-staff", "chance": 0.5 },
-      { "template": "lamp-oil", "chance": 0.3 }
+      { "template": "lamp-oil", "chance": 0.3 },
+      { "template": "regeneration-draught", "chance": 0.25 }
     ]
   },
   "cave-lurker": {

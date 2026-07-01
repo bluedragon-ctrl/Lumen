@@ -179,7 +179,8 @@
   warder's staff**). The whole crew fights as a **coordinated unit** — every outlaw is a `helper`
   (assist: attack one and its roommates pile on) and `pursues` up to **3 rooms** (a fleeing delver
   is run down through the camp and out into the approach, the Foreman included). Sentries/prospectors
-  drop iron weapons at a low chance. No new mob-uses-items code was needed — the roster is built
+  drop, at a low chance, a camp's ordinary supplies — an iron weapon, lamp-oil, a torch, or simple
+  cooked food. No new mob-uses-items code was needed — the roster is built
   entirely on existing `helper`/`pursues`/`attack`/`cast`/`guard`.
 - **Light inverts the bat spire.** These are living humans who *keep* light: cook-fires and lamps
   make the camp a **lit pocket** (`ambientLight 1`) in the dark approach, and the warder himself
