@@ -419,7 +419,8 @@ function renderPlayer(p) {
     if (item) {
       let sub = slot;
       if (item.type === "light") sub += item.lit ? ` · lit · fuel ${Math.floor(item.fuel)}/${item.fuelMax}` : ` · unlit · fuel ${Math.floor(item.fuel)}/${item.fuelMax}`;
-      li.innerHTML = `<span>${item.name}</span><span class="sub">${sub}</span>`;
+      const rar = item.rarity && item.rarity !== "common" ? " rarity-" + item.rarity : "";
+      li.innerHTML = `<span class="item-name${rar}">${item.name}</span><span class="sub">${sub}</span>`;
     } else {
       li.className = "empty";
       li.innerHTML = `<span>— ${slot} —</span>`;
@@ -451,7 +452,8 @@ function renderPlayer(p) {
     const li = document.createElement("li");
     const qty = item.qty != null ? ` ×${item.qty}` : "";
     const fuel = item.type === "light" ? ` <span class="sub">fuel ${Math.floor(item.fuel)}/${item.fuelMax}</span>` : "";
-    li.innerHTML = `<span>${item.name}${qty}</span>${fuel}`;
+    const rar = item.rarity && item.rarity !== "common" ? " rarity-" + item.rarity : "";
+    li.innerHTML = `<span class="item-name${rar}">${item.name}${qty}</span>${fuel}`;
     inv.appendChild(li);
   }
 
