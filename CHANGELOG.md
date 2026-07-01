@@ -15,11 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a still daylight vista over wild pine and bare peaks with no sign of civilization — a deliberate
   break in the always-downward descent, and a light-safe breather. Off the Gallery, **The Brood
   Vault** (`d1.spire.roost`) is the lightless lair of the mini-boss. Two new mobs: the **blood
-  bat** (a blood-draining mid-tier flier that flees bright light) and **Night Wing** (the
-  brood-matriarch boss — `guard` behaviour, summons `cave-bat` waves, hurt by bright light but
-  will not rout). New drop: **bat guano** (`guano`), a saltpetre-bearing material foreshadowing a
-  later alchemy line. Light inverts the usual pressure here — the dark swarms you, bright light is
-  your weapon.
+  bat** (a blood-draining mid-tier flier that shuns light and routs to a searing flare) and
+  **Night Wing** (the brood-matriarch boss — `guard` behaviour, summons `cave-bat` waves, holds
+  its ground under light and will not rout). Bats dislike light but are not readily harmed by it:
+  `lightBane` only bites at searing intensity (10+). New drop: **bat guano** (`guano`), a
+  saltpetre-bearing material foreshadowing a later alchemy line. Light inverts the usual pressure
+  here — the dark swarms you, and bright light scatters the swarm rather than killing it.
 - **Foot of the Bat Spire — the shallow entry to a future vertical shaft.** Added
   **The Bending Cave** (`d1.spire.approach`) west of `d1.roost` — a quiet cave-traversal beat —
   and **The Foot of the Spire** (`d1.spire.foot`) north of it: the base of a natural flue that

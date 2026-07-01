@@ -204,7 +204,7 @@
     "hostile": true,
     "helper": true,
     "attack": { "damage": "1d4", "actionCost": 12 },
-    "lightBane": { "above": 3, "damage": "1d2" },
+    "lightBane": { "above": 10, "damage": "1d2" },
     "xp": 8,
     "shards": "1d3",
     "actions": [
@@ -229,7 +229,7 @@
     "behavior": "guard",
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 12 },
-    "lightBane": { "above": 3, "damage": "1d3" },
+    "lightBane": { "above": 10, "damage": "1d3" },
     "xp": 32,
     "shards": "2d6",
     "actions": [

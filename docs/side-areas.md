@@ -52,9 +52,10 @@
   (`d1.spire.gallery`) → **The Open Crown** (`d1.spire.crown`, `ambientLight 3` — a sealed daylight
   vista over wild woods and peaks, **no civilization in view**). Off the Gallery, **The Brood
   Vault** (`d1.spire.roost`) is the lightless boss lair. New mobs: **blood-bat** (mid-tier
-  blood-drinker, flees bright light) and **Night Wing** (brood-matriarch boss — `guard`, summons
-  `cave-bat`, `lightBane` but no flee). New drop: **guano** (saltpetre material, foreshadows the
-  alchemy line). The up-to-daylight framing is **intentional** — a deliberate break in the
+  blood-drinker, shuns light, flees a searing flare at `lightAbove 6`) and **Night Wing**
+  (brood-matriarch boss — `guard`, summons `cave-bat`, no flee). Bats dislike light but are not
+  readily harmed by it — `lightBane` only bites at searing 10+. New drop: **guano** (saltpetre
+  material, foreshadows the alchemy line). The up-to-daylight framing is **intentional** — a deliberate break in the
   always-downward descent and a hint of the world outside, which supersedes the naming caveat below.
 - Multi-level bat-focused mini-dungeon. `cave-bat` exists but is a lone nuisance;
   here the *swarm* is the point. **`d1.roost` ("The Bat Roost") already exists** — an
