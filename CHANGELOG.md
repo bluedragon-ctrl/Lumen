@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **A delver leaving the game now darkens the room for those left behind.** On
+  disconnect (a dropped tab *or* `quit`), the vacated room's light was never
+  recomputed and co-located players were never refreshed or told — so if the
+  departing delver carried the room's only light, the others kept seeing a lit
+  room with the delver still in it until some unrelated event happened to refresh
+  their view. The socket-close teardown now recomputes the room's light, announces
+  the departure ("X slips away into the dark."), and refreshes the remaining
+  occupants. Both paths share this teardown, so a dropped connection reads exactly
+  like `quit`; the now-redundant announcement was removed from the `quit` command.
+
 ### Added
 - **The Seized Working — an outlaw prospector camp and Lumen's first living-human enemy class
   (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
