@@ -17,6 +17,15 @@
     "target": "creature",
     "effect": { "type": "heal-over-time", "name": "Regeneration", "interval": 2, "duration": 10, "magnitude": 0, "scale": { "attr": "intellect", "per": 2 }, "good": true }
   },
+  "chorus-of-mending": {
+    "id": "chorus-of-mending",
+    "name": "Chorus of Mending",
+    "description": "Where Regeneration is a single thread of mending light sunk into one body, the Chorus is that same weave sung wide — the caster raises a low, ringing note of glimmer that settles over everyone standing with them, delver and biddable creature alike, and knits their wounds a little at a time while it holds. It cannot be aimed at a foe, only spread over your own side, and its light is thinner spread across many than a single Regeneration laid on one — but in a hard fight with the party bloodied, a chorus mends the whole line at once where a single weave saves only one. The keener the caster's mind, the more each pulse knits.",
+    "manaCost": 14,
+    "hostile": false,
+    "target": "room",
+    "effect": { "type": "heal-over-time", "name": "Chorus of Mending", "interval": 2, "duration": 12, "magnitude": 0, "scale": { "attr": "intellect", "per": 3 }, "good": true }
+  },
   "glimmerskin": {
     "id": "glimmerskin",
     "name": "Glimmerskin",
@@ -88,6 +97,23 @@
       "good": true
     }
   },
+  "aegis": {
+    "id": "aegis",
+    "name": "Aegis",
+    "description": "Mage Armour drawn wide: rather than close a lattice of hardened light about one body, the caster throws it up over the whole line at once — a shared barding of will that settles on themselves and every ally standing with them, turning a blade a fraction before it bites. Like Mage Armour it is pure concentration, no glimmer, and holds a few minutes before it thins; the keener the caster's mind, the tighter each share of the weave. It cannot be raised over a foe, only your own side; re-casting renews the lattice rather than stacking it.",
+    "manaCost": 12,
+    "hostile": false,
+    "target": "room",
+    "effect": {
+      "type": "protect",
+      "name": "Aegis",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 8 } },
+      "ward": 0,
+      "good": true
+    }
+  },
   "cleanse": {
     "id": "cleanse",
     "name": "Cleanse",
@@ -96,6 +122,15 @@
     "hostile": false,
     "target": "creature",
     "effect": { "type": "cleanse", "name": "Cleanse", "good": true }
+  },
+  "purge": {
+    "id": "purge",
+    "name": "Purge",
+    "description": "Where Cleanse is a scour of clean light drawn tight over one body, Purge is that same light loosed wide — the caster raises a hard, ringing pulse of it that washes the whole chamber and burns the clinging harm off everyone standing with them at once: witchfire, poison, any smouldering affliction the party carries. Like Cleanse it does nothing for a blow already struck, only for the slow harm still working — but where a single scour saves one, a Purge scours the whole line. It cannot touch a foe, only your own side.",
+    "manaCost": 10,
+    "hostile": false,
+    "target": "room",
+    "effect": { "type": "cleanse", "name": "Purge", "good": true }
   },
   "sleep": {
     "id": "sleep",
@@ -188,6 +223,24 @@
       "damage": "4d8",
       "cause": "iron-blast",
       "scale": { "attr": "intellect", "per": 3 }
+    }
+  },
+  "iron-skin": {
+    "id": "iron-skin",
+    "name": "Iron Skin",
+    "description": "The defensive twin of Iron Blast, and the same trick turned inward: rather than burst the iron outward, the caster drags a smelted bar up out of the pack and works it thin over their own hide — a hammered shell of grey iron-light that clamps close and turns a blade where flesh would part. It is metal, not glimmer, so it does nothing against hostile magic — a warded bolt slides through it untouched — but against tooth and edge nothing a delver can weave holds harder. The bar is spent utterly in the shaping, and a keener mind beats the shell thinner and tighter. It can only be worked over your own skin, never laid on another; re-casting renews the shell rather than doubling it.",
+    "manaCost": 12,
+    "itemCost": [{ "template": "iron-bar", "qty": 1 }],
+    "hostile": false,
+    "target": "self",
+    "effect": {
+      "type": "protect",
+      "name": "Iron Skin",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 3, "scale": { "attr": "intellect", "per": 3 } },
+      "ward": 0,
+      "good": true
     }
   },
   "glimmer-husk": {

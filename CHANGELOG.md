@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Aegis — a room-wide ward (the party counterpart to Mage Armour).** Throws a
+  shared lattice of hardened light over the caster and every ally present,
+  granting each the same armour-only protection Mage Armour gives one
+  (`1 + Intellect/8`) for one cast at roughly double the mana. Non-hostile,
+  `target: "room"`; keeps Mage Armour's no-shard, armour-only identity (Glimmerskin
+  stays the single-target armour+ward option). Cast prefix `ae`. Taught by a
+  new **Scroll of Aegis**, sold by Vesper.
+- **Purge — a room-wide cleanse (the party counterpart to Cleanse).** A wide
+  pulse of scouring light that strips every `damage-over-time` affliction
+  (witchfire, poison) off the caster and every ally present at once, where
+  Cleanse scours only one target. Non-hostile, `target: "room"`. Named for a
+  short, unambiguous cast prefix (`p`) that doesn't collide with Cleanse
+  (`cle`). Taught by a new **Scroll of Purge**, sold by Vesper.
+- **Chorus of Mending — the first room-wide support spell (a party heal).** A
+  `heal-over-time` sung wide over the caster and every ally present (co-located
+  delvers and allied creatures — summons, pets), knitting each a little every
+  couple of ticks. Thinner per-target than a single Regeneration (`Intellect/3`
+  per pulse vs `/2`) and costing near double the mana, but it mends the whole
+  line at once — the group counterpart to Regeneration, and the first spell to
+  exercise the `target: "room"` support path in live content. Taught by a new
+  **Scroll of the Mending Chorus**, sold by Vesper.
+- **Iron Skin — a new advanced self-only ward, the defensive twin of Iron Blast.**
+  Works a smelted iron bar thin over the caster's own hide for a heavy flat
+  Armour stack (`3 + Intellect/3`, well above Mage Armour or Glimmerskin) — but
+  being iron, not glimmer, it grants **no Ward**: pure physical protection that
+  a warded bolt slides straight through, the mirror of Iron Blast's "warded by
+  nothing, blunted only by armour." Self-only (naming an ally is refused),
+  consumes an **iron bar**, re-cast renews rather than stacks. The first spell
+  to exercise the new `target: "self"` shape. Taught by a new **Scroll of Iron
+  Skin**, sold by Vesper the glimmer-mage beside the Blast scroll.
 - **`target` is now the spell targeting contract** (`self` / `creature` / `room`,
   crossed with `hostile` — see docs/data-model.md). The previously dead field
   drives `cast` routing and unlocks two new spell shapes: **self-only** support

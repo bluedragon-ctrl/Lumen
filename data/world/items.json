@@ -356,6 +356,17 @@
     "scroll": { "spell": "regeneration" },
     "keywords": ["regen"]
   },
+  "scroll-chorus-of-mending": {
+    "id": "scroll-chorus-of-mending",
+    "name": "a Scroll of the Mending Chorus",
+    "description": "Vellum dense with the same breathing vinework as the Regeneration scroll, but the glyphs run in ranks rather than a single thread — a whole choir of them, faintly ringing green. Study it to learn the Chorus of Mending — a mending light sung wide over yourself and every ally beside you — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "chorus-of-mending" },
+    "keywords": ["chorus", "mending"]
+  },
   "scroll-glimmerskin": {
     "id": "scroll-glimmerskin",
     "name": "a Scroll of Glimmerskin",
@@ -396,6 +407,16 @@
     "stackable": true,
     "scroll": { "spell": "cleanse" }
   },
+  "scroll-purge": {
+    "id": "scroll-purge",
+    "name": "a Scroll of Purge",
+    "description": "Vellum ruled with the same sharp, near-white glyphs as the Cleanse scroll, but struck in a broad radiating burst rather than a single tight line. Study it to learn the Purge weave — a wide pulse of scouring light that burns witchfire, poison, and other clinging afflictions off yourself and every ally at once — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 85,
+    "stackable": true,
+    "scroll": { "spell": "purge" }
+  },
   "scroll-mage-armour": {
     "id": "scroll-mage-armour",
     "name": "a Scroll of Mage Armour",
@@ -405,6 +426,16 @@
     "value": 55,
     "stackable": true,
     "scroll": { "spell": "mage-armour" }
+  },
+  "scroll-aegis": {
+    "id": "scroll-aegis",
+    "name": "a Scroll of Aegis",
+    "description": "Vellum ruled with the same fine, mail-like lattice of glyphs as the Mage Armour scroll, but thrown wide across the whole page rather than tight about a single mark. Study it to learn the Aegis weave — a shared barding of hardened light raised over yourself and every ally at once — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "aegis" }
   },
   "scroll-sleep": {
     "id": "scroll-sleep",
@@ -485,6 +516,16 @@
     "value": 100,
     "stackable": true,
     "scroll": { "spell": "iron-blast" }
+  },
+  "scroll-iron-skin": {
+    "id": "scroll-iron-skin",
+    "name": "a Scroll of Iron Skin",
+    "description": "Heavy iron-grey vellum, its glyphs stamped rather than inked — but where the Blast scroll's marks scatter outward like shot, these curl inward, a tight coil pressed cold into the page. Study it to learn Iron Skin — a war-weave that works a smelted iron bar thin over your own hide, a hammered shell that turns blade and tooth but does nothing against hostile magic — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "iron-skin" }
   },
   "scroll-glimmer-husk": {
     "id": "scroll-glimmer-husk",
