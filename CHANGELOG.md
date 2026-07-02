@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Purge — a room-wide cleanse (the party counterpart to Cleanse).** A wide
+  pulse of scouring light that strips every `damage-over-time` affliction
+  (witchfire, poison) off the caster and every ally present at once, where
+  Cleanse scours only one target. Non-hostile, `target: "room"`. Named for a
+  short, unambiguous cast prefix (`p`) that doesn't collide with Cleanse
+  (`cle`). Taught by a new **Scroll of Purge**, sold by Vesper.
 - **Chorus of Mending — the first room-wide support spell (a party heal).** A
   `heal-over-time` sung wide over the caster and every ally present (co-located
   delvers and allied creatures — summons, pets), knitting each a little every

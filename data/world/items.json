@@ -407,6 +407,16 @@
     "stackable": true,
     "scroll": { "spell": "cleanse" }
   },
+  "scroll-purge": {
+    "id": "scroll-purge",
+    "name": "a Scroll of Purge",
+    "description": "Vellum ruled with the same sharp, near-white glyphs as the Cleanse scroll, but struck in a broad radiating burst rather than a single tight line. Study it to learn the Purge weave — a wide pulse of scouring light that burns witchfire, poison, and other clinging afflictions off yourself and every ally at once — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 85,
+    "stackable": true,
+    "scroll": { "spell": "purge" }
+  },
   "scroll-mage-armour": {
     "id": "scroll-mage-armour",
     "name": "a Scroll of Mage Armour",

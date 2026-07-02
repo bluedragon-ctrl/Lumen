@@ -106,6 +106,15 @@
     "target": "creature",
     "effect": { "type": "cleanse", "name": "Cleanse", "good": true }
   },
+  "purge": {
+    "id": "purge",
+    "name": "Purge",
+    "description": "Where Cleanse is a scour of clean light drawn tight over one body, Purge is that same light loosed wide — the caster raises a hard, ringing pulse of it that washes the whole chamber and burns the clinging harm off everyone standing with them at once: witchfire, poison, any smouldering affliction the party carries. Like Cleanse it does nothing for a blow already struck, only for the slow harm still working — but where a single scour saves one, a Purge scours the whole line. It cannot touch a foe, only your own side.",
+    "manaCost": 10,
+    "hostile": false,
+    "target": "room",
+    "effect": { "type": "cleanse", "name": "Purge", "good": true }
+  },
   "sleep": {
     "id": "sleep",
     "name": "Sleep",
