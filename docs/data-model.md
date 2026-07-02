@@ -605,6 +605,22 @@ conjures a **permanent** companion (`duration` omitted), with the same per-owner
 `group` recast cap. This is the pet counterpart to the time-limited combat Summon
 spell; richer pet handling (naming, dismissal, following) is to come.
 
+A `damage-room` effect (a hostile area spell, e.g. Arc Flash, or a thrown bomb) may
+carry an optional `dot` sub-spec — an instant burst plus a lingering burn/poison,
+e.g. Flame Burst:
+
+```json
+{ "type": "damage-room", "damageType": "fire", "damage": "3d6", "dot": { "name": "Flame Burst", "damage": "1d4", "duration": 10, "durationScale": { "attr": "intellect", "per": 2 }, "emitLight": 2 } }
+```
+
+`dot` applies a `damage-over-time` state (see above) to every target the initial
+burst doesn't kill, stamped with the caster like the single-target `damage-over-time`
+spell type; a spell's `dot.durationScale` scales the same way as a top-level spell
+`durationScale`. `dot.emitLight`, if set, pushes a matching `emit-light` state so a
+burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight`).
+`damageType` is narration flavour only (`"physical"` vs everything else) — it does
+not currently gate any resistance.
+
 ---
 
 ## Starting character template (static) — `data/templates/player.json`

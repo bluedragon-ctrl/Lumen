@@ -466,6 +466,16 @@
     "stackable": true,
     "scroll": { "spell": "glimmer-storm" }
   },
+  "scroll-flame-burst": {
+    "id": "scroll-flame-burst",
+    "name": "a Scroll of Flame Burst",
+    "description": "Vellum scorched dark at every edge, the glyphs drawn in something that still smells faintly of ash and ammonia. Study it to learn Flame Burst — a delver's heaviest fire-work, a room-catching bloom that leaves whatever it doesn't kill outright to keep burning — and the scroll goes up with it, consumed in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 100,
+    "stackable": true,
+    "scroll": { "spell": "flame-burst" }
+  },
   "scroll-glimmer-husk": {
     "id": "scroll-glimmer-husk",
     "name": "a Scroll of Glimmer Husk",

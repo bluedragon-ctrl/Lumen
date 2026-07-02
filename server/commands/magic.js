@@ -62,6 +62,10 @@ function spellList(state, player) {
       const bonus = e.scale ? spellScaleBonus(effectiveAttributes(w, player), e.scale) : 0;
       tail = ` — ${e.damage} ${bonus ? `+${bonus} ` : ""}${e.damageType || "magical"} to every foe in the room` +
         (e.scale ? ` (${e.scale.attr}/${e.scale.per})` : "");
+      if (e.dot) {
+        const dur = (e.dot.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.dot.durationScale);
+        tail += `, then ${e.dot.damage} burn per tick for ${dur}${e.dot.durationScale ? ` (${e.dot.durationScale.attr})` : ""}${e.dot.emitLight ? `, sheds ${e.dot.emitLight} light` : ""}`;
+      }
     }
     else if (e.type === "emit-light") {
       const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
@@ -197,9 +201,11 @@ function castBurst(state, player, spell, ctx) {
     return [{ type: "error", text: `There's nothing here for ${spell.name} to catch — best save the mana.` }];
 
   const verb = spell.name.toLowerCase();
+  const fire = spell.effect && spell.effect.damageType === "fire";
   const results = state.castRoomSpell(player, spell, targets);
   const killed = results.filter((r) => r.killed);
   const hurt = results.filter((r) => !r.killed && r.damage > 0);
+  const burning = results.filter((r) => !r.killed && r.dot);
   const resisted = results.filter((r) => r.resisted);
   const xp = killed.reduce((s, r) => s + (r.death.xp || 0), 0);
   const loot = killed.flatMap((r) => r.death.loot || []);
@@ -207,15 +213,22 @@ function castBurst(state, player, spell, ctx) {
   stickToSurvivor(state, player, results);
 
   let outcome = "";
-  if (hurt.length) outcome += ` It sears ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (hurt.length) outcome += ` It ${fire ? "scorches" : "sears"} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (burning.length) outcome += ` ${burning.map((r) => r.name).join(", ")} ${burning.length === 1 ? "catches" : "catch"} alight, left to burn.`;
   if (killed.length) outcome += ` It burns apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (resisted.length) outcome += ` ${resisted.map((r) => r.name).join(", ")} ${resisted.length === 1 ? "shrugs" : "shrug"} the burst off, warded.`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
   const qmsgs = killed.flatMap((r) => questKill(state, player, r.death));
-  ctx.toRoom(player.location, { type: "combat", text: `${player.name} looses a blinding ${verb} and the room erupts in white light!` }, player.id);
+  const roomText = fire
+    ? `${player.name} looses a roaring ${verb} and flame rolls through the room!`
+    : `${player.name} looses a blinding ${verb} and the room erupts in white light!`;
+  const selfText = fire
+    ? `You loose ${spell.name}; fire rolls through the chamber.${outcome}`
+    : `You loose ${spell.name}; light floods the chamber.${outcome}`;
+  ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  const out = selfAndViews(state, player, `You loose ${spell.name}; light floods the chamber.${outcome}`, "combat");
+  const out = selfAndViews(state, player, selfText, "combat");
   out.push(...qmsgs);
   return out;
 }
