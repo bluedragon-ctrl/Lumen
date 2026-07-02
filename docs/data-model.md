@@ -621,6 +621,28 @@ burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight
 `damageType` is narration flavour only (`"physical"` vs everything else) — it does
 not currently gate any resistance.
 
+**Spell narration overrides (`messages`).** A spell may reflavour its landed-hit
+lines without touching code — an optional `messages` block of template strings:
+
+```json
+"messages": {
+  "self": "You drive {spell} through {target} for {damage} damage.",
+  "room": "{caster} drives a spear of frozen light through {target}.",
+  "hitVerb": "scorches"
+}
+```
+
+| Key       | Used by | Default |
+|-----------|---------|---------|
+| `self`    | the caster's line for a landed, non-lethal hit (single-target `damage`) or the loosing line (`damage-room`, outcomes appended). | `You hurl {spell} at {target} for {damage} damage.` / `You loose {spell}; light floods the chamber.` |
+| `room`    | the onlookers' line for the same beat. | `{caster} hurls a crackling {verb} at {target}.` / `{caster} looses a blinding {verb} and the room erupts in white light!` |
+| `hitVerb` | the per-target verb in a `damage-room` outcome clause ("It *sears* X for 5"). | `sears` |
+
+Placeholders: `{caster}`, `{target}`, `{spell}` (proper name), `{verb}`
+(lower-cased name), `{damage}`. Resist/DoT/sleep/kill beats keep their generic
+type-level narration. See Flame Burst (fire flavour) and Glimmer Spike for
+authored examples.
+
 ---
 
 ## Starting character template (static) — `data/templates/player.json`

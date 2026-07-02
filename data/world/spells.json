@@ -122,6 +122,10 @@
     "shardCost": 3,
     "hostile": true,
     "target": "creature",
+    "messages": {
+      "self": "You drive {spell} through {target} for {damage} damage.",
+      "room": "{caster} drives a spear of frozen light through {target}."
+    },
     "effect": { "type": "damage", "damageType": "magical", "damage": "3d8", "scale": { "attr": "intellect", "per": 2 } }
   },
   "witchfire": {
@@ -160,6 +164,11 @@
     "itemCost": [{ "template": "guano", "qty": 2 }],
     "hostile": true,
     "target": "room",
+    "messages": {
+      "self": "You loose {spell}; fire rolls through the chamber.",
+      "room": "{caster} looses a roaring {verb} and flame rolls through the room!",
+      "hitVerb": "scorches"
+    },
     "effect": {
       "type": "damage-room",
       "damageType": "fire",

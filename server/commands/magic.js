@@ -11,6 +11,20 @@ const {
   autoStand, roomHostiles, stickToSurvivor,
 } = require("./shared");
 
+// Effect types each player cast path can resolve, checked before any cost is
+// spent so an authoring mistake (e.g. a scroll teaching a mob-only spell like
+// Snuff) reads as a refusal, not a half-cast that eats mana and does nothing.
+// tools/validate-data.js enforces the same sets on learnable spells at build time.
+const HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room"];
+const SUPPORT_EFFECTS = ["restore", "protect", "cleanse", "heal-over-time", "emit-light"];
+
+// Fill a spell narration template (`spell.messages`, see docs/data-model.md):
+// {caster}, {target}, {spell} (proper name), {verb} (lower-cased name),
+// {damage}. An unknown placeholder renders literally.
+function fillTemplate(tpl, vars) {
+  return tpl.replace(/\{(\w+)\}/g, (ph, k) => (vars[k] != null ? String(vars[k]) : ph));
+}
+
 // Format a tick count as m:ss for narration (one tick = one second). Mirrors
 // render.js's fmtDuration so spoken durations match the status panel countdown.
 function fmtTicks(ticks) {
@@ -43,8 +57,10 @@ function spellList(state, player) {
       tail = ` — ${e.damage} ${bonus ? `+${bonus} ` : ""}${e.damageType || "physical"} damage` +
         (e.scale ? ` (${e.scale.attr}/${e.scale.per})` : "");
     }
-    else if (e.type === "heal-over-time")
-      tail = ` — heals ${e.magnitude || 0}${e.scale ? `+${e.scale.attr}/${e.scale.per}` : ""} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${e.duration || 0}`;
+    else if (e.type === "heal-over-time") {
+      const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
+      tail = ` — heals ${fmtAmount({ base: e.magnitude, scale: e.scale })} HP every ${e.interval || 1} tick${(e.interval || 1) === 1 ? "" : "s"} for ${fmtTicks(dur)}${e.durationScale ? ` (${e.durationScale.attr})` : ""}`;
+    }
     else if (e.type === "protect") {
       const parts = [];
       if (e.armour) parts.push(`armour ${fmtAmount(e.armour)}`);
@@ -56,7 +72,7 @@ function spellList(state, player) {
     else if (e.type === "damage-over-time") {
       const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
       const ds = e.durationScale ? ` (${e.durationScale.attr})` : "";
-      tail = ` — ${e.damage} ${e.damageType || "magical"} burn per tick for ${dur}${ds}${e.emitLight ? `, sheds ${e.emitLight} light` : ""} (resisted by Ward)`;
+      tail = ` — ${e.damage} ${e.damageType || "magical"} burn per tick for ${fmtTicks(dur)}${ds}${e.emitLight ? `, sheds ${e.emitLight} light` : ""} (resisted by Ward)`;
     }
     else if (e.type === "damage-room") {
       const bonus = e.scale ? spellScaleBonus(effectiveAttributes(w, player), e.scale) : 0;
@@ -64,7 +80,7 @@ function spellList(state, player) {
         (e.scale ? ` (${e.scale.attr}/${e.scale.per})` : "");
       if (e.dot) {
         const dur = (e.dot.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.dot.durationScale);
-        tail += `, then ${e.dot.damage} burn per tick for ${dur}${e.dot.durationScale ? ` (${e.dot.durationScale.attr})` : ""}${e.dot.emitLight ? `, sheds ${e.dot.emitLight} light` : ""}`;
+        tail += `, then ${e.dot.damage} burn per tick for ${fmtTicks(dur)}${e.dot.durationScale ? ` (${e.dot.durationScale.attr})` : ""}${e.dot.emitLight ? `, sheds ${e.dot.emitLight} light` : ""}`;
       }
     }
     else if (e.type === "emit-light") {
@@ -90,7 +106,8 @@ function spellList(state, player) {
 
 // `cast <spell> [at] <target>`: spend mana to hurl a known spell at a creature
 // you can perceive. Resolution (Ward resist, Intellect-scaled damage, threat,
-// kill) lives in state.castSpell; this handles targeting and narration.
+// kill) lives in state.castSpell; this handles targeting and narration. A spell
+// may reflavour its landed-hit lines via `messages` ({self, room} templates).
 function cast(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return [{ type: "error", text: "Cast what? Try `spells`." }];
@@ -108,8 +125,24 @@ function cast(state, player, arg, ctx) {
     });
     if (hit) { spellId = hit; rest = tokens.slice(n); }
   }
-  if (!spellId) return [{ type: "error", text: `You don't know any spell called "${tokens[0]}". Try \`spells\`.` }];
+  if (!spellId) {
+    // Quote everything up to an `at` as the attempted name — a multi-word spell
+    // name can't be told apart from a bare target tail, so this is the honest guess.
+    const atIdx = tokens.findIndex((tk) => tk.toLowerCase() === "at");
+    const tried = (atIdx > 0 ? tokens.slice(0, atIdx) : tokens).join(" ");
+    return [{ type: "error", text: `You don't know any spell called "${tried}". Try \`spells\`.` }];
+  }
   const spell = w.spells[spellId];
+  const eff = spell.effect || {};
+
+  // Refuse an effect type this path can't resolve — an authoring error — before
+  // any cost is spent; a half-cast that eats mana and does nothing is worse than
+  // a refusal. The validator enforces the same sets on the data at build time.
+  if (eff.type !== "summon" && !(spell.hostile ? HOSTILE_EFFECTS : SUPPORT_EFFECTS).includes(eff.type)) {
+    console.warn(`[lumen] spell ${spellId}: no ${spell.hostile ? "hostile" : "support"} cast path for effect type "${eff.type}"`);
+    return [{ type: "error", text: `You reach for ${spell.name}, but the weave slips from your grasp and comes to nothing.` }];
+  }
+
   if (rest[0] && rest[0].toLowerCase() === "at") rest = rest.slice(1); // `cast spark at lightbug`
   const targetQ = rest.join(" ");
 
@@ -121,7 +154,7 @@ function cast(state, player, arg, ctx) {
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
 
   // Summon spells are self-centred (no creature target) — conjure at the caster.
-  if (spell.effect && spell.effect.type === "summon") return castSummon(state, player, spell, ctx);
+  if (eff.type === "summon") return castSummon(state, player, spell, ctx);
 
   // Beneficial spells (no `hostile` flag) mend rather than harm — they have their
   // own targeting (self by default, an ally delver, or any creature in the room).
@@ -129,7 +162,7 @@ function cast(state, player, arg, ctx) {
 
   // Area spells (Arc Flash) blast every eligible foe in the room at once — no single
   // target to name. Eligibility/narration live in castBurst.
-  if (spell.effect && spell.effect.type === "damage-room") return castBurst(state, player, spell, ctx);
+  if (eff.type === "damage-room") return castBurst(state, player, spell, ctx);
 
   let mob;
   if (targetQ) {
@@ -146,47 +179,49 @@ function cast(state, player, arg, ctx) {
 
   const mt = w.mobs[mob.template];
   const verb = spell.name.toLowerCase();
-  const res = state.castSpell(player, spell, mob);
+  const events = [];
+  const res = state.castSpell(player, spell, mob, events);
+  const msgs = spell.messages || {};
 
+  let roomText, selfText;
+  const tail = []; // quest messages, appended after the views
   if (res.resisted) {
-    ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.` }, player.id);
-    ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`, "combat");
-  }
-
-  if (res.slept) {
+    roomText = `${player.name}'s ${verb} crackles against ${mt.name} and fizzles.`;
+    selfText = `You cast ${spell.name} at ${mt.name}, but its ward turns the bolt aside.`;
+  } else if (res.slept) {
     // Don't let the caster's own queued swing instantly rouse the sleeper.
     if (player.pending && player.pending.targetId === mob.id) player.pending = null;
-    ctx.toRoom(player.location, { type: "combat", text: `${player.name} weaves a drowsy hush over ${mt.name}, and it sinks into slumber.` }, player.id);
-    ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You weave ${spell.name} over ${mt.name}; its limbs go slack and it sinks into a deep slumber.`, "combat");
-  }
-
-  if (res.dot) {
+    roomText = `${player.name} weaves a drowsy hush over ${mt.name}, and it sinks into slumber.`;
+    selfText = `You weave ${spell.name} over ${mt.name}; its limbs go slack and it sinks into a deep slumber.`;
+  } else if (res.dot) {
     const span = res.duration ? ` for ${fmtTicks(res.duration)}` : "";
-    ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} catches on ${mt.name}, and it begins to smoulder.` }, player.id);
-    ctx.refreshRoom(player.location, player.id);
-    return selfAndViews(state, player, `You set ${spell.name} alight in ${mt.name}; a clinging glimmer-burn takes hold and will gnaw at it${span}.`, "combat");
-  }
-
-  if (res.killed) {
+    roomText = `${player.name}'s ${verb} catches on ${mt.name}, and it begins to smoulder.`;
+    selfText = `You set ${spell.name} alight in ${mt.name}; a clinging glimmer-burn takes hold and will gnaw at it${span}.`;
+  } else if (res.killed) {
     const d = res.death;
     const lootTxt = d.loot && d.loot.length ? ` It leaves behind ${d.loot.join(", ")}.` : "";
-    const qmsgs = questKill(state, player, d);
-    ctx.toRoom(player.location, { type: "combat", text: `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}` }, player.id);
-    ctx.refreshRoom(player.location, player.id);
-    const out = selfAndViews(
-      state, player,
-      `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`,
-      "combat"
-    );
-    out.push(...qmsgs);
-    return out;
+    tail.push(...questKill(state, player, d));
+    roomText = `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}`;
+    selfText = `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`;
+  } else {
+    // A landed, non-lethal hit — the one beat a spell may reflavour via `messages`.
+    const vars = { caster: player.name, target: mt.name, spell: spell.name, verb, damage: res.damage };
+    roomText = fillTemplate(msgs.room || "{caster} hurls a crackling {verb} at {target}.", vars);
+    selfText = fillTemplate(msgs.self || "You hurl {spell} at {target} for {damage} damage.", vars);
   }
 
-  ctx.toRoom(player.location, { type: "combat", text: `${player.name} hurls a crackling ${verb} at ${mt.name}.` }, player.id);
+  ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You hurl ${spell.name} at ${mt.name} for ${res.damage} damage.`, "combat");
+  const out = selfAndViews(state, player, selfText, "combat");
+  out.push(...tail);
+  // Deliver castSpell's side-effects: a rousted sleeper broadcasts through the
+  // dispatcher; auto-engage is caster-directed, so it's appended here instead,
+  // to land AFTER the cast line (the dispatcher would deliver it first).
+  for (const ev of events) {
+    if (ev.type === "combat-auto-start") out.push({ type: "combat", text: `You turn on ${ev.targetName} and fight back!` });
+    else ctx.emit(ev);
+  }
+  return out;
 }
 
 // Cast a hostile area spell (Arc Flash): sear every eligible foe in the room at once.
@@ -194,15 +229,18 @@ function cast(state, player, arg, ctx) {
 // burst, so a cast in town won't sear a peaceful shopkeeper, and with nothing to hit
 // the cast is refused and the mana kept. Per-target damage, Intellect scaling, threat
 // and kills live in state.castRoomSpell; this filters, narrates, and sticks the caster
-// to a survivor so they keep swinging (mirrors a single-target hostile cast).
+// to a survivor so they keep swinging (mirrors a single-target hostile cast). The
+// loosing lines and per-target verb default to a burst of light; a spell reflavours
+// them via `messages` ({self, room, hitVerb} — see Flame Burst's fire).
 function castBurst(state, player, spell, ctx) {
   const targets = roomHostiles(state, player);
   if (!targets.length)
     return [{ type: "error", text: `There's nothing here for ${spell.name} to catch — best save the mana.` }];
 
   const verb = spell.name.toLowerCase();
-  const fire = spell.effect && spell.effect.damageType === "fire";
-  const results = state.castRoomSpell(player, spell, targets);
+  const msgs = spell.messages || {};
+  const events = [];
+  const results = state.castRoomSpell(player, spell, targets, events);
   const killed = results.filter((r) => r.killed);
   const hurt = results.filter((r) => !r.killed && r.damage > 0);
   const burning = results.filter((r) => !r.killed && r.dot);
@@ -213,23 +251,24 @@ function castBurst(state, player, spell, ctx) {
   stickToSurvivor(state, player, results);
 
   let outcome = "";
-  if (hurt.length) outcome += ` It ${fire ? "scorches" : "sears"} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (hurt.length) outcome += ` It ${msgs.hitVerb || "sears"} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
   if (burning.length) outcome += ` ${burning.map((r) => r.name).join(", ")} ${burning.length === 1 ? "catches" : "catch"} alight, left to burn.`;
   if (killed.length) outcome += ` It burns apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (resisted.length) outcome += ` ${resisted.map((r) => r.name).join(", ")} ${resisted.length === 1 ? "shrugs" : "shrug"} the burst off, warded.`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
   const qmsgs = killed.flatMap((r) => questKill(state, player, r.death));
-  const roomText = fire
-    ? `${player.name} looses a roaring ${verb} and flame rolls through the room!`
-    : `${player.name} looses a blinding ${verb} and the room erupts in white light!`;
-  const selfText = fire
-    ? `You loose ${spell.name}; fire rolls through the chamber.${outcome}`
-    : `You loose ${spell.name}; light floods the chamber.${outcome}`;
+  const vars = { caster: player.name, spell: spell.name, verb };
+  const roomText = fillTemplate(msgs.room || "{caster} looses a blinding {verb} and the room erupts in white light!", vars);
+  const selfText = fillTemplate(msgs.self || "You loose {spell}; light floods the chamber.", vars) + outcome;
   ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const out = selfAndViews(state, player, selfText, "combat");
   out.push(...qmsgs);
+  // Of the resolver's side-effects only the wake-ups need forwarding — the
+  // per-target outcome line above already narrates damage and kills (the
+  // dispatcher's mob-hurt/death lines would double-narrate them).
+  for (const ev of events) if (ev.type === "mob-woke") ctx.emit(ev);
   return out;
 }
 
@@ -268,12 +307,17 @@ function castSupport(state, player, spell, targetQ, ctx) {
   }
   if (!target) return [{ type: "error", text: `You see no "${targetQ}" here to mend.` }];
 
-  const res = state.castBeneficial(player, spell, target);
+  const events = [];
+  const res = state.castBeneficial(player, spell, target, events);
   const verb = spell.name.toLowerCase();
   const targetName = target.isSelf ? "themselves" : target.name; // for the room's view
 
   ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
+  // Forward the take-hold only when it landed on an ALLY — it confirms the buff
+  // and refreshes their vitals panel at once. A self-cast (or a mob target) is
+  // already fully narrated by the lines above and below.
+  for (const ev of events) if (ev.type === "effect-applied" && ev.playerId !== player.id) ctx.emit(ev);
 
   const onWhom = target.isSelf ? "yourself" : target.name;
 
@@ -310,7 +354,13 @@ function castSupport(state, player, spell, targetQ, ctx) {
 // caster's room and fights autonomously via the faction AI.
 function castSummon(state, player, spell, ctx) {
   const w = state.world;
-  const res = state.castSummon(player, spell);
+  const events = [];
+  const res = state.castSummon(player, spell, events);
+  // The conjuring (and a replacement made here) is narrated below; forward only
+  // a recast dismissal in ANOTHER room, so onlookers there see the old summon
+  // unravel and get their room view refreshed. (The `summon` event itself is
+  // never forwarded — the dispatcher expects player summons narrated here.)
+  for (const ev of events) if (ev.type === "summon-end" && ev.roomId !== player.location) ctx.emit(ev);
   const name = res.mob.name;
   const bare = name.replace(/^an? /i, ""); // "a Wisp" -> "Wisp" for the possessive clause
   // A construct built from a material component (Glimmer Husk) is forged, not conjured.

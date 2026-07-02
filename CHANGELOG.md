@@ -6,6 +6,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Spells can reflavour their cast narration from data.** An optional `messages`
+  block on a spell (`self` / `room` templates plus a `hitVerb` for area bursts —
+  see docs/data-model.md) overrides the generic landed-hit lines, so a new
+  spell's flavour no longer needs code. Flame Burst's fire narration moved from
+  a hardcoded branch into its data, and Glimmer Spike gained bespoke lines
+  ("You drive Glimmer Spike through…"). The validator checks the block's keys.
+
+### Fixed
+- **Spell casts no longer drop their side-effect messages.** The player cast
+  resolvers produced events nobody delivered, so: a sleeping mob roused by a
+  hostile cast (or caught in an Arc Flash / thrown bomb) woke silently, the
+  "You turn on X and fight back!" auto-engage line after a hostile cast never
+  appeared, an ally buffed by another delver got no "takes hold" confirmation
+  (or prompt vitals refresh), and a summon replaced by a recast while standing
+  in another room vanished unseen. All four paths now deliver their events.
+- **A spell whose effect the cast paths can't resolve is refused up front, not
+  half-cast.** Casting e.g. a mob-only weave (Snuff) used to spend the mana,
+  do nothing, and narrate "for undefined damage"; `cast` now refuses before any
+  cost is spent (and warns server-side). The validator enforces the same rule:
+  every learnable spell (scroll, book, quest reward, player template) must use
+  a player-castable effect type, and a mob's hostile `cast` action must use one
+  the mob path resolves.
+- **Mob-cast damage-over-time spells now bake duration and glow correctly.**
+  Player and mob casting resolve hostile effects through one shared core
+  (`_applyHostileSpellEffect`), fixing the mob path applying a DoT's raw spec —
+  which ignored `durationScale` (making e.g. a mob-cast Witchfire permanent)
+  and dropped its `emitLight` companion glow.
+
+### Changed
+- **`spells` listing consistency.** All durations now render as m:ss (DoT and
+  area-burn durations were raw tick counts), heal-over-time durations fold in
+  `durationScale`, and scaling amounts share one formatter. The unknown-spell
+  error now quotes the full attempted name instead of its first word.
+
+### Added
 - **New quest: "Something Worse in the Pens".** Wick (`rim-hatcher`) now also offers a
   follow-up to the stonebug-stalker quest — a huge bat out of the Bat Spire has taken to
   raiding his pens, and he wants it dead. Kill Night Wing (`d1.spire.roost`) to complete it.

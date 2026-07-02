@@ -444,15 +444,18 @@ function drink(state, player, arg, ctx, verb = "use") {
   if (spec.type === "summon") {
     const tmpl = w.mobs[spec.mob];
     const group = spec.group || spec.mob;
-    const existing = [];
-    for (const r of Object.values(state.rooms))
-      for (const m of r.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
-    for (const m of existing) state._dismissSummon(m, "recast");
+    const events = [];
+    const existing = state._ownedSummons(player.id, group);
+    for (const m of existing) state._dismissSummon(m, "recast", events);
     state._summon({
       roomId: player.location, mobId: spec.mob, count: spec.count || 1,
       faction: "player", ownerId: player.id, summonerId: player.id, group, lifetime: null,
       by: "player", byName: player.name,
     });
+    // The hatching (and a replacement made here) is narrated below; forward only
+    // a dismissal in ANOTHER room, so onlookers there see the old pet slip away
+    // and get their room view refreshed (mirrors castSummon in magic.js).
+    for (const ev of events) if (ev.roomId !== player.location) ctx.emit(ev);
     ctx.toRoom(player.location, { type: "log", text: `${player.name} ${verb}s ${t.name}, and ${tmpl.name} wriggles free.` }, player.id);
     ctx.refreshRoom(player.location, player.id);
     const replaced = existing.length ? ` Your previous ${tmpl.name.replace(/^an? /i, "")} skitters off into the dark.` : "";
@@ -484,7 +487,8 @@ function throwBomb(state, player, idx, inst, t, spec, ctx, verb) {
   if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
   else player.inventory.splice(idx, 1);
 
-  const results = state.detonateRoom(player, spec, targets);
+  const events = [];
+  const results = state.detonateRoom(player, spec, targets, 0, events);
   const killed = results.filter((r) => r.killed);
   const hurt = results.filter((r) => !r.killed && r.damage > 0);
   const poisoned = results.filter((r) => !r.killed && r.dot);
@@ -506,6 +510,10 @@ function throwBomb(state, player, idx, inst, t, spec, ctx, verb) {
   const flavour = t.consumable.flavour ? ` ${t.consumable.flavour}` : "";
   const out = selfAndViews(state, player, `You hurl ${t.name}.${flavour}${outcome}`, "combat");
   out.push(...qmsgs);
+  // Of the resolver's side-effects only the wake-ups need forwarding — the
+  // per-target outcome line above already narrates damage and kills (the
+  // dispatcher's mob-hurt/death lines would double-narrate them).
+  for (const ev of events) if (ev.type === "mob-woke") ctx.emit(ev);
   return out;
 }
 

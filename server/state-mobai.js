@@ -853,8 +853,11 @@ class MobAIMixin {
     const resisted = wardNegates(ward);
     let damage = 0, killed = false, death = null, effectName = null, doused = false;
     if (!resisted) {
-      if (eff.type === "damage") {
-        damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
+      // Per-type resolution is the shared core (state._applyHostileSpellEffect),
+      // scaled by the mob's own attributes; no sourceId — a mob credits no one.
+      const applied = this._applyHostileSpellEffect(eff, spell.name, t.attributes || {}, target);
+      if (applied.kind === "damage") {
+        damage = applied.damage;
         this._addThreat(m, target.id, damage); // mirror melee: damage stokes threat
         target.actor.hp -= damage;
         if (target.actor.hp <= 0) {
@@ -863,20 +866,13 @@ class MobAIMixin {
             ? this._beginDeath(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
-      } else if (eff.type === "douse") {
-        // Snuff the target's carried light — a shadow's signature reach. Only a player
-        // wields a doused-able lit source (a mob's glow is innate, not a kindled flame),
-        // so it no-ops on a mob target. The delver must relight (a turn) or fight blind;
-        // the room darkens immediately, recomputed below so the band is fresh.
-        if (isPlayer) {
-          const li = target.actor.equipment && target.actor.equipment.light;
-          if (li && li.lit) { li.lit = false; doused = true; }
-        }
-        effectName = eff.name || "Douse";
-      } else {
-        // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
-        this.applyEffect(target.actor, { ...eff });
-        effectName = eff.name || eff.type;
+      } else if (applied.kind === "douse") {
+        // The delver must relight (a turn) or fight blind; the room darkens
+        // immediately, recomputed below so the band is fresh.
+        doused = applied.doused;
+        effectName = applied.name;
+      } else if (applied.kind === "dot") {
+        effectName = applied.name;
       }
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
