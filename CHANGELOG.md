@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Bat guano to gather in the Bat Spire's deepest rooms.** The Sink and The Guano
+  Sump (depth 1) describe floors heaped with droppings, but had no `guano` on the
+  ground to actually pick up — it now spawns there (respawning), matching the
+  existing `guano` material's own flavor text about gathering saltpetre from a
+  roost floor.
 - **The Seized Working — an outlaw prospector camp and Lumen's first living-human enemy class
   (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
   gate and off the watch's beat: five rooms of outlaws squatting a working they took by force — **The

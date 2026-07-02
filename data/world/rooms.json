@@ -469,7 +469,7 @@
     "ambientLight": 0,
     "exits": { "up": "d1.spire.gullet", "west": "d1.spire.sump" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [{ "template": "guano", "qty": 1, "respawn": 120 }],
     "spawns": [{ "mob": "cave-bat", "max": 3, "respawn": 90 }, { "mob": "blood-bat", "max": 1, "respawn": 180 }]
   },
   "d1.spire.sump": {
@@ -481,7 +481,10 @@
     "ambientLight": 0,
     "exits": { "east": "d1.spire.sink" },
     "fixtures": [],
-    "groundItems": [{ "template": "lamp-oil", "qty": 1, "hidden": { "perception": 4 } }],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 4 } },
+      { "template": "guano", "qty": 2, "respawn": 120 }
+    ],
     "spawns": [{ "mob": "blood-bat", "max": 1, "respawn": 180 }, { "mob": "cave-bat", "max": 2, "respawn": 90 }]
   },
   "d1.spire.climb": {
