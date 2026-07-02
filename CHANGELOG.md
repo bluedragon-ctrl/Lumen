@@ -46,6 +46,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Spells can now deal true physical damage**, soaked by the target's Armour and
+  immune to the Ward fizzle (a physical spell always lands) — the melee damage-type
+  mitigation was pulled into a shared helper so spells and weapons resolve damage the
+  same way, leaving a clean seam for more types (light, fire) later.
+- **Iron Blast — a new advanced war-spell**: bursts a smelted iron bar into a room-wide
+  hail of shrapnel that tears every foe in the room. Physical damage — no ward turns it,
+  only Armour blunts it — a heavy single burst (no follow-up) that contrasts with Flame
+  Burst's fire-and-burn. Hostile, consumes an **iron bar** as its component. Taught by a
+  new **Scroll of Iron Blast**, sold by Vesper the glimmer-mage.
 - **Bat guano to gather in the Bat Spire's deepest rooms.** The Sink and The Guano
   Sump (depth 1) describe floors heaped with droppings, but had no `guano` on the
   ground to actually pick up — it now spawns there (respawning), matching the

@@ -476,6 +476,16 @@
     "stackable": true,
     "scroll": { "spell": "flame-burst" }
   },
+  "scroll-iron-blast": {
+    "id": "scroll-iron-blast",
+    "name": "a Scroll of Iron Blast",
+    "description": "Heavy iron-grey vellum, the glyphs stamped rather than inked — cold, blunt marks like a row of rivet-heads pressed into the page. Study it to learn Iron Blast — a war-weave that bursts a smelted iron bar into a room-filling hail of shrapnel, warded by nothing and blunted only by armour — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 100,
+    "stackable": true,
+    "scroll": { "spell": "iron-blast" }
+  },
   "scroll-glimmer-husk": {
     "id": "scroll-glimmer-husk",
     "name": "a Scroll of Glimmer Husk",
