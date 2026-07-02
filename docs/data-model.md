@@ -618,8 +618,20 @@ burst doesn't kill, stamped with the caster like the single-target `damage-over-
 spell type; a spell's `dot.durationScale` scales the same way as a top-level spell
 `durationScale`. `dot.emitLight`, if set, pushes a matching `emit-light` state so a
 burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight`).
-`damageType` is narration flavour only (`"physical"` vs everything else) — it does
-not currently gate any resistance.
+
+**`damageType` selects a mitigation rule** on any `damage` / `damage-room` effect
+(spell or thrown bomb), via the shared `mitigate` helper that weapons use too:
+
+- `"physical"` — the damage is a *blow*, not a weave: soaked flat by the target's
+  **Armour** (floor 1), and **immune to the Ward fizzle** — a physical spell always
+  lands (Ward never negates it). Iron Blast is the reference spell.
+- **anything else** (`"magical"`, `"fire"`, `"light"`, or omitted) — the existing
+  behavior: a hostile spell *cast* is negated wholesale by **Ward** (`wardNegates`,
+  all-or-nothing per target), and lands at full damage if it isn't. Only `physical`
+  has a concrete non-default rule today; other strings are accepted as labels and
+  behave like magical until they earn their own rule (a new branch in `mitigate`
+  plus a defensive stat). For a *weapon*, `magical` is instead a Ward **percent**
+  cut (see `strike`) — the per-cast fizzle is a spell-only gate.
 
 **Spell targeting (`target`).** Every spell declares who a cast may land on —
 `"self" | "creature" | "room"` — and the `cast` command routes on it, crossed
@@ -651,16 +663,24 @@ lines without touching code — an optional `messages` block of template strings
 }
 ```
 
-| Key       | Used by | Default |
-|-----------|---------|---------|
-| `self`    | the caster's line for a landed, non-lethal hit (single-target `damage`) or the loosing line (`damage-room`, outcomes appended). | `You hurl {spell} at {target} for {damage} damage.` / `You loose {spell}; light floods the chamber.` |
-| `room`    | the onlookers' line for the same beat. | `{caster} hurls a crackling {verb} at {target}.` / `{caster} looses a blinding {verb} and the room erupts in white light!` |
-| `hitVerb` | the per-target verb in a `damage-room` outcome clause ("It *sears* X for 5"). | `sears` |
+| Key        | Used by | Default |
+|------------|---------|---------|
+| `self`     | the caster's line for a landed, non-lethal hit (single-target `damage`) or the loosing line (`damage-room`, outcomes appended). | `You hurl {spell} at {target} for {damage} damage.` / `You loose {spell}; {flavour.self}.` |
+| `room`     | the onlookers' line for the same beat. | `{caster} hurls a crackling {verb} at {target}.` / `{caster} looses {flavour.room} {verb} and {flavour.wave}!` |
+| `hitVerb`  | the per-target verb in a `damage-room` outcome clause ("It *sears* X for 5"). | `flavour.hitVerb` |
+| `killVerb` | the per-target verb in a `damage-room` kill clause ("It *burns apart* X!"). | `flavour.killVerb` |
 
 Placeholders: `{caster}`, `{target}`, `{spell}` (proper name), `{verb}`
-(lower-cased name), `{damage}`. Resist/DoT/sleep/kill beats keep their generic
-type-level narration. See Flame Burst (fire flavour) and Glimmer Spike for
-authored examples.
+(lower-cased name), `{damage}`. Resist/DoT/sleep/kill beats (outside
+`damage-room`) keep their generic type-level narration.
+
+For a `damage-room` spell, `flavour` above is `BURST_FLAVOUR[effect.damageType]`
+(magic.js) — a per-damage-type row of stock wording (`fire`, `physical`; anything
+else, including omitted, falls to a generic light-burst default) that a spell
+gets for free without authoring `messages` at all. Iron Blast (`physical`) and
+Flame Burst (`fire`) both rely on their row's defaults; `messages` is for a
+spell that wants to diverge from its damage type's stock wording, or for a
+single-target spell (`messages.self`/`.room` only — see Glimmer Spike).
 
 ---
 

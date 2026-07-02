@@ -236,14 +236,28 @@ function cast(state, player, arg, ctx) {
   return out;
 }
 
+// Per-damage-type default flavour for a room burst (hitVerb/killVerb/room/wave/
+// self); anything without a row (magical light-spells like Arc Flash) falls to
+// the default. A new damage type adds a row here rather than another boolean.
+// A spell's own `messages` still wins piece-by-piece over these defaults (see
+// castBurst) — the table just spares an author from restating the obvious for
+// a spell that's happy with its damage type's stock wording (Iron Blast needs
+// none of its own).
+const BURST_FLAVOUR = {
+  fire: { hitVerb: "scorches", killVerb: "burns apart", room: "a roaring", wave: "flame rolls through the room", self: "fire rolls through the chamber" },
+  physical: { hitVerb: "shreds", killVerb: "tears apart", room: "a screaming", wave: "iron shrapnel tears through the room", self: "shrapnel tears through the chamber" },
+};
+const DEFAULT_BURST_FLAVOUR = { hitVerb: "sears", killVerb: "burns apart", room: "a blinding", wave: "the room erupts in white light", self: "light floods the chamber" };
+
 // Cast a hostile area spell (Arc Flash): sear every eligible foe in the room at once.
 // Eligibility mirrors throwBomb — only hostile (or already-engaged) mobs catch the
 // burst, so a cast in town won't sear a peaceful shopkeeper, and with nothing to hit
 // the cast is refused and the mana kept. Per-target damage, Intellect scaling, threat
 // and kills live in state.castRoomSpell; this filters, narrates, and sticks the caster
 // to a survivor so they keep swinging (mirrors a single-target hostile cast). The
-// loosing lines and per-target verb default to a burst of light; a spell reflavours
-// them via `messages` ({self, room, hitVerb} — see Flame Burst's fire).
+// loosing lines and per-target verbs default to the spell's damageType row in
+// BURST_FLAVOUR above; a spell reflavours any piece via `messages` ({self, room,
+// hitVerb, killVerb} — see Glimmer Spike for the single-target equivalent).
 function castBurst(state, player, spell, ctx) {
   const targets = roomHostiles(state, player);
   if (!targets.length)
@@ -251,6 +265,7 @@ function castBurst(state, player, spell, ctx) {
 
   const verb = spell.name.toLowerCase();
   const msgs = spell.messages || {};
+  const flav = BURST_FLAVOUR[spell.effect && spell.effect.damageType] || DEFAULT_BURST_FLAVOUR;
   const events = [];
   const results = state.castRoomSpell(player, spell, targets, events);
   const killed = results.filter((r) => r.killed);
@@ -263,16 +278,16 @@ function castBurst(state, player, spell, ctx) {
   stickToSurvivor(state, player, results);
 
   let outcome = "";
-  if (hurt.length) outcome += ` It ${msgs.hitVerb || "sears"} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (hurt.length) outcome += ` It ${msgs.hitVerb || flav.hitVerb} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
   if (burning.length) outcome += ` ${burning.map((r) => r.name).join(", ")} ${burning.length === 1 ? "catches" : "catch"} alight, left to burn.`;
-  if (killed.length) outcome += ` It burns apart ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
+  if (killed.length) outcome += ` It ${msgs.killVerb || flav.killVerb} ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (resisted.length) outcome += ` ${resisted.map((r) => r.name).join(", ")} ${resisted.length === 1 ? "shrugs" : "shrug"} the burst off, warded.`;
   if (loot.length) outcome += ` They leave behind ${loot.join(", ")}.`;
 
   const qmsgs = killed.flatMap((r) => questKill(state, player, r.death));
   const vars = { caster: player.name, spell: spell.name, verb };
-  const roomText = fillTemplate(msgs.room || "{caster} looses a blinding {verb} and the room erupts in white light!", vars);
-  const selfText = fillTemplate(msgs.self || "You loose {spell}; light floods the chamber.", vars) + outcome;
+  const roomText = fillTemplate(msgs.room || `{caster} looses ${flav.room} {verb} and ${flav.wave}!`, vars);
+  const selfText = fillTemplate(msgs.self || `You loose {spell}; ${flav.self}.`, vars) + outcome;
   ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
   ctx.refreshRoom(player.location, player.id);
   const out = selfAndViews(state, player, selfText, "combat");

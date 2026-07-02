@@ -490,7 +490,7 @@ function main() {
     return t === "summon" || (sp.hostile ? PLAYER_HOSTILE_EFFECTS : PLAYER_SUPPORT_EFFECTS).includes(t);
   };
   // Narration overrides a spell may carry (see fillTemplate in magic.js).
-  const SPELL_MESSAGE_KEYS = ["self", "room", "hitVerb"];
+  const SPELL_MESSAGE_KEYS = ["self", "room", "hitVerb", "killVerb"];
   // The targeting contract: who a cast may land on. Routing in magic.js keys off
   // this (crossed with `hostile`, which decides eligibility for "room"), so it
   // must exist on every spell and agree with the effect's shape.

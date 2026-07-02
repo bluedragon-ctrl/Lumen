@@ -842,18 +842,19 @@ class MobAIMixin {
   }
 
   /** Spell payload: the target's Ward gets a wholesale negation roll (see
-   *  wardNegates); a spell that lands deals magical damage scaled by the mob's own
-   *  attributes, snuffs the target's light, or applies a hostile status effect. No
-   *  mana bookkeeping for mobs — cadence is gated by action energy. Pushes the
-   *  `mob-cast` event the server narrates. Returns `{ targetDied, attackerDied }`:
-   *  a hostile cast triggers no defender `onDamage` in this pass, so the caster
-   *  cannot die from casting (`attackerDied` is always false). */
+   *  wardNegates) — skipped for a `damageType: "physical"` spell, a blow rather
+   *  than a weave, gated only by Armour (see _applyHostileSpellEffect); a spell
+   *  that lands deals damage scaled by the mob's own attributes, snuffs the
+   *  target's light, or applies a hostile status effect. No mana bookkeeping for
+   *  mobs — cadence is gated by action energy. Pushes the `mob-cast` event the
+   *  server narrates. Returns `{ targetDied, attackerDied }`: a hostile cast
+   *  triggers no defender `onDamage` in this pass, so the caster cannot die from
+   *  casting (`attackerDied` is always false). */
   _resolveSpellPayload(ctx, spell) {
     const { m, t, roomId, rt, events, target, isPlayer, tmt } = ctx;
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
-    const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (mobDefence(tmt, target.actor).ward || 0);
-    const resisted = wardNegates(ward);
+    const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
     let damage = 0, killed = false, death = null, effectName = null, doused = false;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),

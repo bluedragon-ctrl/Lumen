@@ -165,11 +165,6 @@
     "itemCost": [{ "template": "guano", "qty": 2 }],
     "hostile": true,
     "target": "room",
-    "messages": {
-      "self": "You loose {spell}; fire rolls through the chamber.",
-      "room": "{caster} looses a roaring {verb} and flame rolls through the room!",
-      "hitVerb": "scorches"
-    },
     "effect": {
       "type": "damage-room",
       "damageType": "fire",
@@ -177,6 +172,22 @@
       "cause": "flame-burst",
       "scale": { "attr": "intellect", "per": 3 },
       "dot": { "name": "Flame Burst", "damage": "1d4", "duration": 0, "durationScale": { "attr": "intellect", "per": 1 }, "emitLight": 2 }
+    }
+  },
+  "iron-blast": {
+    "id": "iron-blast",
+    "name": "Iron Blast",
+    "description": "A weave that spends metal instead of glimmer: the caster drags a smelted iron bar up out of the pack, holds it a moment against the will, and bursts it apart into a whirling hail of shrapnel-hot iron that tears through every foe sharing the dark. It is a hurled blow, not a hex — no ward turns it, only iron and hide stand against it, so a foe's Armour blunts its bite where its Ward is useless. The bar is spent utterly in the shaping, and it asks a keen Intellect to hold so much iron together long enough to loose it. Cast it and the room fills with screaming metal.",
+    "manaCost": 16,
+    "itemCost": [{ "template": "iron-bar", "qty": 1 }],
+    "hostile": true,
+    "target": "room",
+    "effect": {
+      "type": "damage-room",
+      "damageType": "physical",
+      "damage": "4d8",
+      "cause": "iron-blast",
+      "scale": { "attr": "intellect", "per": 3 }
     }
   },
   "glimmer-husk": {
