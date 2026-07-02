@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Killing a quest's later target no longer wastes the kill if it dies alongside an
+  earlier one.** Multi-step kill quests (e.g. thin the outlaw crew, then put down the
+  Foreman) only credited the *current* step, so a Foreman felled while the outlaw-count
+  step was still active simply didn't count — you'd have to find and kill another one
+  once the crew step cleared. Kill credit now banks per-mob across the whole quest, so
+  it's available the moment its step becomes current, no matter when the kill happened.
 - **A delver leaving the game now darkens the room for those left behind.** On
   disconnect (a dropped tab *or* `quit`), the vacated room's light was never
   recomputed and co-located players were never refreshed or told — so if the

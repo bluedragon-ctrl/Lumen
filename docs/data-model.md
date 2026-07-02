@@ -526,7 +526,7 @@ the quest log is shown in the console with `quest` / `journal` (no UI pane).
 | `id`,`name`   | string    | `id` matches the map key; `name` is the journal title. |
 | `description` | string?   | One-line summary shown when the quest is accepted. |
 | `start`       | block     | How the quest is offered (see below). |
-| `steps`       | Step[]    | Ordered objectives; only the current step accrues progress. |
+| `steps`       | Step[]    | Ordered objectives, revealed one at a time. `kill` steps accrue progress for the whole quest, so a mob matching a not-yet-current `kill` step still banks credit toward it; other objective types only accrue once their step is current. |
 | `rewards`     | block?    | Paid out once, on completing the last step. |
 | `repeatable`  | bool?     | Default `false` (one-time). `true` lets a finished quest be retaken. |
 
@@ -543,7 +543,7 @@ the quest log is shown in the console with `quest` / `journal` (no UI pane).
 
 | Objective | Shape | Complete when… |
 |-----------|-------|----------------|
-| `kill`    | `{ kill: <mobId>, count }`              | the player is credited with `count` kills of that mob. |
+| `kill`    | `{ kill: <mobId>, count }`              | the player is credited with `count` kills of that mob — credit banks even while an earlier step is active. |
 | `deliver` | `{ deliver: <itemId>, count, npc }`     | the player `give`s `count` of the item to that NPC (consumed). |
 | `use`     | `{ use: <fixtureId> }`                  | the player `use`s that fixture. |
 | `collect` | `{ collect: <itemId>, count }`          | the player **possesses** `count` of the item (live inventory). |
@@ -552,9 +552,11 @@ the quest log is shown in the console with `quest` / `journal` (no UI pane).
 `items` (ItemRef[] into the pack), `recipes` (recipe ids taught), `spells` (spell ids taught).
 
 > **Runtime state.** A player's quest log is dynamic state on the player object —
-> `player.quests = { active: { [questId]: { step, progress } }, done: [questId, …] }` —
+> `player.quests = { active: { [questId]: { step, progress, kills } }, done: [questId, …] }` —
 > persisted with the rest of the character (not committed). `progress` is the running
-> count for the current `kill`/`deliver` step.
+> count for the current `deliver` step; `kills` is a `{ [mobId]: count }` tally banked
+> across the whole quest, so a `kill` step may already be (partly) satisfied the moment
+> it becomes current.
 
 ---
 
