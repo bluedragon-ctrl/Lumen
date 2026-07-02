@@ -386,6 +386,16 @@
     "stackable": true,
     "scroll": { "spell": "halo" }
   },
+  "scroll-cleanse": {
+    "id": "scroll-cleanse",
+    "name": "a Scroll of Cleanse",
+    "description": "Vellum ruled with sharp, scouring glyphs, the ink almost white against the page. Study it to learn the Cleanse weave — a scour of clean light that burns out witchfire, poison, and other clinging afflictions — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 55,
+    "stackable": true,
+    "scroll": { "spell": "cleanse" }
+  },
   "scroll-mage-armour": {
     "id": "scroll-mage-armour",
     "name": "a Scroll of Mage Armour",

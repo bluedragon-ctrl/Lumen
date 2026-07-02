@@ -283,6 +283,12 @@ function castSupport(state, player, spell, targetQ, ctx) {
   if (res.effect === "emit-light") {
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a mote of light kindles overhead, shedding ${res.perPulse} light for ${fmtTicks(res.duration)}.`);
   }
+  if (res.effect === "cleanse") {
+    const tail = res.removed > 0
+      ? `; ${res.removed} clinging affliction${res.removed === 1 ? "" : "s"} burn${res.removed === 1 ? "s" : ""} away`
+      : "; but nothing clings to burn away";
+    return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}${tail}.`);
+  }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
 }
 

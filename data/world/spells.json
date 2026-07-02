@@ -87,6 +87,15 @@
       "good": true
     }
   },
+  "cleanse": {
+    "id": "cleanse",
+    "name": "Cleanse",
+    "description": "A weave of clean, scouring light drawn tight over the skin, meant not to mend a wound but to burn out what clings to one — witchfire, poison, any smouldering affliction eating away beneath the surface. It does nothing for a blow already struck, only for the slow harm still working. Cast it on yourself, an ally, or any creature you can see.",
+    "manaCost": 6,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "cleanse", "name": "Cleanse", "good": true }
+  },
   "sleep": {
     "id": "sleep",
     "name": "Sleep",

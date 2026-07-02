@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Cleanse — a new support spell that burns off damage-over-time afflictions** (Witchfire
+  and the like). Non-hostile, targets the caster by default like Regeneration or Mage Armour,
+  or any ally/creature in the room. Taught by a new **Scroll of Cleanse**, sold by Vesper the
+  glimmer-mage alongside her other scrolls.
 - **The Seized Working — an outlaw prospector camp and Lumen's first living-human enemy class
   (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
   gate and off the watch's beat: five rooms of outlaws squatting a working they took by force — **The

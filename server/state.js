@@ -1522,6 +1522,14 @@ class GameState {
       return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration };
     }
 
+    if (eff.type === "cleanse") {
+      const states = target.actor.states || [];
+      const removed = states.filter((s) => s.type === "damage-over-time");
+      target.actor.states = states.filter((s) => s.type !== "damage-over-time");
+      this._drawSupportThreat(player, target.id, removed.length || 1);
+      return { effect: "cleanse", name: spell.name, removed: removed.length };
+    }
+
     // Status effects (heal-over-time and future buffs). Bake any caster scaling
     // into the magnitude so the instance carries a fixed strength.
     const bonus = spellScaleBonus(attrs, eff.scale);
