@@ -6,6 +6,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`target` is now the spell targeting contract** (`self` / `creature` / `room`,
+  crossed with `hostile` — see docs/data-model.md). The previously dead field
+  drives `cast` routing and unlocks two new spell shapes: **self-only** support
+  (naming anyone else is refused — "X can only be laid on your own skin") and
+  **room-wide support**, which lays the full caster-baked effect on the caster
+  and every ally present (co-located delvers plus mobs of allied factions —
+  summons, pets, the rim watch) for one cast cost, drawing healer-aggro per
+  ally mended. Mob AI honours the same axis: a mob's non-hostile `cast` action
+  with `target: "room"` mends its whole side (one room-wide narration beat;
+  mended delvers get their personal take-hold), sharing the new beneficial-
+  effect core with player casting. Summons backfilled as `target: "self"`; the
+  validator requires the field and cross-checks it against the effect shape so
+  it can never contradict how the spell resolves. The `spells` listing shows
+  the shape ("self only" / "you and every ally present").
+- **Spells can reflavour their cast narration from data.** An optional `messages`
+  block on a spell (`self` / `room` templates plus a `hitVerb` for area bursts —
+  see docs/data-model.md) overrides the generic landed-hit lines, so a new
+  spell's flavour no longer needs code. Flame Burst's fire narration moved from
+  a hardcoded branch into its data, and Glimmer Spike gained bespoke lines
+  ("You drive Glimmer Spike through…"). The validator checks the block's keys.
+
+### Fixed
+- **Spell casts no longer drop their side-effect messages.** The player cast
+  resolvers produced events nobody delivered, so: a sleeping mob roused by a
+  hostile cast (or caught in an Arc Flash / thrown bomb) woke silently, the
+  "You turn on X and fight back!" auto-engage line after a hostile cast never
+  appeared, an ally buffed by another delver got no "takes hold" confirmation
+  (or prompt vitals refresh), and a summon replaced by a recast while standing
+  in another room vanished unseen. All four paths now deliver their events.
+- **A spell whose effect the cast paths can't resolve is refused up front, not
+  half-cast.** Casting e.g. a mob-only weave (Snuff) used to spend the mana,
+  do nothing, and narrate "for undefined damage"; `cast` now refuses before any
+  cost is spent (and warns server-side). The validator enforces the same rule:
+  every learnable spell (scroll, book, quest reward, player template) must use
+  a player-castable effect type, and a mob's hostile `cast` action must use one
+  the mob path resolves.
+- **Mob-cast damage-over-time spells now bake duration and glow correctly.**
+  Player and mob casting resolve hostile effects through one shared core
+  (`_applyHostileSpellEffect`), fixing the mob path applying a DoT's raw spec —
+  which ignored `durationScale` (making e.g. a mob-cast Witchfire permanent)
+  and dropped its `emitLight` companion glow.
+
+### Changed
+- **Mob self-buffs resolve through the shared beneficial core.** `_mobCastSelf`
+  now bakes through the same per-type core as player support casts (which also
+  gained the core's negative-magnitude handling, so a darkness aura like Drink
+  the Light keeps its pull whoever weaves it). Behavioural side-effects for
+  mobs: `durationScale` on a self-buff now bakes properly instead of being
+  ignored, and a protect buff's `emitLight` companion glow applies — nothing
+  currently authored relied on either gap.
+- **`spells` listing consistency.** All durations now render as m:ss (DoT and
+  area-burn durations were raw tick counts), heal-over-time durations fold in
+  `durationScale`, and scaling amounts share one formatter. The unknown-spell
+  error now quotes the full attempted name instead of its first word.
+- **Room-burst narration reconciled with Iron Blast's per-damage-type flavour
+  table.** Iron Blast (below) landed its own hardcoded fire/physical/default
+  wording for `damage-room` casts at the same time `messages` (above) gave
+  spells a data-driven override; the two are now one system — a spell's
+  `damageType` picks a stock wording row (physical/fire/default) it gets for
+  free, and `messages` (now with a `killVerb` key too) overrides any piece of
+  it. Flame Burst's `messages` block was removed as redundant with its `fire`
+  row's identical defaults. A mob's hostile `cast` also now skips the
+  wholesale Ward-negate roll for a `damageType: "physical"` spell, matching
+  the player path — no authored mob spell uses one yet.
+
+### Added
 - **New quest: "Something Worse in the Pens".** Wick (`rim-hatcher`) now also offers a
   follow-up to the stonebug-stalker quest — a huge bat out of the Bat Spire has taken to
   raiding his pens, and he wants it dead. Kill Night Wing (`d1.spire.roost`) to complete it.

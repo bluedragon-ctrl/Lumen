@@ -14,7 +14,7 @@ const { rollDice } = require("./dice");
 const { DEFAULT_FACTION } = require("./config");
 const { canSee, noticeChance } = require("./light");
 const {
-  playerDefence, mobDefence, spellScaleBonus, scaledAmount, wardNegates,
+  playerDefence, mobDefence, wardNegates,
   pickWeighted, strike, mobOnDamage, playerOnDamage,
 } = require("./combat-math");
 const { factionRelation, combatantFaction } = require("./factions");
@@ -828,33 +828,40 @@ class MobAIMixin {
   }
 
   /** A mob casts a spell (the `cast` action). A beneficial weave lands on the
-   *  caster (`_mobCastSelf`); a hostile one runs the shared hostile-action pipeline
-   *  with a spell payload. Thin entry — the hostile resolution lives in
-   *  `_resolveSpellPayload`. */
+   *  caster (`_mobCastSelf`) or — `target: "room"` — across its whole side
+   *  (`_mobCastRoomSupport`); a hostile one runs the shared hostile-action
+   *  pipeline with a spell payload (`_resolveSpellPayload`). */
   _mobCast(m, t, roomId, events, enemies, spellId) {
     const spell = this.world.spells[spellId];
     if (!spell) return;
-    if (!spell.hostile) return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
+    if (!spell.hostile) {
+      if (spell.target === "room") return this._mobCastRoomSupport(m, t, roomId, events, spell);
+      return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
+    }
     return this._mobHostileAction(m, t, roomId, events, enemies, { kind: "spell", spell });
   }
 
   /** Spell payload: the target's Ward gets a wholesale negation roll (see
-   *  wardNegates); a spell that lands deals magical damage scaled by the mob's own
-   *  attributes, snuffs the target's light, or applies a hostile status effect. No
-   *  mana bookkeeping for mobs — cadence is gated by action energy. Pushes the
-   *  `mob-cast` event the server narrates. Returns `{ targetDied, attackerDied }`:
-   *  a hostile cast triggers no defender `onDamage` in this pass, so the caster
-   *  cannot die from casting (`attackerDied` is always false). */
+   *  wardNegates) — skipped for a `damageType: "physical"` spell, a blow rather
+   *  than a weave, gated only by Armour (see _applyHostileSpellEffect); a spell
+   *  that lands deals damage scaled by the mob's own attributes, snuffs the
+   *  target's light, or applies a hostile status effect. No mana bookkeeping for
+   *  mobs — cadence is gated by action energy. Pushes the `mob-cast` event the
+   *  server narrates. Returns `{ targetDied, attackerDied }`: a hostile cast
+   *  triggers no defender `onDamage` in this pass, so the caster cannot die from
+   *  casting (`attackerDied` is always false). */
   _resolveSpellPayload(ctx, spell) {
     const { m, t, roomId, rt, events, target, isPlayer, tmt } = ctx;
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
-    const ward = isPlayer ? (playerDefence(this.world, target.actor).ward || 0) : (mobDefence(tmt, target.actor).ward || 0);
-    const resisted = wardNegates(ward);
+    const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
     let damage = 0, killed = false, death = null, effectName = null, doused = false;
     if (!resisted) {
-      if (eff.type === "damage") {
-        damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(t.attributes || {}, eff.scale));
+      // Per-type resolution is the shared core (state._applyHostileSpellEffect),
+      // scaled by the mob's own attributes; no sourceId — a mob credits no one.
+      const applied = this._applyHostileSpellEffect(eff, spell.name, t.attributes || {}, target);
+      if (applied.kind === "damage") {
+        damage = applied.damage;
         this._addThreat(m, target.id, damage); // mirror melee: damage stokes threat
         target.actor.hp -= damage;
         if (target.actor.hp <= 0) {
@@ -863,20 +870,13 @@ class MobAIMixin {
             ? this._beginDeath(target.actor, roomId, events)
             : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
         }
-      } else if (eff.type === "douse") {
-        // Snuff the target's carried light — a shadow's signature reach. Only a player
-        // wields a doused-able lit source (a mob's glow is innate, not a kindled flame),
-        // so it no-ops on a mob target. The delver must relight (a turn) or fight blind;
-        // the room darkens immediately, recomputed below so the band is fresh.
-        if (isPlayer) {
-          const li = target.actor.equipment && target.actor.equipment.light;
-          if (li && li.lit) { li.lit = false; doused = true; }
-        }
-        effectName = eff.name || "Douse";
-      } else {
-        // A hostile status effect (debuff). Stamp no sourceId — a mob credits no one.
-        this.applyEffect(target.actor, { ...eff });
-        effectName = eff.name || eff.type;
+      } else if (applied.kind === "douse") {
+        // The delver must relight (a turn) or fight blind; the room darkens
+        // immediately, recomputed below so the band is fresh.
+        doused = applied.doused;
+        effectName = applied.name;
+      } else if (applied.kind === "dot") {
+        effectName = applied.name;
       }
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
@@ -892,38 +892,60 @@ class MobAIMixin {
 
   /** A mob casts a beneficial spell on *itself* — the support side of mob casting
    *  (e.g. an Umbral glimmer-singer crusting Glimmerskin over its own hide before
-   *  it spikes you). Mobs pay no mana/shards; defence/heal magnitudes are baked
-   *  from the mob's own attributes, mirroring castBeneficial. Reusable for future
-   *  warder/healer mobs. The _mobAct filter gates a refresh-buff so it isn't recast
-   *  while already up. */
+   *  it spikes you). Mobs pay no mana/shards; magnitudes bake from the mob's own
+   *  attributes through the shared beneficial core. The core's take-hold events
+   *  are dropped — the single mob-cast-self event narrates the whole beat. The
+   *  _mobAct filter gates a refresh-buff so it isn't recast while already up. */
   _mobCastSelf(m, t, roomId, events, spell) {
-    const rt = this.rooms[roomId];
     const eff = spell.effect || {};
-    const attrs = t.attributes || {};
-    if (eff.type === "protect") {
-      const armour = scaledAmount(attrs, eff.armour);
-      const ward = scaledAmount(attrs, eff.ward);
-      this.applyEffect(m, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
-    } else if (eff.type === "restore") {
-      this.applyRestore(m, eff);
-    } else {
-      const bonus = spellScaleBonus(attrs, eff.scale);
-      const raw = (eff.magnitude || 0) + bonus;
-      // A *darkness* aura is an emit-light effect authored with a negative magnitude
-      // (it drinks the room's light rather than sheds it — see computeRoomLight, which
-      // sums a source's output be it positive or negative). Preserve the negative; a
-      // positive light weave still floors at 1 so a scaling source always shows.
-      const magnitude = raw < 0 ? raw : Math.max(eff.scale ? 1 : 0, raw);
-      this.applyEffect(m, { ...eff, magnitude });
-      if (eff.type === "emit-light") rt.light = this.computeRoomLight(roomId);
-    }
+    this._applyBeneficialSpellEffect(t.attributes || {}, spell,
+      { kind: "mob", actor: m, id: m.id, name: t.name, roomId, emitsLight: t.emitsLight > 0 }, []);
     events.push({
       type: "mob-cast-self", roomId, mobId: m.id, mobName: t.name,
-      emitsLight: t.emitsLight > 0, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
+      emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light, spellName: spell.name, effectName: eff.name || eff.type,
       // A negative emit-light weave is a darkness aura, not a self-buff — the client
       // narrates it as the room being swallowed rather than something drawn "about itself".
       darkened: eff.type === "emit-light" && ((eff.magnitude || 0) < 0),
     });
+  }
+
+  /** A mob lays a room-wide support weave (`target: "room"`) over its whole
+   *  side — itself and every allied combatant present (its pack; delvers too if
+   *  its faction allies them, e.g. a rim warden mending the watch). Mobs pay no
+   *  mana; each recipient gets the full effect baked from the caster's own
+   *  attributes via the shared beneficial core. One mob-cast-room event narrates
+   *  the beat; a mended DELVER additionally keeps their personal take-hold from
+   *  the core's events so their vitals refresh at once (the mob-side take-holds
+   *  are dropped — they'd double-narrate the room event). */
+  _mobCastRoomSupport(m, t, roomId, events, spell) {
+    const eff = spell.effect || {};
+    const scratch = [];
+    const targets = this._friendliesInRoom(roomId, combatantFaction(m, "mob"));
+    for (const tgt of targets) this._applyBeneficialSpellEffect(t.attributes || {}, spell, tgt, scratch);
+    for (const ev of scratch) if (ev.type === "effect-applied") events.push(ev);
+    events.push({
+      type: "mob-cast-room", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0,
+      light: this.rooms[roomId].light, spellName: spell.name, effectName: eff.name || eff.type, count: targets.length,
+    });
+  }
+
+  /** Every live combatant in `roomId` on `faction`'s side — the allies a
+   *  room-wide support weave catches: co-located delvers (when the faction
+   *  allies the player side, which "player" itself always does) and mobs of
+   *  allied factions (own summons and pets, packmates, the rim watch). The
+   *  caster is included. Returns castBeneficial-shaped target descriptors,
+   *  players first. */
+  _friendliesInRoom(roomId, faction) {
+    const out = [];
+    if (factionRelation(faction, "player") === "ally")
+      for (const p of this.playersIn(roomId)) if (p.hp > 0) out.push({ kind: "player", actor: p, id: p.id, name: p.name });
+    for (const mob of this.rooms[roomId].mobs) {
+      if (mob.hp <= 0) continue;
+      if (factionRelation(faction, combatantFaction(mob, "mob")) !== "ally") continue;
+      const mt = this.world.mobs[mob.template];
+      out.push({ kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId, emitsLight: mt.emitsLight > 0 });
+    }
+    return out;
   }
 
   /** True if a mob currently carries an active state by name (used to gate a

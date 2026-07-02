@@ -331,6 +331,13 @@ function main() {
           const t = (spells[a.spell].effect || {}).type;
           if (!SELF_CASTABLE.includes(t))
             errs.push(`mob ${id}: non-hostile cast spell ${a.spell} has effect "${t}" a mob can't self-cast (use one of ${SELF_CASTABLE.join(", ")})`);
+        } else {
+          // A hostile cast resolves through the shared per-type core (see
+          // state._applyHostileSpellEffect) — only these kinds land from a mob.
+          const MOB_CASTABLE = ["damage", "douse", "damage-over-time"];
+          const t = (spells[a.spell].effect || {}).type;
+          if (!MOB_CASTABLE.includes(t))
+            errs.push(`mob ${id}: hostile cast spell ${a.spell} has effect "${t}" a mob can't cast (use one of ${MOB_CASTABLE.join(", ")})`);
         }
       }
       if (a.type === "summon") {
@@ -472,7 +479,22 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "emit-light", "heal-over-time", "protect", "sleep", "summon", "cleanse"];
+  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "emit-light", "heal-over-time", "protect", "restore", "sleep", "summon", "cleanse"];
+  // Effect types each PLAYER cast path resolves — must mirror the runtime sets
+  // in server/commands/magic.js (HOSTILE_EFFECTS / SUPPORT_EFFECTS). A spell a
+  // player can come to know must fall inside them, or `cast` refuses it.
+  const PLAYER_HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room"];
+  const PLAYER_SUPPORT_EFFECTS = ["restore", "protect", "cleanse", "heal-over-time", "emit-light"];
+  const playerCastable = (sp) => {
+    const t = (sp.effect || {}).type;
+    return t === "summon" || (sp.hostile ? PLAYER_HOSTILE_EFFECTS : PLAYER_SUPPORT_EFFECTS).includes(t);
+  };
+  // Narration overrides a spell may carry (see fillTemplate in magic.js).
+  const SPELL_MESSAGE_KEYS = ["self", "room", "hitVerb", "killVerb"];
+  // The targeting contract: who a cast may land on. Routing in magic.js keys off
+  // this (crossed with `hostile`, which decides eligibility for "room"), so it
+  // must exist on every spell and agree with the effect's shape.
+  const SPELL_TARGETS = ["self", "creature", "room"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {
@@ -496,6 +518,29 @@ function main() {
       else for (const c of sp.itemCost) {
         if (!c || typeof c !== "object" || !has(items, c.template)) errs.push(`spell ${id}: itemCost references missing item ${c && c.template}`);
         if (c && c.qty != null && (typeof c.qty !== "number" || c.qty <= 0)) errs.push(`spell ${id}: itemCost qty must be a positive number`);
+      }
+    }
+    // Targeting: required, enum-checked, and cross-checked against the effect
+    // shape so the field can never contradict how the spell actually resolves.
+    if (!SPELL_TARGETS.includes(sp.target)) {
+      errs.push(`spell ${id}: target must be one of ${SPELL_TARGETS.join(", ")}`);
+    } else if (sp.effect && typeof sp.effect === "object" && sp.effect.type) {
+      const t = sp.effect.type;
+      if (t === "summon" && sp.target !== "self")
+        errs.push(`spell ${id}: a summon conjures at the caster — target must be "self"`);
+      if (sp.hostile && sp.target === "self")
+        errs.push(`spell ${id}: a hostile spell cannot target "self"`);
+      if (t === "damage-room" && sp.target !== "room")
+        errs.push(`spell ${id}: a damage-room effect must have target "room"`);
+      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse"].includes(t) && sp.target !== "creature")
+        errs.push(`spell ${id}: hostile effect "${t}" is single-target — target must be "creature"`);
+    }
+    // Optional narration overrides: an object of template strings by known key.
+    if (sp.messages != null) {
+      if (typeof sp.messages !== "object" || Array.isArray(sp.messages)) errs.push(`spell ${id}: messages must be an object of template strings`);
+      else for (const [k, v] of Object.entries(sp.messages)) {
+        if (!SPELL_MESSAGE_KEYS.includes(k)) errs.push(`spell ${id}: unknown messages key "${k}" (known: ${SPELL_MESSAGE_KEYS.join(", ")})`);
+        else if (typeof v !== "string" || !v) errs.push(`spell ${id}: messages.${k} must be a non-empty string`);
       }
     }
     const eff = sp.effect;
@@ -561,7 +606,29 @@ function main() {
           errs.push(`spell ${id}: effect.durationScale.per must be a positive number`);
       }
       if (eff.group != null && typeof eff.group !== "string") errs.push(`spell ${id}: summon group must be a string`);
+    } else if (eff.type === "restore") {
+      // An instant top-up (hp and/or mana), the spell twin of a potion's restore.
+      if (eff.hp == null && eff.mana == null) errs.push(`spell ${id}: restore effect needs at least one of hp/mana`);
+      if (eff.hp != null && (typeof eff.hp !== "number" || eff.hp <= 0)) errs.push(`spell ${id}: effect.hp must be a positive number`);
+      if (eff.mana != null && (typeof eff.mana !== "number" || eff.mana <= 0)) errs.push(`spell ${id}: effect.mana must be a positive number`);
     }
+  }
+
+  // Every spell a player can come to KNOW — scrolls, books, quest rewards, the
+  // new-player template — must resolve through a player cast path, or `cast`
+  // refuses it at the table (e.g. `douse` is a mob-only weave; see magic.js).
+  const learnable = new Map(); // spell id -> one source, for the error line
+  for (const [id, it] of Object.entries(items)) {
+    if (it.scroll && it.scroll.spell) learnable.set(it.scroll.spell, `item ${id} (scroll)`);
+    for (const sid of (it.teaches && it.teaches.spells) || []) learnable.set(sid, `item ${id} (teaches)`);
+  }
+  for (const [id, q] of Object.entries(quests))
+    for (const sid of (q.rewards && q.rewards.spells) || []) learnable.set(sid, `quest ${id} (reward)`);
+  for (const sid of player.knownSpells || []) learnable.set(sid, "player template knownSpells");
+  for (const [sid, src] of learnable) {
+    const sp = spells[sid];
+    if (sp && !playerCastable(sp))
+      errs.push(`spell ${sid}: learnable via ${src} but its ${sp.hostile ? "hostile" : "support"} effect "${(sp.effect || {}).type}" has no player cast path (hostile: ${PLAYER_HOSTILE_EFFECTS.join("/")}; support: ${PLAYER_SUPPORT_EFFECTS.join("/")}; or summon)`);
   }
 
   // Quests: data-driven goals (data/world/quests.json). A `start` trigger offers

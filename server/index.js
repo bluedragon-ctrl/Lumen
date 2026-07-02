@@ -498,6 +498,12 @@ const EVENT_HANDLERS = {
     }
   },
 
+  "mob-cast-room": (ev) =>
+    // A mob wove a room-wide support spell over its whole side (see
+    // state._mobCastRoomSupport). One line for the beat; each mended delver
+    // also got a personal take-hold via its own effect-applied event.
+    broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} weaves ${ev.spellName.toLowerCase()} wide over its own, and a soft light settles across them.`, { type: "combat", refreshRoom: true }),
+
   "combat-stop": (ev) => sendToPlayer(ev.playerId, { type: "log", text: ev.reason }),
 
   "tide-phase": (ev) => {

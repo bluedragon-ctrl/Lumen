@@ -177,11 +177,19 @@ class GameState {
     events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, verb: verb || "slips out of sight" });
   }
 
+  /** This owner's live summons, optionally narrowed to one recast `group` —
+   *  the world-wide scan behind the per-owner recast cap and owner-gone
+   *  cleanup (few summons ever exist, so a scan is fine). */
+  _ownedSummons(ownerId, group = null) {
+    const owned = [];
+    for (const rt of Object.values(this.rooms))
+      for (const m of rt.mobs) if (m.ownerId === ownerId && (group == null || m.summonGroup === group)) owned.push(m);
+    return owned;
+  }
+
   /** Dismiss every summon owned by `ownerId` (owner death/disconnect). */
   _dismissOwnedSummons(ownerId, reason, events = []) {
-    const owned = [];
-    for (const rt of Object.values(this.rooms)) for (const m of rt.mobs) if (m.ownerId === ownerId) owned.push(m);
-    for (const m of owned) this._dismissSummon(m, reason, events);
+    for (const m of this._ownedSummons(ownerId)) this._dismissSummon(m, reason, events);
     return events;
   }
 
@@ -1316,28 +1324,105 @@ class GameState {
   spendCost(player, spell) {
     player.mana = Math.max(0, (player.mana || 0) - (spell.manaCost || 0));
     if (spell.shardCost) player.shards = Math.max(0, (player.shards || 0) - spell.shardCost);
+    const inv = player.inventory || []; // same guard as costShortfall — the pair must agree
     for (const need of spell.itemCost || []) {
       let remaining = need.qty || 1;
-      for (let i = player.inventory.length - 1; i >= 0 && remaining > 0; i--) {
-        const inst = player.inventory[i];
+      for (let i = inv.length - 1; i >= 0 && remaining > 0; i--) {
+        const inst = inv[i];
         if (!inst || inst.template !== need.template) continue;
         const take = Math.min(remaining, inst.qty || 1);
         if (inst.qty != null && inst.qty > take) inst.qty -= take;
-        else player.inventory.splice(i, 1);
+        else inv.splice(i, 1);
         remaining -= take;
       }
     }
   }
 
+  /** A target's live defence profile, dispatching on kind — the one place both
+   *  directions of hostile casting (a player's target mob, a mob's target
+   *  player or mob) resolve Armour/Ward for the wholesale Ward-negate roll and
+   *  the `mitigate()` reduction step. */
+  _defenceOf(target) {
+    return target.kind === "player"
+      ? playerDefence(this.world, target.actor)
+      : mobDefence(this.world.mobs[target.actor.template], target.actor);
+  }
+
   /**
-   * Resolve an immediate spell cast by a player at a mob. Spends the cost, rolls the
-   * target's Ward to (maybe) fizzle the whole spell, then applies the effect
-   * primitive — today only `damage` (dice + scaling-attribute bonus). Hostile
-   * spells earn the target's threat even when resisted. Returns a result the
-   * caller narrates: { resisted } | { damage, killed, death }.
+   * Apply one hostile spell effect that already passed the target's Ward roll —
+   * the per-type core shared by BOTH directions of casting (a player's castSpell
+   * and a mob's _resolveSpellPayload), so damage scaling, DoT duration-baking and
+   * the companion glow can never drift apart between them. `attrs` is the
+   * caster's attribute block (a player's effective attributes, a mob template's
+   * `attributes`); `sourceId` stamps a DoT so a smoulder-kill credits that player
+   * (a mob's burn credits no one). Direction-specific work — dealing rolled
+   * damage to hp, threat, kill resolution, light recompute and narration — stays
+   * with the caller. Returns { kind, ... }:
+   *   { kind: "damage", damage }        — rolled+scaled (Armour-mitigated if
+   *                                       `damageType: "physical"`); caller applies it
+   *   { kind: "dot", name, duration }   — burn (+ its glow) already applied
+   *   { kind: "sleep" }                 — mob target dropped into slumber
+   *   { kind: "douse", doused, name }   — target's carried light snuffed (players only)
+   *   { kind: "unhandled" }             — no resolution for this type (warned;
+   *                                       the command guard / validator should
+   *                                       have refused it upstream)
+   */
+  _applyHostileSpellEffect(eff, spellName, attrs, target, sourceId = null) {
+    const name = eff.name || spellName;
+    switch (eff.type) {
+      case "damage": {
+        let damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(attrs, eff.scale));
+        // A physical-type spell (Iron Blast's hurled iron) is a blow, not a weave:
+        // it's soaked flat by Armour, never touched by Ward (whose one shot was the
+        // wholesale cast-negate the caller already rolled — see wardNegates callers).
+        // Non-physical spells land at full roll here; a percent cut too would
+        // double-count the Ward fizzle that already gated them.
+        if (eff.damageType === "physical") damage = mitigate(damage, "physical", this._defenceOf(target));
+        return { kind: "damage", damage };
+      }
+      case "damage-over-time": {
+        // A clinging burn (Witchfire): no immediate blow, but a DoT whose length
+        // scales with the caster (more total damage, a longer-lasting mark)
+        // rather than hitting harder. Per-tick damage runs in _tickEffects.
+        const duration = (eff.duration || 0) + durationScaleBonus(attrs, eff.durationScale);
+        this.applyEffect(target.actor, { type: "damage-over-time", name, damage: eff.damage, duration, sourceId, good: false });
+        // The burning glimmer glows: a matching emit-light state marks the foe in
+        // the dark for as long as it smoulders (summed in by computeRoomLight).
+        if (eff.emitLight) this.applyEffect(target.actor, { type: "emit-light", name, magnitude: eff.emitLight, duration, good: false });
+        return { kind: "dot", name, duration };
+      }
+      case "sleep":
+        // A non-damaging hex that drops a foe into slumber, making it inert (see
+        // resolveMobAI) until any blow rouses it. Only a mob can be lulled today.
+        if (target.kind !== "mob") break;
+        target.actor.posture = "sleeping";
+        return { kind: "sleep" };
+      case "douse": {
+        // Snuff the target's carried light — a shadow's signature reach. Only a
+        // player wields a doused-able lit source (a mob's glow is innate, not a
+        // kindled flame), so it no-ops on a mob target.
+        let doused = false;
+        if (target.kind === "player") {
+          const li = target.actor.equipment && target.actor.equipment.light;
+          if (li && li.lit) { li.lit = false; doused = true; }
+        }
+        return { kind: "douse", doused, name };
+      }
+    }
+    console.warn(`[lumen] spell "${spellName}": no hostile resolution for effect type "${eff.type}" on a ${target.kind} target`);
+    return { kind: "unhandled" };
+  }
+
+  /**
+   * Resolve an immediate spell cast by a player at a mob. Spends the cost, rolls
+   * the target's Ward to (maybe) fizzle the whole spell, then applies the effect
+   * primitive via the shared `_applyHostileSpellEffect`. Hostile spells earn the
+   * target's threat even when resisted. Returns a result the caller narrates:
+   * { resisted } | { slept } | { dot, duration, name } | { damage, killed, death }.
    *
    * Cost and target validation happen in the command handler; by here the cast
-   * is committed. `events` is optional and used to push auto-retaliation events.
+   * is committed. `events` receives the side-effects the caller must deliver
+   * (a rousted sleeper, auto-retaliation) — see the cast command in magic.js.
    */
   castSpell(player, spell, mob, events = []) {
     const w = this.world;
@@ -1353,45 +1438,31 @@ class GameState {
       return { resisted: true };
     }
 
-    // Sleep: a non-damaging hex that drops a perceiving foe into slumber, making
-    // it inert (see resolveMobAI) until any blow rouses it. Ward had its wholesale
-    // chance to negate above; on success it draws no threat and does NOT rouse or
-    // auto-engage — the point is to slip away or line up an ambush.
-    if (eff.type === "sleep") {
-      mob.posture = "sleeping";
+    const applied = this._applyHostileSpellEffect(eff, spell.name, effectiveAttributes(w, player), { kind: "mob", actor: mob }, player.id);
+
+    // Sleep: Ward had its wholesale chance to negate above; on success it draws
+    // no threat and does NOT rouse or auto-engage — the point is to slip away or
+    // line up an ambush.
+    if (applied.kind === "sleep") {
       this.rooms[player.location].light = this.computeRoomLight(player.location);
       return { resisted: false, slept: true };
     }
 
     const result = { resisted: false };
-    if (eff.type === "damage") {
-      let damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(effectiveAttributes(w, player), eff.scale));
-      // A physical-type spell is soaked flat by Armour (never touched Ward above).
-      // Non-physical spells land at full damage — the Ward fizzle was their gate,
-      // so applying a percent cut here too would double-count and nerf them.
-      if (eff.damageType === "physical") damage = mitigate(damage, "physical", mobDefence(w.mobs[mob.template], mob));
-      this._addThreat(mob, player.id, Math.max(1, damage));
-      mob.hp -= damage;
-      result.damage = damage;
+    if (applied.kind === "damage") {
+      this._addThreat(mob, player.id, Math.max(1, applied.damage));
+      mob.hp -= applied.damage;
+      result.damage = applied.damage;
       if (mob.hp <= 0) {
         result.killed = true;
         result.death = this._killMob(mob, player); // removes mob, drops loot/shards, awards xp
       }
-    } else if (eff.type === "damage-over-time") {
-      // A clinging burn (Witchfire): no immediate blow, but a DoT stamped with the
-      // caster so a smoulder-kill credits them (like a bleed). Intellect lengthens the
-      // burn (more total damage, and a longer-lasting mark) rather than hitting harder.
-      // Ward already had its wholesale chance to fizzle it above; per-tick damage runs
-      // in _tickEffects.
-      const duration = (eff.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), eff.durationScale);
-      this.applyEffect(mob, { type: "damage-over-time", name: eff.name || spell.name, damage: eff.damage, duration, sourceId: player.id, good: false });
-      // The burning glimmer glows: a matching emit-light state marks the foe in the
-      // dark for as long as it smoulders (summed into room light by computeRoomLight).
-      if (eff.emitLight) this.applyEffect(mob, { type: "emit-light", name: eff.name || spell.name, magnitude: eff.emitLight, duration, good: false });
+    } else if (applied.kind === "dot") {
+      // Stamped with the caster above, so a smoulder-kill credits them (like a bleed).
       this._addThreat(mob, player.id, 1);
       result.dot = true;
-      result.duration = duration;
-      result.name = eff.name || spell.name;
+      result.duration = applied.duration;
+      result.name = applied.name;
     } else if (spell.hostile) {
       this._addThreat(mob, player.id, 1);
     }
@@ -1502,32 +1573,29 @@ class GameState {
   }
 
   /**
-   * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
-   * `target` is the normalized descriptor the command handler built:
-   *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
-   * Spends mana (and any `shardCost` material), then applies the effect
-   * primitive. `heal-over-time` bakes its per-pulse magnitude from the caster's
-   * scaling attribute at cast time (so the power follows the caster, while an
-   * innate mob regen authors `magnitude` directly); `protect` likewise bakes its
-   * armour/ward from the caster; an instant `restore` tops up hp/mana now.
-   * Returns a result the caller narrates: { effect, name, perPulse?, restored?,
-   * armour?, ward?, duration? }.
+   * Apply one beneficial spell effect to `target`, baked from `attrs` — the
+   * per-type core shared by every support direction: a player's single-target
+   * cast (castBeneficial), a player's room-wide weave (castRoomBeneficial), and
+   * a mob's self/room support (_mobCastSelf / _mobCastRoomSupport). `target` is
+   * the normalized descriptor { kind: "player"|"mob", actor, name, id, roomId,
+   * emitsLight }. `heal-over-time` bakes its per-pulse magnitude from the
+   * caster's scaling attribute at cast time (so the power follows the caster,
+   * while an innate mob regen authors `magnitude` directly); `protect` likewise
+   * bakes its armour/ward; an instant `restore` tops up hp/mana now.
    *
-   * Support-spell threat: mending or buffing an ally makes whatever is fighting
-   * that ally turn on the caster too (see `_drawSupportThreat`), mirroring the
-   * damage→threat convention — the amount is the HP/mana mended (a flat 1 for a
-   * pure buff). This is the aggro hook this method long reserved.
+   * Threat is the CALLER's concern: the result carries a `threat` hint (HP/mana
+   * mended, a flat 1 for a pure buff) that player casts feed to
+   * _drawSupportThreat and mob casts ignore. Take-hold narration goes through
+   * `events` (_narrateEffectApplied); callers forward or drop those. Returns
+   * { effect, name, threat, perPulse?, restored?, armour?, ward?, duration? }.
    */
-  castBeneficial(player, spell, target, events = []) {
-    const w = this.world;
+  _applyBeneficialSpellEffect(attrs, spell, target, events) {
     const eff = spell.effect || {};
-    const attrs = effectiveAttributes(w, player);
-    this.spendCost(player, spell);
+    const roomId = target.kind === "player" ? target.actor.location : target.roomId;
 
     if (eff.type === "restore") {
       const got = this.applyRestore(target.actor, eff);
-      this._drawSupportThreat(player, target.id, (got.hp || 0) + (got.mana || 0));
-      return { effect: "restore", name: spell.name, restored: got };
+      return { effect: "restore", name: spell.name, restored: got, threat: (got.hp || 0) + (got.mana || 0) };
     }
 
     if (eff.type === "protect") {
@@ -1540,28 +1608,31 @@ class GameState {
       this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration, refresh: eff.refresh, good: true });
       // A radiant ward (Halo) also sheds light: a companion emit-light state, lasting
       // as long as the ward, brightens the room at once — mirrors the smouldering DoT's
-      // glow (see castSpell) and the way a quaffed light potion lifts the room.
+      // glow (see _applyHostileSpellEffect) and the way a quaffed light potion lifts the room.
       if (eff.emitLight) {
         this.applyEffect(target.actor, { type: "emit-light", name: eff.name || "protect", magnitude: eff.emitLight, duration, refresh: eff.refresh, good: true });
-        this.rooms[player.location].light = this.computeRoomLight(player.location);
+        this.rooms[roomId].light = this.computeRoomLight(roomId);
       }
       this._narrateEffectApplied(events, target, eff.name || eff.type);
-      this._drawSupportThreat(player, target.id, 1); // a pure buff: a flat sliver of threat
-      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration };
+      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration, threat: 1 }; // a pure buff: a flat sliver of threat
     }
 
     if (eff.type === "cleanse") {
       const states = target.actor.states || [];
       const removed = states.filter((s) => s.type === "damage-over-time");
       target.actor.states = states.filter((s) => s.type !== "damage-over-time");
-      this._drawSupportThreat(player, target.id, removed.length || 1);
-      return { effect: "cleanse", name: spell.name, removed: removed.length };
+      return { effect: "cleanse", name: spell.name, removed: removed.length, threat: removed.length || 1 };
     }
 
-    // Status effects (heal-over-time and future buffs). Bake any caster scaling
-    // into the magnitude so the instance carries a fixed strength.
+    // Status effects (heal-over-time, emit-light, and future buffs). Bake any
+    // caster scaling into the magnitude so the instance carries a fixed strength.
     const bonus = spellScaleBonus(attrs, eff.scale);
-    const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+    const raw = (eff.magnitude || 0) + bonus;
+    // A *darkness* aura is an emit-light effect authored with a negative magnitude
+    // (it drinks the room's light rather than sheds it — see computeRoomLight, which
+    // sums a source's output be it positive or negative). Preserve the negative; a
+    // positive weave still floors at 1 when it scales, so a scaling source always shows.
+    const magnitude = raw < 0 ? raw : Math.max(eff.scale ? 1 : 0, raw);
     // Lifetime can scale with the caster (durationScale, ticks per point) on top of
     // any flat base — a keener mage holds Candlelight longer, like a longer-lived summon.
     const duration = eff.durationScale
@@ -1569,10 +1640,41 @@ class GameState {
       : eff.duration;
     this.applyEffect(target.actor, { ...eff, magnitude, duration });
     // A light-shedding weave (Candlelight) brightens the room at once, like a potion.
-    if (eff.type === "emit-light") this.rooms[player.location].light = this.computeRoomLight(player.location);
+    if (eff.type === "emit-light") this.rooms[roomId].light = this.computeRoomLight(roomId);
     this._narrateEffectApplied(events, target, eff.name || eff.type);
-    this._drawSupportThreat(player, target.id, magnitude); // mend-over-time: per-pulse magnitude as threat
-    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: duration || 0 };
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: duration || 0, threat: magnitude }; // mend-over-time: per-pulse magnitude as threat
+  }
+
+  /**
+   * Resolve a beneficial (non-hostile) spell cast by a player on ONE target.
+   * Spends the full cost, applies the effect via the shared beneficial core,
+   * then draws support threat: mending or buffing an ally makes whatever is
+   * fighting that ally turn on the caster too (see `_drawSupportThreat`),
+   * mirroring the damage→threat convention. Returns the core's result for the
+   * caller to narrate.
+   */
+  castBeneficial(player, spell, target, events = []) {
+    this.spendCost(player, spell);
+    const res = this._applyBeneficialSpellEffect(effectiveAttributes(this.world, player), spell, target, events);
+    this._drawSupportThreat(player, target.id, res.threat);
+    return res;
+  }
+
+  /**
+   * Resolve a player's room-wide support spell (`target: "room"`): one cost,
+   * the full caster-baked effect laid on every target in `targets` (the caller
+   * has gathered the caster + their co-located allies — see _friendliesInRoom).
+   * Support threat fires per ally mended, so a room-wide heal draws a room's
+   * worth of healer-aggro. Returns one { id, name, isSelf, res } per target.
+   */
+  castRoomBeneficial(player, spell, targets, events = []) {
+    this.spendCost(player, spell);
+    const attrs = effectiveAttributes(this.world, player);
+    return targets.map((t) => {
+      const res = this._applyBeneficialSpellEffect(attrs, spell, t, events);
+      this._drawSupportThreat(player, t.id, res.threat);
+      return { id: t.id, name: t.name, isSelf: !!t.isSelf, res };
+    });
   }
 
   /**
@@ -1592,9 +1694,7 @@ class GameState {
     let lifetime = eff.duration != null ? eff.duration : null;
     if (eff.durationScale)
       lifetime = (eff.duration || 0) + durationScaleBonus(effectiveAttributes(this.world, player), eff.durationScale);
-    const existing = [];
-    for (const rt of Object.values(this.rooms))
-      for (const m of rt.mobs) if (m.ownerId === player.id && m.summonGroup === group) existing.push(m);
+    const existing = this._ownedSummons(player.id, group);
     for (const m of existing) this._dismissSummon(m, "recast", events);
     const made = this._summon({
       roomId: player.location, mobId: eff.mob, count: eff.count || 1,

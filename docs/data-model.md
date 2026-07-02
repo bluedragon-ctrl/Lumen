@@ -633,6 +633,55 @@ burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight
   plus a defensive stat). For a *weapon*, `magical` is instead a Ward **percent**
   cut (see `strike`) — the per-cast fizzle is a spell-only gate.
 
+**Spell targeting (`target`).** Every spell declares who a cast may land on —
+`"self" | "creature" | "room"` — and the `cast` command routes on it, crossed
+with the `hostile` flag (which decides *eligibility* for `room`):
+
+| `hostile` | `target` | Behaviour |
+|-----------|----------|-----------|
+| `false` | `self`     | Self-only weave — naming anyone else is refused outright. |
+| `false` | `creature` | The classic support targeting: self by default, an ally delver, or any creature you can see. |
+| `false` | `room`     | Lays the full caster-baked effect on the caster **and every ally present** — co-located delvers and mobs of factions *allied* to the caster's side (your summons and pets, the rim watch in town). Healer-aggro fires per ally mended. |
+| `true`  | `creature` | Single-target attack (`damage`, `damage-over-time`, `sleep`, mob-only `douse`). |
+| `true`  | `room`     | Blasts every eligible foe at once (`damage-room` only). |
+
+Summons are `target: "self"` (they conjure at the caster). The validator
+requires the field and cross-checks it against the effect shape (`damage-room`
+⇔ `room`, summon ⇔ `self`, hostile single-target effects ⇔ `creature`), so it
+can never contradict how the spell resolves. Mobs honour the same axis: a mob's
+non-hostile `cast` action self-buffs (`self`/`creature`) or, with `room`, mends
+its whole side (see `state._mobCastRoomSupport`).
+
+**Spell narration overrides (`messages`).** A spell may reflavour its landed-hit
+lines without touching code — an optional `messages` block of template strings:
+
+```json
+"messages": {
+  "self": "You drive {spell} through {target} for {damage} damage.",
+  "room": "{caster} drives a spear of frozen light through {target}.",
+  "hitVerb": "scorches"
+}
+```
+
+| Key        | Used by | Default |
+|------------|---------|---------|
+| `self`     | the caster's line for a landed, non-lethal hit (single-target `damage`) or the loosing line (`damage-room`, outcomes appended). | `You hurl {spell} at {target} for {damage} damage.` / `You loose {spell}; {flavour.self}.` |
+| `room`     | the onlookers' line for the same beat. | `{caster} hurls a crackling {verb} at {target}.` / `{caster} looses {flavour.room} {verb} and {flavour.wave}!` |
+| `hitVerb`  | the per-target verb in a `damage-room` outcome clause ("It *sears* X for 5"). | `flavour.hitVerb` |
+| `killVerb` | the per-target verb in a `damage-room` kill clause ("It *burns apart* X!"). | `flavour.killVerb` |
+
+Placeholders: `{caster}`, `{target}`, `{spell}` (proper name), `{verb}`
+(lower-cased name), `{damage}`. Resist/DoT/sleep/kill beats (outside
+`damage-room`) keep their generic type-level narration.
+
+For a `damage-room` spell, `flavour` above is `BURST_FLAVOUR[effect.damageType]`
+(magic.js) — a per-damage-type row of stock wording (`fire`, `physical`; anything
+else, including omitted, falls to a generic light-burst default) that a spell
+gets for free without authoring `messages` at all. Iron Blast (`physical`) and
+Flame Burst (`fire`) both rely on their row's defaults; `messages` is for a
+spell that wants to diverge from its damage type's stock wording, or for a
+single-target spell (`messages.self`/`.room` only — see Glimmer Spike).
+
 ---
 
 ## Starting character template (static) — `data/templates/player.json`
