@@ -486,6 +486,16 @@
     "stackable": true,
     "scroll": { "spell": "iron-blast" }
   },
+  "scroll-iron-skin": {
+    "id": "scroll-iron-skin",
+    "name": "a Scroll of Iron Skin",
+    "description": "Heavy iron-grey vellum, its glyphs stamped rather than inked — but where the Blast scroll's marks scatter outward like shot, these curl inward, a tight coil pressed cold into the page. Study it to learn Iron Skin — a war-weave that works a smelted iron bar thin over your own hide, a hammered shell that turns blade and tooth but does nothing against hostile magic — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "iron-skin" }
+  },
   "scroll-glimmer-husk": {
     "id": "scroll-glimmer-husk",
     "name": "a Scroll of Glimmer Husk",

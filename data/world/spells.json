@@ -190,6 +190,24 @@
       "scale": { "attr": "intellect", "per": 3 }
     }
   },
+  "iron-skin": {
+    "id": "iron-skin",
+    "name": "Iron Skin",
+    "description": "The defensive twin of Iron Blast, and the same trick turned inward: rather than burst the iron outward, the caster drags a smelted bar up out of the pack and works it thin over their own hide — a hammered shell of grey iron-light that clamps close and turns a blade where flesh would part. It is metal, not glimmer, so it does nothing against hostile magic — a warded bolt slides through it untouched — but against tooth and edge nothing a delver can weave holds harder. The bar is spent utterly in the shaping, and a keener mind beats the shell thinner and tighter. It can only be worked over your own skin, never laid on another; re-casting renews the shell rather than doubling it.",
+    "manaCost": 12,
+    "itemCost": [{ "template": "iron-bar", "qty": 1 }],
+    "hostile": false,
+    "target": "self",
+    "effect": {
+      "type": "protect",
+      "name": "Iron Skin",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 3, "scale": { "attr": "intellect", "per": 3 } },
+      "ward": 0,
+      "good": true
+    }
+  },
   "glimmer-husk": {
     "id": "glimmer-husk",
     "name": "Glimmer Husk",

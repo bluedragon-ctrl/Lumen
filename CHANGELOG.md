@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Iron Skin — a new advanced self-only ward, the defensive twin of Iron Blast.**
+  Works a smelted iron bar thin over the caster's own hide for a heavy flat
+  Armour stack (`3 + Intellect/3`, well above Mage Armour or Glimmerskin) — but
+  being iron, not glimmer, it grants **no Ward**: pure physical protection that
+  a warded bolt slides straight through, the mirror of Iron Blast's "warded by
+  nothing, blunted only by armour." Self-only (naming an ally is refused),
+  consumes an **iron bar**, re-cast renews rather than stacks. The first spell
+  to exercise the new `target: "self"` shape. Taught by a new **Scroll of Iron
+  Skin**, sold by Vesper the glimmer-mage beside the Blast scroll.
 - **`target` is now the spell targeting contract** (`self` / `creature` / `room`,
   crossed with `hostile` — see docs/data-model.md). The previously dead field
   drives `cast` routing and unlocks two new spell shapes: **self-only** support
