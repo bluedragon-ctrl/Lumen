@@ -290,7 +290,7 @@ function castSupport(state, player, spell, targetQ, ctx) {
     if (res.ward) parts.push(`+${res.ward} ward`);
     if (res.light) parts.push(`${res.light} light`);
     const grant = parts.length ? parts.join(", ") : "a faint sheen";
-    const sheath = res.light ? "a wreath of cold glimmer-light" : "a crust of hardened glimmer";
+    const sheath = res.light ? "a wreath of cold glimmer-light" : "a lattice of hardened light";
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${sheath} grants ${grant} for ${fmtTicks(res.duration)}.`);
   }
   if (res.effect === "emit-light") {

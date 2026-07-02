@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and PR flow. The natural home for tuning the new hidden-item respawn default below.
 
 ### Fixed
+- **Mage Armour's cast message no longer calls itself a glimmer effect.** The shared
+  "protect" narration hardcoded "a crust of hardened glimmer," but Mage Armour's own
+  description explicitly draws its ward from "pure will rather than glimmer." The
+  generic line now reads "a lattice of hardened light," matching Mage Armour while
+  staying neutral for other protect spells (Glimmerskin keeps its glimmer flavor via
+  its own description).
 - **Searchable (hidden) ground items no longer stay gone forever once picked up.** A
   hidden groundItem with no authored `respawn` was static — found once, never again —
   while plenty of hidden items elsewhere already regrow on an explicit timer. It now
@@ -40,6 +46,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Bat guano to gather in the Bat Spire's deepest rooms.** The Sink and The Guano
+  Sump (depth 1) describe floors heaped with droppings, but had no `guano` on the
+  ground to actually pick up — it now spawns there (respawning), matching the
+  existing `guano` material's own flavor text about gathering saltpetre from a
+  roost floor.
 - **Flame Burst — a new advanced war-spell**: a room-wide fire burst that leaves every
   survivor it doesn't kill outright to keep burning (a follow-up damage-over-time burn
   that also sheds its own light, like Witchfire, but scaled up to hit the whole room).
