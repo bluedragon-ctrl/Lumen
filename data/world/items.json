@@ -427,6 +427,16 @@
     "stackable": true,
     "scroll": { "spell": "mage-armour" }
   },
+  "scroll-aegis": {
+    "id": "scroll-aegis",
+    "name": "a Scroll of Aegis",
+    "description": "Vellum ruled with the same fine, mail-like lattice of glyphs as the Mage Armour scroll, but thrown wide across the whole page rather than tight about a single mark. Study it to learn the Aegis weave — a shared barding of hardened light raised over yourself and every ally at once — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "aegis" }
+  },
   "scroll-sleep": {
     "id": "scroll-sleep",
     "name": "a Scroll of Sleep",

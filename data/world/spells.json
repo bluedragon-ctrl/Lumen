@@ -97,6 +97,23 @@
       "good": true
     }
   },
+  "aegis": {
+    "id": "aegis",
+    "name": "Aegis",
+    "description": "Mage Armour drawn wide: rather than close a lattice of hardened light about one body, the caster throws it up over the whole line at once — a shared barding of will that settles on themselves and every ally standing with them, turning a blade a fraction before it bites. Like Mage Armour it is pure concentration, no glimmer, and holds a few minutes before it thins; the keener the caster's mind, the tighter each share of the weave. It cannot be raised over a foe, only your own side; re-casting renews the lattice rather than stacking it.",
+    "manaCost": 12,
+    "hostile": false,
+    "target": "room",
+    "effect": {
+      "type": "protect",
+      "name": "Aegis",
+      "duration": 180,
+      "refresh": true,
+      "armour": { "base": 1, "scale": { "attr": "intellect", "per": 8 } },
+      "ward": 0,
+      "good": true
+    }
+  },
   "cleanse": {
     "id": "cleanse",
     "name": "Cleanse",

@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Aegis — a room-wide ward (the party counterpart to Mage Armour).** Throws a
+  shared lattice of hardened light over the caster and every ally present,
+  granting each the same armour-only protection Mage Armour gives one
+  (`1 + Intellect/8`) for one cast at roughly double the mana. Non-hostile,
+  `target: "room"`; keeps Mage Armour's no-shard, armour-only identity (Glimmerskin
+  stays the single-target armour+ward option). Cast prefix `ae`. Taught by a
+  new **Scroll of Aegis**, sold by Vesper.
 - **Purge — a room-wide cleanse (the party counterpart to Cleanse).** A wide
   pulse of scouring light that strips every `damage-over-time` affliction
   (witchfire, poison) off the caster and every ally present at once, where
