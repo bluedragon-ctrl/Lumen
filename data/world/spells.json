@@ -157,7 +157,7 @@
     "name": "Flame Burst",
     "description": "A delver's heaviest fire-work: a lump of bat-guano, rich with old saltpetre, dragged up and set off all at once in a single roaring bloom that catches every foe sharing the dark with you. What the initial blast doesn't finish keeps burning — a clinging fire gnaws at each survivor long after the flash fades, and the flame sheds its own light, so the burned mark themselves in the black. It asks a keen Intellect to shape so much fire at once, and burns mana to match; each foe's Ward may yet turn its share of the burst aside. Cast it and the room catches light.",
     "manaCost": 16,
-    "itemCost": [{ "template": "guano", "qty": 3 }],
+    "itemCost": [{ "template": "guano", "qty": 2 }],
     "hostile": true,
     "target": "room",
     "effect": {
