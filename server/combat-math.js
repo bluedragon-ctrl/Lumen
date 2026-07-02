@@ -211,6 +211,20 @@ function wardNegates(ward) {
   return (ward || 0) > 0 && Math.random() < ward * WARD_RESIST_PER_POINT;
 }
 
+/** How much of a *landed* blow survives the defender's mitigation, keyed by
+ *  damage type. `physical` is soaked flat by Armour; every other type (magical,
+ *  and any future label until it earns its own rule) is cut by Ward as a PERCENT
+ *  (ward 50 → halved). This is the reduction step ONLY — whether the blow lands
+ *  at all is the caller's business (melee's accuracy roll; a spell cast's Ward
+ *  fizzle, see wardNegates). Floor of 1 so any blow that lands still stings.
+ *  The single seam shared by strike() (weapons) and the spell-damage paths, and
+ *  the one place a new damage type's mitigation rule is added. */
+function mitigate(base, damageType, defence) {
+  return damageType === "physical"
+    ? Math.max(1, base - (defence.armour || 0))
+    : Math.max(1, Math.round(base * (1 - (defence.ward || 0) / 100)));
+}
+
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
 function pickWeighted(options) {
   const total = options.reduce((s, o) => s + (o.weight || 1), 0);
@@ -258,13 +272,11 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
   const crit = Math.random() < ((attacker.crit || 0) + overflowCrit);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
-  // Physical blows are soaked flat by Armour. Magical-type blows are cut by Ward
-  // as a PERCENT reduction (ward is a percentage: ward 50 → halved). A spell
-  // *cast* is instead negated wholesale by Ward (see wardNegates); a magical
-  // weapon always lands once it hits, but its bite is reduced here.
-  const damage = damageType === "physical"
-    ? Math.max(1, base - (defender.armour || 0))
-    : Math.max(1, Math.round(base * (1 - (defender.ward || 0) / 100)));
+  // Physical blows are soaked flat by Armour; magical-type blows are cut by Ward
+  // as a PERCENT (see mitigate). A spell *cast* is instead negated wholesale by
+  // Ward (see wardNegates); a magical weapon always lands once it hits, but its
+  // bite is reduced here.
+  const damage = mitigate(base, damageType, defender);
   return { hit: true, sighted, damage, crit };
 }
 
@@ -294,6 +306,7 @@ module.exports = {
   scaledAmount,
   WARD_RESIST_PER_POINT,
   wardNegates,
+  mitigate,
   pickWeighted,
   roomEffectFires,
   MIN_HIT,

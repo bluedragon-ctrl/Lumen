@@ -10,7 +10,7 @@ const {
   HP_BASE, HP_PER_LEVEL, HP_PER_VITALITY, MANA_PER_INTELLECT, ATTR_BASELINE, SIGHT_PER_PERCEPTION,
   HIT_PER_PERCEPTION, CRIT_PER_PERCEPTION,
   effectiveAttributes, playerDefence, effectiveSpeed, mobDefence,
-  spellScaleBonus, durationScaleBonus, scaledAmount, wardNegates,
+  spellScaleBonus, durationScaleBonus, scaledAmount, wardNegates, mitigate,
   roomEffectFires, strike,
 } = require("./combat-math");
 const { SELL_RATE, buyValueOf, sellValueOf } = require("./economy");
@@ -1344,8 +1344,11 @@ class GameState {
     const eff = spell.effect || {};
     this.spendCost(player, spell);
 
+    // Ward negates a hostile spell *cast* wholesale — but only a non-physical one.
+    // A physical spell (Iron Blast's hurled iron) is a blow, not a weave: Ward can't
+    // fizzle it; it always lands and is soaked by Armour below (see mitigate).
     const ward = mobDefence(w.mobs[mob.template], mob).ward || 0;
-    if (spell.hostile && wardNegates(ward)) {
+    if (spell.hostile && eff.damageType !== "physical" && wardNegates(ward)) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
     }
@@ -1362,7 +1365,11 @@ class GameState {
 
     const result = { resisted: false };
     if (eff.type === "damage") {
-      const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(effectiveAttributes(w, player), eff.scale));
+      let damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(effectiveAttributes(w, player), eff.scale));
+      // A physical-type spell is soaked flat by Armour (never touched Ward above).
+      // Non-physical spells land at full damage — the Ward fizzle was their gate,
+      // so applying a percent cut here too would double-count and nerf them.
+      if (eff.damageType === "physical") damage = mitigate(damage, "physical", mobDefence(w.mobs[mob.template], mob));
       this._addThreat(mob, player.id, Math.max(1, damage));
       mob.hp -= damage;
       result.damage = damage;
@@ -1459,7 +1466,9 @@ class GameState {
       const t = w.mobs[mob.template];
       // A magical burst rolls each foe's Ward independently — a shrugged-off blast
       // still earns the caster's ire, but lands no damage or burn on that target.
-      if (wardCheck && wardNegates(mobDefence(t, mob).ward || 0)) {
+      // A physical burst (Iron Blast's shrapnel) can't be warded off — it always
+      // lands and is soaked by Armour below.
+      if (wardCheck && spec.damageType !== "physical" && wardNegates(mobDefence(t, mob).ward || 0)) {
         this._addThreat(mob, player.id, 1);
         results.push({ id: mob.id, name: t.name, damage: 0, dot: false, resisted: true, killed: false, death: null });
         continue;
@@ -1468,6 +1477,9 @@ class GameState {
       let death = null;
       if (spec.damage != null) {
         damage = Math.max(1, rollDice(spec.damage) + bonus);
+        // A physical burst is soaked flat by each foe's Armour; a magical one isn't
+        // (its only defence was the Ward negation above).
+        if (spec.damageType === "physical") damage = mitigate(damage, "physical", mobDefence(t, mob));
         this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
         death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
       }

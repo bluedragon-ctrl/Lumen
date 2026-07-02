@@ -40,6 +40,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   like `quit`; the now-redundant announcement was removed from the `quit` command.
 
 ### Added
+- **Spells can now deal true physical damage**, soaked by the target's Armour and
+  immune to the Ward fizzle (a physical spell always lands) — the melee damage-type
+  mitigation was pulled into a shared helper so spells and weapons resolve damage the
+  same way, leaving a clean seam for more types (light, fire) later.
+- **Iron Blast — a new advanced war-spell**: bursts a smelted iron bar into a room-wide
+  hail of shrapnel that tears every foe in the room. Physical damage — no ward turns it,
+  only Armour blunts it — a heavy single burst (no follow-up) that contrasts with Flame
+  Burst's fire-and-burn. Hostile, consumes an **iron bar** as its component. Taught by a
+  new **Scroll of Iron Blast**, sold by Vesper the glimmer-mage.
 - **Flame Burst — a new advanced war-spell**: a room-wide fire burst that leaves every
   survivor it doesn't kill outright to keep burning (a follow-up damage-over-time burn
   that also sheds its own light, like Witchfire, but scaled up to hit the whole room).
