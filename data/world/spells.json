@@ -87,6 +87,15 @@
       "good": true
     }
   },
+  "cleanse": {
+    "id": "cleanse",
+    "name": "Cleanse",
+    "description": "A weave of clean, scouring light drawn tight over the skin, meant not to mend a wound but to burn out what clings to one — witchfire, poison, any smouldering affliction eating away beneath the surface. It does nothing for a blow already struck, only for the slow harm still working. Cast it on yourself, an ally, or any creature you can see.",
+    "manaCost": 6,
+    "hostile": false,
+    "target": "creature",
+    "effect": { "type": "cleanse", "name": "Cleanse", "good": true }
+  },
   "sleep": {
     "id": "sleep",
     "name": "Sleep",
@@ -142,6 +151,23 @@
     "hostile": true,
     "target": "room",
     "effect": { "type": "damage-room", "damageType": "magical", "damage": "3d6", "cause": "glimmer-storm", "scale": { "attr": "intellect", "per": 3 } }
+  },
+  "flame-burst": {
+    "id": "flame-burst",
+    "name": "Flame Burst",
+    "description": "A delver's heaviest fire-work: a lump of bat-guano, rich with old saltpetre, dragged up and set off all at once in a single roaring bloom that catches every foe sharing the dark with you. What the initial blast doesn't finish keeps burning — a clinging fire gnaws at each survivor long after the flash fades, and the flame sheds its own light, so the burned mark themselves in the black. It asks a keen Intellect to shape so much fire at once, and burns mana to match; each foe's Ward may yet turn its share of the burst aside. Cast it and the room catches light.",
+    "manaCost": 16,
+    "itemCost": [{ "template": "guano", "qty": 2 }],
+    "hostile": true,
+    "target": "room",
+    "effect": {
+      "type": "damage-room",
+      "damageType": "fire",
+      "damage": "3d6",
+      "cause": "flame-burst",
+      "scale": { "attr": "intellect", "per": 3 },
+      "dot": { "name": "Flame Burst", "damage": "1d4", "duration": 0, "durationScale": { "attr": "intellect", "per": 1 }, "emitLight": 2 }
+    }
   },
   "glimmer-husk": {
     "id": "glimmer-husk",

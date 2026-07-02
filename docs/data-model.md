@@ -575,7 +575,7 @@ An **effect spec** is the descriptor authored on the source (e.g. a consumable's
 
 | Field       | Type    | Notes |
 |-------------|---------|-------|
-| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch — a **negative** `magnitude` is a *darkness aura* that subtracts, drinking the room toward black); `summon` (see below). |
+| `type`      | enum    | The primitive. Implemented: `emit-light` (actor radiates `magnitude` light, summed into room light like a torch — a **negative** `magnitude` is a *darkness aura* that subtracts, drinking the room toward black); `summon` (see below); `cleanse` (strips every `damage-over-time` state from the target instead of applying a new one — an instant, not a lingering effect). |
 | `name`      | string  | Display label for the state chip. |
 | `magnitude` | number  | Effect strength (e.g. light output). |
 | `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |
@@ -604,6 +604,22 @@ A **`consumable`** item may carry the same `summon` effect (the pet path — e.g
 conjures a **permanent** companion (`duration` omitted), with the same per-owner
 `group` recast cap. This is the pet counterpart to the time-limited combat Summon
 spell; richer pet handling (naming, dismissal, following) is to come.
+
+A `damage-room` effect (a hostile area spell, e.g. Arc Flash, or a thrown bomb) may
+carry an optional `dot` sub-spec — an instant burst plus a lingering burn/poison,
+e.g. Flame Burst:
+
+```json
+{ "type": "damage-room", "damageType": "fire", "damage": "3d6", "dot": { "name": "Flame Burst", "damage": "1d4", "duration": 10, "durationScale": { "attr": "intellect", "per": 2 }, "emitLight": 2 } }
+```
+
+`dot` applies a `damage-over-time` state (see above) to every target the initial
+burst doesn't kill, stamped with the caster like the single-target `damage-over-time`
+spell type; a spell's `dot.durationScale` scales the same way as a top-level spell
+`durationScale`. `dot.emitLight`, if set, pushes a matching `emit-light` state so a
+burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight`).
+`damageType` is narration flavour only (`"physical"` vs everything else) — it does
+not currently gate any resistance.
 
 ---
 

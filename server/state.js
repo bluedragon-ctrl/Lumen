@@ -1409,25 +1409,34 @@ class GameState {
 
   /**
    * Resolve a hostile area spell (`effect.type === "damage-room"`, e.g. Arc Flash) cast
-   * by a player. Spends mana and any `shardCost`, then blasts every mob in `targets`
-   * (the caller has already filtered to the eligible) through the shared bomb
-   * resolver, folding the caster's Intellect in as a flat per-target bonus. Returns
-   * detonateRoom's per-target results for the caller to narrate.
+   * by a player. Spends mana, shards and any `itemCost` material (e.g. Flame Burst's
+   * guano), then blasts every mob in `targets` (the caller has already filtered to the
+   * eligible) through the shared bomb resolver, folding the caster's Intellect in as a
+   * flat per-target damage bonus. A room spell's `dot` (Flame Burst's follow-up burn)
+   * gets its duration scaled by Intellect here too, the same as a single-target
+   * `damage-over-time` spell (see castSpell). Returns detonateRoom's per-target results
+   * for the caller to narrate.
    */
   castRoomSpell(player, spell, targets, events = []) {
     const eff = spell.effect || {};
     this.spendCost(player, spell);
-    const bonus = spellScaleBonus(effectiveAttributes(this.world, player), eff.scale);
-    return this.detonateRoom(player, eff, targets, bonus, events, true); // a magical burst rolls each foe's Ward
+    const attrs = effectiveAttributes(this.world, player);
+    const bonus = spellScaleBonus(attrs, eff.scale);
+    const spec = eff.dot
+      ? { ...eff, dot: { ...eff.dot, duration: (eff.dot.duration || 0) + durationScaleBonus(attrs, eff.dot.durationScale) } }
+      : eff;
+    return this.detonateRoom(player, spec, targets, bonus, events, true); // a magical burst rolls each foe's Ward
   }
 
   /**
    * Resolve a thrown area bomb (a consumable's `damage-room` effect), applying it to
    * every mob in `targets` (the caller has already filtered to the eligible — hostile
    * or already-engaged — mobs, so a stray toss never blasts a peaceful shopkeeper).
-   * A bomb carries an instant burst (`damage`, fresh-rolled per target), a lingering
-   * `dot` ({ name, damage, duration } — a corroding/poison cloud applied as a
-   * damage-over-time state, credited to the thrower like an `onHit` venom), or both.
+   * A bomb (or room spell) carries an instant burst (`damage`, fresh-rolled per
+   * target), a lingering `dot` ({ name, damage, duration, emitLight? } — a
+   * corroding/poison/burning cloud applied as a damage-over-time state, credited to
+   * the thrower like an `onHit` venom, and optionally a matching emit-light state
+   * for a DoT that glows, e.g. Flame Burst), or both.
    * Either way it threatens the thrower so survivors turn on them, rouses any sleeper
    * it doesn't kill, and credits the thrower with kills (loot/xp). Mob removal, light
    * recompute and the kill's spoils are handled by `_hurtMob` (and, for the DoT, by
@@ -1467,6 +1476,8 @@ class GameState {
       let dot = false;
       if (spec.dot && !death) {
         this.applyEffect(mob, { type: "damage-over-time", name: spec.dot.name || spec.cause || "poison", damage: spec.dot.damage, duration: spec.dot.duration, sourceId: player.id, good: false });
+        // A burning cloud (Flame Burst) sheds its own light for as long as it smoulders.
+        if (spec.dot.emitLight) this.applyEffect(mob, { type: "emit-light", name: spec.dot.name || spec.cause || "poison", magnitude: spec.dot.emitLight, duration: spec.dot.duration, good: false });
         this._addThreat(mob, player.id, 1); // the splash sticks the thrower in its sights
         dot = true;
       }
@@ -1525,6 +1536,14 @@ class GameState {
       this._narrateEffectApplied(events, target, eff.name || eff.type);
       this._drawSupportThreat(player, target.id, 1); // a pure buff: a flat sliver of threat
       return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration };
+    }
+
+    if (eff.type === "cleanse") {
+      const states = target.actor.states || [];
+      const removed = states.filter((s) => s.type === "damage-over-time");
+      target.actor.states = states.filter((s) => s.type !== "damage-over-time");
+      this._drawSupportThreat(player, target.id, removed.length || 1);
+      return { effect: "cleanse", name: spell.name, removed: removed.length };
     }
 
     // Status effects (heal-over-time and future buffs). Bake any caster scaling
