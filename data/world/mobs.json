@@ -1701,5 +1701,155 @@
       { "template": "mantle-of-interred-night", "chance": 0.2 },
       { "template": "staff-of-drinking-dark", "chance": 0.2 }
     ]
+  },
+  "camp-miner": {
+    "id": "camp-miner",
+    "faction": "rim",
+    "name": "Bricke the pickman",
+    "keywords": ["bricke", "miner", "pickman", "prospector"],
+    "description": "A broad, stooped old prospector with a pick worn thin at the head and hands gone to horn from a lifetime of swinging it. He came down with one of the first waves and, unlike most, is still swinging — the deepest working pick in the Abyss, and proud of it. Lately he spends near as much time watching the deep-folk across the water as digging: their stonework shames his own, and he has been trying, slow and stubborn, to learn the way they read a seam. He'll trade a delver the tools and the light to cut their own, and grumble the whole time about what the young ones don't know.",
+    "maxHp": 24,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 6, "intellect": 4, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["works the seam with a slow, steady swing", "spits on his palms and takes up the pick again", "squints across the water at the deep-folk's stonework, frowning", "traces a vein in the rock with one horny finger, muttering", "tests the edge of his pick against a calloused thumb"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["turns his lamp-pole up and sets his back to the rock as the dark comes on", "stops swinging and watches the black past the stakes, pick held low", "mutters that a working man keeps his light close when the deep breathes"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"], "carriedLightBelow": 1 }, "messages": [
+          { "target": "jabs his pick toward your dark hands: \"No light, this deep, with the Tide coming? That's a fool's way to end up a story. Buy a lamp off me first.\"", "room": "jabs his pick toward {name}'s unlit hands." }
+        ] },
+        { "if": { "equipped": "prospectors-hatchet" }, "messages": [
+          { "target": "nods at the hatchet on your belt: \"Good steel. Keep it sharp — the deep rock eats a soft edge.\"", "room": "nods approvingly at the hatchet on {name}'s belt." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "eyes your wounds: \"You've been below, then. Get Wren at the rope-head to look at that before it goes bad.\"", "room": "eyes {name}'s wounds and jerks a thumb east toward the rope-head." }
+        ] },
+        { "messages": [
+          { "target": "leans on his pick: \"Deepest working seam in the Abyss, this. Want the tools to cut your own? I sell 'em, and cheaper than dying does.\"", "room": "leans on his pick and says something to {name} about the seam." },
+          { "target": "nods across the water: \"The deep-folk read this rock like a book I can't. Forty years swinging and I'm still learning off 'em. Don't tell 'em I said so.\"", "room": "nods across the water toward the Umbral fields and mutters to {name}." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }]
+    }
+  },
+  "camp-captain": {
+    "id": "camp-captain",
+    "faction": "rim",
+    "name": "Captain Sella",
+    "keywords": ["sella", "captain"],
+    "description": "A lean, weathered woman in a patched deep-coat, grey coming into hair she keeps cropped short, with the still watchfulness of someone who has counted a great many people down a hole and not all of them back up. She led the expedition that made the whole descent and, when the others wanted to turn for the surface rich, planted a stake here instead and called it Lastlight. It was her doing that the deep-folk across the water let the camp stand — a slow, wordless truce of kept distance and small trades — and she guards it as carefully as she guards the light. Nobody voted her captain. Nobody has argued.",
+    "maxHp": 26,
+    "speed": 12,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 7, "intellect": 5, "wits": 6, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["marks a name off a battered roster with a stub of chalk", "feeds a fresh coal to the fire-pit and watches it catch", "checks the stacked descent-kit with a practised eye", "looks east toward the rope-head and the dark past it", "weighs a stranger's crystal in her palm without a word"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["orders every lamp on the ring turned up and counts heads by the fire", "stands and watches the dark past the stakes until the Tide passes", "tells the camp, quiet and firm, that nobody ropes down till it turns"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "catches your arm: \"Tide's in. You don't go over the edge in this, and you don't leave the lamps. Sit by the fire till it turns.\"", "room": "catches {name}'s arm and steers them toward the fire." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "looks you over: \"You came back up leaking. Good — up beats the other way. See Wren at the rope-head before you do anything stupid twice.\"", "room": "looks {name}'s wounds over and points them east to the rope-head." }
+        ] },
+        { "if": { "carriedLightBelow": 1 }, "messages": [
+          { "target": "frowns at your dark hands: \"No light and you want to go deeper? Not off my rope-head you don't. Kit up first.\"", "room": "frowns at {name}'s unlit hands." }
+        ] },
+        { "messages": [
+          { "target": "measures you with a look: \"You made it to Lastlight. Most don't. What you do past the rope-head is your business — but you kit up and mend up here first, or you don't go at all.\"", "room": "measures {name} with a long, level look." },
+          { "target": "nods across the water: \"We stand here because the deep-folk let us, and they let us because we keep our distance and our word. You'll do the same under my lamps.\"", "room": "says a low, firm word to {name} and glances toward the Umbral fields." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "hearty-broth" }, { "template": "deep-stew" }, { "template": "cooked-skewer" }, { "template": "lamp-oil" }, { "template": "torch" }]
+    }
+  },
+  "camp-alchemist": {
+    "id": "camp-alchemist",
+    "faction": "rim",
+    "name": "Corvane the alchemist",
+    "keywords": ["corvane", "alchemist"],
+    "description": "A rangy, bright-eyed man with a singed collar, a dozen stains on his sleeves and not one apology for any of them. He is that rare thing — an alchemist who came down the hole himself rather than buy his reagents off those who did, and he'll tell you at length that you cannot know a deep-gathered stuff until you've gathered it in the deep. His bench holds things no Rim alchemist has ever cracked a stopper on, and he grins like a man who means to boil down the whole Abyss one jar at a time. He sells the results, and throws in the theory free whether you want it or not.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 1,
+    "attributes": { "might": 4, "vitality": 5, "intellect": 7, "wits": 6, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["swirls a vial against the lamp and watches the colour turn", "scribbles a formula on the bench-plank and underlines it twice", "sniffs a jar, recoils, and writes something down anyway", "grinds a pinch of glimmer-dust and murmurs at how it catches the light", "tastes something off the back of his hand, considering"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["holds a vial of glowing draught up as the dark comes on, delighted at how it shines", "trims his bench-lamp higher and keeps right on working through the Tide", "mutters that the deep breath does the strangest things to a reagent, and reaches for a fresh jar"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "brightens at your wounds: \"Oh, you're a mess — perfect. No no, mostly a jest. Mostly. Here, a regeneration draught, proper stuff, drink it before you fall over.\"", "room": "eyes {name}'s wounds with unsettling enthusiasm and reaches for a vial." }
+        ] },
+        { "if": { "carriedLightBelow": 1 }, "messages": [
+          { "target": "waggles a glowing vial at you: \"In the dark with nothing lit? I bottle light, friend — cheaper than a funeral and far more interesting.\"", "room": "waggles a faintly glowing vial toward {name}." }
+        ] },
+        { "messages": [
+          { "target": "leans across the bench, eyes bright: \"You cannot know a deep-gathered stuff until you've gathered it in the deep — which I have, so buy from a man who's bled for his reagents.\"", "room": "leans across the bench and launches into something at {name}, hands waving." },
+          { "target": "taps a stoppered jar of glimmer-dust: \"Down here the light itself is an ingredient. Try getting that to sit still on a Rim bench. Go on — I'll wait.\"", "room": "taps a jar of faintly glowing dust and grins at {name}." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "minor-light-potion" }, { "template": "light-potion" }, { "template": "regeneration-draught" }, { "template": "mana-tonic" }, { "template": "glimmer-dust" }, { "template": "scroll-cleanse" }, { "template": "scroll-purge" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
+    }
+  },
+  "camp-healer": {
+    "id": "camp-healer",
+    "faction": "rim",
+    "name": "Wren the mender",
+    "keywords": ["wren", "mender", "healer"],
+    "description": "A quiet, plain-robed woman with steady hands and tired eyes, who set up her post at the very lip of the shaft because that is where she is needed — mending delvers whole before they rope down, and catching what staggers back up. Hers is the surface tradition of magic, the kind paid for in will alone with no glimmer burned: light cantrips, a warding weave, the slow knitting of a wound. She does not delve. She waits at the edge, keeps her light lit, and sends other people's children over it as sound as she can make them. She sells what a delver can carry, and mends what she can for the asking.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 1,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 7, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["traces a slow warding-sign over the mouth of the shaft", "rolls fresh bandages by lamplight and stacks them ready", "murmurs a mending-cantrip under her breath, testing the weave", "watches the black shaft as though listening for someone climbing", "warms her hands at the lamp and says nothing"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["draws a bright warding-light about her post as the dark presses in", "keeps her lamp high and her eyes on the shaft through the whole of the Tide", "whispers a small light-cantrip and holds it steady against the gloom"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "reaches for you at once: \"Hold still — you're hurt worse than you're letting on. Let me knit that before you take it back down.\"", "room": "reaches at once for {name}, hands already glowing with a mending-weave." },
+          { "target": "steadies you with a glowing hand: \"Sit. Breathe. The shaft will still be there when you're whole.\"", "room": "steadies {name} with a softly glowing hand." }
+        ] },
+        { "if": { "slotEmpty": "body" }, "messages": [
+          { "target": "frowns gently: \"No armour, and going over the edge? At least let me lay a warding-weave on you — will alone, no glimmer, it costs you nothing.\"", "room": "frowns gently at {name}'s unprotected body." }
+        ] },
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "keeps her warding-light high: \"Not down the shaft in a Tide, please. Stay in the light. I'll mend you here till it turns.\"", "room": "keeps her warding-light high and beckons {name} close." }
+        ] },
+        { "messages": [
+          { "target": "meets your eye, calm and tired: \"Nobody ropes down unmended, not off my post. Come here whole or don't go — those are the only two I allow.\"", "room": "gives {name} a calm, tired look from the lip of the shaft." },
+          { "target": "says softly: \"I don't delve. I wait here, and I mend what comes back. Someone has to be the light at the top of the rope.\"", "room": "says something soft to {name} at the edge of the shaft." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "scroll-regeneration" }, { "template": "scroll-chorus-of-mending" }, { "template": "scroll-halo" }, { "template": "scroll-candlelight" }, { "template": "scroll-mage-armour" }, { "template": "regeneration-draught" }]
+    }
   }
 }
