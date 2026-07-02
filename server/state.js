@@ -1546,32 +1546,29 @@ class GameState {
   }
 
   /**
-   * Resolve a beneficial (non-hostile) spell cast by a player on a target actor —
-   * `target` is the normalized descriptor the command handler built:
-   *   { kind: "player"|"mob", actor, name, id, roomId, emitsLight }
-   * Spends mana (and any `shardCost` material), then applies the effect
-   * primitive. `heal-over-time` bakes its per-pulse magnitude from the caster's
-   * scaling attribute at cast time (so the power follows the caster, while an
-   * innate mob regen authors `magnitude` directly); `protect` likewise bakes its
-   * armour/ward from the caster; an instant `restore` tops up hp/mana now.
-   * Returns a result the caller narrates: { effect, name, perPulse?, restored?,
-   * armour?, ward?, duration? }.
+   * Apply one beneficial spell effect to `target`, baked from `attrs` — the
+   * per-type core shared by every support direction: a player's single-target
+   * cast (castBeneficial), a player's room-wide weave (castRoomBeneficial), and
+   * a mob's self/room support (_mobCastSelf / _mobCastRoomSupport). `target` is
+   * the normalized descriptor { kind: "player"|"mob", actor, name, id, roomId,
+   * emitsLight }. `heal-over-time` bakes its per-pulse magnitude from the
+   * caster's scaling attribute at cast time (so the power follows the caster,
+   * while an innate mob regen authors `magnitude` directly); `protect` likewise
+   * bakes its armour/ward; an instant `restore` tops up hp/mana now.
    *
-   * Support-spell threat: mending or buffing an ally makes whatever is fighting
-   * that ally turn on the caster too (see `_drawSupportThreat`), mirroring the
-   * damage→threat convention — the amount is the HP/mana mended (a flat 1 for a
-   * pure buff). This is the aggro hook this method long reserved.
+   * Threat is the CALLER's concern: the result carries a `threat` hint (HP/mana
+   * mended, a flat 1 for a pure buff) that player casts feed to
+   * _drawSupportThreat and mob casts ignore. Take-hold narration goes through
+   * `events` (_narrateEffectApplied); callers forward or drop those. Returns
+   * { effect, name, threat, perPulse?, restored?, armour?, ward?, duration? }.
    */
-  castBeneficial(player, spell, target, events = []) {
-    const w = this.world;
+  _applyBeneficialSpellEffect(attrs, spell, target, events) {
     const eff = spell.effect || {};
-    const attrs = effectiveAttributes(w, player);
-    this.spendCost(player, spell);
+    const roomId = target.kind === "player" ? target.actor.location : target.roomId;
 
     if (eff.type === "restore") {
       const got = this.applyRestore(target.actor, eff);
-      this._drawSupportThreat(player, target.id, (got.hp || 0) + (got.mana || 0));
-      return { effect: "restore", name: spell.name, restored: got };
+      return { effect: "restore", name: spell.name, restored: got, threat: (got.hp || 0) + (got.mana || 0) };
     }
 
     if (eff.type === "protect") {
@@ -1584,28 +1581,31 @@ class GameState {
       this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration, refresh: eff.refresh, good: true });
       // A radiant ward (Halo) also sheds light: a companion emit-light state, lasting
       // as long as the ward, brightens the room at once — mirrors the smouldering DoT's
-      // glow (see castSpell) and the way a quaffed light potion lifts the room.
+      // glow (see _applyHostileSpellEffect) and the way a quaffed light potion lifts the room.
       if (eff.emitLight) {
         this.applyEffect(target.actor, { type: "emit-light", name: eff.name || "protect", magnitude: eff.emitLight, duration, refresh: eff.refresh, good: true });
-        this.rooms[player.location].light = this.computeRoomLight(player.location);
+        this.rooms[roomId].light = this.computeRoomLight(roomId);
       }
       this._narrateEffectApplied(events, target, eff.name || eff.type);
-      this._drawSupportThreat(player, target.id, 1); // a pure buff: a flat sliver of threat
-      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration };
+      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration, threat: 1 }; // a pure buff: a flat sliver of threat
     }
 
     if (eff.type === "cleanse") {
       const states = target.actor.states || [];
       const removed = states.filter((s) => s.type === "damage-over-time");
       target.actor.states = states.filter((s) => s.type !== "damage-over-time");
-      this._drawSupportThreat(player, target.id, removed.length || 1);
-      return { effect: "cleanse", name: spell.name, removed: removed.length };
+      return { effect: "cleanse", name: spell.name, removed: removed.length, threat: removed.length || 1 };
     }
 
-    // Status effects (heal-over-time and future buffs). Bake any caster scaling
-    // into the magnitude so the instance carries a fixed strength.
+    // Status effects (heal-over-time, emit-light, and future buffs). Bake any
+    // caster scaling into the magnitude so the instance carries a fixed strength.
     const bonus = spellScaleBonus(attrs, eff.scale);
-    const magnitude = Math.max(eff.scale ? 1 : 0, (eff.magnitude || 0) + bonus);
+    const raw = (eff.magnitude || 0) + bonus;
+    // A *darkness* aura is an emit-light effect authored with a negative magnitude
+    // (it drinks the room's light rather than sheds it — see computeRoomLight, which
+    // sums a source's output be it positive or negative). Preserve the negative; a
+    // positive weave still floors at 1 when it scales, so a scaling source always shows.
+    const magnitude = raw < 0 ? raw : Math.max(eff.scale ? 1 : 0, raw);
     // Lifetime can scale with the caster (durationScale, ticks per point) on top of
     // any flat base — a keener mage holds Candlelight longer, like a longer-lived summon.
     const duration = eff.durationScale
@@ -1613,10 +1613,41 @@ class GameState {
       : eff.duration;
     this.applyEffect(target.actor, { ...eff, magnitude, duration });
     // A light-shedding weave (Candlelight) brightens the room at once, like a potion.
-    if (eff.type === "emit-light") this.rooms[player.location].light = this.computeRoomLight(player.location);
+    if (eff.type === "emit-light") this.rooms[roomId].light = this.computeRoomLight(roomId);
     this._narrateEffectApplied(events, target, eff.name || eff.type);
-    this._drawSupportThreat(player, target.id, magnitude); // mend-over-time: per-pulse magnitude as threat
-    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: duration || 0 };
+    return { effect: eff.type, name: spell.name, perPulse: magnitude, interval: eff.interval || 1, duration: duration || 0, threat: magnitude }; // mend-over-time: per-pulse magnitude as threat
+  }
+
+  /**
+   * Resolve a beneficial (non-hostile) spell cast by a player on ONE target.
+   * Spends the full cost, applies the effect via the shared beneficial core,
+   * then draws support threat: mending or buffing an ally makes whatever is
+   * fighting that ally turn on the caster too (see `_drawSupportThreat`),
+   * mirroring the damage→threat convention. Returns the core's result for the
+   * caller to narrate.
+   */
+  castBeneficial(player, spell, target, events = []) {
+    this.spendCost(player, spell);
+    const res = this._applyBeneficialSpellEffect(effectiveAttributes(this.world, player), spell, target, events);
+    this._drawSupportThreat(player, target.id, res.threat);
+    return res;
+  }
+
+  /**
+   * Resolve a player's room-wide support spell (`target: "room"`): one cost,
+   * the full caster-baked effect laid on every target in `targets` (the caller
+   * has gathered the caster + their co-located allies — see _friendliesInRoom).
+   * Support threat fires per ally mended, so a room-wide heal draws a room's
+   * worth of healer-aggro. Returns one { id, name, isSelf, res } per target.
+   */
+  castRoomBeneficial(player, spell, targets, events = []) {
+    this.spendCost(player, spell);
+    const attrs = effectiveAttributes(this.world, player);
+    return targets.map((t) => {
+      const res = this._applyBeneficialSpellEffect(attrs, spell, t, events);
+      this._drawSupportThreat(player, t.id, res.threat);
+      return { id: t.id, name: t.name, isSelf: !!t.isSelf, res };
+    });
   }
 
   /**

@@ -621,6 +621,25 @@ burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight
 `damageType` is narration flavour only (`"physical"` vs everything else) — it does
 not currently gate any resistance.
 
+**Spell targeting (`target`).** Every spell declares who a cast may land on —
+`"self" | "creature" | "room"` — and the `cast` command routes on it, crossed
+with the `hostile` flag (which decides *eligibility* for `room`):
+
+| `hostile` | `target` | Behaviour |
+|-----------|----------|-----------|
+| `false` | `self`     | Self-only weave — naming anyone else is refused outright. |
+| `false` | `creature` | The classic support targeting: self by default, an ally delver, or any creature you can see. |
+| `false` | `room`     | Lays the full caster-baked effect on the caster **and every ally present** — co-located delvers and mobs of factions *allied* to the caster's side (your summons and pets, the rim watch in town). Healer-aggro fires per ally mended. |
+| `true`  | `creature` | Single-target attack (`damage`, `damage-over-time`, `sleep`, mob-only `douse`). |
+| `true`  | `room`     | Blasts every eligible foe at once (`damage-room` only). |
+
+Summons are `target: "self"` (they conjure at the caster). The validator
+requires the field and cross-checks it against the effect shape (`damage-room`
+⇔ `room`, summon ⇔ `self`, hostile single-target effects ⇔ `creature`), so it
+can never contradict how the spell resolves. Mobs honour the same axis: a mob's
+non-hostile `cast` action self-buffs (`self`/`creature`) or, with `room`, mends
+its whole side (see `state._mobCastRoomSupport`).
+
 **Spell narration overrides (`messages`).** A spell may reflavour its landed-hit
 lines without touching code — an optional `messages` block of template strings:
 

@@ -14,7 +14,7 @@ const { rollDice } = require("./dice");
 const { DEFAULT_FACTION } = require("./config");
 const { canSee, noticeChance } = require("./light");
 const {
-  playerDefence, mobDefence, spellScaleBonus, scaledAmount, wardNegates,
+  playerDefence, mobDefence, wardNegates,
   pickWeighted, strike, mobOnDamage, playerOnDamage,
 } = require("./combat-math");
 const { factionRelation, combatantFaction } = require("./factions");
@@ -828,13 +828,16 @@ class MobAIMixin {
   }
 
   /** A mob casts a spell (the `cast` action). A beneficial weave lands on the
-   *  caster (`_mobCastSelf`); a hostile one runs the shared hostile-action pipeline
-   *  with a spell payload. Thin entry — the hostile resolution lives in
-   *  `_resolveSpellPayload`. */
+   *  caster (`_mobCastSelf`) or — `target: "room"` — across its whole side
+   *  (`_mobCastRoomSupport`); a hostile one runs the shared hostile-action
+   *  pipeline with a spell payload (`_resolveSpellPayload`). */
   _mobCast(m, t, roomId, events, enemies, spellId) {
     const spell = this.world.spells[spellId];
     if (!spell) return;
-    if (!spell.hostile) return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
+    if (!spell.hostile) {
+      if (spell.target === "room") return this._mobCastRoomSupport(m, t, roomId, events, spell);
+      return this._mobCastSelf(m, t, roomId, events, spell); // a beneficial weave lands on the caster
+    }
     return this._mobHostileAction(m, t, roomId, events, enemies, { kind: "spell", spell });
   }
 
@@ -888,38 +891,60 @@ class MobAIMixin {
 
   /** A mob casts a beneficial spell on *itself* — the support side of mob casting
    *  (e.g. an Umbral glimmer-singer crusting Glimmerskin over its own hide before
-   *  it spikes you). Mobs pay no mana/shards; defence/heal magnitudes are baked
-   *  from the mob's own attributes, mirroring castBeneficial. Reusable for future
-   *  warder/healer mobs. The _mobAct filter gates a refresh-buff so it isn't recast
-   *  while already up. */
+   *  it spikes you). Mobs pay no mana/shards; magnitudes bake from the mob's own
+   *  attributes through the shared beneficial core. The core's take-hold events
+   *  are dropped — the single mob-cast-self event narrates the whole beat. The
+   *  _mobAct filter gates a refresh-buff so it isn't recast while already up. */
   _mobCastSelf(m, t, roomId, events, spell) {
-    const rt = this.rooms[roomId];
     const eff = spell.effect || {};
-    const attrs = t.attributes || {};
-    if (eff.type === "protect") {
-      const armour = scaledAmount(attrs, eff.armour);
-      const ward = scaledAmount(attrs, eff.ward);
-      this.applyEffect(m, { type: "protect", name: eff.name || "protect", armour, ward, duration: eff.duration, refresh: eff.refresh, good: true });
-    } else if (eff.type === "restore") {
-      this.applyRestore(m, eff);
-    } else {
-      const bonus = spellScaleBonus(attrs, eff.scale);
-      const raw = (eff.magnitude || 0) + bonus;
-      // A *darkness* aura is an emit-light effect authored with a negative magnitude
-      // (it drinks the room's light rather than sheds it — see computeRoomLight, which
-      // sums a source's output be it positive or negative). Preserve the negative; a
-      // positive light weave still floors at 1 so a scaling source always shows.
-      const magnitude = raw < 0 ? raw : Math.max(eff.scale ? 1 : 0, raw);
-      this.applyEffect(m, { ...eff, magnitude });
-      if (eff.type === "emit-light") rt.light = this.computeRoomLight(roomId);
-    }
+    this._applyBeneficialSpellEffect(t.attributes || {}, spell,
+      { kind: "mob", actor: m, id: m.id, name: t.name, roomId, emitsLight: t.emitsLight > 0 }, []);
     events.push({
       type: "mob-cast-self", roomId, mobId: m.id, mobName: t.name,
-      emitsLight: t.emitsLight > 0, light: rt.light, spellName: spell.name, effectName: eff.name || eff.type,
+      emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light, spellName: spell.name, effectName: eff.name || eff.type,
       // A negative emit-light weave is a darkness aura, not a self-buff — the client
       // narrates it as the room being swallowed rather than something drawn "about itself".
       darkened: eff.type === "emit-light" && ((eff.magnitude || 0) < 0),
     });
+  }
+
+  /** A mob lays a room-wide support weave (`target: "room"`) over its whole
+   *  side — itself and every allied combatant present (its pack; delvers too if
+   *  its faction allies them, e.g. a rim warden mending the watch). Mobs pay no
+   *  mana; each recipient gets the full effect baked from the caster's own
+   *  attributes via the shared beneficial core. One mob-cast-room event narrates
+   *  the beat; a mended DELVER additionally keeps their personal take-hold from
+   *  the core's events so their vitals refresh at once (the mob-side take-holds
+   *  are dropped — they'd double-narrate the room event). */
+  _mobCastRoomSupport(m, t, roomId, events, spell) {
+    const eff = spell.effect || {};
+    const scratch = [];
+    const targets = this._friendliesInRoom(roomId, combatantFaction(m, "mob"));
+    for (const tgt of targets) this._applyBeneficialSpellEffect(t.attributes || {}, spell, tgt, scratch);
+    for (const ev of scratch) if (ev.type === "effect-applied") events.push(ev);
+    events.push({
+      type: "mob-cast-room", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0,
+      light: this.rooms[roomId].light, spellName: spell.name, effectName: eff.name || eff.type, count: targets.length,
+    });
+  }
+
+  /** Every live combatant in `roomId` on `faction`'s side — the allies a
+   *  room-wide support weave catches: co-located delvers (when the faction
+   *  allies the player side, which "player" itself always does) and mobs of
+   *  allied factions (own summons and pets, packmates, the rim watch). The
+   *  caster is included. Returns castBeneficial-shaped target descriptors,
+   *  players first. */
+  _friendliesInRoom(roomId, faction) {
+    const out = [];
+    if (factionRelation(faction, "player") === "ally")
+      for (const p of this.playersIn(roomId)) if (p.hp > 0) out.push({ kind: "player", actor: p, id: p.id, name: p.name });
+    for (const mob of this.rooms[roomId].mobs) {
+      if (mob.hp <= 0) continue;
+      if (factionRelation(faction, combatantFaction(mob, "mob")) !== "ally") continue;
+      const mt = this.world.mobs[mob.template];
+      out.push({ kind: "mob", actor: mob, id: mob.id, name: mt.name, roomId, emitsLight: mt.emitsLight > 0 });
+    }
+    return out;
   }
 
   /** True if a mob currently carries an active state by name (used to gate a

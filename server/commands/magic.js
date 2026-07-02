@@ -8,7 +8,7 @@ const { effectiveAttributes, spellScaleBonus, durationScaleBonus } = require("..
 const { canSee } = require("../light");
 const {
   selfAndViews, matchesQuery, findMobInRoom, questKill,
-  autoStand, roomHostiles, stickToSurvivor,
+  autoStand, roomHostiles, stickToSurvivor, joinList,
 } = require("./shared");
 
 // Effect types each player cast path can resolve, checked before any cost is
@@ -95,6 +95,12 @@ function spellList(state, player) {
       const span = life ? ` for ${fmtTicks(life)}${e.durationScale ? ` (${e.durationScale.attr})` : ""}` : "";
       tail = ` — conjures ${sm ? sm.name : e.mob}${span}`;
     }
+    // A non-default support shape gets a targeting hint (a hostile room spell
+    // already says "every foe in the room" in its own tail).
+    if (!s.hostile && e.type !== "summon") {
+      if (s.target === "self") tail += " (self only)";
+      else if (s.target === "room") tail += " (you and every ally present)";
+    }
     // Material components (e.g. a chitin plate for Glimmer Husk) are listed after mana/shards as `name (qty)`.
     const comps = (s.itemCost || []).map((c) => `${w.items[c.template] ? w.items[c.template].name : c.template} (${c.qty || 1})`);
     const cost = [`${s.manaCost || 0} mana`, s.shardCost ? `${s.shardCost} shards` : null, ...comps].filter(Boolean).join(" + ");
@@ -156,13 +162,19 @@ function cast(state, player, arg, ctx) {
   // Summon spells are self-centred (no creature target) — conjure at the caster.
   if (eff.type === "summon") return castSummon(state, player, spell, ctx);
 
-  // Beneficial spells (no `hostile` flag) mend rather than harm — they have their
-  // own targeting (self by default, an ally delver, or any creature in the room).
-  if (!spell.hostile) return castSupport(state, player, spell, targetQ, ctx);
+  // Beneficial spells (no `hostile` flag) mend rather than harm. `target` picks
+  // the shape: "room" lays the weave across the caster's whole side at once;
+  // "self" refuses any other name (see castSupport); "creature" is the classic
+  // self-by-default / ally / any-creature targeting.
+  if (!spell.hostile) {
+    if (spell.target === "room") return castSupportAll(state, player, spell, ctx);
+    return castSupport(state, player, spell, targetQ, ctx, spell.target === "self");
+  }
 
-  // Area spells (Arc Flash) blast every eligible foe in the room at once — no single
-  // target to name. Eligibility/narration live in castBurst.
-  if (eff.type === "damage-room") return castBurst(state, player, spell, ctx);
+  // Area spells (Arc Flash) blast every eligible foe in the room at once — no
+  // single target to name. Eligibility/narration live in castBurst. (The
+  // effect-type check is a fallback for unvalidated in-memory spells.)
+  if (spell.target === "room" || eff.type === "damage-room") return castBurst(state, player, spell, ctx);
 
   let mob;
   if (targetQ) {
@@ -275,14 +287,18 @@ function castBurst(state, player, spell, ctx) {
 // Cast a beneficial spell. Resolution (mana, magnitude scaling, applying the
 // effect) lives in state.castBeneficial; this resolves the target and narrates.
 // Target precedence: an explicit self word (or no target) → the caster; else an
-// ally delver in the room; else a creature. Per-pulse effects (Regeneration)
-// then surface their healing over the following ticks via `regen-tick` events.
-function castSupport(state, player, spell, targetQ, ctx) {
+// ally delver in the room; else a creature. A `selfOnly` spell (target: "self")
+// refuses any other name outright — a typo should read as a refusal, not
+// silently land on the caster. Per-pulse effects (Regeneration) then surface
+// their healing over the following ticks via `regen-tick` events.
+function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
   const w = state.world;
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const ql = (targetQ || "").trim().toLowerCase();
   const selfWords = ["", "self", "me", "myself", player.name.toLowerCase()];
+  if (selfOnly && !selfWords.includes(ql))
+    return [{ type: "error", text: `${spell.name} can only be laid on your own skin.` }];
 
   let target = null;
   if (selfWords.includes(ql)) {
@@ -347,6 +363,56 @@ function castSupport(state, player, spell, targetQ, ctx) {
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}${tail}.`);
   }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
+}
+
+// Cast a room-wide support spell (`target: "room"`): lay the weave on yourself
+// and every ally beside you — co-located delvers and creatures of factions
+// allied to yours (your wisp, a rim warden). Cost is paid once; every recipient
+// gets the full caster-baked effect. Resolution and per-ally healer-aggro live
+// in state.castRoomBeneficial; this gathers the side and narrates.
+function castSupportAll(state, player, spell, ctx) {
+  const events = [];
+  const friends = state._friendliesInRoom(player.location, "player").filter((f) => f.id !== player.id);
+  const targets = [
+    { kind: "player", actor: player, id: player.id, name: "yourself", isSelf: true },
+    ...friends,
+  ];
+  const results = state.castRoomBeneficial(player, spell, targets, events);
+  const verb = spell.name.toLowerCase();
+
+  ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} wide over everyone beside them, and a soft light settles across the room.` }, player.id);
+  ctx.refreshRoom(player.location, player.id);
+  // Forward each ally delver's take-hold (confirmation + a prompt vitals
+  // refresh); the caster and allied creatures are narrated right here instead.
+  for (const ev of events) if (ev.type === "effect-applied" && ev.playerId !== player.id) ctx.emit(ev);
+
+  const res = results[0].res; // caster-baked, so every recipient's numbers match
+  const over = friends.length ? `yourself and ${joinList(friends.map((f) => f.name))}` : "yourself";
+  let clause;
+  if (res.effect === "restore") {
+    const hp = results.reduce((s, r) => s + (r.res.restored.hp || 0), 0);
+    const mana = results.reduce((s, r) => s + (r.res.restored.mana || 0), 0);
+    const parts = [];
+    if (hp) parts.push(`${hp} health`);
+    if (mana) parts.push(`${mana} mana`);
+    clause = parts.length ? `restoring ${parts.join(" and ")} in all` : "but nothing was wanting";
+  } else if (res.effect === "protect") {
+    const parts = [];
+    if (res.armour) parts.push(`+${res.armour} armour`);
+    if (res.ward) parts.push(`+${res.ward} ward`);
+    if (res.light) parts.push(`${res.light} light`);
+    clause = `a lattice of hardened light grants each ${parts.length ? parts.join(", ") : "a faint sheen"} for ${fmtTicks(res.duration)}`;
+  } else if (res.effect === "cleanse") {
+    const removed = results.reduce((s, r) => s + r.res.removed, 0);
+    clause = removed > 0
+      ? `${removed} clinging affliction${removed === 1 ? "" : "s"} burn${removed === 1 ? "s" : ""} away`
+      : "but nothing clings to burn away";
+  } else if (res.effect === "emit-light") {
+    clause = `motes of light kindle overhead, shedding ${res.perPulse} light each for ${fmtTicks(res.duration)}`;
+  } else {
+    clause = `${res.perPulse} HP will knit into each every ${res.interval} tick${res.interval === 1 ? "" : "s"}`;
+  }
+  return selfAndViews(state, player, `You weave ${spell.name} over ${over}; ${clause}.`);
 }
 
 // Cast a summon spell. Resolution (mana, recast-replace, conjuring) lives in

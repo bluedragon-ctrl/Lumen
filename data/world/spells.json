@@ -40,6 +40,7 @@
     "name": "Summon Wisp",
     "description": "A weave that conjures a knot of cold light into a biddable shape and binds it to your will for a time. The conjured wisp drifts at your heel and spits its light at your foes, but the binding frays — the keener your Intellect the longer it holds, yet in time it always slips loose and the wisp unravels. Cast it and a Wisp answers; cast it again and the old one lets go as the new takes shape.",
     "manaCost": 10,
+    "target": "self",
     "effect": { "type": "summon", "mob": "wisp", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "summon-wisp" }
   },
   "candlelight": {
@@ -185,6 +186,7 @@
     "manaCost": 8,
     "shardCost": 4,
     "itemCost": [{ "template": "chitin-plate", "qty": 1 }],
+    "target": "self",
     "effect": { "type": "summon", "mob": "glimmer-husk", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "glimmer-husk" }
   },
   "drink-light": {

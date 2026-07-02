@@ -491,6 +491,10 @@ function main() {
   };
   // Narration overrides a spell may carry (see fillTemplate in magic.js).
   const SPELL_MESSAGE_KEYS = ["self", "room", "hitVerb"];
+  // The targeting contract: who a cast may land on. Routing in magic.js keys off
+  // this (crossed with `hostile`, which decides eligibility for "room"), so it
+  // must exist on every spell and agree with the effect's shape.
+  const SPELL_TARGETS = ["self", "creature", "room"];
   // Validate a `{ base?, scale? }` amount spec (or a bare number) — used by the
   // protect effect's armour/ward components.
   const chkAmount = (a, where) => {
@@ -515,6 +519,21 @@ function main() {
         if (!c || typeof c !== "object" || !has(items, c.template)) errs.push(`spell ${id}: itemCost references missing item ${c && c.template}`);
         if (c && c.qty != null && (typeof c.qty !== "number" || c.qty <= 0)) errs.push(`spell ${id}: itemCost qty must be a positive number`);
       }
+    }
+    // Targeting: required, enum-checked, and cross-checked against the effect
+    // shape so the field can never contradict how the spell actually resolves.
+    if (!SPELL_TARGETS.includes(sp.target)) {
+      errs.push(`spell ${id}: target must be one of ${SPELL_TARGETS.join(", ")}`);
+    } else if (sp.effect && typeof sp.effect === "object" && sp.effect.type) {
+      const t = sp.effect.type;
+      if (t === "summon" && sp.target !== "self")
+        errs.push(`spell ${id}: a summon conjures at the caster — target must be "self"`);
+      if (sp.hostile && sp.target === "self")
+        errs.push(`spell ${id}: a hostile spell cannot target "self"`);
+      if (t === "damage-room" && sp.target !== "room")
+        errs.push(`spell ${id}: a damage-room effect must have target "room"`);
+      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse"].includes(t) && sp.target !== "creature")
+        errs.push(`spell ${id}: hostile effect "${t}" is single-target — target must be "creature"`);
     }
     // Optional narration overrides: an object of template strings by known key.
     if (sp.messages != null) {

@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`target` is now the spell targeting contract** (`self` / `creature` / `room`,
+  crossed with `hostile` — see docs/data-model.md). The previously dead field
+  drives `cast` routing and unlocks two new spell shapes: **self-only** support
+  (naming anyone else is refused — "X can only be laid on your own skin") and
+  **room-wide support**, which lays the full caster-baked effect on the caster
+  and every ally present (co-located delvers plus mobs of allied factions —
+  summons, pets, the rim watch) for one cast cost, drawing healer-aggro per
+  ally mended. Mob AI honours the same axis: a mob's non-hostile `cast` action
+  with `target: "room"` mends its whole side (one room-wide narration beat;
+  mended delvers get their personal take-hold), sharing the new beneficial-
+  effect core with player casting. Summons backfilled as `target: "self"`; the
+  validator requires the field and cross-checks it against the effect shape so
+  it can never contradict how the spell resolves. The `spells` listing shows
+  the shape ("self only" / "you and every ally present").
 - **Spells can reflavour their cast narration from data.** An optional `messages`
   block on a spell (`self` / `room` templates plus a `hitVerb` for area bursts —
   see docs/data-model.md) overrides the generic landed-hit lines, so a new
@@ -35,6 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and dropped its `emitLight` companion glow.
 
 ### Changed
+- **Mob self-buffs resolve through the shared beneficial core.** `_mobCastSelf`
+  now bakes through the same per-type core as player support casts (which also
+  gained the core's negative-magnitude handling, so a darkness aura like Drink
+  the Light keeps its pull whoever weaves it). Behavioural side-effects for
+  mobs: `durationScale` on a self-buff now bakes properly instead of being
+  ignored, and a protect buff's `emitLight` companion glow applies — nothing
+  currently authored relied on either gap.
 - **`spells` listing consistency.** All durations now render as m:ss (DoT and
   area-burn durations were raw tick counts), heal-over-time durations fold in
   `durationScale`, and scaling amounts share one formatter. The unknown-spell
