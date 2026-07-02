@@ -2226,13 +2226,71 @@
     "name": "The Keeper's Lake",
     "depth": 10,
     "ambientLight": 1,
-    "description": "The channel opens into a broad, still lake held in a basin of worked stone, lit blue-green by the crop crowding its banks and by the lightbugs that drift low over the water. This is the kept lake, the bottom of the deep-folk's water and the richest of it: pale blind cave-fish hang thick in the cold shallows, and a patient hand with a baited line — the grubs the terraces breed are the surest bait — could take a good few. At the lake's far end the water gathers, narrows, and slides away into a black cleft in the cavern wall, gone down into the rock to wherever the deep takes it, and does not come back. The channel runs back north toward the common.",
-    "exits": { "north": "d10.fields.channel" },
+    "description": "The channel opens into a broad, still lake held in a basin of worked stone, lit blue-green by the crop crowding its banks and by the lightbugs that drift low over the water. This is the kept lake, the bottom of the deep-folk's water and the richest of it: pale blind cave-fish hang thick in the cold shallows, and a patient hand with a baited line — the grubs the terraces breed are the surest bait — could take a good few. At the lake's far end the water gathers, narrows, and slides away into a black cleft in the cavern wall, gone down into the rock to wherever the deep takes it, and does not come back. East, across a worked stone causeway the deep-folk never built, a scatter of surface lamplight burns where no Umbral light should be — the pickets of a prospectors' camp, the first human ground this deep. The channel runs back north toward the common.",
+    "exits": { "north": "d10.fields.channel", "east": "d10.camp.picket" },
     "fixtures": ["keepers-lake"],
     "groundItems": [],
     "spawns": [
       { "mob": "blind-cave-fish", "max": 4, "respawn": 120 },
       { "mob": "lightbug", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d10.camp.picket": {
+    "id": "d10.camp.picket",
+    "zone": "frontline-camp",
+    "name": "The Lastlight Picket",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The causeway lets you off the kept water onto ground no Umbral ever worked — a picket of driven stakes, oil-lamps on poles, and a hand-painted board reading LASTLIGHT nailed crooked to the rock. This is the first human foothold this deep: the far end of a road that started at the Rim, ten floors up, and the few who walked the whole of it holed up here where the deep-folk's fields end and the true dark begins. The lamps burn surface-yellow against the fields' cold blue-green glow across the water, a stubborn little warmth in a place that was never meant for it. A worked iron seam runs the near wall, half-dug, a pick left leaning in it. The causeway runs back west to the lake; east, past the stakes, the camp proper opens into a lamplit common.",
+    "exits": { "west": "d10.fields.lake", "east": "d10.camp.commons" },
+    "fixtures": ["camp-lamp", "iron-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "camp-miner", "max": 1, "respawn": 400 }
+    ]
+  },
+  "d10.camp.commons": {
+    "id": "d10.camp.commons",
+    "zone": "frontline-camp",
+    "name": "The Lastlight Common",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The camp opens into a low, lamplit common dug back under an overhang and fenced from the dark with driven stakes and a ring of oil-lamps kept always burning. A fire-pit crackles at its heart — real flame, hauled down as coals and fed on dried moss, the one open fire this deep — and around it stand the plank bunks, gear-lines, and upturned crates of folk who came down with the Rush and, against every odd, made the whole descent and stayed. Kit is stacked ready for the drop below: coils of line, patched packs, spare lamps trimmed and filled. This is the heart of Lastlight, and its captain holds court by the fire. The picket lies west on the lake; a canvas-walled bench sits south where the reek of reagents leaks out; east the ground runs to the rope-head and the dark beyond.",
+    "exits": { "west": "d10.camp.picket", "south": "d10.camp.bench", "east": "d10.camp.ropehead" },
+    "fixtures": ["camp-firepit", "camp-lamp"],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 2, "respawn": 1200 }
+    ],
+    "spawns": [
+      { "mob": "camp-captain", "max": 1, "respawn": 400 }
+    ]
+  },
+  "d10.camp.bench": {
+    "id": "d10.camp.bench",
+    "zone": "frontline-camp",
+    "name": "Corvane's Bench",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "A canvas lean-to walled off south of the common, close and warm and stinking wonderfully of char, spirits, and crushed reagent. An alchemist's bench runs the length of it — glass coils, a cold burner, racked vials, and a clutter of deep-gathered stuffs no surface bench ever sees: dried moss that glows, ground chitin, a stoppered jar of raw glimmer-dust breathing faint blue light through the glass. This is the working end of Lastlight, where the deep is boiled down into things a delver can carry. Whoever keeps it clearly went adventuring for the ingredients themselves and came back grinning. The common lies back north.",
+    "exits": { "north": "d10.camp.commons" },
+    "fixtures": ["camp-bench"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "camp-alchemist", "max": 1, "respawn": 400 }
+    ]
+  },
+  "d10.camp.ropehead": {
+    "id": "d10.camp.ropehead",
+    "zone": "frontline-camp",
+    "name": "The Rope-Head",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The east edge of Lastlight, where the lamplight thins and the kept ground gives out at the lip of a black shaft driven down into the rock. This is the jump-off: iron pitons hammered into the throat of the shaft, coils of good line flaked out ready, a windlass half-built over the drop. Below is the deep the whole camp is a staging-post for — the warded way down, and whatever the deep-folk keep their gate shut against. Nobody ropes down alone, and nobody ropes down unmended: a camp healer keeps a post here to send delvers over the edge whole, and to catch what comes back up. The rigging is not yet finished, and the shaft does not yet take a climber. The common lies back west.",
+    "exits": { "west": "d10.camp.commons" },
+    "fixtures": ["prospectors-rigging", "camp-lamp"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "camp-healer", "max": 1, "respawn": 400 }
     ]
   },
   "d5.fault.deep": {

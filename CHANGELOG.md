@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Lastlight Camp — a 4-room prospectors' frontline camp at depth 10** (zone
+  `frontline-camp`), reached east from The Keeper's Lake across a worked causeway.
+  The deepest human foothold in the Abyss: the rare expedition that made the whole
+  descent from the Rim and dug in beside the Umbral fields as a staging-post for
+  going deeper, kept standing by a wordless truce with the deep-folk across the
+  water. Four rooms — **The Lastlight Picket** (entry, an iron seam to mine),
+  **The Lastlight Common** (hearth and heart), **Corvane's Bench** (alchemy
+  station), and **The Rope-Head** (the descent jump-off, not yet riggable) — and
+  four new `rim`-faction NPCs, each with `react`/`talk` dialogue, Tide-aware lines,
+  and a shop of existing goods: **Bricke the pickman** (a seasoned miner learning
+  Umbral stonecraft — light, tools, armour), **Captain Sella** (founder of the camp
+  and broker of the truce — provisions), **Corvane the alchemist** (an adventurer
+  who gathers his own deep reagents — potions, glimmer-dust, alchemy schematics),
+  and **Wren the mender** (a human-tradition healing mage at the shaft's lip —
+  healing and warding scrolls). Added an `east` exit to `d10.fields.lake`.
 - **Aegis — a room-wide ward (the party counterpart to Mage Armour).** Throws a
   shared lattice of hardened light over the caster and every ally present,
   granting each the same armour-only protection Mage Armour gives one
