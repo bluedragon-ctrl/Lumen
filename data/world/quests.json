@@ -73,6 +73,24 @@
       "recipes": ["minor-light-potion"]
     }
   },
+  "wick-night-wing": {
+    "id": "wick-night-wing",
+    "name": "Something Worse in the Pens",
+    "description": "A monstrous bat out of the spire has taken to raiding Wick's pens at night — bigger and bolder than anything that denned there before.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-hatcher",
+      "offerText": "\"Thought I'd seen the worst of it with that centipede,\" Wick says, jaw tight. \"Now something's coming down out of the spire at night — big, black, wings like a torn cloak. Tore a pen clean open and carried off the lot, stock and all. That's no denning thing, that's flying down from the roost up there. I want it dead before it takes something bigger than a stonebug.\""
+    },
+    "steps": [
+      { "kill": "night-wing", "count": 1, "text": "Kill the huge bat raiding Wick's pens from the roost in the Bat Spire" }
+    ],
+    "rewards": {
+      "xp": 70,
+      "shards": 40,
+      "items": [{ "template": "minor-light-potion", "qty": 3 }]
+    }
+  },
   "fenn-quiet-claim": {
     "id": "fenn-quiet-claim",
     "name": "Quiet Too Long",

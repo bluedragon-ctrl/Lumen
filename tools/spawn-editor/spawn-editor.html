@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lumen — room spawn editor</title>
+<title>Lumen — room spawn & item editor</title>
 <style>
   :root { --bg:#0b0d10; --panel:#12161b; --panel2:#171c23; --ink:#cdd3da; --dim:#8b95a1; --line:#252c35; --accent:#e0b15e; --good:#6fcf97; --bad:#e06f6f; }
   * { box-sizing: border-box; }
@@ -26,10 +26,12 @@
   .roomhead { margin:0 0 1rem; }
   .roomhead .t { color:var(--accent); font-size:16px; }
   .roomhead .d { color:var(--dim); font-size:12px; }
-  table.spawns { width:100%; border-collapse:collapse; margin-bottom:1rem; }
-  table.spawns th { text-align:left; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding:.3rem .5rem; border-bottom:1px solid var(--line); font-weight:500; }
-  table.spawns td { padding:.3rem .5rem; vertical-align:middle; }
-  table.spawns tr:hover td { background:var(--panel2); }
+  h2.section { color:var(--accent); font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin:1.5rem 0 .5rem; }
+  h2.section:first-of-type { margin-top:0; }
+  table.rowtable { width:100%; border-collapse:collapse; margin-bottom:1rem; }
+  table.rowtable th { text-align:left; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding:.3rem .5rem; border-bottom:1px solid var(--line); font-weight:500; }
+  table.rowtable td { padding:.3rem .5rem; vertical-align:middle; }
+  table.rowtable tr:hover td { background:var(--panel2); }
   input[type=text], input[type=number], select { background:var(--panel2); border:1px solid var(--line); color:var(--ink); border-radius:4px; padding:.35rem .5rem; font:inherit; outline:none; width:100%; }
   input:focus, select:focus { border-color:var(--accent); }
   td.num input { width:90px; }
@@ -52,8 +54,8 @@
 </head>
 <body>
 <header>
-  <h1>Lumen &middot; room spawn editor</h1>
-  <span class="sub">data/world/rooms.json &mdash; spawn rules (mob / max / respawn)</span>
+  <h1>Lumen &middot; room spawn &amp; item editor</h1>
+  <span class="sub">data/world/rooms.json &mdash; spawn rules (mob / max / respawn) &amp; ground items (template / qty / hidden / respawn)</span>
   <span class="sub" id="dirtycount"></span>
 </header>
 <div class="wrap">
@@ -64,28 +66,31 @@
   <main id="main"><p class="empty">Loading rooms&hellip;</p></main>
 </div>
 <datalist id="mobids"></datalist>
+<datalist id="itemids"></datalist>
 <script>
 let original = {};   // pristine rooms, parsed from disk
 let rooms = {};      // working copy
 let mobIds = [];     // for the mob datalist
+let itemIds = [];    // for the item datalist
 let current = null;  // selected room id
 
 const $ = (s, r=document) => r.querySelector(s);
 const el = (tag, props={}, ...kids) => { const n = Object.assign(document.createElement(tag), props); for (const k of kids) n.append(k); return n; };
 const clone = (o) => JSON.parse(JSON.stringify(o));
-const spawnsOf = (id) => (rooms[id].spawns || []);
-const eqSpawns = (id) => JSON.stringify(original[id].spawns || []) === JSON.stringify(rooms[id].spawns || []);
+const eqField = (id, field) => JSON.stringify(original[id][field] || []) === JSON.stringify(rooms[id][field] || []);
 
 async function load() {
   const r = await (await fetch("/api/rooms")).json();
-  original = r.rooms; rooms = clone(r.rooms); mobIds = r.mobIds || [];
+  original = r.rooms; rooms = clone(r.rooms); mobIds = r.mobIds || []; itemIds = r.itemIds || [];
   const dl = $("#mobids"); dl.textContent = "";
   for (const id of mobIds) dl.append(el("option", { value: id }));
+  const idl = $("#itemids"); idl.textContent = "";
+  for (const id of itemIds) idl.append(el("option", { value: id }));
   current = Object.keys(rooms)[0] || null;
   renderList(); renderForm();
 }
 
-function isDirty(id) { return !eqSpawns(id); }
+function isDirty(id) { return !eqField(id, "spawns") || !eqField(id, "groundItems"); }
 function dirtyIds() { return Object.keys(rooms).filter(isDirty); }
 
 function renderList() {
@@ -97,7 +102,8 @@ function renderList() {
     const li = el("li", { className: (id===current?"active ":"") + (isDirty(id)?"dirty":"") });
     li.append(el("span", { className:"nm" }, (room.name||id)));
     li.append(el("span", { className:"id", textContent:id }));
-    li.append(el("span", { className:"count", textContent: String((room.spawns||[]).length || "") }));
+    li.append(el("span", { className:"count", title:"spawn rules", textContent: String((room.spawns||[]).length || "") }));
+    li.append(el("span", { className:"count", title:"ground items", textContent: String((room.groundItems||[]).length || "") }));
     li.onclick = () => { current = id; renderList(); renderForm(); };
     ul.append(li);
   }
@@ -115,9 +121,13 @@ function renderForm() {
   head.append(el("div", { className:"d", textContent: current + (room.zone ? "  ·  zone: " + room.zone : "") + "  ·  depth " + (room.depth ?? "?") }));
   main.append(head);
 
+  main.append(el("h2", { className:"section", textContent:"Spawns" }));
   main.append(spawnTable(room));
-
   main.append(el("p", { className:"hint", textContent: "max = population cap kept in this room. respawn = ticks between refills (1 tick = 1s); leave blank for a one-time spawn that never refills." }));
+
+  main.append(el("h2", { className:"section", textContent:"Ground items" }));
+  main.append(groundItemsTable(room));
+  main.append(el("p", { className:"hint", textContent: "hidden perception = the search threshold that reveals the item; leave blank for an item sitting in plain sight. respawn = ticks before a picked-up item regrows (1 tick = 1s); leave blank and a plain-sight item is a one-time find, while a hidden one falls back to the 30-minute default (DEFAULT_HIDDEN_ITEM_RESPAWN, config.js) — set an explicit value here to override that default for this room." }));
 
   main.append(actionBar());
   main.append(el("div", { id:"out" }));
@@ -125,7 +135,7 @@ function renderForm() {
 
 function spawnTable(room) {
   room.spawns = room.spawns || [];
-  const table = el("table", { className:"spawns" });
+  const table = el("table", { className:"rowtable" });
   const thead = el("tr");
   for (const h of ["mob", "max", "respawn", ""]) thead.append(el("th", { textContent: h }));
   table.append(thead);
@@ -156,6 +166,51 @@ function spawnRow(room, s, i) {
   // remove
   const del = el("button", { className:"x", textContent:"remove" });
   del.onclick = () => { room.spawns.splice(i, 1); renderForm(); touch(); };
+  const dtd = el("td"); dtd.append(del); tr.append(dtd);
+  return tr;
+}
+
+function groundItemsTable(room) {
+  room.groundItems = room.groundItems || [];
+  const table = el("table", { className:"rowtable" });
+  const thead = el("tr");
+  for (const h of ["item", "qty", "hidden (perception)", "respawn", ""]) thead.append(el("th", { textContent: h }));
+  table.append(thead);
+
+  room.groundItems.forEach((g, i) => table.append(groundItemRow(room, g, i)));
+
+  const addBtn = el("button", { className:"add", textContent:"+ add ground item" });
+  addBtn.onclick = () => { room.groundItems.push({ template: itemIds[0] || "", qty: 1 }); renderForm(); touch(); };
+  const wrap = el("div"); wrap.append(table, addBtn);
+  return wrap;
+}
+
+function groundItemRow(room, g, i) {
+  const tr = el("tr");
+  // template (with datalist of valid item ids)
+  const tmpl = el("input", { type:"text", value: g.template ?? "", placeholder:"item id" });
+  tmpl.setAttribute("list", "itemids");
+  tmpl.oninput = () => { g.template = tmpl.value; touch(); };
+  const ttd = el("td"); ttd.append(tmpl); tr.append(ttd);
+  // qty (optional — schema defaults to 1 when omitted)
+  const qty = el("input", { type:"number", min:"1", step:"1", value: g.qty ?? "" });
+  qty.oninput = () => { if (qty.value === "") delete g.qty; else g.qty = Number(qty.value); touch(); };
+  const qtd = el("td", { className:"num" }); qtd.append(qty); tr.append(qtd);
+  // hidden.perception (optional — clearing it makes the item sit in plain sight)
+  const hidden = el("input", { type:"number", min:"0", step:"1", value: (g.hidden && g.hidden.perception) ?? "", placeholder:"(visible)" });
+  hidden.oninput = () => {
+    if (hidden.value === "") delete g.hidden;
+    else g.hidden = { perception: Number(hidden.value) };
+    touch();
+  };
+  const htd = el("td", { className:"num" }); htd.append(hidden); tr.append(htd);
+  // respawn (optional — blank means "static" for a visible item, "30-min default" for a hidden one)
+  const resp = el("input", { type:"number", min:"0", step:"1", value: g.respawn ?? "", placeholder:"(none/default)" });
+  resp.oninput = () => { if (resp.value === "") delete g.respawn; else g.respawn = Number(resp.value); touch(); };
+  const rtd = el("td", { className:"num" }); rtd.append(resp); tr.append(rtd);
+  // remove
+  const del = el("button", { className:"x", textContent:"remove" });
+  del.onclick = () => { room.groundItems.splice(i, 1); renderForm(); touch(); };
   const dtd = el("td"); dtd.append(del); tr.append(dtd);
   return tr;
 }
@@ -198,7 +253,7 @@ async function save(mode) {
 
 function renderValidate(out, r) {
   if (r.error) return msg(out, "err", r.error);
-  if (!r.changed || !r.changed.length) return msg(out, "ok", "No spawn changes to save.");
+  if (!r.changed || !r.changed.length) return msg(out, "ok", "No spawn or ground-item changes to save.");
   msg(out, r.ok ? "ok" : "err", (r.ok ? "✓ Validation passed. " : "✗ Validation FAILED. ") + "Changed rooms: " + r.changed.join(", ") + "\n\n" + (r.validate||""));
   if (r.diff) out.append(diffBlock(r.diff));
 }
