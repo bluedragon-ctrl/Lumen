@@ -1,7 +1,7 @@
 "use strict";
 const { effectiveLight } = require("./light");
 const { rollDice } = require("./dice");
-const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, TIDE } = require("./config");
+const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, TIDE, DEFAULT_HIDDEN_ITEM_RESPAWN } = require("./config");
 const { tidePhaseAt, tideOffset } = require("./world-clock");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
@@ -68,15 +68,19 @@ class GameState {
     // countdown. A rule without `respawn` is static (spawned once, never refills).
     this.spawners = [];
     // Harvesters regrow a picked-up floor item after a delay (mushrooms, seeps,
-    // …). A groundItem without `respawn` is static (placed once, gone when taken).
+    // …). A groundItem without `respawn` is static (placed once, gone when
+    // taken) — UNLESS it's `hidden` (a searched-out find), which falls back to
+    // DEFAULT_HIDDEN_ITEM_RESPAWN so searchable items always regrow eventually;
+    // a room's own `respawn` still overrides that default either way.
     this.harvesters = [];
     for (const [id, room] of Object.entries(this.world.rooms)) {
       this.rooms[id] = { mobs: [], items: [], fixtures: [], light: room.ambientLight || 0 };
       for (const g of room.groundItems || []) {
         const inst = makeItemInstance(g, this.world);
-        if (g.respawn != null) {
+        const respawn = g.respawn != null ? g.respawn : (g.hidden ? DEFAULT_HIDDEN_ITEM_RESPAWN : null);
+        if (respawn != null) {
           inst.origin = { roomId: id, template: g.template, harvest: true }; // tags it for regrow tracking
-          this.harvesters.push({ roomId: id, template: g.template, qty: g.qty != null ? g.qty : 1, respawn: g.respawn, timer: g.respawn });
+          this.harvesters.push({ roomId: id, template: g.template, qty: g.qty != null ? g.qty : 1, respawn, timer: respawn, hidden: g.hidden });
         }
         if (g.hidden) inst.hidden = g.hidden; // a stashed item — unseen until searched out, and re-hidden on leave
         this.rooms[id].items.push(inst);
@@ -274,6 +278,7 @@ class GameState {
       hv.timer = hv.respawn;
       const inst = makeItemInstance({ template: hv.template, qty: hv.qty }, this.world);
       inst.origin = { roomId: hv.roomId, template: hv.template, harvest: true };
+      if (hv.hidden) inst.hidden = hv.hidden; // regrow into hiding, same as its authored state — still requires a search
       this.rooms[hv.roomId].items.push(inst);
       const t = this.world.items[hv.template];
       events.push({ type: "item-regrow", roomId: hv.roomId, itemName: t.name });

@@ -59,10 +59,11 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   edit-recipes` or double-click `tools/recipe-editor/start.bat`, port 3942).
   Edits `data/world/recipes.json` (name, station, shards, inputs, output);
   validates and can open a PR via `gh`.
-- `tools/spawn-editor/` — browser-based room spawn-rule editor (`npm run
+- `tools/spawn-editor/` — browser-based room spawn & ground-item editor (`npm run
   edit-spawns` or `tools/spawn-editor/start.bat`, port 3940). Edits the
-  per-room `spawns` (mob / max / respawn) in `data/world/rooms.json`; validates
-  and can open a PR via `gh`.
+  per-room `spawns` (mob / max / respawn) and `groundItems` (template / qty /
+  hidden / respawn) in `data/world/rooms.json`; validates and can open a PR via
+  `gh`.
 - `DESIGN.md` — pillars and design intent. `docs/lore.md` — **canon world & lore**;
   the reference for authored/AI-generated content (consistency rules included).
   `CHANGELOG.md` — keep-a-changelog.

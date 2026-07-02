@@ -5,7 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **New quest: "Something Worse in the Pens".** Wick (`rim-hatcher`) now also offers a
+  follow-up to the stonebug-stalker quest — a huge bat out of the Bat Spire has taken to
+  raiding his pens, and he wants it dead. Kill Night Wing (`d1.spire.roost`) to complete it.
+- **The room spawn editor (`tools/spawn-editor/`) now also edits ground items.** It was
+  scoped to the `spawns` field only; it now has a second table per room for `groundItems`
+  (template / qty / hidden perception / respawn), using the same source-preserving save
+  and PR flow. The natural home for tuning the new hidden-item respawn default below.
+
 ### Fixed
+- **Searchable (hidden) ground items no longer stay gone forever once picked up.** A
+  hidden groundItem with no authored `respawn` was static — found once, never again —
+  while plenty of hidden items elsewhere already regrow on an explicit timer. It now
+  falls back to a 30-minute default (`DEFAULT_HIDDEN_ITEM_RESPAWN`, config.js) when a
+  room doesn't set its own `respawn`, so every searchable find eventually comes back.
+  Fixed a latent bug in the same code path: a regrown item never got its `hidden` flag
+  reapplied, so any item using this respawn-after-pickup behavior (even before this
+  change) popped back into plain view instead of requiring another search.
 - **Killing a quest's later target no longer wastes the kill if it dies alongside an
   earlier one.** Multi-step kill quests (e.g. thin the outlaw crew, then put down the
   Foreman) only credited the *current* step, so a Foreman felled while the outlaw-count
