@@ -17,6 +17,15 @@
     "target": "creature",
     "effect": { "type": "heal-over-time", "name": "Regeneration", "interval": 2, "duration": 10, "magnitude": 0, "scale": { "attr": "intellect", "per": 2 }, "good": true }
   },
+  "chorus-of-mending": {
+    "id": "chorus-of-mending",
+    "name": "Chorus of Mending",
+    "description": "Where Regeneration is a single thread of mending light sunk into one body, the Chorus is that same weave sung wide — the caster raises a low, ringing note of glimmer that settles over everyone standing with them, delver and biddable creature alike, and knits their wounds a little at a time while it holds. It cannot be aimed at a foe, only spread over your own side, and its light is thinner spread across many than a single Regeneration laid on one — but in a hard fight with the party bloodied, a chorus mends the whole line at once where a single weave saves only one. The keener the caster's mind, the more each pulse knits.",
+    "manaCost": 14,
+    "hostile": false,
+    "target": "room",
+    "effect": { "type": "heal-over-time", "name": "Chorus of Mending", "interval": 2, "duration": 12, "magnitude": 0, "scale": { "attr": "intellect", "per": 3 }, "good": true }
+  },
   "glimmerskin": {
     "id": "glimmerskin",
     "name": "Glimmerskin",

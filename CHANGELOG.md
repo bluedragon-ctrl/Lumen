@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Chorus of Mending — the first room-wide support spell (a party heal).** A
+  `heal-over-time` sung wide over the caster and every ally present (co-located
+  delvers and allied creatures — summons, pets), knitting each a little every
+  couple of ticks. Thinner per-target than a single Regeneration (`Intellect/3`
+  per pulse vs `/2`) and costing near double the mana, but it mends the whole
+  line at once — the group counterpart to Regeneration, and the first spell to
+  exercise the `target: "room"` support path in live content. Taught by a new
+  **Scroll of the Mending Chorus**, sold by Vesper.
 - **Iron Skin — a new advanced self-only ward, the defensive twin of Iron Blast.**
   Works a smelted iron bar thin over the caster's own hide for a heavy flat
   Armour stack (`3 + Intellect/3`, well above Mage Armour or Glimmerskin) — but

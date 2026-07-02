@@ -356,6 +356,17 @@
     "scroll": { "spell": "regeneration" },
     "keywords": ["regen"]
   },
+  "scroll-chorus-of-mending": {
+    "id": "scroll-chorus-of-mending",
+    "name": "a Scroll of the Mending Chorus",
+    "description": "Vellum dense with the same breathing vinework as the Regeneration scroll, but the glyphs run in ranks rather than a single thread — a whole choir of them, faintly ringing green. Study it to learn the Chorus of Mending — a mending light sung wide over yourself and every ally beside you — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "chorus-of-mending" },
+    "keywords": ["chorus", "mending"]
+  },
   "scroll-glimmerskin": {
     "id": "scroll-glimmerskin",
     "name": "a Scroll of Glimmerskin",
