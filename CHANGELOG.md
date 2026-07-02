@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Mage Armour's cast message no longer calls itself a glimmer effect.** The shared
+  "protect" narration hardcoded "a crust of hardened glimmer," but Mage Armour's own
+  description explicitly draws its ward from "pure will rather than glimmer." The
+  generic line now reads "a lattice of hardened light," matching Mage Armour while
+  staying neutral for other protect spells (Glimmerskin keeps its glimmer flavor via
+  its own description).
 - **Killing a quest's later target no longer wastes the kill if it dies alongside an
   earlier one.** Multi-step kill quests (e.g. thin the outlaw crew, then put down the
   Foreman) only credited the *current* step, so a Foreman felled while the outlaw-count
