@@ -27,6 +27,12 @@ module.exports = {
   // not a constant — it equals the output's sale value (see commands.js craft).
   EXPLORE_XP: 5,
 
+  // A hidden (searched-out) groundItem with no explicit `respawn` regrows after
+  // this many ticks instead of being a one-time find — a room can still author
+  // its own `respawn` to override. Non-hidden groundItems are unaffected; they
+  // stay static without an explicit `respawn`. See state.js `_initRooms`.
+  DEFAULT_HIDDEN_ITEM_RESPAWN: 1800,
+
   // The sides a creature can fight FOR (a mob's instance `faction`, default
   // "wild"). The *vocabulary* lives here so the data validator and the game
   // share one whitelist; how the sides regard one another (ally/enemy/neutral)

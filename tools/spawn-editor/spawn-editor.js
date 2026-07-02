@@ -1,24 +1,27 @@
 #!/usr/bin/env node
 /**
- * Lumen room spawn-rule editor — a local, browser-based form for editing the
- * `spawns` rules (mob / max / respawn) on each room in `data/world/rooms.json`,
+ * Lumen room spawn & ground-item editor — a local, browser-based form for
+ * editing, per room in `data/world/rooms.json`, the `spawns` rules (mob / max
+ * / respawn) and the `groundItems` list (template / qty / hidden / respawn),
  * and opening a pull request with the result.
  *
  *   node tools/spawn-editor/spawn-editor.js   # serves http://localhost:3940
  *   MOB_EDITOR_PORT / SPAWN_EDITOR_PORT       # override the port
  *
- * Spawn rules live on the ROOM, not the mob (one mob template is spawned in
- * many rooms, each with its own population cap and respawn cadence) — so this
- * is a sibling of the mob stat editor (`tools/mob-editor/`).
+ * Both fields live on the ROOM, not the mob/item template (one mob or item
+ * template can be placed in many rooms, each with its own cap/qty and its own
+ * respawn cadence) — so this is a sibling of the mob stat editor
+ * (`tools/mob-editor/`) and the item template editor (`tools/item-editor/`).
  *
  *   • "Validate & preview"  — writes the file, runs `npm run validate`, shows
  *     the exact `git diff`, then RESTORES the file so your tree stays clean.
  *   • "Create pull request" — writes, validates, then branches, commits
  *     (Conventional Commit), pushes, and opens a PR via `gh`.
  *
- * Diff hygiene: this edits ONLY the `spawns` field of each room. A changed
- * room keeps every other field's source text byte-for-byte; only its `spawns`
- * value is re-serialised (1 rule inline, 2+ one-per-line, matching the file).
+ * Diff hygiene: this edits ONLY the `spawns` and `groundItems` fields of each
+ * room. A changed room keeps every other field's source text byte-for-byte;
+ * only the field(s) that actually changed are re-serialised (1 entry inline,
+ * 2+ one-per-line, matching the file's house style).
  */
 "use strict";
 const http = require("http");
@@ -29,10 +32,12 @@ const { execFileSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..", ".."); // tools/spawn-editor/ -> repo root
 const ROOMS_PATH = path.join(ROOT, "data", "world", "rooms.json");
 const MOBS_PATH = path.join(ROOT, "data", "world", "mobs.json");
+const ITEMS_PATH = path.join(ROOT, "data", "world", "items.json");
 const CHANGELOG_PATH = path.join(ROOT, "CHANGELOG.md");
 const PAGE_PATH = path.join(__dirname, "spawn-editor.html");
 const PORT = Number(process.env.SPAWN_EDITOR_PORT) || 3940;
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+const ROOM_ARRAY_FIELDS = ["spawns", "groundItems"]; // room fields this editor may re-serialise
 
 // ---------------------------------------------------------------------------
 // Source-preserving (de)serialisation of rooms.json
@@ -141,31 +146,32 @@ function serInline(v) {
   return JSON.stringify(v);
 }
 
-// Serialise a `spawns` array in the house style: [] / one rule inline /
-// 2+ rules one-per-line at 6-space indent (closing bracket at 4).
-function serSpawns(arr, nl = "\n") {
+// Serialise a room array field (`spawns` or `groundItems`) in the house
+// style: [] / one entry inline / 2+ entries one-per-line at 6-space indent
+// (closing bracket at 4).
+function serArray(arr, nl = "\n") {
   if (!Array.isArray(arr) || arr.length === 0) return "[]";
   if (arr.length === 1) return "[" + serInline(arr[0]) + "]";
   return "[" + nl + arr.map((e) => "      " + serInline(e)).join("," + nl) + nl + "    ]";
 }
 
 // Full room serialiser (only used for brand-new rooms, which this UI doesn't
-// create — every field inline except `spawns`).
+// create — every field inline except the ones in ROOM_ARRAY_FIELDS).
 function serRoomValue(room, nl = "\n") {
-  const field = (k, v) => (k === "spawns" ? serSpawns(v, nl) : serInline(v));
+  const field = (k, v) => (ROOM_ARRAY_FIELDS.includes(k) ? serArray(v, nl) : serInline(v));
   const lines = Object.keys(room).map((k) => `    ${JSON.stringify(k)}: ${field(k, room[k])}`);
   return "{" + nl + lines.join("," + nl) + nl + "  }";
 }
 
-// Replace just the `spawns` value inside a room's source text, preserving every
-// other byte. Inserts a `spawns` field if the room somehow lacks one.
-function spliceSpawns(roomText, spawns, nl) {
-  const val = serSpawns(spawns, nl);
-  const span = fieldValueSpan(roomText, "spawns");
+// Replace just one array field's value inside a room's source text, preserving
+// every other byte. Inserts the field if the room somehow lacks one.
+function spliceField(roomText, key, arr, nl) {
+  const val = serArray(arr, nl);
+  const span = fieldValueSpan(roomText, key);
   if (span) return roomText.slice(0, span.start) + val + roomText.slice(span.end);
   const close = roomText.lastIndexOf("}");
   const before = roomText.slice(0, close).replace(/\s*$/, "");
-  return before + "," + nl + '    "spawns": ' + val + nl + "  }";
+  return before + "," + nl + `    ${JSON.stringify(key)}: ` + val + nl + "  }";
 }
 
 function deepEqual(a, b) {
@@ -182,7 +188,7 @@ function deepEqual(a, b) {
 }
 
 // Re-assemble rooms.json: unchanged rooms keep exact source text; rooms whose
-// spawns changed get only their `spawns` value re-serialised.
+// spawns and/or groundItems changed get only those field(s) re-serialised.
 function buildFile(newRooms, origRaw) {
   const nl = origRaw.includes("\r\n") ? "\r\n" : "\n";
   const entries = topLevelEntries(origRaw);
@@ -196,21 +202,28 @@ function buildFile(newRooms, origRaw) {
   const parts = outKeys.map((k) => {
     let valueText;
     if (has(orig, k) && deepEqual(orig[k], newRooms[k])) valueText = rawByKey.get(k);
-    else if (rawByKey.has(k)) valueText = spliceSpawns(rawByKey.get(k), newRooms[k].spawns || [], nl);
-    else valueText = serRoomValue(newRooms[k], nl);
+    else if (rawByKey.has(k)) {
+      valueText = rawByKey.get(k);
+      for (const field of ROOM_ARRAY_FIELDS) {
+        if (!deepEqual((orig[k] || {})[field] || [], newRooms[k][field] || [])) {
+          valueText = spliceField(valueText, field, newRooms[k][field] || [], nl);
+        }
+      }
+    } else valueText = serRoomValue(newRooms[k], nl);
     return `  ${JSON.stringify(k)}: ${valueText}`;
   });
   const eofNL = origRaw.endsWith(nl) ? nl : origRaw.endsWith("\n") ? "\n" : "";
   return "{" + nl + parts.join("," + nl) + nl + "}" + eofNL;
 }
 
-// Which room ids have changed spawns?
+// Which room ids have a changed `spawns` and/or `groundItems`?
 function changedRooms(orig, next) {
   const ids = new Set([...Object.keys(orig), ...Object.keys(next)]);
   const out = [];
   for (const id of ids) {
     if (!has(next, id) || !has(orig, id)) continue;
-    if (!deepEqual(orig[id].spawns || [], next[id].spawns || [])) out.push(id);
+    const changed = ROOM_ARRAY_FIELDS.some((f) => !deepEqual(orig[id][f] || [], next[id][f] || []));
+    if (changed) out.push(id);
   }
   return out;
 }
@@ -292,7 +305,7 @@ function handlePR(newRooms, summary, type) {
   const origRaw = fs.readFileSync(ROOMS_PATH, "utf8");
   const orig = JSON.parse(origRaw);
   const changed = changedRooms(orig, newRooms);
-  if (!changed.length) return { ok: false, error: "No spawn changes to commit." };
+  if (!changed.length) return { ok: false, error: "No spawn or ground-item changes to commit." };
 
   const owned = new Set(["data/world/rooms.json", "CHANGELOG.md"]);
   const dirty = git(["status", "--porcelain"]) // "XY path"
@@ -314,13 +327,13 @@ function handlePR(newRooms, summary, type) {
 
   const subject = `${type}: ${summary}`;
   const branch = `${type}/${slugify(summary)}-${Date.now().toString(36)}`;
-  const changelogLine = `**Spawn rules** — ${summary} (${changed.join(", ")}).`;
+  const changelogLine = `**Room spawns/items** — ${summary} (${changed.join(", ")}).`;
 
   try {
     git(["checkout", "-b", branch]);
     updateChangelog(changelogLine);
     git(["add", "data/world/rooms.json", "CHANGELOG.md"]);
-    const body = `Edited via the spawn-rule editor (\`tools/spawn-editor/\`).\n\n**Rooms changed:** ${changed.join(", ")}\n\n${summary}`;
+    const body = `Edited via the room spawn & ground-item editor (\`tools/spawn-editor/\`).\n\n**Rooms changed:** ${changed.join(", ")}\n\n${summary}`;
     git(["commit", "-m", subject, "-m", body]);
     git(["push", "-u", "origin", branch]);
     const pr = run("gh", ["pr", "create", "--base", "main", "--head", branch, "--title", subject, "--body", body]);
@@ -358,7 +371,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && req.url === "/api/rooms") {
       const rooms = JSON.parse(fs.readFileSync(ROOMS_PATH, "utf8"));
       const mobIds = Object.keys(JSON.parse(fs.readFileSync(MOBS_PATH, "utf8")));
-      return void sendJSON(res, 200, { ok: true, rooms, mobIds });
+      const itemIds = Object.keys(JSON.parse(fs.readFileSync(ITEMS_PATH, "utf8")));
+      return void sendJSON(res, 200, { ok: true, rooms, mobIds, itemIds });
     }
     if (req.method === "POST" && req.url === "/api/save") {
       const body = JSON.parse(await readBody(req));
@@ -378,7 +392,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 // Exposed for require()-ing / tests; the server only listens when run directly.
-module.exports = { topLevelEntries, fieldValueSpan, serSpawns, spliceSpawns, deepEqual, buildFile, changedRooms };
+module.exports = { topLevelEntries, fieldValueSpan, serArray, spliceField, deepEqual, buildFile, changedRooms };
 
 if (require.main === module) {
   server.listen(PORT, () => {

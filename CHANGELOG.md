@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **New quest: "Something Worse in the Pens".** Wick (`rim-hatcher`) now also offers a
+  follow-up to the stonebug-stalker quest — a huge bat out of the Bat Spire has taken to
+  raiding his pens, and he wants it dead. Kill Night Wing (`d1.spire.roost`) to complete it.
+- **The room spawn editor (`tools/spawn-editor/`) now also edits ground items.** It was
+  scoped to the `spawns` field only; it now has a second table per room for `groundItems`
+  (template / qty / hidden perception / respawn), using the same source-preserving save
+  and PR flow. The natural home for tuning the new hidden-item respawn default below.
+
 ### Fixed
 - **Mage Armour's cast message no longer calls itself a glimmer effect.** The shared
   "protect" narration hardcoded "a crust of hardened glimmer," but Mage Armour's own
@@ -12,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   generic line now reads "a lattice of hardened light," matching Mage Armour while
   staying neutral for other protect spells (Glimmerskin keeps its glimmer flavor via
   its own description).
+- **Searchable (hidden) ground items no longer stay gone forever once picked up.** A
+  hidden groundItem with no authored `respawn` was static — found once, never again —
+  while plenty of hidden items elsewhere already regrow on an explicit timer. It now
+  falls back to a 30-minute default (`DEFAULT_HIDDEN_ITEM_RESPAWN`, config.js) when a
+  room doesn't set its own `respawn`, so every searchable find eventually comes back.
+  Fixed a latent bug in the same code path: a regrown item never got its `hidden` flag
+  reapplied, so any item using this respawn-after-pickup behavior (even before this
+  change) popped back into plain view instead of requiring another search.
 - **Killing a quest's later target no longer wastes the kill if it dies alongside an
   earlier one.** Multi-step kill quests (e.g. thin the outlaw crew, then put down the
   Foreman) only credited the *current* step, so a Foreman felled while the outlaw-count
@@ -34,6 +51,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ground to actually pick up — it now spawns there (respawning), matching the
   existing `guano` material's own flavor text about gathering saltpetre from a
   roost floor.
+- **Flame Burst — a new advanced war-spell**: a room-wide fire burst that leaves every
+  survivor it doesn't kill outright to keep burning (a follow-up damage-over-time burn
+  that also sheds its own light, like Witchfire, but scaled up to hit the whole room).
+  Hostile, consumes bat guano as a material component alongside its (steep) mana cost.
+  Taught by a new **Scroll of Flame Burst**, sold by Vesper the glimmer-mage.
+- **Cleanse — a new support spell that burns off damage-over-time afflictions** (Witchfire
+  and the like). Non-hostile, targets the caster by default like Regeneration or Mage Armour,
+  or any ally/creature in the room. Taught by a new **Scroll of Cleanse**, sold by Vesper the
+  glimmer-mage alongside her other scrolls.
 - **The Seized Working — an outlaw prospector camp and Lumen's first living-human enemy class
   (`docs/side-areas.md` #5).** Opens **east off The Crooked Cut** (`d1.crook`), well below the
   gate and off the watch's beat: five rooms of outlaws squatting a working they took by force — **The
