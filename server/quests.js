@@ -10,14 +10,19 @@
  * logic serves both the command path and the combat-tick path.
  *
  *   player.quests = {
- *     active: { [questId]: { step: <int>, progress: <int> } }, // cursor + step counter
+ *     active: { [questId]: { step: <int>, progress: <int>, kills: { [mobId]: <int> } } },
  *     done:   [questId, …]                                     // completed at least once
  *   }
  *
- * `progress` is the running count for the current `kill`/`deliver` step, a 0/1 flag
- * for `use`, and ignored for `collect` (which reads live inventory). A quest with a
- * `use`/`enter`/`item`/`talk` start trigger is offered by the matching note/handle
- * hook below; rewards land on completion of the final step (grantRewards).
+ * `progress` is the running count for the current `deliver` step, a 0/1 flag for
+ * `use`, and ignored for `collect` (which reads live inventory). `kills` is a
+ * per-mob tally that accrues for the *whole quest*, not just the current step — a
+ * kill counts toward every `kill` step that names that mob, even one not yet
+ * active, so e.g. felling a boss alongside its guards banks credit for a later
+ * "slay the boss" step. It is never reset on step advance (unlike `progress`).
+ * A quest with a `use`/`enter`/`item`/`talk` start trigger is offered by the
+ * matching note/handle hook below; rewards land on completion of the final step
+ * (grantRewards).
  */
 const { makeItemInstance } = require("./state");
 
@@ -77,11 +82,18 @@ function stepLabel(state, step) {
   return "…";
 }
 
+// Tally banked toward a `kill` objective for `template` — accrued across the whole
+// quest (see the file header), so it may already be nonzero on a freshly-revealed step.
+function killCount(entry, template) {
+  return (entry.kills && entry.kills[template]) || 0;
+}
+
 // "(x/n)" for the current step, or "" for objectives without a count (use).
 function stepProgress(state, player, quest, entry) {
   const step = quest.steps[entry.step];
   const kind = objectiveOf(step);
-  if (kind === "kill" || kind === "deliver") return `${Math.min(entry.progress || 0, step.count || 1)}/${step.count || 1}`;
+  if (kind === "kill") return `${Math.min(killCount(entry, step.kill), step.count || 1)}/${step.count || 1}`;
+  if (kind === "deliver") return `${Math.min(entry.progress || 0, step.count || 1)}/${step.count || 1}`;
   if (kind === "collect") return `${Math.min(countItem(player, step.collect), step.count || 1)}/${step.count || 1}`;
   return "";
 }
@@ -96,7 +108,8 @@ function progressLine(state, player, quest, entry) {
 function stepComplete(state, player, quest, entry) {
   const step = quest.steps[entry.step];
   const kind = objectiveOf(step);
-  if (kind === "kill" || kind === "deliver") return (entry.progress || 0) >= (step.count || 1);
+  if (kind === "kill") return killCount(entry, step.kill) >= (step.count || 1);
+  if (kind === "deliver") return (entry.progress || 0) >= (step.count || 1);
   if (kind === "collect") return countItem(player, step.collect) >= (step.count || 1);
   if (kind === "use") return (entry.progress || 0) >= 1;
   return true;
@@ -168,7 +181,7 @@ function offer(state, player, qid) {
   if (!quest) return msgs;
   if (isActive(player, qid)) return msgs;
   if (isDone(player, qid) && !quest.repeatable) return msgs;
-  ensure(player).active[qid] = { step: 0, progress: 0 };
+  ensure(player).active[qid] = { step: 0, progress: 0, kills: {} };
   // offerText is authored verbatim (quote NPC speech in the data; leave descriptive
   // item/enter triggers unquoted), shown muted.
   if (quest.start && quest.start.offerText) msgs.push({ type: "log", text: `<#gray>${quest.start.offerText}` });
@@ -179,17 +192,20 @@ function offer(state, player, qid) {
   return msgs;
 }
 
-/** A kill credited to `player` — advance any active `kill` step for that mob. */
+/** A kill credited to `player` — bank it against every `kill` step in each active
+ *  quest that names this mob (current or not yet reached, e.g. a boss felled
+ *  alongside its guards), then advance the current step if that cleared it. */
 function noteKill(state, player, mobTemplate) {
   const msgs = [];
   const q = ensure(player);
   for (const [qid, entry] of Object.entries(q.active)) {
     const quest = state.world.quests[qid];
-    if (!quest) continue;
+    if (!quest || !quest.steps.some((s) => objectiveOf(s) === "kill" && s.kill === mobTemplate)) continue;
+    entry.kills = entry.kills || {};
+    entry.kills[mobTemplate] = (entry.kills[mobTemplate] || 0) + 1;
     const step = quest.steps[entry.step];
-    if (objectiveOf(step) !== "kill" || step.kill !== mobTemplate) continue;
-    entry.progress = (entry.progress || 0) + 1;
-    if (entry.progress < (step.count || 1)) msgs.push(progressLine(state, player, quest, entry));
+    if (objectiveOf(step) === "kill" && step.kill === mobTemplate && !stepComplete(state, player, quest, entry))
+      msgs.push(progressLine(state, player, quest, entry));
     advanceIfComplete(state, player, qid, msgs);
   }
   return msgs;
