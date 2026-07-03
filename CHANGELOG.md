@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Per-creature arrival flavour.** 30 of the wild bestiary now carry a
+  `spawnMessage` in `data/world/mobs.json` — the atmospheric line onlookers see
+  when the creature spawns into their room (respawn, Tide creep, or onset roster),
+  replacing the generic "X appears." Covers the wandering/hunting fauna, predators,
+  necropolis undead, and the roving outlaws; the name stays light-gated, so an
+  unseen arrival still reads as "something." Named town/camp NPCs and unique
+  lair-bound bosses are left on the generic line by design.
 - **Ambient Tide emotes.** The world clock can now perform atmospheric room lines
   during a phase (authored in `data/world/tide.json` `emotes`, keyed by phase with
   `everyTicks` / `chance` / `requireDark` / `lines`) — flavour that belongs to the
