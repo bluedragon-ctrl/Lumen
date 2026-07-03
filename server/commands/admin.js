@@ -120,8 +120,9 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
     case "@tide": {
       // Drive the world clock by hand for testing (see state.forceTidePhase /
       // world-clock.js). `auto` resumes the automatic cycle; `status` reports the
-      // current phase. A dev affordance, not authored content.
-      const PHASES = ["calm", "stirring", "tide", "receding"];
+      // current phase. A dev affordance, not authored content. Phases come from the
+      // resolved tide config, so a re-storied world's phase names still work.
+      const PHASES = state.tide.phases;
       const a = (arg || "").trim().toLowerCase();
       if (a === "status")
         return [{ type: "log", text: `Tide phase: ${state.tidePhase}${state.tideOverride ? " (forced)" : " (auto)"}.` }];

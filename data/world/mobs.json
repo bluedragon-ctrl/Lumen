@@ -1422,6 +1422,8 @@
     "name": "a void shadow",
     "keywords": ["void", "shadow", "shade", "dark"],
     "description": "Lesser kin of the Starving Dark, and never the only one for long — a shred of living black that peels itself out of the unlit air when the Tide drowns the deep and a delver's own light has failed. The eye slides off it; it is a deeper dark sliding against the dark, ringed in a cold that leans on the skin. It cannot bear a flame: bright light sears it thin and soundless and drives it off, so it snuffs what it can reach and closes in the black of its own making. Bold in the dark, and it follows. When the Tide recedes, it sinks back into the air it came from.",
+    "spawnMessage": "The dark thickens and folds — {name} peels itself out of the unlit air beside you.",
+    "despawnVerb": "sinks back into the dark",
     "maxHp": 34,
     "speed": 12,
     "armour": 2,

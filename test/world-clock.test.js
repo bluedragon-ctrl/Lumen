@@ -1,7 +1,7 @@
 "use strict";
 const { test } = require("node:test");
 const assert = require("node:assert");
-const { PHASES, tidePhaseAt, tideOffset } = require("../server/world-clock");
+const { PHASES, DEFAULT_TIDE, resolveTide, tidePhaseAt, tideOffset } = require("../server/world-clock");
 const { GameState } = require("../server/state");
 
 const LENGTHS = { calm: 600, stirring: 60, tide: 240, receding: 60 }; // matches config default
@@ -38,6 +38,50 @@ test("tideOffset: Calm is neutral, the edges dim gently", () => {
   assert.equal(tideOffset("calm", 7, CFG), 0);
   assert.equal(tideOffset("stirring", 7, CFG), -1);
   assert.equal(tideOffset("receding", 7, CFG), -1);
+});
+
+test("tideOffset: the darkening formula and phase roles are data-driven", () => {
+  // A re-storied world with renamed phases and a different depth curve.
+  const cfg = { deepCap: -8, edgeOffset: -2, tideBase: -1, tideDepthDivisor: 2, tidePhases: ["dark"], edgePhases: ["warn"] };
+  assert.equal(tideOffset("dark", 0, cfg), -1); // tideBase at the rim
+  assert.equal(tideOffset("dark", 4, cfg), -3); // -1 - floor(4/2)
+  assert.equal(tideOffset("dark", 99, cfg), -8); // deepCap bites
+  assert.equal(tideOffset("warn", 5, cfg), -2); // the edge dim
+  assert.equal(tideOffset("calm", 5, cfg), 0); // an unlisted phase is neutral
+});
+
+// --- Data-driven config (resolveTide) --------------------------------------
+
+test("resolveTide: a world with no tide config gets the built-in defaults", () => {
+  const t = resolveTide({});
+  assert.deepEqual(t.phaseTicks, DEFAULT_TIDE.phaseTicks);
+  assert.equal(t.enabled, true);
+  assert.equal(t.predator.mob, "void-shadow");
+});
+
+test("resolveTide: authored fields override, untouched siblings keep defaults", () => {
+  const t = resolveTide({ tide: {
+    phaseTicks: { calm: 10, stirring: 5, tide: 20, receding: 5 },
+    darkening: { deepCap: -9 }, // partial — edgeOffset etc. fall back to defaults
+    predator: { chance: 0.5 }, // partial predator merge
+  } });
+  assert.equal(t.phaseTicks.tide, 20);
+  assert.equal(t.darkening.deepCap, -9);
+  assert.equal(t.darkening.edgeOffset, DEFAULT_TIDE.darkening.edgeOffset); // kept
+  assert.equal(t.predator.chance, 0.5);
+  assert.equal(t.predator.mob, "void-shadow"); // kept from default
+});
+
+test("resolveTide: predator:null yields a toothless Tide", () => {
+  assert.equal(resolveTide({ tide: { predator: null } }).predator, null);
+});
+
+test("tidePhaseAt: honours a custom phase order and lengths", () => {
+  const phases = ["quiet", "surge"];
+  const lengths = { quiet: 3, surge: 2 };
+  assert.equal(tidePhaseAt(0, lengths, phases).phase, "quiet");
+  assert.equal(tidePhaseAt(3, lengths, phases).phase, "surge");
+  assert.equal(tidePhaseAt(5, lengths, phases).phase, "quiet"); // wraps at cycle 5
 });
 
 // --- GameState integration -------------------------------------------------
@@ -89,6 +133,63 @@ test("the clock fires a tide-phase event when it crosses a boundary", () => {
   const evs = s.advance();
   assert.equal(s.tidePhase, "stirring");
   assert.ok(evs.some((e) => e.type === "tide-phase" && e.phase === "stirring"));
+});
+
+test("the clock honours data-driven phaseTicks from the world", () => {
+  const world = makeWorld();
+  world.tide = { phaseTicks: { calm: 2, stirring: 2, tide: 2, receding: 2 } };
+  const s = new GameState(world);
+  assert.equal(s.tidePhase, "calm");
+  s.tick = 1; // next advance() lands on 2 → Stirring under the short cycle
+  s.advance();
+  assert.equal(s.tidePhase, "stirring");
+});
+
+// --- Ambient Tide emotes (data-driven) -------------------------------------
+
+function makeEmoteWorld() {
+  return {
+    rooms: { deep: { id: "deep", name: "Deep", description: "", depth: 6, ambientLight: 0, exits: {} } },
+    items: {}, mobs: {}, fixtures: {}, recipes: {}, spells: {}, quests: {},
+    tide: {
+      // everyTicks 0 → no cadence gate; chance 1 → always; requireDark → only in the void.
+      emotes: { tide: { everyTicks: 0, chance: 1, requireDark: true, lines: ["The dark leans close."] } },
+    },
+    playerTemplate: {
+      level: 1, xp: 0, shards: 0,
+      attributes: { might: 5, vitality: 5, intellect: 5, wits: 5, perception: 5 },
+      manaRegen: 0, speed: 12,
+      perception: { blindBelow: 1, dimBelow: 3, harmedAbove: 9 },
+      startLocation: "deep", startInventory: [], startEquipment: {},
+      knownRecipes: [], knownSpells: [],
+    },
+  };
+}
+
+test("Tide emotes: an ambient line fires in a dark, occupied room during the phase", () => {
+  const s = new GameState(makeEmoteWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Delver", "deep");
+  assert.ok(s.rooms.deep.light < 0, "the deep is in the void during the Tide");
+  const events = [];
+  s._tideEmoteTick(events);
+  const emote = events.find((e) => e.type === "tide-emote");
+  assert.ok(emote && emote.roomId === "deep");
+  assert.equal(emote.text, "The dark leans close.");
+});
+
+test("Tide emotes: none without an occupant, and none in a phase with no config", () => {
+  const s = new GameState(makeEmoteWorld());
+  s.forceTidePhase("tide");
+  const e1 = [];
+  s._tideEmoteTick(e1); // nobody in the room
+  assert.equal(e1.filter((e) => e.type === "tide-emote").length, 0);
+
+  admitAt(s, "Delver", "deep");
+  s.forceTidePhase("calm"); // calm authors no emote
+  const e2 = [];
+  s._tideEmoteTick(e2);
+  assert.equal(e2.filter((e) => e.type === "tide-emote").length, 0);
 });
 
 // --- NPCs lighting lamps as the Tide turns ---------------------------------

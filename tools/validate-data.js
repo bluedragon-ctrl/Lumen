@@ -26,9 +26,15 @@ function main() {
   const recipes = read("data/world/recipes.json");
   const spells = read("data/world/spells.json");
   const quests = read("data/world/quests.json");
+  const tide = read("data/world/tide.json");
   const player = read("data/templates/player.json");
 
   const errs = [];
+
+  // The Tide's phase vocabulary is data-driven (tide.json `phases`); mob action /
+  // reaction `phase` gates below validate against it (falling back to the engine
+  // default PHASES if a world omits the list).
+  const tidePhases = Array.isArray(tide.phases) && tide.phases.length ? tide.phases : PHASES;
 
   // A `hidden: { perception }` block gates a feature behind `search` (positive req).
   const checkHidden = (h, where) => {
@@ -317,8 +323,8 @@ function main() {
       if (!["attack", "cast", "emote", "wander", "idle", "flee", "summon", "react"].includes(a.type))
         errs.push(`mob ${id}: invalid action type "${a.type}"`);
       // Tide-gated action: a `phase` array restricts when the action is eligible.
-      if (a.phase != null && (!Array.isArray(a.phase) || !a.phase.length || a.phase.some((p) => !PHASES.includes(p))))
-        errs.push(`mob ${id}: action phase must be a non-empty array of ${PHASES.map((p) => `"${p}"`).join(", ")}`);
+      if (a.phase != null && (!Array.isArray(a.phase) || !a.phase.length || a.phase.some((p) => !tidePhases.includes(p))))
+        errs.push(`mob ${id}: action phase must be a non-empty array of ${tidePhases.map((p) => `"${p}"`).join(", ")}`);
       if (a.type === "emote" && (!Array.isArray(a.messages) || !a.messages.length))
         errs.push(`mob ${id}: emote action needs a non-empty messages array`);
       if (a.type === "cast") {
@@ -364,8 +370,8 @@ function main() {
             errs.push(`mob ${id}: react if.slotEmpty must be a slot name string`);
           if (c.equipped != null && !has(items, c.equipped))
             errs.push(`mob ${id}: react if.equipped references missing item ${c.equipped}`);
-          if (c.phase != null && (!Array.isArray(c.phase) || !c.phase.length || c.phase.some((p) => !PHASES.includes(p))))
-            errs.push(`mob ${id}: react if.phase must be a non-empty array of ${PHASES.map((p) => `"${p}"`).join(", ")}`);
+          if (c.phase != null && (!Array.isArray(c.phase) || !c.phase.length || c.phase.some((p) => !tidePhases.includes(p))))
+            errs.push(`mob ${id}: react if.phase must be a non-empty array of ${tidePhases.map((p) => `"${p}"`).join(", ")}`);
           if (c.carriedLightBelow != null && (typeof c.carriedLightBelow !== "number" || c.carriedLightBelow <= 0))
             errs.push(`mob ${id}: react if.carriedLightBelow must be a positive number`);
         }
@@ -681,6 +687,90 @@ function main() {
         }
         for (const rid of r.recipes || []) if (!has(recipes, rid)) errs.push(`quest ${id}: rewards.recipes references missing recipe ${rid}`);
         for (const sid of r.spells || []) if (!has(spells, sid)) errs.push(`quest ${id}: rewards.spells references missing spell ${sid}`);
+      }
+    }
+  }
+
+  // The Tide (data/world/tide.json): the world clock's config — timing, darkening,
+  // generation, messages, emotes. Cross-check the phase vocabulary and every mob
+  // the dark looses; a re-storied world lives or dies by this file resolving.
+  {
+    if (tide.enabled != null && typeof tide.enabled !== "boolean") errs.push("tide: enabled must be a boolean");
+    if (!Array.isArray(tide.phases) || !tide.phases.length || !tide.phases.every((p) => typeof p === "string"))
+      errs.push("tide: phases must be a non-empty array of phase-name strings");
+    const knownPhase = (p) => tidePhases.includes(p);
+    const phaseList = (arr, where) => {
+      if (arr == null) return;
+      if (!Array.isArray(arr) || arr.some((p) => !knownPhase(p)))
+        errs.push(`tide: ${where} must be an array of known phases (${tidePhases.join(", ")})`);
+    };
+    // Every declared phase needs a length, and every length names a real phase.
+    if (tide.phaseTicks == null || typeof tide.phaseTicks !== "object") {
+      errs.push("tide: phaseTicks must be an object of phase -> tick count");
+    } else {
+      for (const p of tidePhases)
+        if (typeof tide.phaseTicks[p] !== "number" || tide.phaseTicks[p] < 0)
+          errs.push(`tide: phaseTicks.${p} must be a non-negative number`);
+      for (const p of Object.keys(tide.phaseTicks)) if (!knownPhase(p)) errs.push(`tide: phaseTicks has unknown phase "${p}"`);
+    }
+    const d = tide.darkening;
+    if (d != null) {
+      for (const k of ["deepCap", "edgeOffset", "tideBase"])
+        if (d[k] != null && typeof d[k] !== "number") errs.push(`tide: darkening.${k} must be a number`);
+      if (d.tideDepthDivisor != null && (typeof d.tideDepthDivisor !== "number" || d.tideDepthDivisor <= 0))
+        errs.push("tide: darkening.tideDepthDivisor must be a positive number");
+      phaseList(d.tidePhases, "darkening.tidePhases");
+      phaseList(d.edgePhases, "darkening.edgePhases");
+    }
+    const lamp = tide.lamp;
+    if (lamp != null) {
+      phaseList(lamp.onPhases, "lamp.onPhases");
+      phaseList(lamp.offPhases, "lamp.offPhases");
+      for (const k of ["onMessage", "offMessage"])
+        if (lamp[k] != null && typeof lamp[k] !== "string") errs.push(`tide: lamp.${k} must be a string`);
+    }
+    if (tide.phaseMessages != null) {
+      if (typeof tide.phaseMessages !== "object" || Array.isArray(tide.phaseMessages)) errs.push("tide: phaseMessages must be an object of phase -> string");
+      else for (const [p, v] of Object.entries(tide.phaseMessages)) {
+        if (!knownPhase(p)) errs.push(`tide: phaseMessages has unknown phase "${p}"`);
+        if (typeof v !== "string" || !v) errs.push(`tide: phaseMessages.${p} must be a non-empty string`);
+      }
+    }
+    // A `chance` knob is a probability in (0, 1].
+    const chkChance = (v, where) => { if (v != null && (typeof v !== "number" || v <= 0 || v > 1)) errs.push(`tide: ${where} must be a number in (0, 1]`); };
+    // The per-tick creep predator (or null for a toothless Tide).
+    if (tide.predator != null) {
+      const pr = tide.predator;
+      if (!has(mobs, pr.mob)) errs.push(`tide: predator.mob references missing mob ${pr.mob}`);
+      chkChance(pr.chance, "predator.chance");
+      if (pr.cap != null && (typeof pr.cap !== "number" || pr.cap < 0)) errs.push("tide: predator.cap must be a non-negative number");
+      if (pr.faction != null && !FACTIONS.includes(pr.faction)) errs.push(`tide: predator.faction "${pr.faction}" is not one of ${FACTIONS.join(", ")}`);
+      if (pr.noSpoils != null && typeof pr.noSpoils !== "boolean") errs.push("tide: predator.noSpoils must be a boolean");
+    }
+    // The onset roster the dark looses across depth bands.
+    if (tide.spawns != null) {
+      if (!Array.isArray(tide.spawns)) errs.push("tide: spawns must be an array of rules");
+      else tide.spawns.forEach((r, i) => {
+        if (!r || typeof r !== "object") return errs.push(`tide: spawns[${i}] must be an object`);
+        if (!has(mobs, r.mob)) errs.push(`tide: spawns[${i}] references missing mob ${r.mob}`);
+        for (const k of ["minDepth", "maxDepth", "maxLight"])
+          if (r[k] != null && typeof r[k] !== "number") errs.push(`tide: spawns[${i}].${k} must be a number`);
+        if (r.count != null && (typeof r.count !== "number" || r.count <= 0)) errs.push(`tide: spawns[${i}].count must be a positive number`);
+        if (r.faction != null && !FACTIONS.includes(r.faction)) errs.push(`tide: spawns[${i}].faction "${r.faction}" is not one of ${FACTIONS.join(", ")}`);
+        if (r.noSpoils != null && typeof r.noSpoils !== "boolean") errs.push(`tide: spawns[${i}].noSpoils must be a boolean`);
+      });
+    }
+    // Ambient per-phase emotes.
+    if (tide.emotes != null) {
+      if (typeof tide.emotes !== "object" || Array.isArray(tide.emotes)) errs.push("tide: emotes must be an object keyed by phase");
+      else for (const [p, e] of Object.entries(tide.emotes)) {
+        if (!knownPhase(p)) errs.push(`tide: emotes has unknown phase "${p}"`);
+        if (!e || typeof e !== "object") { errs.push(`tide: emotes.${p} must be an object`); continue; }
+        if (!Array.isArray(e.lines) || !e.lines.length || e.lines.some((l) => typeof l !== "string" || !l))
+          errs.push(`tide: emotes.${p}.lines must be a non-empty array of strings`);
+        if (e.everyTicks != null && (typeof e.everyTicks !== "number" || e.everyTicks < 0)) errs.push(`tide: emotes.${p}.everyTicks must be a non-negative number`);
+        chkChance(e.chance, `emotes.${p}.chance`);
+        if (e.requireDark != null && typeof e.requireDark !== "boolean") errs.push(`tide: emotes.${p}.requireDark must be a boolean`);
       }
     }
   }

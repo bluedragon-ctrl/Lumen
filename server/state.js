@@ -1,8 +1,8 @@
 "use strict";
 const { effectiveLight } = require("./light");
 const { rollDice } = require("./dice");
-const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, TIDE, DEFAULT_HIDDEN_ITEM_RESPAWN } = require("./config");
-const { tidePhaseAt, tideOffset } = require("./world-clock");
+const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, DEFAULT_HIDDEN_ITEM_RESPAWN } = require("./config");
+const { tidePhaseAt, tideOffset, resolveTide } = require("./world-clock");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
 const {
@@ -55,10 +55,14 @@ class GameState {
     this.revealedMobs = new Map(); // playerId -> Set(mob runtime id); ephemeral hidden-mob reveals
     this.revealedItems = new Map(); // playerId -> Set(item runtime id); ephemeral hidden-item reveals (forgotten on leave)
     this.ownedCounts = new Map(); // `${roomId}|${mob}` -> living mobs from that spawner (see _countOwned)
-    // The Tide (world-clock.js): the world's current phase, derived from `tick`
-    // each tick. `tideOverride` pins it for admin testing (@tide), bypassing the
-    // clock. Set before _initRooms so the first light computation sees the phase.
-    this.tidePhase = TIDE.enabled ? tidePhaseAt(this.tick, TIDE.phaseTicks).phase : "calm";
+    // The Tide (world-clock.js): the resolved config (data/world/tide.json merged
+    // over DEFAULT_TIDE), and the world's current phase, derived from `tick` each
+    // tick. `tideOverride` pins it for admin testing (@tide), bypassing the clock.
+    // Both set before _initRooms so the first light computation sees the phase.
+    this.tide = resolveTide(world);
+    this.tidePhase = this.tide.enabled
+      ? tidePhaseAt(this.tick, this.tide.phaseTicks, this.tide.phases).phase
+      : this.tide.phases[0] || "calm";
     this.tideOverride = null;
     this._initRooms();
   }
@@ -267,7 +271,7 @@ class GameState {
       const m = this._spawnMob(sp.roomId, sp.mob, sp.hidden);
       const t = this.world.mobs[sp.mob];
       const light = this.rooms[sp.roomId].light = this.computeRoomLight(sp.roomId);
-      events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light });
+      events.push({ type: "mob-spawn", roomId: sp.roomId, mobId: m.id, mobTemplate: sp.mob, mobName: t.name, emitsLight: t.emitsLight > 0, light });
     }
   }
 
@@ -318,10 +322,16 @@ class GameState {
   // and, when it changes, apply the transition: every room's effective light
   // shifts at once, predators stir on the way in and sink back on the way out.
 
+  /** Is `phase` one of the dark phases — the ones that plunge the world into the
+   *  void and loose the Tide's predators (as opposed to the gentle edge dims)? */
+  _isDarkPhase(phase) {
+    return (this.tide.darkening.tidePhases || ["tide"]).includes(phase);
+  }
+
   /** Resolve the tide phase for this tick and, if it changed, apply it. */
   _tideTick(events) {
-    if (!TIDE.enabled) return;
-    const phase = this.tideOverride || tidePhaseAt(this.tick, TIDE.phaseTicks).phase;
+    if (!this.tide.enabled) return;
+    const phase = this.tideOverride || tidePhaseAt(this.tick, this.tide.phaseTicks, this.tide.phases).phase;
     if (phase === this.tidePhase) return;
     const prev = this.tidePhase;
     this.tidePhase = phase;
@@ -347,17 +357,36 @@ class GameState {
    *  Stirring, full at the Tide, falling through Receding). `enabled` is false when
    *  the world clock is off, so the client can hide the indicator entirely. */
   tideStatus() {
-    if (!TIDE.enabled) return { enabled: false, phase: "calm", intensity: 0 };
-    const info = tidePhaseAt(this.tick, TIDE.phaseTicks);
+    if (!this.tide.enabled) return { enabled: false, phase: this.tide.phases[0] || "calm", intensity: 0 };
+    const info = tidePhaseAt(this.tick, this.tide.phaseTicks, this.tide.phases);
     const phase = this.tideOverride || info.phase;
+    // Intensity keys off how a phase darkens the world: full during a dark phase,
+    // partial during an edge (warning/ebb) phase, none otherwise. Under the live
+    // clock the edge phases ramp/ebb with progress through the phase.
+    const isDark = this._isDarkPhase(phase);
+    const edgePhases = this.tide.darkening.edgePhases || [];
+    const isEdge = edgePhases.includes(phase);
     let intensity;
     if (this.tideOverride) {
-      intensity = phase === "tide" ? 1 : phase === "stirring" || phase === "receding" ? 0.5 : 0;
+      intensity = isDark ? 1 : isEdge ? 0.5 : 0;
     } else {
-      const frac = Math.min(1, info.sinceStart / (TIDE.phaseTicks[phase] || 1));
-      intensity = phase === "tide" ? 1 : phase === "stirring" ? frac : phase === "receding" ? 1 - frac : 0;
+      const frac = Math.min(1, info.sinceStart / (this.tide.phaseTicks[phase] || 1));
+      // An edge phase before a dark one ramps up; one after it ebbs down. Heuristic:
+      // ramp while the next phase is darker (approaching the Tide), ebb otherwise.
+      const ramping = isEdge && this._edgeRampsUp(phase);
+      intensity = isDark ? 1 : isEdge ? (ramping ? frac : 1 - frac) : 0;
     }
     return { enabled: true, phase, intensity: Math.round(intensity * 100) / 100 };
+  }
+
+  /** For the HUD: does this edge phase build toward the dark (ramp up) or follow
+   *  it (ebb down)? True when the next phase in the cycle is a dark phase. */
+  _edgeRampsUp(phase) {
+    const order = this.tide.phases;
+    const i = order.indexOf(phase);
+    if (i < 0) return false;
+    const next = order[(i + 1) % order.length];
+    return this._isDarkPhase(next);
   }
 
   /** A tide phase change. Recompute EVERY room's light first — the darkening
@@ -369,12 +398,14 @@ class GameState {
    *  player watches the world darken. */
   _applyTidePhase(prev, phase, events) {
     for (const id of Object.keys(this.rooms)) this.rooms[id].light = this.computeRoomLight(id);
-    // NPCs light their lamps against the gathering dark (Stirring through the
-    // Tide) and snuff them once it has receded (Calm) — before spawn, so a lit
-    // camp's brightness already repels the predators' maxLight check.
-    if (phase === "stirring" || phase === "tide") this._setTideLamps(true, events);
-    else if (phase === "calm") this._setTideLamps(false, events);
-    if (phase === "tide") this._tideSpawn(events);
+    // NPCs light their lamps against the gathering dark (the lamp `onPhases`) and
+    // snuff them once it has receded (the `offPhases`) — before spawn, so a lit
+    // camp's brightness already repels the predators' maxLight check. A phase in
+    // neither list leaves the lamps as they are.
+    const lamp = this.tide.lamp || {};
+    if ((lamp.onPhases || []).includes(phase)) this._setTideLamps(true, events);
+    else if ((lamp.offPhases || []).includes(phase)) this._setTideLamps(false, events);
+    if (this._isDarkPhase(phase)) this._tideSpawn(events);
     else this._tideSweep(events);
     events.push({ type: "tide-phase", phase, prev });
   }
@@ -406,15 +437,15 @@ class GameState {
     }
   }
 
-  /** Loose the Tide's light-fearing predators. Data-driven from an optional
-   *  `world.tideSpawns` roster (the followup content task) — until that lands the
-   *  dark comes empty-handed. Each rule: { mob, minDepth, maxDepth, count,
-   *  maxLight, faction, noSpoils }. A rule skips any room already brighter than
-   *  `maxLight`, so a lit camp keeps the hunters out. Spawned mobs are tagged
-   *  `tideSpawn` so the ebb can reclaim them; they carry no spawner `origin`
-   *  (never repop, never count against a room's cap). */
+  /** Loose the Tide's onset roster — mobs the dark pours across whole depth bands
+   *  the instant it comes in. Data-driven from `tide.spawns` (empty by default, so
+   *  the dark comes empty-handed unless a world authors a roster). Each rule:
+   *  { mob, minDepth, maxDepth, count, maxLight, faction, noSpoils }. A rule skips
+   *  any room already brighter than `maxLight`, so a lit camp keeps the hunters
+   *  out. Spawned mobs are tagged `tideSpawn` so the ebb can reclaim them; they
+   *  carry no spawner `origin` (never repop, never count against a room's cap). */
   _tideSpawn(events) {
-    const roster = this.world.tideSpawns;
+    const roster = this.tide.spawns;
     if (!Array.isArray(roster) || !roster.length) return;
     for (const [roomId, room] of Object.entries(this.world.rooms)) {
       const depth = room.depth || 0;
@@ -436,7 +467,7 @@ class GameState {
         }
         const light = rt.light = this.computeRoomLight(roomId); // a dark-shedding predator deepens the room
         const t = this.world.mobs[rule.mob];
-        events.push({ type: "mob-spawn", roomId, mobId: last.id, mobName: t.name, emitsLight: t.emitsLight > 0, light });
+        events.push({ type: "mob-spawn", roomId, mobId: last.id, mobTemplate: rule.mob, mobName: t.name, emitsLight: t.emitsLight > 0, light });
       }
     }
   }
@@ -454,16 +485,18 @@ class GameState {
         m.hp = 0; // mark gone for any lingering reference
         removed++;
         const t = this.world.mobs[m.template];
-        events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, verb: "sinks back into the dark" });
+        // The exit flavour is the creature's own (mobs.json `despawnVerb`); the ebb
+        // just falls back to a generic sink if the mob authors none.
+        events.push({ type: "mob-flee", roomId, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light, verb: t.despawnVerb || "sinks back into the dark" });
       }
       if (removed) rt.light = this.computeRoomLight(roomId); // a dark predator leaving lifts the gloom
     }
   }
 
-  /** The Tide's living teeth, per tick (called from advance only while the phase is
-   *  `tide`). The dark itself births a predator beside a delver who has let their
+  /** The Tide's living teeth, per tick (called from advance only while in a dark
+   *  phase). The dark itself births a predator beside a delver who has let their
    *  light fail: every room holding a living player whose effective light is below 0
-   *  (the void band) has `TIDE.predator.chance` to spawn one `predator.mob` right
+   *  (the void band) has `tide.predator.chance` to spawn one `predator.mob` right
    *  there. Capped at `predator.cap` shadows worldwide, so a long dark mounts pressure
    *  toward the cap rather than flooding. A lit camp (light ≥ 0) is never a birthplace
    *  — keeping a flame is the whole counterplay — and a shadow that strays into light
@@ -471,7 +504,7 @@ class GameState {
    *  `_tideSweep` reclaims any still abroad; they carry no `origin` (never repop, and
    *  their pursuit is unleashed — the dark does not give up). */
   _tideCreepTick(events) {
-    const cfg = TIDE.predator;
+    const cfg = this.tide.predator;
     if (!cfg || !cfg.mob || !this.world.mobs[cfg.mob]) return;
     const cap = cfg.cap != null ? cfg.cap : 5;
     let alive = 0; // living tide-spawned shadows already abroad (the global cap)
@@ -492,7 +525,27 @@ class GameState {
       rt.mobs.push(m);
       alive++;
       const light = (rt.light = this.computeRoomLight(roomId)); // a dark-shedding predator deepens the room
-      events.push({ type: "mob-spawn", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light, tideCreep: true });
+      events.push({ type: "mob-spawn", roomId, mobId: m.id, mobTemplate: cfg.mob, mobName: t.name, emitsLight: t.emitsLight > 0, light, tideCreep: true });
+    }
+  }
+
+  /** Ambient Tide emotes: the world clock itself performs atmospheric lines during
+   *  a phase that authors one in `tide.emotes[phase]` — flavour with no home on any
+   *  mob. Config per phase: { everyTicks, chance, requireDark, lines:[...] }. Fires
+   *  at most once per `everyTicks`, per occupied room, gated by `chance` and (if
+   *  `requireDark`) a failed-light room. A `tide-emote` event carries the line. */
+  _tideEmoteTick(events) {
+    const cfg = this.tide.emotes && this.tide.emotes[this.tidePhase];
+    if (!cfg || !Array.isArray(cfg.lines) || !cfg.lines.length) return;
+    const every = cfg.everyTicks || 0;
+    if (every > 0 && this.tick % every !== 0) return;
+    const chance = cfg.chance != null ? cfg.chance : 1;
+    for (const [roomId, rt] of Object.entries(this.rooms)) {
+      if (cfg.requireDark && rt.light >= 0) continue; // only where the dark has taken hold
+      if (!this.playersIn(roomId).some((p) => p.hp > 0)) continue; // nobody to feel it
+      if (chance < 1 && Math.random() >= chance) continue;
+      const text = cfg.lines[Math.floor(Math.random() * cfg.lines.length)];
+      events.push({ type: "tide-emote", roomId, text });
     }
   }
 
@@ -576,9 +629,9 @@ class GameState {
    *  depth-scaled darkening, folded into ambient by computeRoomLight. 0 when the
    *  system is disabled or the world is Calm. See world-clock.js. */
   tideOffsetFor(roomId) {
-    if (!TIDE.enabled) return 0;
+    if (!this.tide.enabled) return 0;
     const room = this.world.rooms[roomId];
-    return tideOffset(this.tidePhase, room ? room.depth : 0, TIDE);
+    return tideOffset(this.tidePhase, room ? room.depth : 0, this.tide.darkening);
   }
 
   /**
@@ -1087,7 +1140,8 @@ class GameState {
     const events = [];
 
     this._tideTick(events); // the world clock: darken/brighten the world on phase changes
-    if (this.tidePhase === "tide") this._tideCreepTick(events); // the dark grows teeth: shadows born beside delvers in failed light
+    if (this._isDarkPhase(this.tidePhase)) this._tideCreepTick(events); // the dark grows teeth: shadows born beside delvers in failed light
+    if (this.tide.enabled) this._tideEmoteTick(events); // ambient Tide flavour for the current phase
     this._dyingTick(events); // fallen delvers count down to waking at the rim (death pacing)
 
     for (const p of this.players.values()) {

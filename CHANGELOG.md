@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Ambient Tide emotes.** The world clock can now perform atmospheric room lines
+  during a phase (authored in `data/world/tide.json` `emotes`, keyed by phase with
+  `everyTicks` / `chance` / `requireDark` / `lines`) — flavour that belongs to the
+  Tide itself rather than any mob. Shipped with lines for Stirring and the Tide.
 - **Lastlight Camp — a 4-room prospectors' frontline camp at depth 10** (zone
   `frontline-camp`), reached east from The Keeper's Lake across a worked causeway.
   The deepest human foothold in the Abyss: the rare expedition that made the whole
@@ -94,6 +98,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and dropped its `emitLight` companion glow.
 
 ### Changed
+- **The Tide is now fully data-driven (`data/world/tide.json`).** Its whole
+  configuration — timing (`phaseTicks`, phase order), depth-scaled `darkening`
+  (formula params + which phases darken vs. edge-dim), lamp on/off phases and
+  messages, per-phase transition messages, and the generation rules (the per-tick
+  creep `predator` + an onset `spawns` roster) — moved out of `server/config.js`
+  into one JSON file, so the same engine can carry a different story by swapping it.
+  Built-in defaults live in `server/world-clock.js` (`DEFAULT_TIDE` / `resolveTide`),
+  merged under the authored file; a world that omits `tide.json` behaves as before.
+  The validator now cross-checks the file (phase vocabulary, every mob the dark
+  looses, message/emote shapes).
+- **Spawn/despawn flavour moved onto the creature (`mobs.json`).** A mob may now
+  author a `spawnMessage` (with `{name}`/`{Name}` for the light-gated name) and a
+  `despawnVerb`, reused by every appearance/exit path — normal respawn, the Tide's
+  creep, and the onset roster — instead of the Tide hardcoding the void-shadow's
+  lines. The void-shadow carries its own "peels itself out of the unlit air" /
+  "sinks back into the dark" wording; other mobs fall back to the generic lines.
 - **Mob self-buffs resolve through the shared beneficial core.** `_mobCastSelf`
   now bakes through the same per-type core as player support casts (which also
   gained the core's negative-magnitude handling, so a darkness aura like Drink

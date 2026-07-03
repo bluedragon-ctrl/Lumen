@@ -271,15 +271,6 @@ const MOB_DEATH_VERB = {
   spikes: { room: "is impaled on its own spines and dies", slay: "Your thorns finish off" },
 };
 
-// The Tide turning — one world-wide line per phase change (see state._applyTidePhase).
-// Coloured to land: red as the dark floods in, calmer on the ebb.
-const TIDE_PHASE_FLAVOUR = {
-  stirring: "<#gold>The lamps gutter and dim. Far below, something vast draws breath — the dark is stirring.<#reset>",
-  tide: "<#red>The Tide comes in. The dark floods every passage. Seek the light, or be taken by it.<#reset>",
-  receding: "<#cyan>The Tide turns. The dark loosens its grip and begins to ebb.<#reset>",
-  calm: "<#cyan>The abyss settles. The dark has receded — for now.<#reset>",
-};
-
 // A mob died: narrate to the room, reward the killer, then share XP / level-ups /
 // quest progress with every participant (Model A — full value to all).
 function handleMobDeath(ev) {
@@ -511,7 +502,7 @@ const EVENT_HANDLERS = {
     // each view — the world has darkened (or lifted) under everyone at once, so
     // even an idle player watches their room change. Mob spawn/flee events from
     // the same transition narrate the predators per-room on their own.
-    const text = TIDE_PHASE_FLAVOUR[ev.phase];
+    const text = state.tide.phaseMessages[ev.phase];
     for (const p of state.players.values()) {
       if (text) sendToPlayer(p.id, { type: "system", text });
       markViews(p.id);
@@ -522,11 +513,15 @@ const EVENT_HANDLERS = {
   "tide-lamp": (ev) => {
     // NPCs lit (or snuffed) this room's lamps as the Tide turned. Narrate to
     // anyone present; the room refresh rides the tide-phase view sweep above.
-    const text = ev.on
-      ? "Lamps flare to life around you, beating back the gathering dark."
-      : "The lamps are snuffed out as the dark recedes.";
-    roomCtx.toRoom(ev.roomId, { type: "log", text });
+    const lamp = state.tide.lamp || {};
+    const text = ev.on ? lamp.onMessage : lamp.offMessage;
+    if (text) roomCtx.toRoom(ev.roomId, { type: "log", text });
   },
+
+  "tide-emote": (ev) =>
+    // The Tide itself performs an ambient atmospheric line in a room (see
+    // state._tideEmoteTick). Felt, not seen — sent to everyone present.
+    roomCtx.toRoom(ev.roomId, { type: "log", text: ev.text }),
 
   "aggro-engage": (ev) => {
     // A mob committed to attack (see state._engageTell): either it proactively
@@ -648,12 +643,19 @@ const EVENT_HANDLERS = {
     // vanish to onlookers and refresh the room so the count updates.
     broadcastRoom(ev.roomId, ev, (n) => `${cap(n)} ${ev.verb}.`, { refreshRoom: true }),
 
-  "mob-spawn": (ev) =>
-    broadcastRoom(ev.roomId, ev, (n) => (ev.tideCreep
-      ? `The dark thickens and folds — ${n} peels itself out of the unlit air beside you.`
+  "mob-spawn": (ev) => {
+    // A creature's arrival flavour is its own (mobs.json `spawnMessage`, with
+    // `{name}`/`{Name}` for the light-gated name), reused by every spawn path
+    // (respawn, Tide creep, onset roster). Without one, a generic line — the
+    // name light-gated so an unseen arrival reads as "something".
+    const tpl = (ev.mobTemplate && world.mobs[ev.mobTemplate]) || {};
+    const custom = tpl.spawnMessage;
+    broadcastRoom(ev.roomId, ev, (n) => (custom
+      ? custom.replace(/\{name\}/g, n).replace(/\{Name\}/g, cap(n))
       : n === "something"
       ? "Something stirs in the dark."
-      : `${cap(ev.mobName)} appears.`), { refreshRoom: true }),
+      : `${cap(ev.mobName)} appears.`), { refreshRoom: true });
+  },
 
   "item-regrow": (ev) => {
     for (const o of state.playersIn(ev.roomId)) {
