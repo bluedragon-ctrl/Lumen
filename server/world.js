@@ -22,6 +22,7 @@ function loadWorld() {
     recipes: readJson("world/recipes.json"),
     spells: readJson("world/spells.json"),
     quests: readJson("world/quests.json"),
+    tide: readJson("world/tide.json"), // the world clock's config (see world-clock.js)
     playerTemplate: readJson("templates/player.json"),
   };
   // Static content must not be mutated at runtime; freeze the top level.

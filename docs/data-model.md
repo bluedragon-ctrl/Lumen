@@ -258,6 +258,8 @@ A map of `mobId → template`.
 | `lightBane`  | block?  | Light hurts it: `{ above, damage (dice) }` — each tick the room light exceeds `above`, the mob is seared for `damage` (credited to the top-threat player present, so light becomes a usable weapon against light-shy things). |
 | `regen`      | block?  | Override **out-of-combat recovery**: `{ delay?, perTick? }`. A wounded mob with nothing fighting or watching it, in a room clear of living foes, mends back to full — but only after `delay` ticks out of combat (default 5), at `perTick` HP/tick (default `ceil(maxHp/20)`, i.e. ~full in 20 ticks). The counter to flee-heal-return. Omit for defaults; set a small `perTick` for a slow-mending boss, or a large one to snap back fast. |
 | `posture`    | enum?   | Starting posture: `standing` (default) \| `sitting` \| `sleeping`. A **`sleeping`** mob perceives nothing — fully inert (no wander/attack/emote, builds no aggro) until a blow (melee or hostile spell) **rouses** it to standing. A **`sitting`** mob is alert-at-rest: it won't wander or emote, but it *does* detect enemies and **stands as it engages** (see Aggro / threat). Authors dozing guardians, resting NPCs, and creatures you can creep past while they sleep. |
+| `spawnMessage` | string? | Custom **arrival** line, used by every spawn path (respawn, the Tide's creep, an onset roster). `{name}` interpolates the light-gated mob name (an unseen arrival reads as "something"); `{Name}` capitalises it. Without one, a generic line (`"X appears."` / `"Something stirs in the dark."`). The void-shadow uses this for its "peels itself out of the unlit air" wording. |
+| `despawnVerb` | string? | Custom **exit** fragment for when the creature vanishes without a corpse (e.g. the Tide's ebb reclaiming a tide-spawned mob), rendered as `"<name> <verb>."`. Defaults to `"sinks back into the dark"` on the tide sweep. |
 
 ### Mob actions (weighted)
 
@@ -557,6 +559,62 @@ the quest log is shown in the console with `quest` / `journal` (no UI pane).
 > count for the current `deliver` step; `kills` is a `{ [mobId]: count }` tally banked
 > across the whole quest, so a `kill` step may already be (partly) satisfied the moment
 > it becomes current.
+
+---
+
+## The Tide (static) — `data/world/tide.json`
+
+The **Tide** is the world clock (see [server/world-clock.js](../server/world-clock.js)):
+the abyss breathes on a fixed cycle of phases — a long **Calm**, a brief **Stirring**
+(the telegraph), the **Tide** (every room darkens, depth-scaled, and light-fearing
+predators stir), then a **Receding** ebb back to Calm. The phase is a pure function of
+the tick, so a restart simply begins again in the first phase.
+
+The whole configuration is data-driven: this one file drives timing, darkening,
+generation, messages, and ambient emotes, so the same engine can carry a different
+story by swapping it. Built-in defaults (`DEFAULT_TIDE`) are merged **under** the
+authored file by `resolveTide`, so a partial file keeps the untouched defaults, and a
+world with no `tide.json` behaves exactly like the shipped one. The engine reads the
+resolved config off `state.tide`.
+
+```json
+{
+  "enabled": true,
+  "phases": ["calm", "stirring", "tide", "receding"],
+  "phaseTicks": { "calm": 600, "stirring": 60, "tide": 240, "receding": 60 },
+  "darkening": {
+    "deepCap": -5, "edgeOffset": -1, "tideBase": -2, "tideDepthDivisor": 3,
+    "tidePhases": ["tide"], "edgePhases": ["stirring", "receding"]
+  },
+  "lamp": {
+    "onPhases": ["stirring", "tide"], "offPhases": ["calm"],
+    "onMessage": "Lamps flare to life…", "offMessage": "The lamps are snuffed out…"
+  },
+  "phaseMessages": { "tide": "<#red>The Tide comes in…<#reset>" },
+  "predator": { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false },
+  "spawns": [],
+  "emotes": {
+    "tide": { "everyTicks": 20, "chance": 0.5, "requireDark": true, "lines": ["The dark presses close…"] }
+  }
+}
+```
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `enabled` | bool | Master switch. `false` = no clock (rooms sit at ambient, HUD hidden). |
+| `phases` | string[] | The cycle order. Phase *names* are free — the roles below reference them by name, so a re-storied world can rename/reorder freely. |
+| `phaseTicks` | map | Per-phase length in ticks (≈ seconds at `TICK_MS`). Every phase in `phases` needs one. |
+| `darkening` | block | The depth-scaled light offset a phase folds into a room's ambient (always ≤ 0). A **tidePhase** applies `max(deepCap, tideBase − floor(depth / tideDepthDivisor))`; an **edgePhase** applies the flat `edgeOffset`; any other phase applies 0. |
+| `lamp` | block | Lamp-tending NPCs (factions `rim`/`umbral`) throw a room's switchable light fixtures on when the Tide enters an `onPhases` phase and snuff the Tide-lit ones on an `offPhases` phase; `onMessage`/`offMessage` narrate it. A phase in neither list leaves lamps as they are. |
+| `phaseMessages` | map | One world-wide line per phase change, keyed by the phase being entered. A phase with no entry announces nothing. Supports the client colour tags (`<#red>…<#reset>`). |
+| `predator` | block\|null | The per-tick **creep**: while in a tidePhase, each tick every room where a living delver stands in failed light (room light `< 0`) has `chance` to birth one `mob` beside them, up to `cap` worldwide. `faction` (default `wild`) and `noSpoils` tag the spawn. `null` = a toothless Tide (darkening only). Tide-spawned mobs are reclaimed by the ebb. |
+| `spawns` | Rule[] | Optional **onset roster**: mobs the dark pours across whole depth bands the instant it comes in. Each rule `{ mob, minDepth?, maxDepth?, count?, maxLight?, faction?, noSpoils? }`; a rule skips any room already brighter than `maxLight` (a lit camp keeps the hunters out). Empty by default. |
+| `emotes` | map | Ambient atmospheric lines the Tide itself performs, keyed by phase: `{ everyTicks, chance, requireDark, lines[] }`. Fires at most once per `everyTicks`, per occupied room, gated by `chance` and (if `requireDark`) a failed-light room. Flavour that belongs to the Tide, not a mob. |
+
+> **Where flavour lives.** A *creature's* own arrival/exit wording is authored on the
+> mob (`spawnMessage` / `despawnVerb` in `mobs.json`), reused by every spawn path
+> (respawn, creep, roster) — not in `tide.json`. `tide.json` holds only what belongs
+> to the world clock itself.
 
 ---
 

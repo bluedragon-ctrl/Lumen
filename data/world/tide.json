@@ -1,0 +1,50 @@
+{
+  "enabled": true,
+  "phases": ["calm", "stirring", "tide", "receding"],
+  "phaseTicks": { "calm": 600, "stirring": 60, "tide": 240, "receding": 60 },
+  "darkening": {
+    "deepCap": -5,
+    "edgeOffset": -1,
+    "tideBase": -2,
+    "tideDepthDivisor": 3,
+    "tidePhases": ["tide"],
+    "edgePhases": ["stirring", "receding"]
+  },
+  "lamp": {
+    "onPhases": ["stirring", "tide"],
+    "offPhases": ["calm"],
+    "onMessage": "Lamps flare to life around you, beating back the gathering dark.",
+    "offMessage": "The lamps are snuffed out as the dark recedes."
+  },
+  "phaseMessages": {
+    "stirring": "<#gold>The lamps gutter and dim. Far below, something vast draws breath — the dark is stirring.<#reset>",
+    "tide": "<#red>The Tide comes in. The dark floods every passage. Seek the light, or be taken by it.<#reset>",
+    "receding": "<#cyan>The Tide turns. The dark loosens its grip and begins to ebb.<#reset>",
+    "calm": "<#cyan>The abyss settles. The dark has receded — for now.<#reset>"
+  },
+  "predator": { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false },
+  "spawns": [],
+  "emotes": {
+    "stirring": {
+      "everyTicks": 20,
+      "chance": 0.4,
+      "requireDark": false,
+      "lines": [
+        "The air thickens and grows heavy, as if the stone were holding its breath.",
+        "A low groan rolls up out of the deep and dies away.",
+        "The flames lean, guttering, though there is no wind to bend them."
+      ]
+    },
+    "tide": {
+      "everyTicks": 20,
+      "chance": 0.5,
+      "requireDark": true,
+      "lines": [
+        "The dark presses close on every side, patient and cold.",
+        "Something vast shifts far below, and the black seems to lean nearer.",
+        "A current of colder air snakes past, and the hair on your neck lifts.",
+        "The silence deepens until you can hear your own pulse in it."
+      ]
+    }
+  }
+}
