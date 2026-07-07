@@ -382,6 +382,14 @@
     "type": "door",
     "door": { "dir": "south", "to": "d5.den.porch", "open": false }
   },
+  "den-lamps": {
+    "id": "den-lamps",
+    "name": "the Graveworker's lamps",
+    "keywords": ["lamp", "lamps", "light", "brackets"],
+    "description": "Oil lamps in fitted iron brackets, spaced with the same measured care as the tunnel's timber sets, every wick trimmed and every reservoir topped. They are never allowed to go out — the work needs light, and the man who works here plainly reckons the dark can have every room but his. Even when the deep's black tide comes flooding in, these burn on.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
   "graveworker-journal": {
     "id": "graveworker-journal",
     "name": "a working journal",

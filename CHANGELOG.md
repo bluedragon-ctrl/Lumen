@@ -21,8 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wires the dead back onto their feet with glimmer shard-wire. Four new `outlaw`
   mobs (risen thornbug, stitched prospector, summon-only wired skeleton, and the
   Graveworker — summons skeleton pairs, casts Mage Armour and the new Leech),
-  four fixtures (including the den door and his journal), and a sealed west face
-  reserved for future content. Boss item loot deferred to a follow-up pass.
+  five fixtures (the den door, his journal, and his ever-burning lamps —
+  `emitsLight 1` in every den room, so the den reads light 4 in calm and keeps
+  a dim light 1 even through the Tide's depth-5 darkening), and a sealed west
+  face reserved for future content. Boss item loot deferred to a follow-up pass.
 - **New spell-effect type `drain` + spell: Leech (mana-only life drain).** A
   hostile drain lands like a damage weave and heals the caster for half the
   damage dealt (capped at max hp), in both cast directions. Mob-castable and

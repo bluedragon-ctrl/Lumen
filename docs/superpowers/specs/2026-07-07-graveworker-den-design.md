@@ -29,7 +29,7 @@ Graveworker — experiments with glimmer-based animation of the dead.
 | Scope | Lean: 8 rooms, 4 mobs, no quest, **no boss item loot yet** |
 | Boss casting | Human tradition (mana-only): Mage Armour + new life-drain spell. **No glimmer spells** — glimmer is the animation *material* (wire), not his casting medium |
 | Boss summon | **Two wired human skeletons** (not thornbugs) |
-| Den light | `ambientLight 3` — a working man's light; matches the human-camp precedent (Lastlight is 2, Spire Crown daylight is 3) |
+| Den light | `ambientLight 3` + a `den-lamps` fixture (`emitsLight 1`) in every den room → light 4 in calm, and a dim 1 even during the Tide (whose depth-5 offset is −3); the lamps are the "his light outlasts the dark" statement |
 
 ## Rooms — 8 new
 
