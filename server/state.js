@@ -1261,10 +1261,11 @@ class GameState {
    * (player→mob or mob→player), from a single place so both get the uniform
    * `attack` event and the data-driven contact triggers identically. Builds the
    * event from the two descriptors (attacker/defender each carry actor, kind,
-   * id, name, emitsLight, roomId), applies damage via the caller's
-   * `defender.deal` sink — deal runs hit or miss: a swing provokes its target
-   * (a mob defender's threat) even when it lands nothing, so flailing in the
-   * dark still draws a creature's ire — then on a *landed* hit fires:
+   * id, name, emitsLight, roomId), then routes the result: a miss calls
+   * `defender.provoke` (when the descriptor has one) — a swing provokes its
+   * target even when it lands nothing, so flailing in the dark still draws a
+   * creature's ire — while a landed hit deals damage via `defender.deal` (the
+   * shared damage sink) and fires:
    *   • attacker `onHit` — effect specs applied to the still-living defender (a
    *     venomous bite, a debuff). A player attacker stamps `sourceId` so a poison
    *     kill credits them; a mob's venom credits no one. Each hit stacks an
@@ -1291,9 +1292,12 @@ class GameState {
       light: this.rooms[defender.roomId].light,
       attackerEmitsLight: attacker.emitsLight, targetEmitsLight: defender.emitsLight,
     });
-    let defenderDeath = defender.deal(r.damage); // damage + threat/kill (or respawn); pushes its own death event
     let attackerDeath = null;
-    if (!r.hit) return { defenderDeath, attackerDeath };
+    if (!r.hit) {
+      if (defender.provoke) defender.provoke(); // a whiffed swing still draws the target's ire
+      return { defenderDeath: null, attackerDeath };
+    }
+    let defenderDeath = defender.deal(r.damage); // damage + threat + kill via the shared sink; pushes its own death event
 
     // Attacker onHit → the defender by default (venom, a debuff), but an entry marked
     // `target: "self"` (or "attacker") lands on the attacker instead — life-steal: a
@@ -1368,7 +1372,8 @@ class GameState {
         // Defence is read fresh each swing, so a contact trigger from an earlier
         // swing this tick (an armour-shredding onHit, a spike buff) counts at once.
         const r = strike(swing, mobDefence(mt, mob), rt.light, weapon.dice, weapon.damageType || "physical");
-        const { attackerDeath } = this.applyHitOutcome({ r, events, attacker, defender });
+        const { defenderDeath, attackerDeath } = this.applyHitOutcome({ r, events, attacker, defender });
+        if (defenderDeath) p.pending = null; // quarry slain — stop swinging
         if (attackerDeath) break; // a reflect killed the player — they've respawned away
       }
     }
@@ -1544,13 +1549,12 @@ class GameState {
 
     const result = { resisted: false };
     if (applied.kind === "damage") {
-      this._addThreat(mob, player.id, Math.max(1, applied.damage));
-      mob.hp -= applied.damage;
       result.damage = applied.damage;
-      if (mob.hp <= 0) {
-        result.killed = true;
-        result.death = this._killMob(mob, player); // removes mob, drops loot/shards, awards xp
-      }
+      // Damage, threat and any kill resolve in the shared sink. Silent: the cast
+      // command narrates the blow — and the kill, so magic.js filters the death
+      // event out of its dispatch for the same reason.
+      result.death = this._hurtMob(mob, player.location, applied.damage, events, { silent: true, threatTo: player.id, killer: player });
+      if (result.death) result.killed = true;
     } else if (applied.kind === "dot") {
       // Stamped with the caster above, so a smoulder-kill credits them (like a bleed).
       this._addThreat(mob, player.id, 1);
@@ -1640,8 +1644,8 @@ class GameState {
         // A physical burst is soaked flat by each foe's Armour; a magical one isn't
         // (its only defence was the Ward negation above).
         if (spec.damageType === "physical") damage = mitigate(damage, "physical", mobDefence(t, mob));
-        this._addThreat(mob, player.id, damage); // a survivor keeps the thrower in its sights
-        death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player });
+        // Threat is folded into the sink — a survivor keeps the thrower in its sights.
+        death = this._hurtMob(mob, roomId, damage, events, { cause: spec.cause || "blast", killer: player, threatTo: player.id });
       }
       // A lingering cloud sinks a DoT into anything the burst didn't outright kill,
       // stamped with the thrower so a corrosion kill credits them (like a bleed).
@@ -1807,31 +1811,43 @@ class GameState {
   }
 
   /**
-   * Apply `amount` damage to a mob from a source that isn't a direct swing — the
-   * room itself (light-bane), a bleed tick, a thrown bomb. Pushes a `mob-hurt`
-   * event tagged with `cause`; a kill resolves through the shared `_killMobAt`
-   * (removal, spoils, XP, light, the `death` event — see state-mobai.js), with
-   * `killer` credited as the finisher when a player is named. Returns the death
-   * event (already pushed), or null if the mob survives.
+   * THE mob damage sink: every point of damage a mob takes — a melee swing (the
+   * defender descriptor's `deal`), a spell, a bleed tick, light-bane, a thrown
+   * bomb — lands through here, so hp, threat and the kill can never drift apart
+   * between paths. A kill resolves through the shared `_killMobAt` (removal,
+   * spoils, XP, light, the `death` event — see state-mobai.js), with `killer`
+   * credited as the finisher when a player is named. Options carry the two
+   * things that genuinely vary by source:
+   *   • `threatTo` — a combatant id to stoke `max(1, amount)` threat toward
+   *     (the damage→threat convention, kept here so the minimum can't drift).
+   *   • `silent` — skip the `mob-hurt` event when the caller's own swing/cast
+   *     event or outcome line already narrates the blow.
+   * Returns the death event (already pushed), or null if the mob survives.
    */
   _hurtMob(mob, roomId, amount, events, opts = {}) {
-    const { cause = "hit", killer = null } = opts;
-    const t = this.world.mobs[mob.template];
+    const { cause = "hit", killer = null, threatTo = null, silent = false } = opts;
+    if (threatTo != null) this._addThreat(mob, threatTo, Math.max(1, amount));
     mob.hp -= amount;
-    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
+    if (!silent) {
+      const t = this.world.mobs[mob.template];
+      events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
+    }
     if (mob.hp > 0) return null;
     const death = this._killMobAt(mob, roomId, killer, cause);
     events.push(death);
     return death;
   }
 
-  /** Apply `amount` non-combat damage to a player (a bleed tick, the room). Pushes
-   *  a `player-hurt` event; routes death through the usual rim respawn. Returns the
-   *  death event, or null if the player survives. */
+  /** The player damage sink: every point of damage a player takes — a mob's swing
+   *  (the defender descriptor's `deal`), a spell, a bleed tick, the room — lands
+   *  through here; death routes through the usual rim respawn (`_beginDeath`).
+   *  Pushes a `player-hurt` event tagged with `cause`, unless `silent` (the
+   *  caller's own swing/cast event already narrates the blow). Returns the death
+   *  event (already pushed), or null if the player survives. */
   _hurtPlayer(player, amount, events, opts = {}) {
-    const { cause = "hit" } = opts;
+    const { cause = "hit", silent = false } = opts;
     player.hp -= amount;
-    events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
+    if (!silent) events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
     if (player.hp <= 0) {
       const death = this._beginDeath(player, player.location, events);
       events.push(death);
