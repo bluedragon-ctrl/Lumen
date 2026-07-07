@@ -84,6 +84,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ("You drive Glimmer Spike through…"). The validator checks the block's keys.
 
 ### Fixed
+- **Contact triggers can no longer strike a corpse twice.** A melee contact
+  trigger (`onHit`/`onDamage`/spikes) now only ever lands on a side still
+  standing: a self-targeted `onHit` that kills its wielder (a blood-price
+  weapon) is captured as the attacker's death — previously it was silently
+  discarded, so the exchange carried on as if the attacker were alive — and
+  once either combatant is down, no further trigger fires at them (a second
+  "kill" would double-run the death path, double-decrementing the spawner count).
+- **A mob slain with no nameable finisher now still pays the players who fought
+  it.** Every mob death resolves through one shared sequence (`_killMobAt`), so
+  an indirect kill — light-bane, a bleed whose caster logged out — credits kill
+  XP to players holding live combat threat, exactly as a direct blow's death
+  path always did. Pure-environment kills with no participants still award nothing.
+- **`weaponOf` no longer crashes on an equipped hand item whose template is
+  missing** (guards like its sibling helpers; previously unreachable in practice
+  thanks to the login-time orphan filter, but a tick-loop crash if ever hit).
 - **Spell casts no longer drop their side-effect messages.** The player cast
   resolvers produced events nobody delivered, so: a sleeping mob roused by a
   hostile cast (or caught in an Arc Flash / thrown bomb) woke silently, the
@@ -105,6 +120,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and dropped its `emitLight` companion glow.
 
 ### Changed
+- **Melee combat internals dedup (no gameplay change beyond the fixes above).**
+  The uniform `attack` event is now built in one place (`applyHitOutcome`) for
+  both directions — player swings gain the `targetKind`/`attackerEmitsLight`
+  fields mob swings already carried, and the never-read `targetMaxHp` is dropped;
+  the duplicated death block in `_hurtMob` now delegates to `_killMobAt`; the
+  thrice-copied "rouse a struck sleeper" and twice-copied auto-retaliate blocks
+  are shared helpers (`_rouseMob`/`_autoEngage`); a missed swing provoking its
+  target (threat on a miss) is now documented as deliberate; `combat-math.js`
+  stops exporting its internal-only constants and `state.js` drops two unused
+  imports.
 - **The Tide is now fully data-driven (`data/world/tide.json`).** Its whole
   configuration — timing (`phaseTicks`, phase order), depth-scaled `darkening`
   (formula params + which phases darken vs. edge-dim), lamp on/off phases and

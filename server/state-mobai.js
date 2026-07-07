@@ -733,23 +733,19 @@ class MobAIMixin {
       ? this._resolveSpellPayload(ctx, action.spell)
       : this._resolveMeleePayload(ctx);
     if (ctx.isPlayer && !targetDied) {
-      this._rouseAndRetaliate(target.actor, m, t, events, { attackerAlive: !attackerDied });
+      this._rouseAndRetaliate(target.actor, m, events, { attackerAlive: !attackerDied });
     }
   }
 
   /** A surviving player target rouses and turns on the mob. Rousing and retaliating
    *  are separate: a struck delver always wakes — you can't sleep through a blow,
-   *  even one whose reflect killed the attacker — but auto-retaliate only fires when
-   *  there is still a living attacker (`attackerAlive`) and the player isn't already
-   *  swinging at something. Only called when the player target is alive, so no
-   *  `hp > 0` guards are needed (the old melee `p.hp > 0` check was a no-op anyway,
-   *  since `_respawn` restores HP). */
-  _rouseAndRetaliate(player, mob, t, events, { attackerAlive }) {
+   *  even one whose reflect killed the attacker — but auto-retaliate (the shared
+   *  `_autoEngage`) only fires when there is still a living attacker
+   *  (`attackerAlive`) and the player isn't already swinging at something. Only
+   *  called when the player target is alive, so no `hp > 0` guards are needed. */
+  _rouseAndRetaliate(player, mob, events, { attackerAlive }) {
     if (this._rouse(player)) events.push({ type: "player-woke", playerId: player.id });
-    if (attackerAlive && !player.pending) {
-      player.pending = { type: "attack", targetId: mob.id };
-      events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
-    }
+    if (attackerAlive) this._autoEngage(player, mob, events);
   }
 
   /** A mob makes one melee attack (the `attack` action). Thin entry over the shared
@@ -776,29 +772,21 @@ class MobAIMixin {
       events.push({ type: "mob-ambush", roomId, mobId: m.id, mobName: t.name,
         targetId: target.id, light: rt.light, emitsLight: t.emitsLight > 0 });
     }
-    const targetName = isPlayer ? target.actor.name : tmt.name;
-    const targetEmitsLight = isPlayer ? false : tmt.emitsLight > 0;
     const defence = isPlayer
       ? playerDefence(this.world, target.actor)
       : mobDefence(tmt, target.actor);
-    const attacker = {
+    const swing = {
       band: t.perception,
       hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
       dmgBonus: (t.attack.bonus) || 0,
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
     };
-    const r = strike(attacker, defence, rt.light, t.attack.damage, t.attack.type || "physical");
-    const attackEvent = {
-      type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
-      targetId: target.id, targetName, targetKind: target.kind, hit: r.hit, sighted: r.sighted,
-      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.actor.hp - r.damage), targetMaxHp: target.actor.maxHp,
-      light: rt.light, attackerEmitsLight: t.emitsLight > 0, targetEmitsLight,
-    };
+    const r = strike(swing, defence, rt.light, t.attack.damage, t.attack.type || "physical");
     const defender = isPlayer
       ? this._playerDefender(target.actor, roomId, events)
       : this._mobDefender(target.actor, tmt, roomId, { id: m.id, kind: "mob", actor: m }, events);
     const { defenderDeath, attackerDeath } = this.applyHitOutcome({
-      r, events, attackEvent,
+      r, events,
       attacker: {
         actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: t.emitsLight > 0, roomId,
         onHit: t.attack.onHit,
@@ -1002,12 +990,15 @@ class MobAIMixin {
     return this._killMobAt(mob, killer.location, killer);
   }
 
-  /** Remove a mob killed by a direct hit in `roomId`, drop its spoils, and award
-   *  XP. `killerPlayer` is the player to credit as finisher (a player attacker, or
-   *  the OWNER of an allied mob that landed the blow — resolved by the caller) or
-   *  null when no player struck the killing blow (e.g. an ownerless ally's kill);
-   *  other players who held threat are still credited via `_awardKillXp`. Returns
-   *  the `death` event. Shared by the player-attack path and mob-vs-mob combat. */
+  /** Remove a slain mob from `roomId`, drop its spoils, and award XP — the ONE
+   *  death sequence every kill path shares: a direct hit (player attack,
+   *  mob-vs-mob, a hostile cast) and the indirect sinks via `_hurtMob` (a bleed
+   *  tick, light-bane, a thrown bomb). `killerPlayer` is the player to credit as
+   *  finisher (a player attacker, or the OWNER of an allied mob that landed the
+   *  blow — resolved by the caller) or null when no player struck the killing
+   *  blow (an ownerless ally's kill, pure environment, a DoT whose source is
+   *  gone); players who traded blows are still credited via `_awardKillXp`
+   *  either way. Returns the `death` event (the caller pushes/forwards it). */
   _killMobAt(mob, roomId, killerPlayer, cause = "hit") {
     const t = this.world.mobs[mob.template];
     const idx = this.rooms[roomId].mobs.indexOf(mob);

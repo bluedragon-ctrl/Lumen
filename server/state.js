@@ -6,7 +6,7 @@ const { tidePhaseAt, tideOffset, resolveTide } = require("./world-clock");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
 const {
-  xpForLevel, MELEE_SCALE, weaponOf, mobOnDamage, playerOnDamage,
+  xpForLevel, MELEE_SCALE, weaponOf,
   HP_BASE, HP_PER_LEVEL, HP_PER_VITALITY, MANA_PER_INTELLECT, ATTR_BASELINE, SIGHT_PER_PERCEPTION,
   HIT_PER_PERCEPTION, CRIT_PER_PERCEPTION,
   effectiveAttributes, playerDefence, effectiveSpeed, mobDefence,
@@ -1127,6 +1127,24 @@ class GameState {
     return false;
   }
 
+  /** Rouse a resting mob and announce the waking (`mob-woke`), if it was in fact
+   *  resting. The one place every hostile contact — a swing, a spell, a blast —
+   *  jolts a sleeper awake from. */
+  _rouseMob(mob, roomId, events) {
+    if (!this._rouse(mob)) return;
+    const t = this.world.mobs[mob.template];
+    events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
+  }
+
+  /** Commit a player to swinging at `mob` unless they're already engaged, with the
+   *  `combat-auto-start` tell. The shared auto-retaliate: a hostile cast sticks the
+   *  caster to the target, a mob's blow turns its victim on it (_rouseAndRetaliate). */
+  _autoEngage(player, mob, events) {
+    if (player.pending) return;
+    player.pending = { type: "attack", targetId: mob.id };
+    events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: this.world.mobs[mob.template].name });
+  }
+
   /**
    * Advance the world one tick:
    *   1. accrue action-point energy (capped) for all actors
@@ -1240,9 +1258,13 @@ class GameState {
 
   /**
    * Process the outcome of one resolved **melee** swing, for either direction
-   * (player→mob or mob→player), from a single place so both get the data-driven
-   * contact triggers identically. Pushes the `attack` event, applies damage via
-   * the caller's `defender.deal` sink, then on a *landed* hit fires:
+   * (player→mob or mob→player), from a single place so both get the uniform
+   * `attack` event and the data-driven contact triggers identically. Builds the
+   * event from the two descriptors (attacker/defender each carry actor, kind,
+   * id, name, emitsLight, roomId), applies damage via the caller's
+   * `defender.deal` sink — deal runs hit or miss: a swing provokes its target
+   * (a mob defender's threat) even when it lands nothing, so flailing in the
+   * dark still draws a creature's ire — then on a *landed* hit fires:
    *   • attacker `onHit` — effect specs applied to the still-living defender (a
    *     venomous bite, a debuff). A player attacker stamps `sourceId` so a poison
    *     kill credits them; a mob's venom credits no one. Each hit stacks an
@@ -1252,13 +1274,23 @@ class GameState {
    *     `self`, and fires only for a matching damage `source` (default melee).
    *     `spikes` is normalized into this list (see mobOnDamage/playerOnDamage).
    *     A reflected DoT credits the *defender* if it's a player (mirror of onHit).
-   * `source` is the damage origin ("melee"); spells/ranged don't call this yet —
-   * the `castSpell` path is where `on: ["spell"]` entries would later hook.
-   * Returns { defenderDeath, attackerDeath } (each a death event or null) so the
-   * caller can stop its swing loop and skip double-processing a death.
+   * A trigger only ever lands on a side still standing: a defender's reflect
+   * fires even on the blow that kills it, but once either side is down no
+   * further trigger strikes that corpse (a second "kill" would double-run the
+   * death path). `source` is the damage origin ("melee"); spells/ranged don't
+   * call this yet — the `castSpell` path is where `on: ["spell"]` entries would
+   * later hook. Returns { defenderDeath, attackerDeath } (each a death event or
+   * null) so the caller can stop its swing loop and skip double-processing a death.
    */
-  applyHitOutcome({ r, events, attackEvent, source = "melee", attacker, defender }) {
-    events.push(attackEvent);
+  applyHitOutcome({ r, events, source = "melee", attacker, defender }) {
+    events.push({
+      type: "attack", by: attacker.kind, attackerId: attacker.id, attackerName: attacker.name,
+      roomId: defender.roomId, targetId: defender.id, targetName: defender.name, targetKind: defender.kind,
+      hit: r.hit, sighted: r.sighted, damage: r.damage, crit: r.crit,
+      targetHp: Math.max(0, defender.actor.hp - r.damage),
+      light: this.rooms[defender.roomId].light,
+      attackerEmitsLight: attacker.emitsLight, targetEmitsLight: defender.emitsLight,
+    });
     let defenderDeath = defender.deal(r.damage); // damage + threat/kill (or respawn); pushes its own death event
     let attackerDeath = null;
     if (!r.hit) return { defenderDeath, attackerDeath };
@@ -1266,30 +1298,34 @@ class GameState {
     // Attacker onHit → the defender by default (venom, a debuff), but an entry marked
     // `target: "self"` (or "attacker") lands on the attacker instead — life-steal: a
     // blade that heals its wielder on a landed hit (the mirror of onDamage's target
-    // axis). Self-target fires even on a killing blow (you drink life as you cut);
-    // defender-target only while the defender still lives.
+    // axis). Self-target fires even on a killing blow (you drink life as you cut) —
+    // but a blood-price effect can also kill the wielder, so its death is captured.
     if (attacker.onHit) {
       for (const spec of attacker.onHit) {
         if (!this._rollChance(spec)) continue;
-        if (spec.target === "self" || spec.target === "attacker")
-          this._applyTriggerEffect(events, spec, attacker, attacker.hurt, null);
-        else if (!defenderDeath)
+        if (spec.target === "self" || spec.target === "attacker") {
+          if (attackerDeath) continue; // already down — nothing left to pay or drink
+          attackerDeath = this._applyTriggerEffect(events, spec, attacker, attacker.hurt, null);
+        } else if (!defenderDeath) {
           this._applyTriggerEffect(events, spec, defender, defender.hurt, attacker.sourceId);
+        }
       }
     }
 
     // Defender onDamage → the attacker (reflect/retaliate) or self (mana-on-hit).
     // Reflect fires on contact regardless of whether the defender has an attack of
-    // its own, and even on the blow that kills it.
+    // its own, and even on the blow that kills it — only a target already down is
+    // skipped (see the corpse rule in the doc above).
     for (const entry of defender.onDamage || []) {
       if (!(entry.on || ["melee"]).includes(source)) continue;
-      if (!this._rollChance(entry)) continue;
       const toAttacker = (entry.target || "attacker") === "attacker";
+      if (toAttacker ? attackerDeath : defenderDeath) continue;
+      if (!this._rollChance(entry)) continue;
       const target = toAttacker ? attacker : defender;
       // A defender-applied DoT on the attacker credits the defender if it's a player.
       const credit = toAttacker ? defender.sourceId : null;
       const death = this._applyTriggerEffect(events, entry, target, target.hurt, credit);
-      if (death) { if (toAttacker) attackerDeath = attackerDeath || death; else defenderDeath = defenderDeath || death; }
+      if (death) { if (toAttacker) attackerDeath = death; else defenderDeath = death; }
     }
     return { defenderDeath, attackerDeath };
   }
@@ -1311,37 +1347,27 @@ class GameState {
       const mobDef = mobDefence(mt, mob);
       const attrs = effectiveAttributes(w, p);
       const per = attrs.perception || 0;
-      const attacker = {
+      const swing = {
         band: p.perception,
         hitBonus: per * HIT_PER_PERCEPTION,
         dmgBonus: spellScaleBonus(attrs, weapon.scale),
         crit: per * CRIT_PER_PERCEPTION + (weapon.crit || 0),
       };
-      const mobName = w.mobs[mob.template].name;
-      const mobEmits = !!w.mobs[mob.template].emitsLight;
       // A dozing/resting mob is jolted awake the instant a delver strikes it —
       // the authored ambush payoff: free opening blows, then it fights back.
-      if (this._rouse(mob)) events.push({ type: "mob-woke", roomId: p.location, mobId: mob.id, mobName, emitsLight: mobEmits, light: rt.light });
+      this._rouseMob(mob, p.location, events);
+      const attacker = {
+        actor: p, kind: "player", id: p.id, name: p.name, emitsLight: false, roomId: p.location,
+        onHit: weapon.onHit,
+        sourceId: p.id, // a player-applied DoT credits them on the kill
+        hurt: (dmg, cause) => this._hurtPlayer(p, dmg, events, { cause }), // reflect lands here
+      };
+      const defender = this._mobDefender(mob, mt, p.location, { id: p.id, kind: "player", actor: p }, events);
       // Stop swinging if the mob dies OR a spike reflect kills the player mid-loop.
       while (p.energy >= weapon.actionCost && mob.hp > 0 && p.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(attacker, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
-        const attackEvent = {
-          type: "attack", by: "player", attackerId: p.id, attackerName: p.name, roomId: p.location,
-          targetId: mob.id, targetName: mobName, hit: r.hit, sighted: r.sighted,
-          damage: r.damage, crit: r.crit, targetHp: Math.max(0, mob.hp - r.damage), targetMaxHp: mob.maxHp,
-          light: rt.light, targetEmitsLight: mobEmits,
-        };
-        const { attackerDeath } = this.applyHitOutcome({
-          r, events, attackEvent,
-          attacker: {
-            actor: p, kind: "player", id: p.id, name: p.name, emitsLight: false, roomId: p.location,
-            onHit: weapon.onHit,
-            sourceId: p.id, // a player-applied DoT credits them on the kill
-            hurt: (dmg, cause) => this._hurtPlayer(p, dmg, events, { cause }), // reflect lands here
-          },
-          defender: this._mobDefender(mob, mt, p.location, { id: p.id, kind: "player", actor: p }, events),
-        });
+        const r = strike(swing, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
+        const { attackerDeath } = this.applyHitOutcome({ r, events, attacker, defender });
         if (attackerDeath) break; // a reflect killed the player — they've respawned away
       }
     }
@@ -1523,17 +1549,12 @@ class GameState {
     // A kill may remove a luminous mob; refresh the room's light either way.
     this.rooms[player.location].light = this.computeRoomLight(player.location);
 
-    // A hostile spell rouses a resting mob just as a blow does (only if it survived).
-    if (spell.hostile && mob.hp > 0 && this._rouse(mob)) {
-      const t = w.mobs[mob.template];
-      events.push({ type: "mob-woke", roomId: player.location, mobId: mob.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: this.rooms[player.location].light });
-    }
-
-    // Auto-retaliate on hostile spell: if the player isn't already attacking something, target this mob
-    if (spell.hostile && !player.pending && player.hp > 0 && mob.hp > 0) {
-      player.pending = { type: "attack", targetId: mob.id };
-      const t = w.mobs[mob.template];
-      events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
+    // A hostile spell rouses a resting mob just as a blow does (only if it survived),
+    // and sticks the caster to it: if the player isn't already attacking something,
+    // they auto-engage this mob.
+    if (spell.hostile && mob.hp > 0) {
+      this._rouseMob(mob, player.location, events);
+      if (player.hp > 0) this._autoEngage(player, mob, events);
     }
 
     return result;
@@ -1618,8 +1639,7 @@ class GameState {
         this._addThreat(mob, player.id, 1); // the splash sticks the thrower in its sights
         dot = true;
       }
-      if (!death && this._rouse(mob))
-        events.push({ type: "mob-woke", roomId, mobId: mob.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light });
+      if (!death) this._rouseMob(mob, roomId, events);
       results.push({ id: mob.id, name: t.name, damage, dot, killed: !!death, death });
     }
     rt.light = this.computeRoomLight(roomId); // a luminous mob blasted apart changes the room
@@ -1773,28 +1793,20 @@ class GameState {
   }
 
   /**
-   * Apply `amount` damage to a mob from a source that isn't a direct hit — the
-   * room itself (light-bane), a bleed tick, etc. Pushes a `mob-hurt` event tagged
-   * with `cause`; on death drops spoils where the mob stands and pushes a `death`
-   * event. XP is credited only when a `killer` player is named (pure environment
-   * rewards no one). This is the shared "killed by something else" path. Returns
-   * the death event, or null if the mob survives.
+   * Apply `amount` damage to a mob from a source that isn't a direct swing — the
+   * room itself (light-bane), a bleed tick, a thrown bomb. Pushes a `mob-hurt`
+   * event tagged with `cause`; a kill resolves through the shared `_killMobAt`
+   * (removal, spoils, XP, light, the `death` event — see state-mobai.js), with
+   * `killer` credited as the finisher when a player is named. Returns the death
+   * event (already pushed), or null if the mob survives.
    */
   _hurtMob(mob, roomId, amount, events, opts = {}) {
     const { cause = "hit", killer = null } = opts;
     const t = this.world.mobs[mob.template];
-    const rt = this.rooms[roomId];
     mob.hp -= amount;
-    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: rt.light });
+    events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
     if (mob.hp > 0) return null;
-    const idx = rt.mobs.indexOf(mob);
-    if (idx >= 0) rt.mobs.splice(idx, 1);
-    this._adjustOwned(mob, -1);
-    const loot = this._dropSpoils(mob, roomId);
-    const xp = t.xp || 0;
-    const participants = (killer && !mob.noSpoils) ? this._awardKillXp(mob, killer, xp, roomId) : []; // shared credit; summons award nothing
-    rt.light = this.computeRoomLight(roomId); // a luminous mob dying changes the room
-    const death = { type: "death", victimKind: "mob", victimId: mob.id, victimName: t.name, victimTemplate: mob.template, roomId, killerId: killer ? killer.id : null, loot, xp: (killer && !mob.noSpoils) ? xp : 0, cause, participants };
+    const death = this._killMobAt(mob, roomId, killer, cause);
     events.push(death);
     return death;
   }

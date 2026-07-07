@@ -585,7 +585,7 @@ function lookAt(state, player, arg) {
 }
 
 // Set a pending attack on a mob in the room; swings resolve on ticks as energy
-// allows (see state.resolveCombat). You can only target what you can perceive.
+// allows (see state.resolvePlayerAttacks). You can only target what you can perceive.
 function attack(state, player, arg) {
   if (!arg) return [{ type: "error", text: "Attack what?" }];
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)

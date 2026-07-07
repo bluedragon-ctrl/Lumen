@@ -27,7 +27,7 @@ function weaponOf(world, player) {
   const hand = player.equipment && player.equipment.hand;
   if (hand) {
     const t = world.items[hand.template];
-    if (t.weapon) {
+    if (t && t.weapon) {
       // A weapon's swing is physical by default; declaring `damage.magical` instead
       // makes it a magical blow, cut by the defender's Ward percentage rather than
       // soaked flat by Armour (see strike). Glimmer-craft weapons scale on Intellect.
@@ -286,8 +286,6 @@ module.exports = {
   weaponOf,
   mobOnDamage,
   playerOnDamage,
-  WARD_PER_WITS,
-  EVASION_PER_WITS,
   HIT_PER_PERCEPTION,
   CRIT_PER_PERCEPTION,
   HP_BASE,
@@ -298,17 +296,14 @@ module.exports = {
   SIGHT_PER_PERCEPTION,
   effectiveAttributes,
   playerDefence,
-  equipSpeedPenalty,
   effectiveSpeed,
   mobDefence,
   spellScaleBonus,
   durationScaleBonus,
   scaledAmount,
-  WARD_RESIST_PER_POINT,
   wardNegates,
   mitigate,
   pickWeighted,
   roomEffectFires,
-  MIN_HIT,
   strike,
 };
