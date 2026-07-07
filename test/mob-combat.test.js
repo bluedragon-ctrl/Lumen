@@ -30,6 +30,7 @@ function makeCombatWorld() {
       bolt: { id: "bolt", name: "Shadow Bolt", hostile: true, effect: { type: "damage", damage: "5" } },
       hex: { id: "hex", name: "Hex", hostile: true, effect: { type: "weaken", name: "Hex", duration: 5 } },
       snuff: { id: "snuff", name: "Snuff", hostile: true, effect: { type: "douse", name: "Snuff" } },
+      leech: { id: "leech", name: "Leech", hostile: true, effect: { type: "drain", damage: "6", healFactor: 0.5 } },
     },
     fixtures: {}, recipes: {}, quests: {},
     playerTemplate: {
@@ -178,6 +179,45 @@ test("cast: mob-vs-mob neither rouses nor auto-starts a player", () => {
   assert.ok(events.some((e) => e.type === "mob-cast" && e.targetKind === "mob"));
   assert.ok(!has(events, "player-woke"));
   assert.ok(!has(events, "combat-auto-start"));
+});
+
+// --- Drain (Leech) ------------------------------------------------------------
+
+test("drain: a mob's leech damages the player and heals the caster, capped at maxHp", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const caster = addMob(state, "caster"); // maxHp 50
+  caster.hp = 40;
+  p.hp = 100;
+  const events = [];
+  state._mobCast(caster, state.world.mobs.caster, "arena", events, [pdesc(p)], "leech");
+  assert.equal(p.hp, 94, "player lost the rolled 6");
+  assert.equal(caster.hp, 43, "caster healed floor(6 * 0.5) = 3");
+  const ev = events.find((e) => e.type === "mob-cast");
+  assert.equal(ev.drained, 3, "mob-cast event carries the drained amount");
+});
+
+test("drain: the heal never overfills the caster", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const caster = addMob(state, "caster");
+  caster.hp = 49; // room for only 1 of the 3
+  const events = [];
+  state._mobCast(caster, state.world.mobs.caster, "arena", events, [pdesc(p)], "leech");
+  assert.equal(caster.hp, 50, "capped at maxHp");
+});
+
+test("drain: a player-cast drain heals the player (engine path for a future scroll)", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const mob = addMob(state, "biter"); // 5 hp — the 6 kills it
+  p.hp = p.maxHp - 10;
+  const events = [];
+  const result = state.castSpell(p, state.world.spells.leech, mob, events);
+  assert.equal(result.damage, 6);
+  assert.ok(result.killed, "the drain still kills");
+  assert.equal(p.hp, p.maxHp - 10 + 3, "player healed floor(6 * 0.5) = 3");
+  assert.equal(result.drained, 3, "result reports the heal for narration");
 });
 
 // --- Shared target selection ------------------------------------------------
