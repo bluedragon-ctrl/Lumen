@@ -360,6 +360,18 @@
     "type": "crafting",
     "station": "kiln"
   },
+  "caged-gate": {
+    "id": "caged-gate",
+    "name": "a caged gate",
+    "keywords": ["gate", "cage", "caged", "bars", "chain", "south"],
+    "description": "The whole southern arch is closed off with a wall of forged iron bars — not a door so much as the front of a cage, each bar as thick as a pick-haft, set deep into holes drilled in the living rock and strapped with cross-bands at knee and shoulder height. A gate is built into the middle of it, hinged and heavy, wound about with chain and shut with a prospector's lock gone orange with the wet. Whoever raised it hauled the iron down five floors to do it, and meant it to hold: the bars are set to keep something in, not delvers out. The warm wind pours through regardless, beading the metal, and far down the passage beyond glows that pale, steady wash of light that no one is carrying.",
+    "type": "scenery"
+  },
+  "gate-warning": {
+    "id": "gate-warning",
+    "name": "a painted warning",
+    "keywords": ["warning", "sign", "paint", "letters", "writing"],
+    "description": "Across the cross-bands of the gate, in whitewash gone grey and laid on thick with a rag, someone painted letters a hand tall: DO NOT ENTER. Below it, smaller, in a different and shakier hand: IT IS NOT WORTH IT. THE LIGHT IS A LIE. Below that, a tally — four strokes and a fifth across them, and two strokes more — the way prospectors count their dead.",
   "verge-niche": {
     "id": "verge-niche",
     "name": "a cut lamp-shelf",

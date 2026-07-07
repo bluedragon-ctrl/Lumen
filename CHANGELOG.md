@@ -33,6 +33,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   chitin-spike, bug-tallow and slug-slime (giving the underused slime binder a
   second home); Vesper the glimmer-mage sells the schematic. Names/balance
   provisional, pending sign-off.
+- **The approach to the hot-springs area — two depth-5 rooms east of the Gullet.**
+  A side-mouth partway down the Gullet's switchback now opens east into **The
+  Windway** (a long, winding passage carrying a warm, damp draught from somewhere
+  ahead) and on to **The Barred Mouth**, a prospector-dressed chamber whose
+  southern arch is sealed floor-to-ceiling by a forged **caged gate** (chained,
+  locked, painted with a DO-NOT-ENTER warning and a dead-men's tally). Through
+  the bars: steam, a green smell of growing things, and a pale wash of light no
+  one is carrying — the first breadcrumbs of the springs area to come. The gate
+  is scenery for now and becomes a real `door` fixture when the area behind it
+  lands. Room and fixture names are provisional pending sign-off.
 - **The Graveworker's den (d5 mini-dungeon, names provisional).** West of the
   Thornreach browse a new grazing-edge room (The Far Verge) drops down a
   human-improved descent to depth 5, through a squeeze into a human-made tunnel,
