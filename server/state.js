@@ -1041,12 +1041,46 @@ class GameState {
     this.revealedItems.delete(playerId);
   }
 
+  /** Reveal an ephemeral hidden item to a player (a search find, or shared with a
+   *  co-located delver). Returns true if it was newly revealed. */
+  _revealItemTo(player, instId) {
+    let set = this.revealedItems.get(player.id);
+    if (!set) { set = new Set(); this.revealedItems.set(player.id, set); }
+    if (set.has(instId)) return false;
+    set.add(instId);
+    return true;
+  }
+
+  /** Reveal an ephemeral hidden mob (lurker) to a player. Returns true if new. */
+  _revealMobTo(player, mobId) {
+    let set = this.revealedMobs.get(player.id);
+    if (!set) { set = new Set(); this.revealedMobs.set(player.id, set); }
+    if (set.has(mobId)) return false;
+    set.add(mobId);
+    return true;
+  }
+
+  /** Record a lasting secret (fixture/exit discovery key) on a player, permanently.
+   *  Returns true if it was newly discovered for them. */
+  _recordDiscovery(player, key) {
+    if (!Array.isArray(player.discovered)) player.discovered = [];
+    if (player.discovered.includes(key)) return false;
+    player.discovered.push(key);
+    return true;
+  }
+
   /**
    * `search` the current room: reveal every hidden feature whose requirement is met
    * by the player's effective Perception (attribute × light tier — so light matters).
    * Lasting secrets (fixtures/exits) are recorded permanently on `player.discovered`;
    * hidden items and mobs are revealed ephemerally (this visit only — a stashed item
-   * you leave behind must be searched out anew). Returns { found, any }.
+   * you leave behind must be searched out anew).
+   *
+   * A find is *shared*: the searcher points it out, so every co-located delver gets
+   * the same reveal too — ignoring their own Perception (they're being shown it).
+   * `shared` reports whether that propagation revealed anything new to someone else,
+   * so the caller can refresh their room view even when the searcher turned up
+   * nothing new. Returns { found, any, shared }.
    */
   search(player) {
     const roomId = player.location;
@@ -1055,39 +1089,34 @@ class GameState {
     const eff = effectivePerception(this.world, player, rt.light);
     if (!Array.isArray(player.discovered)) player.discovered = [];
     const found = [];
+    const others = this.playersIn(roomId).filter((p) => p.id !== player.id);
+    let shared = false;
+    const shareItem = (id) => { for (const o of others) if (this._revealItemTo(o, id)) shared = true; };
+    const shareMob = (id) => { for (const o of others) if (this._revealMobTo(o, id)) shared = true; };
+    const shareKey = (key) => { for (const o of others) if (this._recordDiscovery(o, key)) shared = true; };
 
-    let items = this.revealedItems.get(player.id);
     for (const inst of rt.items) {
       if (!inst.hidden || inst.hidden.perception > eff) continue;
-      if (!items) { items = new Set(); this.revealedItems.set(player.id, items); }
-      if (!items.has(inst.id)) {
-        items.add(inst.id);
-        found.push(this.world.items[inst.template].name);
-      }
+      if (this._revealItemTo(player, inst.id)) found.push(this.world.items[inst.template].name);
+      shareItem(inst.id);
     }
     for (const inst of rt.fixtures) {
-      if (inst.hidden && !isDiscovered(player, inst.discoveryKey) && inst.hidden.perception <= eff) {
-        player.discovered.push(inst.discoveryKey);
-        found.push(this.world.fixtures[inst.template].name);
-      }
+      if (!inst.hidden || inst.hidden.perception > eff) continue;
+      if (this._recordDiscovery(player, inst.discoveryKey)) found.push(this.world.fixtures[inst.template].name);
+      shareKey(inst.discoveryKey);
     }
     for (const [dir, h] of Object.entries(room.hiddenExits || {})) {
+      if ((h.perception || 0) > eff) continue;
       const key = discoveryKey(roomId, "exit", dir);
-      if (!isDiscovered(player, key) && (h.perception || 0) <= eff) {
-        player.discovered.push(key);
-        found.push(h.name || `a passage ${dir}`);
-      }
+      if (this._recordDiscovery(player, key)) found.push(h.name || `a passage ${dir}`);
+      shareKey(key);
     }
-    let set = this.revealedMobs.get(player.id);
     for (const m of rt.mobs) {
-      if (!m.hidden) continue;
-      if (!set) { set = new Set(); this.revealedMobs.set(player.id, set); }
-      if (!set.has(m.id) && m.hidden.perception <= eff) {
-        set.add(m.id);
-        found.push(this.world.mobs[m.template].name);
-      }
+      if (!m.hidden || m.hidden.perception > eff) continue;
+      if (this._revealMobTo(player, m.id)) found.push(this.world.mobs[m.template].name);
+      shareMob(m.id);
     }
-    return { found, any: found.length > 0 };
+    return { found, any: found.length > 0, shared };
   }
 
   /**
