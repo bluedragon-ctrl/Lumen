@@ -186,6 +186,15 @@
     },
     "effect": { "type": "drain", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 }, "healFactor": 0.5 }
   },
+  "summon-skeleton": {
+    "id": "summon-skeleton",
+    "name": "Summon Skeleton",
+    "description": "The Graveworker's graft of two crafts: human will to drive the weave, in the surface tradition — and raw glimmer spent outright, in the Umbral way, not woven as light but drawn out into hair-fine wire that strings a skeleton's joints and hauls it upright to serve. The risen thing is no husk and no ghost; there is nothing in it at all but the wire and your intent, and when the weave frays it drops back into a heap of honest bone. The keener your Intellect, the longer the binding holds. Cast it and a wired skeleton answers; cast it again and the old servant collapses as the new one rises.",
+    "manaCost": 12,
+    "shardCost": 4,
+    "target": "self",
+    "effect": { "type": "summon", "mob": "wired-skeleton", "count": 1, "durationScale": { "attr": "intellect", "per": 30 }, "group": "summon-skeleton" }
+  },
   "arc-flash": {
     "id": "arc-flash",
     "name": "Arc Flash",

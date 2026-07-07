@@ -818,7 +818,12 @@
       { "type": "attack", "weight": 1 },
       { "type": "emote", "weight": 2, "messages": ["says, without looking up: \"You're interrupting delicate work.\"", "winds a length of shard-wire off the spool, unhurried", "studies you the way a man studies materials", "says, mild: \"Do stop bleeding on my floor.\""] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "graveworked-apron", "chance": 0.2 },
+      { "template": "graveworkers-scalpel", "chance": 0.2 },
+      { "template": "scroll-leech", "chance": 0.2 },
+      { "template": "scroll-summon-skeleton", "chance": 0.2 }
+    ]
   },
   "cave-lurker": {
     "id": "cave-lurker",

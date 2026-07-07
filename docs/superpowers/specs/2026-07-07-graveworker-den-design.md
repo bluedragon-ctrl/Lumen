@@ -102,8 +102,8 @@ leather apron, shard-wire spooled at his belt, working under his own light
 (`emitsLight 1`). Speaks in mild, unbothered lines (warder's vein).
 
 **55 hp · speed 11 · armour 1 · ward 4 · melee 1d4 (hooked knife, cost 12) ·
-attributes m4 v7 i8 w6 p7 · xp 48 · shards 3d6 · loot: none** (unique drop
-deferred to a follow-up pass). `guard` in the sanctum, hostile, pursues 2.
+attributes m4 v7 i8 w6 p7 · xp 48 · shards 3d6** · loot: four uniques at 20%
+each (see *Boss loot* below). `guard` in the sanctum, hostile, pursues 2.
 
 Actions:
 - **summon** `wired-skeleton`, count 2, max 2, weight 3 — *"snaps his fingers,
@@ -124,8 +124,8 @@ human/glimmer-craft line clean per lore.md).
   the target, heals the caster for half the damage dealt.
 - **Server addition (the only one):** a `drain` effect type in the spell-effect
   handler (damage target + heal caster). Everything else in this build is JSON.
-- Mob-usable from day one; not sold/taught anywhere yet (scroll placement can
-  come with the loot follow-up pass).
+- Mob-usable from day one; taught to players only by the Scroll of Leech the
+  boss drops (see *Boss loot*).
 
 ## Lore compliance
 
@@ -142,10 +142,27 @@ human/glimmer-craft line clean per lore.md).
 - `server/factions.js` comment for `outlaw` gets one line noting the faction
   also covers the outlaws' wired dead (no logic change).
 
+## Boss loot (added in the loot pass, 20% chance each)
+
+- **`graveworked-apron`** — body, rarity rare: armour 0, ward 0,
+  `attrMod { intellect: 2, wits: 2 }`. The summoner's trade-off: the biggest
+  attrMod piece in the game, paid for with zero physical protection.
+- **`graveworkers-scalpel`** — hand, rarity rare: physical 1d4, actionCost 11,
+  scales `intellect/4`, `onHit restore 3 hp to self` (the hungering-dagger
+  mechanism — flat self-heal per landed cut; at scalpel numbers that converts
+  most of each blow). INT-scaled surgeon's counterpart to the perception-scaled
+  dagger.
+- **`scroll-leech`** — teaches `leech` (already player-castable end-to-end).
+- **`scroll-summon-skeleton`** — teaches **`summon-skeleton`** (new spell):
+  mana 12 + **4 shards**, summon-wisp pattern (one `wired-skeleton`, duration
+  scales INT ×30, `group` recast-replaces). The shard cost is deliberate
+  cross-craft: human will drives the weave, raw glimmer is spent as *wire* —
+  flagged in the description so the "shards = glimmer-craft" lore rule reads
+  as the graft it is. The skeleton stays wire-puppetry, distinct from the
+  Hollowed husks.
+
 ## Explicitly deferred (follow-up passes)
 
-- Boss unique item loot (stitching-hook weapon vs apron armour) + any scroll
-  placement for `leech`.
 - Quest hook (Fenn/Rim: a body-snatcher on the ledger).
 - Content behind the gallery's sealed west face.
 - Wider use of `wired-skeleton` outside the den.
