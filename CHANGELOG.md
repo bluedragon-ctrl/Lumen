@@ -92,6 +92,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ("You drive Glimmer Spike through…"). The validator checks the block's keys.
 
 ### Fixed
+- **Contact triggers can no longer strike a corpse twice.** A melee contact
+  trigger (`onHit`/`onDamage`/spikes) now only ever lands on a side still
+  standing: a self-targeted `onHit` that kills its wielder (a blood-price
+  weapon) is captured as the attacker's death — previously it was silently
+  discarded, so the exchange carried on as if the attacker were alive — and
+  once either combatant is down, no further trigger fires at them (a second
+  "kill" would double-run the death path, double-decrementing the spawner count).
+- **A mob slain with no nameable finisher now still pays the players who fought
+  it.** Every mob death resolves through one shared sequence (`_killMobAt`), so
+  an indirect kill — light-bane, a bleed whose caster logged out — credits kill
+  XP to players holding live combat threat, exactly as a direct blow's death
+  path always did. Pure-environment kills with no participants still award nothing.
+- **`weaponOf` no longer crashes on an equipped hand item whose template is
+  missing** (guards like its sibling helpers; previously unreachable in practice
+  thanks to the login-time orphan filter, but a tick-loop crash if ever hit).
 - **A mob's hostile status spell (a debuff/hex) lands again.** The shared
   hostile-cast core (`_applyHostileSpellEffect`) had no fallback for effect
   types outside damage / damage-over-time / sleep / douse, so a mob casting a
@@ -123,6 +138,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and dropped its `emitLight` companion glow.
 
 ### Changed
+- **All combat damage now flows through two shared sinks (`_hurtMob` /
+  `_hurtPlayer`).** Every path that used to hand-roll `hp -=` + threat + kill —
+  melee `deal`, a player's damage spell, a mob's cast, a room burst/bomb — now
+  calls the sink, which owns the damage→threat convention (`threatTo` stokes
+  `max(1, damage)`, so the minimum can no longer differ between the two cast
+  directions, as it quietly did), suppresses its `mob-hurt`/`player-hurt` event
+  where the swing/cast event already narrates the blow (`silent`), and resolves
+  every kill through the one shared death sequence. A missed swing provoking its
+  target is now an explicit `defender.provoke` rule rather than a side-effect of
+  dealing 0 damage; "quarry slain → stop swinging" moved from the mob defender's
+  damage closure to the player attack loop where it belongs; a mob's killing cast
+  now narrates cast-then-death (the cast event carries the post-blow hp, like
+  melee) instead of relying on caller-side event ordering; and the now-unused
+  `_killMob` wrapper is gone. New `test/damage-sink.test.js` pins the
+  conventions. No tuning changes.
+- **Melee combat internals dedup (no gameplay change beyond the fixes above).**
+  The uniform `attack` event is now built in one place (`applyHitOutcome`) for
+  both directions — player swings gain the `targetKind`/`attackerEmitsLight`
+  fields mob swings already carried, and the never-read `targetMaxHp` is dropped;
+  the duplicated death block in `_hurtMob` now delegates to `_killMobAt`; the
+  thrice-copied "rouse a struck sleeper" and twice-copied auto-retaliate blocks
+  are shared helpers (`_rouseMob`/`_autoEngage`); a missed swing provoking its
+  target (threat on a miss) is now documented as deliberate; `combat-math.js`
+  stops exporting its internal-only constants and `state.js` drops two unused
+  imports.
+- **Action-economy tuning knobs live in `server/config.js`.** The scattered
+  literals — default weapon/mob-attack action cost (12), the unarmed swing (10),
+  the default mob speed (10, previously duplicated in two places), and the
+  3-actions energy-bank cap (also duplicated) — are now `DEFAULT_ACTION_COST`,
+  `UNARMED_ACTION_COST`, `DEFAULT_MOB_SPEED` and `ENERGY_BANK_ACTIONS`, so the
+  accrual and gating sides of the energy system can no longer drift apart;
+  `search`'s cost references the same action constant. No values changed.
+- **A mob's defence is read fresh on every swing of a multi-swing tick** (was
+  snapshotted once per tick), so a future contact trigger that shifts Armour/Ward
+  mid-exchange (an armour-shredding `onHit`) counts from the very next blow.
 - **The Tide is now fully data-driven (`data/world/tide.json`).** Its whole
   configuration — timing (`phaseTicks`, phase order), depth-scaled `darkening`
   (formula params + which phases darken vs. edge-dim), lamp on/off phases and

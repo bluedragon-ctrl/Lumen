@@ -5,7 +5,7 @@
 // state.js so combat tuning can be read/edited without loading the whole engine.
 const { canSee, hitChance } = require("./light");
 const { rollDice } = require("./dice");
-const { XP_BASE, XP_GROWTH } = require("./config");
+const { XP_BASE, XP_GROWTH, DEFAULT_ACTION_COST, UNARMED_ACTION_COST } = require("./config");
 
 /** Cumulative lifetime XP required to *reach* `level` (level 1 = 0). The
  *  increment for each step is XP_BASE * XP_GROWTH^(step-1), so successive levels
@@ -27,7 +27,7 @@ function weaponOf(world, player) {
   const hand = player.equipment && player.equipment.hand;
   if (hand) {
     const t = world.items[hand.template];
-    if (t.weapon) {
+    if (t && t.weapon) {
       // A weapon's swing is physical by default; declaring `damage.magical` instead
       // makes it a magical blow, cut by the defender's Ward percentage rather than
       // soaked flat by Armour (see strike). Glimmer-craft weapons scale on Intellect.
@@ -36,14 +36,14 @@ function weaponOf(world, player) {
       return {
         dice: (magical ? dmg.magical : dmg.physical) || "1d2",
         damageType: magical ? "magical" : "physical",
-        actionCost: t.weapon.actionCost || 12,
+        actionCost: t.weapon.actionCost || DEFAULT_ACTION_COST,
         scale: t.weapon.scale || MELEE_SCALE,
         crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
         onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
       };
     }
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
+  return { dice: "1d2", actionCost: UNARMED_ACTION_COST, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------
@@ -286,8 +286,6 @@ module.exports = {
   weaponOf,
   mobOnDamage,
   playerOnDamage,
-  WARD_PER_WITS,
-  EVASION_PER_WITS,
   HIT_PER_PERCEPTION,
   CRIT_PER_PERCEPTION,
   HP_BASE,
@@ -298,17 +296,14 @@ module.exports = {
   SIGHT_PER_PERCEPTION,
   effectiveAttributes,
   playerDefence,
-  equipSpeedPenalty,
   effectiveSpeed,
   mobDefence,
   spellScaleBonus,
   durationScaleBonus,
   scaledAmount,
-  WARD_RESIST_PER_POINT,
   wardNegates,
   mitigate,
   pickWeighted,
   roomEffectFires,
-  MIN_HIT,
   strike,
 };

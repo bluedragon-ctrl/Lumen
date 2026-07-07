@@ -11,7 +11,7 @@
 // reaches methods that live in state.js or the other mixins. Pure relocation —
 // no behaviour change.
 const { rollDice } = require("./dice");
-const { DEFAULT_FACTION } = require("./config");
+const { DEFAULT_FACTION, DEFAULT_ACTION_COST } = require("./config");
 const { canSee, noticeChance } = require("./light");
 const {
   playerDefence, mobDefence, wardNegates,
@@ -69,7 +69,7 @@ class MobAIMixin {
         // A *sitting* mob is alert-at-rest: it still runs _mobAct to detect enemies
         // and stands as it engages (it just won't wander/emote — see _mobAct).
         const t = this.world.mobs[m.template];
-        const cost = (t.attack && t.attack.actionCost) || 12;
+        const cost = (t.attack && t.attack.actionCost) || DEFAULT_ACTION_COST;
         if (m.energy < cost) continue;
         m.energy -= cost;
         this._mobAct(m, t, roomId, events);
@@ -680,17 +680,10 @@ class MobAIMixin {
       actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: mt.emitsLight > 0, roomId,
       onDamage: mobOnDamage(mt),
       sourceId: null, // a mob defender's retaliatory DoT credits no one
-      deal: (dmg) => {
-        this._addThreat(mob, attacker.id, Math.max(1, dmg)); // being hit earns the striker its ire
-        mob.hp -= dmg;
-        if (mob.hp <= 0) {
-          const d = this._killMobAt(mob, roomId, this._killerPlayerFor(attacker));
-          events.push(d);
-          if (attacker.kind === "player") attacker.actor.pending = null; // quarry slain — stop swinging
-          return d;
-        }
-        return null;
-      },
+      // A landed blow: hp, threat and any kill resolve in the shared sink. Silent —
+      // the `attack` event already narrated the hit.
+      deal: (dmg) => this._hurtMob(mob, roomId, dmg, events, { silent: true, threatTo: attacker.id, killer: this._killerPlayerFor(attacker) }),
+      provoke: () => this._addThreat(mob, attacker.id, 1), // a whiffed swing still earns the striker its ire
       hurt: (dmg, cause) => this._hurtMob(mob, roomId, dmg, events, { cause }), // self-damage onDamage (rare)
     };
   }
@@ -701,11 +694,10 @@ class MobAIMixin {
       actor: player, kind: "player", id: player.id, name: player.name, emitsLight: false, roomId,
       onDamage: playerOnDamage(this.world, player), // player armour triggers (none seeded yet)
       sourceId: player.id, // a player's reflected DoT credits them
-      deal: (dmg) => {
-        player.hp -= dmg;
-        if (player.hp <= 0) { const d = this._beginDeath(player, roomId, events); events.push(d); return d; }
-        return null;
-      },
+      // A landed blow resolves in the shared sink (silent — the `attack` event
+      // narrated it); a fatal one routes to the rim through _beginDeath. No
+      // provoke: players hold no threat table, so a whiffed swing is just a whiff.
+      deal: (dmg) => this._hurtPlayer(player, dmg, events, { silent: true }),
       hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
     };
   }
@@ -733,23 +725,19 @@ class MobAIMixin {
       ? this._resolveSpellPayload(ctx, action.spell)
       : this._resolveMeleePayload(ctx);
     if (ctx.isPlayer && !targetDied) {
-      this._rouseAndRetaliate(target.actor, m, t, events, { attackerAlive: !attackerDied });
+      this._rouseAndRetaliate(target.actor, m, events, { attackerAlive: !attackerDied });
     }
   }
 
   /** A surviving player target rouses and turns on the mob. Rousing and retaliating
    *  are separate: a struck delver always wakes — you can't sleep through a blow,
-   *  even one whose reflect killed the attacker — but auto-retaliate only fires when
-   *  there is still a living attacker (`attackerAlive`) and the player isn't already
-   *  swinging at something. Only called when the player target is alive, so no
-   *  `hp > 0` guards are needed (the old melee `p.hp > 0` check was a no-op anyway,
-   *  since `_respawn` restores HP). */
-  _rouseAndRetaliate(player, mob, t, events, { attackerAlive }) {
+   *  even one whose reflect killed the attacker — but auto-retaliate (the shared
+   *  `_autoEngage`) only fires when there is still a living attacker
+   *  (`attackerAlive`) and the player isn't already swinging at something. Only
+   *  called when the player target is alive, so no `hp > 0` guards are needed. */
+  _rouseAndRetaliate(player, mob, events, { attackerAlive }) {
     if (this._rouse(player)) events.push({ type: "player-woke", playerId: player.id });
-    if (attackerAlive && !player.pending) {
-      player.pending = { type: "attack", targetId: mob.id };
-      events.push({ type: "combat-auto-start", playerId: player.id, targetId: mob.id, targetName: t.name });
-    }
+    if (attackerAlive) this._autoEngage(player, mob, events);
   }
 
   /** A mob makes one melee attack (the `attack` action). Thin entry over the shared
@@ -776,29 +764,21 @@ class MobAIMixin {
       events.push({ type: "mob-ambush", roomId, mobId: m.id, mobName: t.name,
         targetId: target.id, light: rt.light, emitsLight: t.emitsLight > 0 });
     }
-    const targetName = isPlayer ? target.actor.name : tmt.name;
-    const targetEmitsLight = isPlayer ? false : tmt.emitsLight > 0;
     const defence = isPlayer
       ? playerDefence(this.world, target.actor)
       : mobDefence(tmt, target.actor);
-    const attacker = {
+    const swing = {
       band: t.perception,
       hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
       dmgBonus: (t.attack.bonus) || 0,
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
     };
-    const r = strike(attacker, defence, rt.light, t.attack.damage, t.attack.type || "physical");
-    const attackEvent = {
-      type: "attack", by: "mob", attackerId: m.id, attackerName: t.name, roomId,
-      targetId: target.id, targetName, targetKind: target.kind, hit: r.hit, sighted: r.sighted,
-      damage: r.damage, crit: r.crit, targetHp: Math.max(0, target.actor.hp - r.damage), targetMaxHp: target.actor.maxHp,
-      light: rt.light, attackerEmitsLight: t.emitsLight > 0, targetEmitsLight,
-    };
+    const r = strike(swing, defence, rt.light, t.attack.damage, t.attack.type || "physical");
     const defender = isPlayer
       ? this._playerDefender(target.actor, roomId, events)
       : this._mobDefender(target.actor, tmt, roomId, { id: m.id, kind: "mob", actor: m }, events);
     const { defenderDeath, attackerDeath } = this.applyHitOutcome({
-      r, events, attackEvent,
+      r, events,
       attacker: {
         actor: m, kind: "mob", id: m.id, name: t.name, emitsLight: t.emitsLight > 0, roomId,
         onHit: t.attack.onHit,
@@ -855,21 +835,13 @@ class MobAIMixin {
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
-    let damage = 0, killed = false, death = null, effectName = null, doused = false;
+    let damage = 0, effectName = null, doused = false;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),
       // scaled by the mob's own attributes; no sourceId — a mob credits no one.
       const applied = this._applyHostileSpellEffect(eff, spell.name, t.attributes || {}, target);
       if (applied.kind === "damage") {
-        damage = applied.damage;
-        this._addThreat(m, target.id, damage); // mirror melee: damage stokes threat
-        target.actor.hp -= damage;
-        if (target.actor.hp <= 0) {
-          killed = true;
-          death = isPlayer
-            ? this._beginDeath(target.actor, roomId, events)
-            : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
-        }
+        damage = applied.damage; // dealt through the shared sink below, after the cast event
       } else if (applied.kind === "douse") {
         // The delver must relight (a turn) or fight blind; the room darkens
         // immediately, recomputed below so the band is fresh.
@@ -882,13 +854,22 @@ class MobAIMixin {
       }
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
+    // The cast event goes out BEFORE the damage lands (post-blow hp precomputed),
+    // so a killing bolt narrates cast-then-death — the same order as melee's
+    // attack event before `deal`.
+    const killed = damage > 0 && damage >= target.actor.hp;
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
       spellName: spell.name, resisted, damage, effectName, doused, killed,
-      targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
+      targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
-    if (death) events.push(death);
+    if (damage > 0) {
+      // Damage, threat and any kill resolve in the shared sinks (silent — the
+      // mob-cast event above narrates the blow).
+      if (isPlayer) this._hurtPlayer(target.actor, damage, events, { silent: true });
+      else this._hurtMob(target.actor, roomId, damage, events, { silent: true, threatTo: m.id, killer: this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }) });
+    }
     return { targetDied: killed, attackerDied: false };
   }
 
@@ -998,18 +979,15 @@ class MobAIMixin {
     return dropped;
   }
 
-  /** A direct kill by a player (melee/spell): removes the mob, drops spoils, and
-   *  awards xp to the killer. Non-combat deaths go through `_hurtMob` instead. */
-  _killMob(mob, killer) {
-    return this._killMobAt(mob, killer.location, killer);
-  }
-
-  /** Remove a mob killed by a direct hit in `roomId`, drop its spoils, and award
-   *  XP. `killerPlayer` is the player to credit as finisher (a player attacker, or
-   *  the OWNER of an allied mob that landed the blow — resolved by the caller) or
-   *  null when no player struck the killing blow (e.g. an ownerless ally's kill);
-   *  other players who held threat are still credited via `_awardKillXp`. Returns
-   *  the `death` event. Shared by the player-attack path and mob-vs-mob combat. */
+  /** Remove a slain mob from `roomId`, drop its spoils, and award XP — the ONE
+   *  death sequence every kill path shares, reached exclusively through the
+   *  `_hurtMob` damage sink (a swing, a spell, a bleed tick, light-bane, a
+   *  thrown bomb). `killerPlayer` is the player to credit as
+   *  finisher (a player attacker, or the OWNER of an allied mob that landed the
+   *  blow — resolved by the caller) or null when no player struck the killing
+   *  blow (an ownerless ally's kill, pure environment, a DoT whose source is
+   *  gone); players who traded blows are still credited via `_awardKillXp`
+   *  either way. Returns the `death` event (the caller pushes/forwards it). */
   _killMobAt(mob, roomId, killerPlayer, cause = "hit") {
     const t = this.world.mobs[mob.template];
     const idx = this.rooms[roomId].mobs.indexOf(mob);

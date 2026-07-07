@@ -27,6 +27,19 @@ module.exports = {
   // not a constant — it equals the output's sale value (see commands.js craft).
   EXPLORE_XP: 5,
 
+  // Action economy (DESIGN.md §3.4 / server/README.md): every actor banks
+  // `speed` energy per tick, capped at ENERGY_BANK_ACTIONS actions' worth, and an
+  // action fires once the bank covers its cost. One "action" is
+  // DEFAULT_ACTION_COST — the default for a weapon or mob attack that authors no
+  // `actionCost` (searching costs the same, so it competes with attacking); an
+  // unarmed swing is a touch quicker. A mob template with no `speed` accrues
+  // DEFAULT_MOB_SPEED per tick. These four knobs must move together: the speed
+  // defaults set how fast the bank fills, the costs how fast it drains.
+  DEFAULT_ACTION_COST: 12,
+  UNARMED_ACTION_COST: 10,
+  DEFAULT_MOB_SPEED: 10,
+  ENERGY_BANK_ACTIONS: 3,
+
   // A hidden (searched-out) groundItem with no explicit `respawn` regrows after
   // this many ticks instead of being a one-time find — a room can still author
   // its own `respawn` to override. Non-hidden groundItems are unaffected; they

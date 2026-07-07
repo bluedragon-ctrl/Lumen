@@ -16,7 +16,7 @@
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
 const { addToFloor, itemVisibleTo, fixtureVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
-const { EXPLORE_XP } = require("./config");
+const { EXPLORE_XP, DEFAULT_ACTION_COST } = require("./config");
 const quests = require("./quests");
 const {
   cap, NOOP_CTX, TRAINABLE, questKill, selfAndViews, announceLevelUps, autoStand,
@@ -30,9 +30,9 @@ const { mine, gather, fish } = require("./commands/resource");
 const { spellList, cast } = require("./commands/magic");
 const { handleAdmin } = require("./commands/admin");
 
-// Searching the room for hidden features costs roughly one action's worth of
-// energy, so it competes with attacking and can't be spammed mid-combat.
-const SEARCH_COST = 12;
+// Searching the room for hidden features costs one action's worth of energy,
+// so it competes with attacking and can't be spammed mid-combat.
+const SEARCH_COST = DEFAULT_ACTION_COST;
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
 const DIR_ALIAS = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
@@ -585,7 +585,7 @@ function lookAt(state, player, arg) {
 }
 
 // Set a pending attack on a mob in the room; swings resolve on ticks as energy
-// allows (see state.resolveCombat). You can only target what you can perceive.
+// allows (see state.resolvePlayerAttacks). You can only target what you can perceive.
 function attack(state, player, arg) {
   if (!arg) return [{ type: "error", text: "Attack what?" }];
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
