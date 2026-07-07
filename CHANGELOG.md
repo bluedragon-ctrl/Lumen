@@ -99,6 +99,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`weaponOf` no longer crashes on an equipped hand item whose template is
   missing** (guards like its sibling helpers; previously unreachable in practice
   thanks to the login-time orphan filter, but a tick-loop crash if ever hit).
+- **A mob's hostile status spell (a debuff/hex) lands again.** The shared
+  hostile-cast core (`_applyHostileSpellEffect`) had no fallback for effect
+  types outside damage / damage-over-time / sleep / douse, so a mob casting a
+  generic hostile status warned "no hostile resolution" and applied nothing —
+  behaviour the mob-cast path had before the shared-core refactor (#186), and
+  that `npm test` has been failing on since. Restored as a `default` branch:
+  the status is applied as-is (marked `good: false`), and the mob-cast event
+  narrates it ("— the Hex takes hold"). The validator's `MOB_CASTABLE` and the
+  player cast guard stay strict, so authored data is unaffected; this only makes
+  the engine able to land whatever they admit. The full test suite is green again.
 - **Spell casts no longer drop their side-effect messages.** The player cast
   resolvers produced events nobody delivered, so: a sleeping mob roused by a
   hostile cast (or caught in an Arc Flash / thrown bomb) woke silently, the

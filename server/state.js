@@ -1444,9 +1444,12 @@ class GameState {
    *   { kind: "dot", name, duration }   — burn (+ its glow) already applied
    *   { kind: "sleep" }                 — mob target dropped into slumber
    *   { kind: "douse", doused, name }   — target's carried light snuffed (players only)
-   *   { kind: "unhandled" }             — no resolution for this type (warned;
-   *                                       the command guard / validator should
-   *                                       have refused it upstream)
+   *   { kind: "status", name }          — any other type: a hostile status (a
+   *                                       debuff/hex) applied as-is
+   *   { kind: "unhandled" }             — a typed case refused this target (e.g.
+   *                                       sleep at a player); warned — the
+   *                                       command guard / validator should have
+   *                                       refused it upstream
    */
   _applyHostileSpellEffect(eff, spellName, attrs, target, sourceId = null) {
     const name = eff.name || spellName;
@@ -1489,7 +1492,17 @@ class GameState {
         }
         return { kind: "douse", doused, name };
       }
+      default:
+        // A hostile status effect (a debuff/hex — any type without its own case
+        // above): applied as-is, marked hostile (`good: false`), no immediate
+        // blow. No sourceId — a lingering hex credits no kill. The player cast
+        // guard (magic.js HOSTILE_EFFECTS) and the validator's MOB_CASTABLE
+        // whitelist still gate what authored data may use; this keeps the engine
+        // able to land whatever they admit.
+        this.applyEffect(target.actor, { ...eff, name, good: false });
+        return { kind: "status", name };
     }
+    // Only reachable when a typed case refused this target (sleep at a player).
     console.warn(`[lumen] spell "${spellName}": no hostile resolution for effect type "${eff.type}" on a ${target.kind} target`);
     return { kind: "unhandled" };
   }
