@@ -875,7 +875,9 @@ class MobAIMixin {
         // immediately, recomputed below so the band is fresh.
         doused = applied.doused;
         effectName = applied.name;
-      } else if (applied.kind === "dot") {
+      } else if (applied.kind === "dot" || applied.kind === "status") {
+        // A burn or a hex: the state is already applied by the shared core; name
+        // it so the mob-cast event narrates "the X takes hold".
         effectName = applied.name;
       }
     }
