@@ -263,6 +263,13 @@ the room or disconnecting — so a stashed item you don't pick up is forgotten a
 be searched out again, and a lurking mob stays unseen *and inert* until a delver who
 has revealed it provokes it.
 
+A find is **shared with everyone present**: the searcher points it out, so every
+co-located delver gets the same reveal — permanent discoveries onto their
+`player.discovered`, ephemeral item/mob reveals into their `revealedItems` /
+`revealedMobs` — *regardless of their own Perception or light* (they're being shown
+it). `search` returns `shared` so the caller can refresh onlookers' views even when
+the searcher personally turned up nothing new.
+
 ### Crafting
 
 `craft <recipe>` produces a recipe's `output` when the player is at a fixture whose

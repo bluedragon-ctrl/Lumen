@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **`search` finds are shared with everyone in the room.** When a delver searches
+  out a hidden feature — a stashed item, a lurking mob, a hidden fixture or exit —
+  it now becomes discovered for every other player present too, regardless of their
+  own Perception or light: the searcher is pointing it out. Permanent secrets
+  (fixtures/exits) land on each onlooker's record; ephemeral item/mob reveals join
+  theirs for the visit. The room log now names what a search turns up.
+
 ### Added
 - **Ambient Tide emotes.** The world clock can now perform atmospheric room lines
   during a phase (authored in `data/world/tide.json` `emotes`, keyed by phase with

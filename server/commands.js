@@ -611,10 +611,14 @@ function search(state, player, ctx) {
   if (player.energy < SEARCH_COST)
     return [{ type: "error", text: "You need a moment to catch your breath before searching again." }];
   player.energy -= SEARCH_COST;
-  const { found, any } = state.search(player);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} searches around.` }, player.id);
+  const { found, any, shared } = state.search(player);
+  ctx.toRoom(player.location, { type: "log", text: any
+    ? `${player.name} searches around and turns up ${found.join(", ")}.`
+    : `${player.name} searches around.` }, player.id);
+  // A find is shared with everyone present, so refresh their view whenever the
+  // search revealed anything new — to the searcher or to a co-located delver.
+  if (any || shared) ctx.refreshRoom(player.location, player.id);
   if (!any) return selfAndViews(state, player, "You search the area, but find nothing you didn't already know.");
-  ctx.refreshRoom(player.location, player.id); // a revealed lurker may now be visible to others too
   return selfAndViews(state, player, `You search the area. You discover ${found.join(", ")}!`);
 }
 
