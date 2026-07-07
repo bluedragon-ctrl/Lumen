@@ -11,6 +11,7 @@
 const { buildRoomView, buildPlayerView } = require("../render");
 const { canSee } = require("../light");
 const { mobVisibleTo, fixtureVisibleTo } = require("../state");
+const { STOP_WORDS, nameTokens, matchesQuery } = require("../query");
 const quests = require("../quests");
 
 const cap = (s) => (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
@@ -48,30 +49,8 @@ function announceLevelUps(player, ups, ctx, out) {
   }
 }
 
-// Words too generic to single out a target — dropped when deriving keywords
-// from a display name (so "a sliver of glimmerstone" yields sliver/glimmerstone).
-const STOP_WORDS = new Set(["a", "an", "the", "of", "some", "and", "with", "to"]);
-
-// Significant lowercase tokens from a display name, used as fallback keywords.
-function nameTokens(name) {
-  return (name || "").toLowerCase().split(/[^a-z0-9]+/).filter((t) => t && !STOP_WORDS.has(t));
-}
-
-// Does query `q` name a thing called `name` (with optional authored `keywords`
-// and instance/template `id`)? Resolution order:
-//   1. exact id match
-//   2. every query word is (a prefix of) some keyword — authored `keywords` if
-//      present, else words derived from the display name. Multi-word queries use
-//      AND semantics, so "glimmer crystal" needs both keywords present.
-//   3. legacy fallback: `q` is a substring of the full display name.
-function matchesQuery(q, name, keywords, id) {
-  const ql = (q || "").trim().toLowerCase();
-  if (!ql) return false;
-  if (id && String(id).toLowerCase() === ql) return true;
-  const kws = keywords && keywords.length ? keywords.map((k) => k.toLowerCase()) : nameTokens(name);
-  if (ql.split(/\s+/).every((qw) => kws.some((kw) => kw === qw || kw.startsWith(qw)))) return true;
-  return (name || "").toLowerCase().includes(ql);
-}
+// STOP_WORDS / nameTokens / matchesQuery live in ../query (shared with the
+// view layer's examine lookup) and are re-exported below for the command modules.
 
 // DikuMUD-style target syntax: split a query into an optional `all` flag, an
 // optional 1-based ordinal (`2.crawler` → the second crawler), and the bare
@@ -130,12 +109,12 @@ function findMobInRoom(state, player, q, requireVisible = true) {
 }
 
 // Find a visible fixture in the player's room that `ql` (lower-cased) names by
-// id or display name and that satisfies `pred(ft)`. The repeated lookup behind
-// `use` (switch/door/restore/harvest/any) and `operateDoor`.
+// id, authored keyword or display name and that satisfies `pred(ft)`. The
+// repeated lookup behind `use` (switch/door/restore/harvest/any) and `operateDoor`.
 function findFixture(rt, world, player, ql, pred) {
   return rt.fixtures.find((f) => {
     const ft = world.fixtures[f.template];
-    return ft && pred(ft) && fixtureVisibleTo(player, f) && (f.id.toLowerCase() === ql || ft.name.toLowerCase().includes(ql));
+    return ft && pred(ft) && fixtureVisibleTo(player, f) && matchesQuery(ql, ft.name, ft.keywords, f.id);
   });
 }
 

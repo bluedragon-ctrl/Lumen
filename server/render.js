@@ -5,6 +5,7 @@
  * perceive at the current light level, per DESIGN.md §3.1 / §5.4).
  */
 const { bandOf, canSee, isHarmedByLight } = require("./light");
+const { matchesQuery } = require("./query");
 const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, buyValueOf, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, MELEE_SCALE } = require("./state");
 
 // How a posture reads to OTHERS in the room (the social tag). Standing is the
@@ -215,13 +216,16 @@ function buildExamineView(state, p, q) {
   const dimBelow = p.perception && p.perception.dimBelow != null ? p.perception.dimBelow : p.perception.blindBelow;
   const detailed = see && light >= dimBelow;
   const ql = (q || "").toLowerCase();
-  const hit = (id, name) => id.toLowerCase() === ql || name.toLowerCase().includes(ql);
+  // Same resolution as command targeting (id, then authored keywords, then
+  // name substring — see query.js), so what `get`/`use`/`attack` can name,
+  // `examine` can too.
+  const hit = (id, name, keywords) => matchesQuery(ql, name, keywords, id);
   const tooDim = { hints: ["Too dim to make out details."] };
 
   for (const m of rt.mobs) {
     if (!mobVisibleTo(state, p, m)) continue; // a hidden lurker isn't examinable until searched out
     const t = w.mobs[m.template];
-    if ((see || t.emitsLight) && hit(m.id, t.name)) {
+    if ((see || t.emitsLight) && hit(m.id, t.name, t.keywords)) {
       if (!detailed) return entity("mob", m.id, t.name, null, { dim: true, ...tooDim });
       const hints = [
         t.hostile ? "Hostile — it may attack if it senses you."
@@ -248,7 +252,7 @@ function buildExamineView(state, p, q) {
     for (const i of rt.items) {
       if (!itemVisibleTo(state, p, i)) continue;
       const t = w.items[i.template];
-      if (hit(i.id, t.name))
+      if (hit(i.id, t.name, t.keywords))
         return detailed
           ? entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) })
           : entity("item", i.id, t.name, null, { dim: true, ...tooDim });
@@ -256,7 +260,7 @@ function buildExamineView(state, p, q) {
     for (const f of rt.fixtures) {
       if (!fixtureVisibleTo(p, f)) continue;
       const t = w.fixtures[f.template];
-      if (hit(f.id, t.name)) {
+      if (hit(f.id, t.name, t.keywords)) {
         if (!detailed) return entity("fixture", f.id, t.name, null, { dim: true, ...tooDim });
         const lines = [];
         const hints = [];
@@ -312,10 +316,10 @@ function buildExamineView(state, p, q) {
   // Carried items are always examined clearly (in hand).
   for (const i of p.inventory) {
     const t = w.items[i.template];
-    if (hit(i.id, t.name)) return entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
+    if (hit(i.id, t.name, t.keywords)) return entity("item", i.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
   }
   for (const slot of Object.values(p.equipment)) {
-    if (slot && hit(slot.id, w.items[slot.template].name)) {
+    if (slot && hit(slot.id, w.items[slot.template].name, w.items[slot.template].keywords)) {
       const t = w.items[slot.template];
       return entity("item", slot.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
     }
@@ -333,7 +337,7 @@ function buildExamineView(state, p, q) {
       for (const o of w.mobs[trader.template].shop.sells || []) {
         if (o.requiresQuest && !done.includes(o.requiresQuest)) continue;
         const t = w.items[o.template];
-        if (!hit(o.template, t.name)) continue;
+        if (!hit(o.template, t.name, t.keywords)) continue;
         if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
         const price = o.price != null ? o.price : buyValueOf(t);
         return entity("item", o.template, t.name, t.description, {
@@ -355,7 +359,7 @@ function buildExamineView(state, p, q) {
     const r = w.recipes[rid];
     if (!r || !r.output) continue;
     const t = w.items[r.output.template];
-    if (!t || !hit(r.output.template, t.name)) continue;
+    if (!t || !hit(r.output.template, t.name, t.keywords)) continue;
     const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
     if (r.shards) ins.push(`${r.shards} shards`);
     const stationFix = Object.values(w.fixtures).find((x) => x.station === r.station);
