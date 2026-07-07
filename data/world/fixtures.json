@@ -359,5 +359,34 @@
     "description": "A round, low-domed kiln of fitted stone with a cradle of raw glimmer banked at its heart, breathing the same smokeless blue-white heat the deep-folk coax from everything they work. It is hot enough to bring fulgurite to a fusing-glow without shattering it, and patient hands use it to bed glimmer into the glass — folding captive light into a dark pane that holds it for good. A delver with the knowing of a recipe and the makings to hand may work it the same way.",
     "type": "crafting",
     "station": "kiln"
+  },
+  "verge-niche": {
+    "id": "verge-niche",
+    "name": "a cut lamp-shelf",
+    "keywords": ["niche", "shelf", "lamp-shelf", "stake", "chalk"],
+    "description": "A niche cut square into the cave wall at shoulder height — not worn, cut, the chisel-strokes still crisp — its ceiling smoke-blacked where a lamp has sat and burned. Below it the rusted stub of an iron stake juts from the rock, and beside that a chalk blaze has faded to a ghost. Someone works this edge of the browse, and has for a long time; whatever they carry, they carry it down.",
+    "type": "scenery"
+  },
+  "gallery-sealed-face": {
+    "id": "gallery-sealed-face",
+    "name": "the sealed west face",
+    "keywords": ["face", "rubble", "timber", "west", "seal", "collapse"],
+    "description": "A few paces on west the gallery simply stops: a fall of rock brought down across the full bore, shored with squared timber so that no more of it can move. Whoever drove this tunnel meant to go further — the dressed walls run right up to the rubble and vanish into it — and someone, later, made very sure nothing would come of it. The timbers are newer than the fall.",
+    "type": "scenery"
+  },
+  "den-door": {
+    "id": "den-door",
+    "name": "a heavy plank door",
+    "keywords": ["door", "plank", "south"],
+    "description": "A door of heavy squared planks set into a dressed frame in the gallery's south wall, hung on leather hinges kept supple with lamp-oil. There is no lock and no bar — down past the browse and the squeeze and a tunnel no natural force made, whoever hung it plainly reckons the dark does the gatekeeping. A faint warmth of lamplight breathes through the seams.",
+    "type": "door",
+    "door": { "dir": "south", "to": "d5.den.porch", "open": false }
+  },
+  "graveworker-journal": {
+    "id": "graveworker-journal",
+    "name": "a working journal",
+    "keywords": ["journal", "notes", "book", "ledger"],
+    "description": "A thick journal lies open on the bench, written in a small, steady hand — no ravings, just work: wire gauges and joint diagrams, tallies of shard spent per subject, a thornbug's leg sketched rebuilt in coil. One margin, underlined twice: 'the wire does not tire. neither do they.' A later page, calmer still: 'flesh is scaffolding. bone is the instrument.' The most recent entry is a shopping list.",
+    "type": "scenery"
   }
 }
