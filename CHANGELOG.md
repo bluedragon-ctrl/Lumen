@@ -25,6 +25,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Falselight — top floor of the hot-springs area (three depth-5 rooms
+  behind the caged gate).** South through the gate (now a passable `door` — its
+  lock has rusted through) opens the first level of the area teased east of the
+  Gullet: **The False Dawn** (you step out under a warm, lit, green cavern),
+  **The Steaming Brink** (the rim of a great steaming gulf — you can look down
+  but not descend), and **The Weeping Stair** (the way down, described but not
+  yet wired — the lower floors land next pass). The light is a **false sky**: a
+  self-luminous Weeping-Chasm-Moss canopy grown across the whole roof (new
+  `false-sky` fixture), glowing like overcast dawn — no sun, no glimmer. Rooms
+  sit at `ambientLight` 3/3/2, so the cavern reads as daylight in Calm and goes
+  fully **dark at the Tide** (the false day has a false night). Zone `falselight`;
+  names provisional pending sign-off. No bespoke fauna yet — the area's distinct
+  monsters are the next content pass.
 - **The approach to the hot-springs area — two depth-5 rooms east of the Gullet.**
   A side-mouth partway down the Gullet's switchback now opens east into **The
   Windway** (a long, winding passage carrying a warm, damp draught from somewhere

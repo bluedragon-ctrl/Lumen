@@ -364,7 +364,15 @@
     "id": "caged-gate",
     "name": "a caged gate",
     "keywords": ["gate", "cage", "caged", "bars", "chain", "south"],
-    "description": "The whole southern arch is closed off with a wall of forged iron bars — not a door so much as the front of a cage, each bar as thick as a pick-haft, set deep into holes drilled in the living rock and strapped with cross-bands at knee and shoulder height. A gate is built into the middle of it, hinged and heavy, wound about with chain and shut with a prospector's lock gone orange with the wet. Whoever raised it hauled the iron down five floors to do it, and meant it to hold: the bars are set to keep something in, not delvers out. The warm wind pours through regardless, beading the metal, and far down the passage beyond glows that pale, steady wash of light that no one is carrying.",
+    "description": "The whole southern arch is closed off with a wall of forged iron bars — not a door so much as the front of a cage, each bar as thick as a pick-haft, set deep into holes drilled in the living rock and strapped with cross-bands at knee and shoulder height. A gate is built into the middle of it, hinged and heavy, and was wound about with chain and shut with a prospector's lock. But the wet has had years to work: the lock has rusted to lace and the chain hangs slack and flaking, and the gate will grind open now to anyone who sets a shoulder to it. The iron has given up — even if the warning has not. The warm wind pours through the bars, beading the metal, and far down the passage beyond glows that pale, steady wash of light that no one is carrying.",
+    "type": "door",
+    "door": { "dir": "south", "to": "d5.falselight.dawn", "open": false }
+  },
+  "false-sky": {
+    "id": "false-sky",
+    "name": "the false sky",
+    "keywords": ["sky", "canopy", "moss", "roof", "ceiling", "light", "glow"],
+    "description": "It is not sky and it is not day, though the eye keeps insisting on both. Far overhead the whole roof of the cavern is furred with pale moss — the weeping kind, the sort that clings above the deep's warm waters and drinks the steam — but grown here to a canopy without a break in it, acres of it, breathing a cold grey-gold light of its own and trailing countless hair-fine threads that hang and drift in the rising mist. It gives no heat; the warmth is all the water's. It carries its own light and needs none, and it does not care to be looked at. When the Tide comes in the glow fails from it like a held breath let go, and for a while there is no sky here at all — only the dark, and the sound of the threads stirring overhead.",
     "type": "scenery"
   },
   "gate-warning": {
@@ -372,6 +380,8 @@
     "name": "a painted warning",
     "keywords": ["warning", "sign", "paint", "letters", "writing"],
     "description": "Across the cross-bands of the gate, in whitewash gone grey and laid on thick with a rag, someone painted letters a hand tall: DO NOT ENTER. Below it, smaller, in a different and shakier hand: IT IS NOT WORTH IT. THE LIGHT IS A LIE. Below that, a tally — four strokes and a fifth across them, and two strokes more — the way prospectors count their dead.",
+    "type": "scenery"
+  },
   "verge-niche": {
     "id": "verge-niche",
     "name": "a cut lamp-shelf",
