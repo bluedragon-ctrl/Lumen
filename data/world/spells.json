@@ -173,6 +173,19 @@
     "target": "creature",
     "effect": { "type": "damage-over-time", "name": "Witchfire", "damage": "1d4", "durationScale": { "attr": "intellect", "per": 1 }, "good": false, "emitLight": 1 }
   },
+  "leech": {
+    "id": "leech",
+    "name": "Leech",
+    "description": "Hedge-craft turned to its oldest forbidden use: the caster hooks a thread of will into a living body and pulls, and what keeps it warm comes away down the line. No glimmer moves in this weave — it is human work, mana and nerve and a bad conscience — and what it takes the caster keeps, stolen warmth closing their own wounds as the mark's blood runs cold. A creature's Ward can shrug the hook off whole. Cast it at any foe you can see.",
+    "manaCost": 7,
+    "hostile": true,
+    "target": "creature",
+    "messages": {
+      "self": "You hook {spell} into {target} and pull — {damage} of their life comes away down the thread.",
+      "room": "{caster} hooks a pale thread into {target} and pulls."
+    },
+    "effect": { "type": "drain", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 }, "healFactor": 0.5 }
+  },
   "arc-flash": {
     "id": "arc-flash",
     "name": "Arc Flash",
