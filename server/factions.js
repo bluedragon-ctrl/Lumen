@@ -21,10 +21,12 @@ function combatantFaction(actor, kind) {
 //   fauna  — peaceful wildlife/livestock    wild   — the deep's predators (default)
 //   umbral — the deep-dwelling Umbrals (Mallki & kin; hostile members gated by
 //            `hostile`, peaceful ones like the trader simply never act on it)
-//   outlaw — living, hostile humans (claim-jumpers/deserters preying on delvers).
-//            A sane, coordinated enemy class, `enemy` to both `player` and the
-//            `rim` watch that would clear them; `neutral` to the deep's own things
-//            (fauna/wild/umbral) — the camp squats among the vermin, not against it.
+//   outlaw — living, hostile humans (claim-jumpers/deserters preying on delvers)
+//            and their wired dead (the Graveworker's shard-wire risen, which ride
+//            the same faction so his den fights as one crew). A sane, coordinated
+//            enemy class, `enemy` to both `player` and the `rim` watch that would
+//            clear them; `neutral` to the deep's own things (fauna/wild/umbral) —
+//            the camp squats among the vermin, not against it.
 // `enemy` only marks who *may* fight; whether a creature *starts* one is the
 // separate `hostile` flag. So fauna are `enemy` to `player` — non-hostile (they
 // never initiate and aren't hunted) but they fight back when farmed (a struck Old

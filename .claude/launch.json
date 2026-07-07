@@ -9,6 +9,12 @@
       "autoPort": true
     },
     {
+      "name": "lumen-test",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set PORT=3738 && npm start"],
+      "port": 3738
+    },
+    {
       "name": "mob-editor",
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/mob-editor/mob-editor.js"],

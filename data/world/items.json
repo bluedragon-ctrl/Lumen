@@ -139,6 +139,55 @@
     "weapon": { "damage": { "magical": "1d4" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 } },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 3 }
   },
+  "graveworked-apron": {
+    "id": "graveworked-apron",
+    "rarity": "rare",
+    "name": "the graveworked apron",
+    "keywords": ["apron", "leather", "graveworked", "graveworker"],
+    "description": "The Graveworker's own working apron: heavy waxed leather gone dark with old stains, threaded through with a lattice of hair-fine glimmer shard-wire in the same neat coils he wound into his subjects. It turns no blade at all — it was never meant to; the wire does subtler work, steadying the mind and quickening the wits of whoever wears it, the way it steadied his through hours of stitching. Gear for a delver who fights through servants and spells, not steel.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 3,
+    "value": 160,
+    "armour": { "armour": 0, "ward": 0, "speedPenalty": 0, "attrMod": { "intellect": 2, "wits": 2 } }
+  },
+  "graveworkers-scalpel": {
+    "id": "graveworkers-scalpel",
+    "rarity": "rare",
+    "name": "the Graveworker's scalpel",
+    "keywords": ["scalpel", "blade", "knife", "hook", "graveworker"],
+    "description": "A slender surgeon's blade with a stitching-hook at the spine, honed past reason and wound about the grip with glimmer shard-wire. It cuts little — it was made for precision, not violence — but it cuts *knowingly*: in a hand that understands where life sits in a body, every stroke opens the mark and closes the wielder, the parted warmth running back up the wire into the arm that holds it. The Graveworker kept himself alive with it for years, one shallow cut at a time.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 130,
+    "weapon": {
+      "damage": { "physical": "1d4" },
+      "actionCost": 11,
+      "scale": { "attr": "intellect", "per": 4 },
+      "onHit": [{ "type": "restore", "hp": 3, "target": "self", "chance": 1 }]
+    }
+  },
+  "scroll-leech": {
+    "id": "scroll-leech",
+    "name": "a Scroll of Leech",
+    "description": "Vellum written in a small, steady working hand — no flourish, no glyph-craft for its own sake, just the weave set down plainly, the way a man notes a technique he means not to lose. Study it to learn Leech — the hook of will that pulls a foe's life back down the line into your own wounds — and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 90,
+    "stackable": true,
+    "scroll": { "spell": "leech" }
+  },
+  "scroll-summon-skeleton": {
+    "id": "scroll-summon-skeleton",
+    "name": "a Scroll of Summon Skeleton",
+    "description": "The Graveworker's masterwork, written out fair: a raising set down step by step, wire-gauge by wire-gauge, in the same steady hand as his journal. The craft is neither the Umbrals' nor the surface's but a graft of the two — human will to drive the weave, raw glimmer spent as wire to string the bones. Study it to learn Summon Skeleton, and the scroll crumbles to ash in the learning.",
+    "type": "scroll",
+    "weight": 0,
+    "value": 120,
+    "stackable": true,
+    "scroll": { "spell": "summon-skeleton" }
+  },
   "umbral-mind-charm": {
     "id": "umbral-mind-charm",
     "rarity": "rare",

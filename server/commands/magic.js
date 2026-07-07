@@ -15,7 +15,7 @@ const {
 // spent so an authoring mistake (e.g. a scroll teaching a mob-only spell like
 // Snuff) reads as a refusal, not a half-cast that eats mana and does nothing.
 // tools/validate-data.js enforces the same sets on learnable spells at build time.
-const HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room"];
+const HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room", "drain"];
 const SUPPORT_EFFECTS = ["restore", "protect", "cleanse", "heal-over-time", "emit-light"];
 
 // Fill a spell narration template (`spell.messages`, see docs/data-model.md):

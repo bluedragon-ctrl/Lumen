@@ -835,13 +835,14 @@ class MobAIMixin {
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
-    let damage = 0, effectName = null, doused = false;
+    let damage = 0, effectName = null, doused = false, drainFactor = 0;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),
       // scaled by the mob's own attributes; no sourceId — a mob credits no one.
       const applied = this._applyHostileSpellEffect(eff, spell.name, t.attributes || {}, target);
       if (applied.kind === "damage") {
         damage = applied.damage; // dealt through the shared sink below, after the cast event
+        drainFactor = applied.drainFactor || 0;
       } else if (applied.kind === "douse") {
         // The delver must relight (a turn) or fight blind; the room darkens
         // immediately, recomputed below so the band is fresh.
@@ -858,10 +859,13 @@ class MobAIMixin {
     // so a killing bolt narrates cast-then-death — the same order as melee's
     // attack event before `deal`.
     const killed = damage > 0 && damage >= target.actor.hp;
+    // A drain feeds the caster from the blow — computed here so the event
+    // narrates it, applied after the damage lands below.
+    const drained = damage > 0 && drainFactor ? Math.min(t.maxHp - m.hp, Math.floor(damage * drainFactor)) : 0;
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
-      spellName: spell.name, resisted, damage, effectName, doused, killed,
+      spellName: spell.name, resisted, damage, effectName, doused, killed, drained,
       targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
     if (damage > 0) {
@@ -870,6 +874,7 @@ class MobAIMixin {
       if (isPlayer) this._hurtPlayer(target.actor, damage, events, { silent: true });
       else this._hurtMob(target.actor, roomId, damage, events, { silent: true, threatTo: m.id, killer: this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }) });
     }
+    if (drained > 0) m.hp += drained;
     return { targetDied: killed, attackerDied: false };
   }
 
