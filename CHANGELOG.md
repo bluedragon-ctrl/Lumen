@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Fixture targeting now honours the authored `keywords` array.** `use`/`open`/
+  `close`/`examine` resolved a fixture only by exact instance id or a substring
+  of its display name, silently ignoring `keywords` in `data/world/fixtures.json`
+  (so a keyword absent from the name — e.g. `niche` on "a cut lamp-shelf" —
+  never matched). Both lookups (`findFixture`, and `examine`'s resolver) now go
+  through the same keyword-aware `matchesQuery` used for item/mob targeting,
+  moved to `server/query.js` so the view layer can share it without an import
+  cycle. `examine` gains the same treatment for mobs, items, shop wares and
+  craftables, so anything `get`/`use`/`attack` can name, `examine` can too.
+
 ### Changed
 - **`search` finds are shared with everyone in the room.** When a delver searches
   out a hidden feature — a stashed item, a lurking mob, a hidden fixture or exit —
