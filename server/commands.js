@@ -16,7 +16,7 @@
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
 const { addToFloor, itemVisibleTo, fixtureVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
-const { EXPLORE_XP } = require("./config");
+const { EXPLORE_XP, DEFAULT_ACTION_COST } = require("./config");
 const quests = require("./quests");
 const {
   cap, NOOP_CTX, TRAINABLE, questKill, selfAndViews, announceLevelUps, autoStand,
@@ -30,9 +30,9 @@ const { mine, gather, fish } = require("./commands/resource");
 const { spellList, cast } = require("./commands/magic");
 const { handleAdmin } = require("./commands/admin");
 
-// Searching the room for hidden features costs roughly one action's worth of
-// energy, so it competes with attacking and can't be spammed mid-combat.
-const SEARCH_COST = 12;
+// Searching the room for hidden features costs one action's worth of energy,
+// so it competes with attacking and can't be spammed mid-combat.
+const SEARCH_COST = DEFAULT_ACTION_COST;
 
 const DIRS = ["north", "south", "east", "west", "up", "down"];
 const DIR_ALIAS = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };

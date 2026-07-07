@@ -1,7 +1,7 @@
 "use strict";
 const { effectiveLight } = require("./light");
 const { rollDice } = require("./dice");
-const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, DEFAULT_HIDDEN_ITEM_RESPAWN } = require("./config");
+const { POINTS_PER_LEVEL, DEFAULT_FACTION, DEATH_DELAY_TICKS, DEFAULT_HIDDEN_ITEM_RESPAWN, DEFAULT_MOB_SPEED, ENERGY_BANK_ACTIONS } = require("./config");
 const { tidePhaseAt, tideOffset, resolveTide } = require("./world-clock");
 // Pure helpers split out of this file (see PR refactor/split-state-helpers).
 // Imported here and re-exported below so the public surface stays unchanged.
@@ -1164,13 +1164,13 @@ class GameState {
 
     for (const p of this.players.values()) {
       const sp = effectiveSpeed(this.world, p); // heavy gear (speedPenalty) slows action-energy gain
-      p.energy = Math.min(p.energy + sp, sp * 3);
+      p.energy = Math.min(p.energy + sp, sp * ENERGY_BANK_ACTIONS);
       this._recoverTick(p, events);
     }
     for (const rt of Object.values(this.rooms)) {
       for (const m of rt.mobs) {
-        const speed = this.world.mobs[m.template].speed || 10;
-        m.energy = Math.min((m.energy || 0) + speed, speed * 3);
+        const speed = this.world.mobs[m.template].speed || DEFAULT_MOB_SPEED;
+        m.energy = Math.min((m.energy || 0) + speed, speed * ENERGY_BANK_ACTIONS);
       }
     }
 
@@ -1344,7 +1344,6 @@ class GameState {
       }
       const weapon = weaponOf(w, p);
       const mt = w.mobs[mob.template];
-      const mobDef = mobDefence(mt, mob);
       const attrs = effectiveAttributes(w, p);
       const per = attrs.perception || 0;
       const swing = {
@@ -1366,7 +1365,9 @@ class GameState {
       // Stop swinging if the mob dies OR a spike reflect kills the player mid-loop.
       while (p.energy >= weapon.actionCost && mob.hp > 0 && p.hp > 0) {
         p.energy -= weapon.actionCost;
-        const r = strike(swing, mobDef, rt.light, weapon.dice, weapon.damageType || "physical");
+        // Defence is read fresh each swing, so a contact trigger from an earlier
+        // swing this tick (an armour-shredding onHit, a spike buff) counts at once.
+        const r = strike(swing, mobDefence(mt, mob), rt.light, weapon.dice, weapon.damageType || "physical");
         const { attackerDeath } = this.applyHitOutcome({ r, events, attacker, defender });
         if (attackerDeath) break; // a reflect killed the player — they've respawned away
       }

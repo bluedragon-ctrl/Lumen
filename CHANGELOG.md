@@ -130,6 +130,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   target (threat on a miss) is now documented as deliberate; `combat-math.js`
   stops exporting its internal-only constants and `state.js` drops two unused
   imports.
+- **Action-economy tuning knobs live in `server/config.js`.** The scattered
+  literals — default weapon/mob-attack action cost (12), the unarmed swing (10),
+  the default mob speed (10, previously duplicated in two places), and the
+  3-actions energy-bank cap (also duplicated) — are now `DEFAULT_ACTION_COST`,
+  `UNARMED_ACTION_COST`, `DEFAULT_MOB_SPEED` and `ENERGY_BANK_ACTIONS`, so the
+  accrual and gating sides of the energy system can no longer drift apart;
+  `search`'s cost references the same action constant. No values changed.
+- **A mob's defence is read fresh on every swing of a multi-swing tick** (was
+  snapshotted once per tick), so a future contact trigger that shifts Armour/Ward
+  mid-exchange (an armour-shredding `onHit`) counts from the very next blow.
 - **The Tide is now fully data-driven (`data/world/tide.json`).** Its whole
   configuration — timing (`phaseTicks`, phase order), depth-scaled `darkening`
   (formula params + which phases darken vs. edge-dim), lamp on/off phases and

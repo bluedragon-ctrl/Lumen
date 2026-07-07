@@ -5,7 +5,7 @@
 // state.js so combat tuning can be read/edited without loading the whole engine.
 const { canSee, hitChance } = require("./light");
 const { rollDice } = require("./dice");
-const { XP_BASE, XP_GROWTH } = require("./config");
+const { XP_BASE, XP_GROWTH, DEFAULT_ACTION_COST, UNARMED_ACTION_COST } = require("./config");
 
 /** Cumulative lifetime XP required to *reach* `level` (level 1 = 0). The
  *  increment for each step is XP_BASE * XP_GROWTH^(step-1), so successive levels
@@ -36,14 +36,14 @@ function weaponOf(world, player) {
       return {
         dice: (magical ? dmg.magical : dmg.physical) || "1d2",
         damageType: magical ? "magical" : "physical",
-        actionCost: t.weapon.actionCost || 12,
+        actionCost: t.weapon.actionCost || DEFAULT_ACTION_COST,
         scale: t.weapon.scale || MELEE_SCALE,
         crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
         onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
       };
     }
   }
-  return { dice: "1d2", actionCost: 10, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
+  return { dice: "1d2", actionCost: UNARMED_ACTION_COST, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------

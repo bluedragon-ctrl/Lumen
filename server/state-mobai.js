@@ -11,7 +11,7 @@
 // reaches methods that live in state.js or the other mixins. Pure relocation —
 // no behaviour change.
 const { rollDice } = require("./dice");
-const { DEFAULT_FACTION } = require("./config");
+const { DEFAULT_FACTION, DEFAULT_ACTION_COST } = require("./config");
 const { canSee, noticeChance } = require("./light");
 const {
   playerDefence, mobDefence, wardNegates,
@@ -69,7 +69,7 @@ class MobAIMixin {
         // A *sitting* mob is alert-at-rest: it still runs _mobAct to detect enemies
         // and stands as it engages (it just won't wander/emote — see _mobAct).
         const t = this.world.mobs[m.template];
-        const cost = (t.attack && t.attack.actionCost) || 12;
+        const cost = (t.attack && t.attack.actionCost) || DEFAULT_ACTION_COST;
         if (m.energy < cost) continue;
         m.energy -= cost;
         this._mobAct(m, t, roomId, events);
