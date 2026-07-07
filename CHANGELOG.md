@@ -25,6 +25,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Graveworker's den (d5 mini-dungeon, names provisional).** West of the
+  Thornreach browse a new grazing-edge room (The Far Verge) drops down a
+  human-improved descent to depth 5, through a squeeze into a human-made tunnel,
+  and behind an unlocked plank door: a four-room den where an outlaw necromancer
+  wires the dead back onto their feet with glimmer shard-wire. Four new `outlaw`
+  mobs (risen thornbug, stitched prospector, summon-only wired skeleton, and the
+  Graveworker — summons skeleton pairs, casts Mage Armour and the new Leech),
+  five fixtures (the den door, his journal, and his ever-burning lamps —
+  `emitsLight 1` in every den room, so the den reads light 4 in calm and keeps
+  a dim light 1 even through the Tide's depth-5 darkening), and a sealed west
+  face reserved for future content. The boss drops (20% each): **the graveworked
+  apron** (+2 INT/+2 WITS, zero armour — the summoner's trade-off), **the
+  Graveworker's scalpel** (small INT-scaled blade whose every cut mends the
+  wielder, hungering-dagger mechanism), **a Scroll of Leech**, and **a Scroll of
+  Summon Skeleton** — a new player summon (`summon-skeleton`, mana + shards:
+  the glimmer is spent as wire, a deliberate Umbral/human cross-craft) that
+  raises a single wired skeleton, recast replacing it.
+- **New spell-effect type `drain` + spell: Leech (mana-only life drain).** A
+  hostile drain lands like a damage weave and heals the caster for half the
+  damage dealt (capped at max hp), in both cast directions. Mob-castable and
+  player-ready (`HOSTILE_EFFECTS`/`MOB_CASTABLE`/validator updated); not yet
+  learnable by players.
 - **Per-creature arrival flavour.** 30 of the wild bestiary now carry a
   `spawnMessage` in `data/world/mobs.json` — the atmospheric line onlookers see
   when the creature spawns into their room (respawn, Tide creep, or onset roster),

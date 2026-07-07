@@ -340,7 +340,7 @@ function main() {
         } else {
           // A hostile cast resolves through the shared per-type core (see
           // state._applyHostileSpellEffect) — only these kinds land from a mob.
-          const MOB_CASTABLE = ["damage", "douse", "damage-over-time"];
+          const MOB_CASTABLE = ["damage", "douse", "damage-over-time", "drain"];
           const t = (spells[a.spell].effect || {}).type;
           if (!MOB_CASTABLE.includes(t))
             errs.push(`mob ${id}: hostile cast spell ${a.spell} has effect "${t}" a mob can't cast (use one of ${MOB_CASTABLE.join(", ")})`);
@@ -485,11 +485,11 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "emit-light", "heal-over-time", "protect", "restore", "sleep", "summon", "cleanse"];
+  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "drain", "emit-light", "heal-over-time", "protect", "restore", "sleep", "summon", "cleanse"];
   // Effect types each PLAYER cast path resolves — must mirror the runtime sets
   // in server/commands/magic.js (HOSTILE_EFFECTS / SUPPORT_EFFECTS). A spell a
   // player can come to know must fall inside them, or `cast` refuses it.
-  const PLAYER_HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room"];
+  const PLAYER_HOSTILE_EFFECTS = ["damage", "damage-over-time", "sleep", "damage-room", "drain"];
   const PLAYER_SUPPORT_EFFECTS = ["restore", "protect", "cleanse", "heal-over-time", "emit-light"];
   const playerCastable = (sp) => {
     const t = (sp.effect || {}).type;
@@ -538,7 +538,7 @@ function main() {
         errs.push(`spell ${id}: a hostile spell cannot target "self"`);
       if (t === "damage-room" && sp.target !== "room")
         errs.push(`spell ${id}: a damage-room effect must have target "room"`);
-      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse"].includes(t) && sp.target !== "creature")
+      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse", "drain"].includes(t) && sp.target !== "creature")
         errs.push(`spell ${id}: hostile effect "${t}" is single-target — target must be "creature"`);
     }
     // Optional narration overrides: an object of template strings by known key.

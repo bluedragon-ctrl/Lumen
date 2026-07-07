@@ -1298,7 +1298,7 @@
     "depth": 4,
     "ambientLight": 1,
     "description": "The shore gives way south to a low, dry gallery, and the lake's roar falls to a murmur at your back. Pale mushroom-caps crowd the floor and the lower walls in glowing drifts, blue-white and thick as a meadow, and the rock is worn smooth in winding lanes where something heavy has trundled the same rounds for a long time. Spent husks and shed spines lie scattered among the caps. It is a still, fed place, far enough from the water to be quiet and close enough to be safe. The lanes run on south and east through the caps; the shore lies back north.",
-    "exits": { "north": "d4.lake.strand", "south": "d4.thornreach.hollow", "east": "d4.thornreach.terrace" },
+    "exits": { "north": "d4.lake.strand", "south": "d4.thornreach.hollow", "east": "d4.thornreach.terrace", "west": "d4.thornreach.verge" },
     "fixtures": [],
     "groundItems": [
       { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
@@ -1355,6 +1355,121 @@
     "groundItems": [],
     "spawns": [
       { "mob": "thornbug", "max": 3, "respawn": 120 }
+    ]
+  },
+  "d4.thornreach.verge": {
+    "id": "d4.thornreach.verge",
+    "zone": "fourth-thornreach",
+    "tags": ["grazing"],
+    "name": "The Far Verge",
+    "depth": 4,
+    "ambientLight": 1,
+    "description": "The browse gives out here at its western edge: the luminous caps grow small and scattered, the moss thins to a grey lace over bare rock, and the herd's trodden lanes fade into untracked floor. The glow behind is a soft wall of blue-white; ahead the dark leans in. In the cave wall a lamp-shelf has been cut square at shoulder height — the one human mark on the whole browse — and near it the floor drops away into a shaft, its lip worn smooth. The caps and the herd lie back east.",
+    "exits": { "east": "d4.thornreach.approach", "down": "d5.underway.stair" },
+    "fixtures": ["verge-niche"],
+    "groundItems": [
+      { "template": "palecap-mushroom", "qty": 2, "respawn": 150 }
+    ],
+    "spawns": [
+      { "mob": "thornbug", "max": 1, "respawn": 120 }
+    ]
+  },
+  "d5.underway.stair": {
+    "id": "d5.underway.stair",
+    "zone": "fifth-underway",
+    "name": "The Cut Descent",
+    "depth": 5,
+    "ambientLight": 0,
+    "description": "The shaft drops in rough natural shelves that a chisel has quietly improved — a notch here, a squared step there, a rusted spike near the top with the stub of a knotted rope still made fast to it. The browse's glow dies within the first few steps and does not come back; from here there is only what light you carry. Long smooth drag-marks score the dust down every ledge, all of them running one way: down. The verge is back up; at the bottom the way on is a squeeze to the west.",
+    "exits": { "up": "d4.thornreach.verge", "west": "d5.underway.pinch" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d5.underway.pinch": {
+    "id": "d5.underway.pinch",
+    "zone": "fifth-underway",
+    "name": "The Pinch",
+    "depth": 5,
+    "ambientLight": 0,
+    "description": "The way west closes to a sideways squeeze between two leaning slabs, tight enough that a laden delver must breathe out to pass. The rock is polished smooth at hip height — years of loads hauled through, and none of them gently — and a scrap of coarse sacking has snagged on a spur and bleached there. Whoever uses this way is stronger than they are careful. East the descent climbs back toward the browse; west, beyond the squeeze, the dark opens out again.",
+    "exits": { "east": "d5.underway.stair", "west": "d5.underway.gallery" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d5.underway.gallery": {
+    "id": "d5.underway.gallery",
+    "zone": "fifth-underway",
+    "name": "The Straight Gallery",
+    "depth": 5,
+    "ambientLight": 0,
+    "description": "You come out of the squeeze into a tunnel no water and no shifting of the earth ever made: dead level, dead straight, the walls dressed in even chisel-courses and squared timber sets standing at measured intervals. After the browse's soft chaos and the crawl of the natural stone, the competence of it is somehow worse than any lair — someone drove this gallery, alone, in the dark, and took their time about it. A few paces west it ends in a fall of rock shored with deliberate timber; in the south wall hangs a heavy plank door, and lamplight breathes faintly through its seams.",
+    "exits": { "east": "d5.underway.pinch" },
+    "fixtures": ["den-door", "gallery-sealed-face"],
+    "groundItems": [
+      { "template": "lamp-oil", "qty": 1, "respawn": 600 }
+    ],
+    "spawns": []
+  },
+  "d5.den.porch": {
+    "id": "d5.den.porch",
+    "zone": "graveworker-den",
+    "name": "The Cold Porch",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "The door opens on lamplight — real, generous, working light, the kind nothing natural burns this deep. A row of iron hooks runs along one wall hung with oiled aprons and a coil of fine wire; a barrel of quicklime stands by a broom worn to the knot; the floor has been swept, and recently. It is a tradesman's porch, tidy and airless and cold, and every homely thing in it is answering a question you have not asked yet. The door back to the gallery is north; the work goes on south.",
+    "exits": { "north": "d5.underway.gallery", "south": "d5.den.work" },
+    "fixtures": ["den-lamps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "risen-thornbug", "max": 2, "respawn": 240 }
+    ]
+  },
+  "d5.den.work": {
+    "id": "d5.den.work",
+    "zone": "graveworker-den",
+    "name": "The Workroom",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "Benches line the walls under bright, well-trimmed lamps: spools of glimmer shard-wire glowing their faint cold blue, pliers and fine hooks laid out in graded rows, and the work itself — thornbug carcasses in every stage of rewiring, some half-threaded, one spread open like a watch under repair. The finished ones stand along the wall, slack on their feet, waiting. There is no smell of rot; the quicklime and the cold see to that. The porch is back north; a colder room opens west, and the best light of all burns south.",
+    "exits": { "north": "d5.den.porch", "west": "d5.den.store", "south": "d5.den.sanctum" },
+    "fixtures": ["den-lamps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "risen-thornbug", "max": 3, "respawn": 240 }
+    ]
+  },
+  "d5.den.store": {
+    "id": "d5.den.store",
+    "zone": "graveworker-den",
+    "name": "The Still Store",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "A cold room cut low behind the workroom, a seep in the far corner ticking into a stone basin and the air off it barely above freezing. Shelves run the length of it, and what lies on the shelves lies very still, wrapped neat in sacking and dusted with lime — the Graveworker's materials, laid in like a winter larder. One of the big ones isn't wrapped, and isn't on a shelf: it stands by the door in a dead man's mining kit, and its seams glow. The workroom is back east.",
+    "exits": { "east": "d5.den.work" },
+    "fixtures": ["den-lamps"],
+    "groundItems": [
+      { "template": "shards", "qty": 8, "respawn": 1200 },
+      { "template": "crystal", "qty": 1, "respawn": 1200, "hidden": { "perception": 4 } }
+    ],
+    "spawns": [
+      { "mob": "stitched-prospector", "max": 1, "respawn": 600 },
+      { "mob": "risen-thornbug", "max": 1, "respawn": 240 }
+    ]
+  },
+  "d5.den.sanctum": {
+    "id": "d5.den.sanctum",
+    "zone": "graveworker-den",
+    "name": "The Grafting Room",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "The heart of the den, and the brightest room this side of the surface: lamps ranked on brackets, a mirror of polished tin throwing their light down onto a long bench where the fine work happens. Wire so thin it is only a glitter lies coiled beside instruments a surgeon would not blush at, and a journal sits open where the hand left off. The man himself works with his back half-turned, unhurried — he heard the door, he heard the porch, and he has not stopped stitching. The workroom is back north.",
+    "exits": { "north": "d5.den.work" },
+    "fixtures": ["graveworker-journal", "den-lamps"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "graveworker", "max": 1, "respawn": 900 }
     ]
   },
   "d5.gullet": {

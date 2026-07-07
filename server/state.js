@@ -1498,6 +1498,15 @@ class GameState {
         if (eff.damageType === "physical") damage = mitigate(damage, "physical", this._defenceOf(target));
         return { kind: "damage", damage };
       }
+      case "drain": {
+        // A necromantic siphon (Leech): lands like a non-physical damage weave
+        // — Ward's wholesale negate already ran in the caller — and hands the
+        // caller a drainFactor so it can heal the CASTER from the damage it
+        // deals. The heal stays caller-side: only the caller knows the caster
+        // and applies the rolled damage.
+        const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(attrs, eff.scale));
+        return { kind: "damage", damage, drainFactor: eff.healFactor || 0.5 };
+      }
       case "damage-over-time": {
         // A clinging burn (Witchfire): no immediate blow, but a DoT whose length
         // scales with the caster (more total damage, a longer-lasting mark)
@@ -1584,6 +1593,11 @@ class GameState {
       // event out of its dispatch for the same reason.
       result.death = this._hurtMob(mob, player.location, applied.damage, events, { silent: true, threatTo: player.id, killer: player });
       if (result.death) result.killed = true;
+      // A drain heals the caster from the blow it just dealt (capped at max).
+      if (applied.drainFactor) {
+        const heal = Math.min(player.maxHp - player.hp, Math.floor(applied.damage * applied.drainFactor));
+        if (heal > 0) { player.hp += heal; result.drained = heal; }
+      }
     } else if (applied.kind === "dot") {
       // Stamped with the caster above, so a smoulder-kill credits them (like a bleed).
       this._addThreat(mob, player.id, 1);

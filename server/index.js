@@ -462,6 +462,7 @@ const EVENT_HANDLERS = {
     else if (ev.doused) youLine = `${cap(who)} reaches out, and your light gutters and dies — the dark rushes in.`;
     else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
     else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
+    if (ev.drained > 0) youLine += ` Your stolen warmth closes ${seen ? "its" : "their"} wounds.`;
     sendToPlayer(ev.targetId, { type: "combat", text: youLine });
     if (target) markPlayerView(ev.targetId);
     for (const o of state.playersIn(ev.roomId)) {
