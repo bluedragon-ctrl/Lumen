@@ -130,6 +130,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and dropped its `emitLight` companion glow.
 
 ### Changed
+- **All combat damage now flows through two shared sinks (`_hurtMob` /
+  `_hurtPlayer`).** Every path that used to hand-roll `hp -=` + threat + kill —
+  melee `deal`, a player's damage spell, a mob's cast, a room burst/bomb — now
+  calls the sink, which owns the damage→threat convention (`threatTo` stokes
+  `max(1, damage)`, so the minimum can no longer differ between the two cast
+  directions, as it quietly did), suppresses its `mob-hurt`/`player-hurt` event
+  where the swing/cast event already narrates the blow (`silent`), and resolves
+  every kill through the one shared death sequence. A missed swing provoking its
+  target is now an explicit `defender.provoke` rule rather than a side-effect of
+  dealing 0 damage; "quarry slain → stop swinging" moved from the mob defender's
+  damage closure to the player attack loop where it belongs; a mob's killing cast
+  now narrates cast-then-death (the cast event carries the post-blow hp, like
+  melee) instead of relying on caller-side event ordering; and the now-unused
+  `_killMob` wrapper is gone. New `test/damage-sink.test.js` pins the
+  conventions. No tuning changes.
 - **Melee combat internals dedup (no gameplay change beyond the fixes above).**
   The uniform `attack` event is now built in one place (`applyHitOutcome`) for
   both directions — player swings gain the `targetKind`/`attackerEmitsLight`

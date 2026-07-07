@@ -228,10 +228,12 @@ function cast(state, player, arg, ctx) {
   out.push(...tail);
   // Deliver castSpell's side-effects: a rousted sleeper broadcasts through the
   // dispatcher; auto-engage is caster-directed, so it's appended here instead,
-  // to land AFTER the cast line (the dispatcher would deliver it first).
+  // to land AFTER the cast line (the dispatcher would deliver it first). The
+  // death event is dropped — the kill is already narrated (and quest-credited)
+  // inline above, so the dispatcher's death lines would double-narrate it.
   for (const ev of events) {
     if (ev.type === "combat-auto-start") out.push({ type: "combat", text: `You turn on ${ev.targetName} and fight back!` });
-    else ctx.emit(ev);
+    else if (ev.type !== "death") ctx.emit(ev);
   }
   return out;
 }

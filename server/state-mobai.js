@@ -680,17 +680,10 @@ class MobAIMixin {
       actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: mt.emitsLight > 0, roomId,
       onDamage: mobOnDamage(mt),
       sourceId: null, // a mob defender's retaliatory DoT credits no one
-      deal: (dmg) => {
-        this._addThreat(mob, attacker.id, Math.max(1, dmg)); // being hit earns the striker its ire
-        mob.hp -= dmg;
-        if (mob.hp <= 0) {
-          const d = this._killMobAt(mob, roomId, this._killerPlayerFor(attacker));
-          events.push(d);
-          if (attacker.kind === "player") attacker.actor.pending = null; // quarry slain — stop swinging
-          return d;
-        }
-        return null;
-      },
+      // A landed blow: hp, threat and any kill resolve in the shared sink. Silent —
+      // the `attack` event already narrated the hit.
+      deal: (dmg) => this._hurtMob(mob, roomId, dmg, events, { silent: true, threatTo: attacker.id, killer: this._killerPlayerFor(attacker) }),
+      provoke: () => this._addThreat(mob, attacker.id, 1), // a whiffed swing still earns the striker its ire
       hurt: (dmg, cause) => this._hurtMob(mob, roomId, dmg, events, { cause }), // self-damage onDamage (rare)
     };
   }
@@ -701,11 +694,10 @@ class MobAIMixin {
       actor: player, kind: "player", id: player.id, name: player.name, emitsLight: false, roomId,
       onDamage: playerOnDamage(this.world, player), // player armour triggers (none seeded yet)
       sourceId: player.id, // a player's reflected DoT credits them
-      deal: (dmg) => {
-        player.hp -= dmg;
-        if (player.hp <= 0) { const d = this._beginDeath(player, roomId, events); events.push(d); return d; }
-        return null;
-      },
+      // A landed blow resolves in the shared sink (silent — the `attack` event
+      // narrated it); a fatal one routes to the rim through _beginDeath. No
+      // provoke: players hold no threat table, so a whiffed swing is just a whiff.
+      deal: (dmg) => this._hurtPlayer(player, dmg, events, { silent: true }),
       hurt: (dmg, cause) => this._hurtPlayer(player, dmg, events, { cause }), // self-damage onDamage (rare)
     };
   }
@@ -843,21 +835,13 @@ class MobAIMixin {
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
-    let damage = 0, killed = false, death = null, effectName = null, doused = false;
+    let damage = 0, effectName = null, doused = false;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),
       // scaled by the mob's own attributes; no sourceId — a mob credits no one.
       const applied = this._applyHostileSpellEffect(eff, spell.name, t.attributes || {}, target);
       if (applied.kind === "damage") {
-        damage = applied.damage;
-        this._addThreat(m, target.id, damage); // mirror melee: damage stokes threat
-        target.actor.hp -= damage;
-        if (target.actor.hp <= 0) {
-          killed = true;
-          death = isPlayer
-            ? this._beginDeath(target.actor, roomId, events)
-            : this._killMobAt(target.actor, roomId, this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }));
-        }
+        damage = applied.damage; // dealt through the shared sink below, after the cast event
       } else if (applied.kind === "douse") {
         // The delver must relight (a turn) or fight blind; the room darkens
         // immediately, recomputed below so the band is fresh.
@@ -870,13 +854,22 @@ class MobAIMixin {
       }
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
+    // The cast event goes out BEFORE the damage lands (post-blow hp precomputed),
+    // so a killing bolt narrates cast-then-death — the same order as melee's
+    // attack event before `deal`.
+    const killed = damage > 0 && damage >= target.actor.hp;
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
       spellName: spell.name, resisted, damage, effectName, doused, killed,
-      targetHp: Math.max(0, target.actor.hp), targetMaxHp: target.actor.maxHp,
+      targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
-    if (death) events.push(death);
+    if (damage > 0) {
+      // Damage, threat and any kill resolve in the shared sinks (silent — the
+      // mob-cast event above narrates the blow).
+      if (isPlayer) this._hurtPlayer(target.actor, damage, events, { silent: true });
+      else this._hurtMob(target.actor, roomId, damage, events, { silent: true, threatTo: m.id, killer: this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }) });
+    }
     return { targetDied: killed, attackerDied: false };
   }
 
@@ -986,16 +979,10 @@ class MobAIMixin {
     return dropped;
   }
 
-  /** A direct kill by a player (melee/spell): removes the mob, drops spoils, and
-   *  awards xp to the killer. Non-combat deaths go through `_hurtMob` instead. */
-  _killMob(mob, killer) {
-    return this._killMobAt(mob, killer.location, killer);
-  }
-
   /** Remove a slain mob from `roomId`, drop its spoils, and award XP — the ONE
-   *  death sequence every kill path shares: a direct hit (player attack,
-   *  mob-vs-mob, a hostile cast) and the indirect sinks via `_hurtMob` (a bleed
-   *  tick, light-bane, a thrown bomb). `killerPlayer` is the player to credit as
+   *  death sequence every kill path shares, reached exclusively through the
+   *  `_hurtMob` damage sink (a swing, a spell, a bleed tick, light-bane, a
+   *  thrown bomb). `killerPlayer` is the player to credit as
    *  finisher (a player attacker, or the OWNER of an allied mob that landed the
    *  blow — resolved by the caller) or null when no player struck the killing
    *  blow (an ownerless ally's kill, pure environment, a DoT whose source is
