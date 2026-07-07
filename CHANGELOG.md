@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **Draught of Iron Sinew — a temporary Might buff potion.** A new `attr-buff`
+  consumable effect raises an attribute for a duration; `effectiveAttributes`
+  now folds active `attr-buff` states in on top of gear, so the bonus flows
+  through to-hit, melee damage, Ward and evasion until it expires. The first
+  such potion (+3 Might for 60 ticks) is crafted at the alchemy station from
+  chitin-spike, bug-tallow and slug-slime (giving the underused slime binder a
+  second home); Vesper the glimmer-mage sells the schematic. Names/balance
+  provisional, pending sign-off.
 - **The Graveworker's den (d5 mini-dungeon, names provisional).** West of the
   Thornreach browse a new grazing-edge room (The Far Verge) drops down a
   human-improved descent to depth 5, through a squeeze into a human-made tunnel,
