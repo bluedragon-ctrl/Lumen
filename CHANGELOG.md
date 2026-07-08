@@ -43,6 +43,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Gloaming descends — depth 6, the insect floor (six rooms).** The Weeping
+  Stair now drops (`down`) into a new zone `gloaming` beneath the false-sky canopy:
+  dimmer, hotter, thick with rot and wings. **The Sunless Landing** branches east to
+  **the Fungal Gallery** (giant-mushroom timber, grazing **grubs**) and south to **the
+  Steaming Terraces** (scalding pools, **vent-scorpions**, a `salt-crust` yielding the
+  new **spring-salt**). Off the terraces, **the Droning Hollow** is a lure — a bank of
+  glowing moss pulls a biting **glow-midge** swarm and feeds the floor's local miniboss,
+  a **steam-mantis** (a hound-sized ambush hunter, ~56 HP), which stands between the
+  delver and **the Shucked Crawl**, its moulting larder, where a `chitin-drift` and the
+  mantis's own kill yield the new **iridescent-carapace** (vent-scorpions now drop it
+  rarely too). **The Gulf Throat** describes the way to depth 7 but leaves it unrigged,
+  as the stair did above. Every glow lives in Tide-dimmable `ambientLight` (the lure
+  included), so the whole floor still goes dark at the flood. No recipes yet; the
+  giant antlion pitched for the pit waits for a lower floor. Names provisional.
 - **The Gloaming's first gatherables (three materials + harvest nodes).** The top
   floor now rewards foraging, distributed to give each room a purpose: **the False
   Dawn** carries a **stand of giant mushrooms** (`cut` for **fungal hardwood** — the

@@ -2088,6 +2088,63 @@
       { "type": "idle", "weight": 3 },
       { "type": "emote", "weight": 2, "messages": ["arches its sting higher", "clicks its claws in warning", "sidles across the scalding stone", "flicks a bead of venom from the barb"] }
     ],
-    "loot": [{ "template": "venom-gland", "chance": 0.7 }]
+    "loot": [{ "template": "venom-gland", "chance": 0.7 }, { "template": "iridescent-carapace", "chance": 0.12 }]
+  },
+  "glow-midge": {
+    "id": "glow-midge",
+    "faction": "fauna",
+    "name": "a cloud of glow-midges",
+    "keywords": ["midge", "midges", "cloud", "swarm", "glow-midge", "gnats", "flies"],
+    "description": "Not one thing but a thousand — a hanging, turning cloud of pale midges no bigger than a grain each, drawn up out of the gulf-dark to any glow they can find and to the warmth of anything that bleeds. Alone they are nothing; in their thousands they whine in the ears, crawl at the eyes, and open a hundred small stinging bites at once, and they do not disperse for long.",
+    "spawnMessage": "A cloud of pale midges gathers out of the bright air, whining, and turns toward the warmth of you.",
+    "maxHp": 14,
+    "speed": 15,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 2, "vitality": 3, "intellect": 0, "wits": 3, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 12 },
+    "behavior": "wander",
+    "hostile": true,
+    "attack": {
+      "damage": "1d2",
+      "actionCost": 8,
+      "onHit": [{ "type": "damage-over-time", "name": "midge-bites", "damage": "1d2", "duration": 3, "chance": 0.5 }]
+    },
+    "xp": 4,
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "emote", "weight": 3, "messages": ["draws into a denser, whining knot", "settles on every patch of bare skin at once", "drifts toward the brightest of the moss-glow", "boils up thicker for a moment, then thins"] }
+    ]
+  },
+  "steam-mantis": {
+    "id": "steam-mantis",
+    "faction": "fauna",
+    "name": "a steam-mantis",
+    "keywords": ["mantis", "steam-mantis", "steam", "hunter", "blades"],
+    "description": "A hunting insect grown to the size of a hound, pale green and glass-smooth, so still against the glowing moss that it passes for a stalk of it until it moves. It stands in the lure-light where the midges are thickest and lets the gulf bring its food to it — and takes whatever larger thing comes to the food. Its forelimbs fold away like sheathed sickles, edged inside with rows of black hooks; when they open, they open faster than the eye.",
+    "spawnMessage": "A pale stalk of moss you never questioned unfolds all at once — {name}, forelimbs opening like a pair of hooked blades.",
+    "maxHp": 56,
+    "speed": 13,
+    "armour": 3,
+    "ward": 1,
+    "attributes": { "might": 10, "vitality": 12, "intellect": 0, "wits": 5, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 14 },
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 1,
+    "attack": {
+      "damage": "2d6",
+      "actionCost": 11,
+      "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }]
+    },
+    "xp": 44,
+    "shards": "2d6",
+    "actions": [
+      { "type": "attack", "weight": 9 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["sways slowly from side to side, tracking you", "cleans a hooked forelimb with unhurried care", "folds its blades tight against the pale glow of its body", "clicks, and a drift of half-eaten midges falls from its jaws"] }
+    ],
+    "loot": [{ "template": "iridescent-carapace", "chance": 0.9 }]
   }
 }

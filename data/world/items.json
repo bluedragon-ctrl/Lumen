@@ -1811,5 +1811,25 @@
     "weight": 0,
     "value": 4,
     "stackable": true
+  },
+  "iridescent-carapace": {
+    "id": "iridescent-carapace",
+    "name": "a plate of iridescent carapace",
+    "keywords": ["carapace", "chitin", "shell", "plate", "iridescent"],
+    "description": "A curved plate of insect shell the length of a forearm, shed or cut from something far too large — thin, immensely strong, and slick with a shifting oil-on-water sheen of green and violet that catches even the false light. Lighter than any metal and cool to the touch; a cunning armourer would see a use for it long before a smith did.",
+    "type": "material",
+    "weight": 1,
+    "value": 14,
+    "stackable": true
+  },
+  "spring-salt": {
+    "id": "spring-salt",
+    "name": "a handful of spring-salt",
+    "keywords": ["salt", "spring-salt", "mineral", "crust", "crystals"],
+    "description": "Coarse warm crystals scraped from the crust the hot springs leave along their rims — grey-white shot through with faint colour, tasting of iron and heat. The deep's cooks and menders both prize it: it keeps without spoiling, it draws the ache from tired flesh, and steeped with the right green it makes a broth that warms from the inside out.",
+    "type": "material",
+    "weight": 0,
+    "value": 5,
+    "stackable": true
   }
 }
