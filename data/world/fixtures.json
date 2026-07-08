@@ -442,5 +442,35 @@
     "description": "Here at the lip the moss-canopy lets its lower fronds down within reach, and they hang heavy with emberfruit — soft, dim-glowing globes of orange-gold clustered along the trailing green, warmed by the steam rising out of the gulf. Reach and pick, if the reaching is worth what shares the rim with you.",
     "type": "scenery",
     "harvest": { "template": "emberfruit", "verb": "pick", "yield": 1, "charges": 4, "respawn": 240, "energy": 9 }
+  },
+  "salt-crust": {
+    "id": "salt-crust",
+    "name": "a crust of spring-salt",
+    "keywords": ["salt", "crust", "spring-salt", "mineral", "rime", "deposit"],
+    "description": "Where the scalding pools lap and dry they leave a thick grey-white rime crusted over the terrace stone, warm underhand and studded with coarse crystals. It flakes away in handfuls where the water has undercut it.",
+    "type": "resource",
+    "harvest": { "template": "spring-salt", "verb": "scrape", "yield": 1, "charges": 3, "respawn": 240, "energy": 10 }
+  },
+  "steaming-pool": {
+    "id": "steaming-pool",
+    "name": "a scalding pool",
+    "keywords": ["pool", "pools", "spring", "springs", "water", "steam", "terrace"],
+    "description": "One of a stair of them — round, still pools terraced down the stone, each brimming clear and green-lit and breathing a slow column of steam into the air. The water is hot enough to scald a hand held in it too long, and the stone between is slick with mineral bloom. The heat draws the deep's small life to the edges to bask, and larger things to the small life.",
+    "type": "scenery"
+  },
+  "glowing-moss-bank": {
+    "id": "glowing-moss-bank",
+    "name": "a bank of glowing moss",
+    "keywords": ["moss", "bank", "glow", "light", "wall", "chasm-moss"],
+    "description": "Below the reach of the false sky, a great bank of the same pale moss has taken this wall and throws its own cold radiance into the hollow — the one bright place left this deep in the gulf. The light hangs thick with drifting midges drawn to it, and the drone of them never stops. It is beautiful, and everything in the dark for a long way around knows exactly where it is.",
+    "type": "scenery"
+  },
+  "chitin-drift": {
+    "id": "chitin-drift",
+    "name": "a drift of shed chitin",
+    "keywords": ["chitin", "drift", "husk", "husks", "carapace", "shell", "moult", "shells"],
+    "description": "The floor of the crawl is banked deep with cast husks and cracked shell — the moults of something that has grown here a long time, and the picked-clean plate of everything it has dragged back to eat. Here and there a whole curve of carapace lies unbroken, glinting oil-bright in the gloom, sound enough to lift and carry.",
+    "type": "resource",
+    "harvest": { "template": "iridescent-carapace", "verb": "prise", "yield": 1, "charges": 3, "respawn": 300, "energy": 12 }
   }
 }
