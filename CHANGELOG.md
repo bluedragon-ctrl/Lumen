@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Attribute-gated doors (`door.requires`).** A door fixture can now gate
+  *opening* on an **effective** attribute score — `{ attr, value, failText?,
+  successText? }` in its `door` block. The door only yields to a delver whose
+  `attr` (base + gear `attrMod` + status buffs, so a Might potion or a ring
+  counts) meets `value`; closing is never gated, and `requires` composes with an
+  optional `key`. The needed attribute is spelled out on the refusal (with the
+  player's current score), on the success line, and as a `needs: <Attr> <value>`
+  line on `examine`, so it's never a guessing game. Two proof-of-concept gates:
+  the Graveworker's plank door (`den-door`) now carries a wire-lattice puzzle-lock
+  needing **Intellect 7**, and the caged gate at the Barred Mouth (`caged-gate`,
+  the way into the false-light Gloaming past The False Dawn) is now a seized,
+  rusted gate you force with **Might 7**. See the data model → *Fixture*.
+
 ### Fixed
 - **Malformed `fixtures.json` (`gate-warning`) broke data loading.** The
   `gate-warning` fixture was missing its `"type"` field and closing brace, so

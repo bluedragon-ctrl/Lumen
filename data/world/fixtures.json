@@ -364,9 +364,16 @@
     "id": "caged-gate",
     "name": "a caged gate",
     "keywords": ["gate", "cage", "caged", "bars", "chain", "south"],
-    "description": "The whole southern arch is closed off with a wall of forged iron bars — not a door so much as the front of a cage, each bar as thick as a pick-haft, set deep into holes drilled in the living rock and strapped with cross-bands at knee and shoulder height. Whoever raised it hauled the iron down five floors to do it, and set the bars to keep something in, not delvers out. A gate is built into the middle of it, hinged and heavy, wound about with chain and shut with a prospector's lock — but the wet has had years to work: the lock has rusted to lace and the chain hangs slack and flaking, and the gate will grind open now to anyone who sets a shoulder to it. The iron has given up, even if the warning has not. The warm wind pours through the bars, beading the metal, and far down the passage beyond glows that pale, steady wash of light that no one is carrying.",
+    "description": "The whole southern arch is closed off with a wall of forged iron bars — not a door so much as the front of a cage, each bar as thick as a pick-haft, set deep into holes drilled in the living rock and strapped with cross-bands at knee and shoulder height. Whoever raised it hauled the iron down five floors to do it, and set the bars to keep something in, not delvers out. A gate is built into the middle of it, hinged and heavy, wound about with chain whose lock has long since rusted into one orange lump with its own links — no key will ever turn it again. The years of wet have seized the hinges as solid as they've ruined the lock, and the whole heavy leaf will only give to main strength, wrenched inward against the rust until it grinds far enough to pass. The iron has given up on its lock, even if it hasn't on its weight, and the warning hasn't given up at all. The warm wind pours through the bars, beading the metal, and far down the passage beyond glows that pale, steady wash of light that no one is carrying.",
     "type": "door",
-    "door": { "dir": "south", "to": "d5.falselight.dawn", "open": false }
+    "door": {
+      "dir": "south", "to": "d5.falselight.dawn", "open": false,
+      "requires": {
+        "attr": "might", "value": 7,
+        "failText": "You set your shoulder to the gate and heave. The seized hinges shriek, flake rust, and hold — it will take more raw strength than that to grind the iron inward.",
+        "successText": "You set your shoulder to the gate and drive with everything you have; the rusted hinges tear free with a long iron shriek and it grinds inward far enough to pass."
+      }
+    }
   },
   "false-sky": {
     "id": "false-sky",
@@ -400,9 +407,16 @@
     "id": "den-door",
     "name": "a heavy plank door",
     "keywords": ["door", "plank", "south"],
-    "description": "A door of heavy squared planks set into a dressed frame in the gallery's south wall, hung on leather hinges kept supple with lamp-oil. There is no lock and no bar — down past the browse and the squeeze and a tunnel no natural force made, whoever hung it plainly reckons the dark does the gatekeeping. A faint warmth of lamplight breathes through the seams.",
+    "description": "A door of heavy squared planks set into a dressed frame in the gallery's south wall, hung on leather hinges kept supple with lamp-oil. There is no lock and no bar — only, at hand height, a flat brass plate threaded with a lattice of stiff coiled wire, each strand sprung against the next, that must be worked into one figure before the latch behind it will lift. The Graveworker's own hand: it does not tire, and it does not open for a hand that cannot read it. A faint warmth of lamplight breathes through the seams, and past it the browse, the squeeze, and a tunnel no natural force made.",
     "type": "door",
-    "door": { "dir": "south", "to": "d5.den.porch", "open": false }
+    "door": {
+      "dir": "south", "to": "d5.den.porch", "open": false,
+      "requires": {
+        "attr": "intellect", "value": 7,
+        "failText": "The wire lattice resists you — a wrong pull springs another strand tight, and the latch stays down. Reading the figure whole takes a sharper mind than you've brought.",
+        "successText": "You trace the coils in the one order that lets them fall slack, and the latch lifts with a click."
+      }
+    }
   },
   "den-lamps": {
     "id": "den-lamps",
