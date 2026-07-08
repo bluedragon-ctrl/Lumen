@@ -25,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Gloaming's first fauna (three depth-5 mobs).** The three top-floor rooms are
+  now inhabited, pacing a deliberate lull-then-bite: **the False Dawn** holds only
+  **basking newts** (soft, harmless grazers cropping the moss — the oasis's calm face),
+  while **the Steaming Brink** and **the Weeping Stair** hold the threat. The gatekeeper
+  is **the Gloamback** (`the-gloamback`), a basking newt grown into a ~50-HP ambush apex
+  whose moss-crusted back glows like the safe canopy until it opens an eye — an elite
+  step above the depth-5 norm that tells a delver at once this is higher-level ground.
+  Between them roams the **vent-scorpion**, whose sting carries a venom
+  damage-over-time. Names provisional pending sign-off; no bespoke loot yet (they drop
+  existing materials).
 - **Canon lore for the Tide.** `docs/lore.md` gains a top-level section (after *The
   Abyss*) defining the Tide as the Abyss's rhythm — an Abyss-wide cycle of darkness
   rising and ebbing in phases (calm → stirring → flood → receding), biting harder the

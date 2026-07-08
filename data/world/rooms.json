@@ -1523,7 +1523,7 @@
     "exits": { "north": "d5.gatemouth", "east": "d5.falselight.brink" },
     "fixtures": ["false-sky"],
     "groundItems": [],
-    "spawns": []
+    "spawns": [{ "mob": "basking-newt", "max": 2, "respawn": 200 }]
   },
   "d5.falselight.brink": {
     "id": "d5.falselight.brink",
@@ -1536,7 +1536,7 @@
     "exits": { "west": "d5.falselight.dawn", "east": "d5.falselight.descent" },
     "fixtures": ["false-sky"],
     "groundItems": [],
-    "spawns": []
+    "spawns": [{ "mob": "the-gloamback", "max": 1, "respawn": 600 }, { "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
   },
   "d5.falselight.descent": {
     "id": "d5.falselight.descent",
@@ -1549,7 +1549,7 @@
     "exits": { "west": "d5.falselight.brink" },
     "fixtures": ["false-sky"],
     "groundItems": [],
-    "spawns": []
+    "spawns": [{ "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
   },
   "d6.camp": {
     "id": "d6.camp",
