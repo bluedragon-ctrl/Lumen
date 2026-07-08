@@ -35,6 +35,19 @@
     "shards": 3,
     "output": { "template": "might-draught", "qty": 1 }
   },
+  "insight-draught": {
+    "id": "insight-draught",
+    "name": "Philtre of the Kindled Mind",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "weeping-chasm-moss", "qty": 2 },
+      { "template": "witchglow-cap", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "insight-draught", "qty": 1 }
+  },
   "mana-tonic": {
     "id": "mana-tonic",
     "name": "Mana Tonic",
