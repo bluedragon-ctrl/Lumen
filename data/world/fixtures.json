@@ -372,6 +372,8 @@
     "name": "a painted warning",
     "keywords": ["warning", "sign", "paint", "letters", "writing"],
     "description": "Across the cross-bands of the gate, in whitewash gone grey and laid on thick with a rag, someone painted letters a hand tall: DO NOT ENTER. Below it, smaller, in a different and shakier hand: IT IS NOT WORTH IT. THE LIGHT IS A LIE. Below that, a tally — four strokes and a fifth across them, and two strokes more — the way prospectors count their dead.",
+    "type": "scenery"
+  },
   "verge-niche": {
     "id": "verge-niche",
     "name": "a cut lamp-shelf",
