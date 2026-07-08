@@ -446,6 +446,18 @@ function main() {
       if (f.door.open != null && typeof f.door.open !== "boolean") errs.push(`fixture ${id}: door.open must be a boolean`);
       // An optional `door.key` locks the door to carriers of that item template.
       if (f.door.key != null && !has(items, f.door.key)) errs.push(`fixture ${id}: door.key references missing item ${f.door.key}`);
+      // An optional `door.requires` gates opening on an effective attribute score.
+      if (f.door.requires != null) {
+        const rq = f.door.requires;
+        const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
+        if (typeof rq !== "object") errs.push(`fixture ${id}: door.requires must be an object`);
+        else {
+          if (!ATTRS.includes(rq.attr)) errs.push(`fixture ${id}: door.requires.attr must be one of ${ATTRS.join(", ")}`);
+          if (typeof rq.value !== "number" || rq.value <= 0) errs.push(`fixture ${id}: door.requires.value must be a positive number`);
+          if (rq.failText != null && typeof rq.failText !== "string") errs.push(`fixture ${id}: door.requires.failText must be a string`);
+          if (rq.successText != null && typeof rq.successText !== "string") errs.push(`fixture ${id}: door.requires.successText must be a string`);
+        }
+      }
     }
     if (f.mine) {
       checkResourceDrop(f.mine, "mine", id);

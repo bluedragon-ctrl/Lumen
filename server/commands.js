@@ -15,7 +15,7 @@
  */
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
 const { canSee } = require("./light");
-const { addToFloor, itemVisibleTo, fixtureVisibleTo, isDiscovered, discoveryKey, xpForLevel } = require("./state");
+const { addToFloor, itemVisibleTo, fixtureVisibleTo, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes } = require("./state");
 const { EXPLORE_XP, DEFAULT_ACTION_COST } = require("./config");
 const quests = require("./quests");
 const {
@@ -315,6 +315,10 @@ function toggleFixture(state, player, f, ctx) {
   return selfAndViews(state, player, `You switch ${f.on ? "on" : "off"} ${ft.name}.${tail}`);
 }
 
+// Player-facing capitalised name for an attribute ("might" → "Might").
+const ATTR_LABEL = { might: "Might", vitality: "Vitality", intellect: "Intellect", wits: "Wits", perception: "Perception" };
+const attrLabel = (a) => ATTR_LABEL[a] || cap(a);
+
 // Open or shut a door fixture (a trapdoor, gate, …). Open, it provides an exit
 // in its `dir`; shut, that way is closed. `want` forces a state (open/close
 // verbs); omit it to toggle (`use`).
@@ -329,10 +333,25 @@ function toggleDoor(state, player, f, ctx, want) {
     const keyName = state.world.items[ft.door.key] ? state.world.items[ft.door.key].name : "the right key";
     return [{ type: "error", text: `${cap(ft.name)} is locked. You'd need ${keyName} to open it.` }];
   }
+  // An attribute-gated door (`door.requires`) only yields to a delver whose
+  // EFFECTIVE attribute (gear and potion buffs counted) meets the threshold — a
+  // rusty gate you must be strong enough to force, a puzzle-lock you must be
+  // sharp enough to solve. The needed attribute is named on both the refusal and
+  // the success line (and on `examine`), so a player is never left guessing.
+  // Closing is always allowed — only forcing it open is gated.
+  const req = ft.door.requires;
+  if (next && req) {
+    const have = effectiveAttributes(state.world, player)[req.attr] || 0;
+    if (have < req.value) {
+      const fail = req.failText || `${cap(ft.name)} won't give — it takes ${attrLabel(req.attr)} ${req.value} to open.`;
+      return [{ type: "error", text: `${fail} (your ${attrLabel(req.attr)}: ${have})` }];
+    }
+  }
   f.open = next;
   ctx.toRoom(player.location, { type: "log", text: `${player.name} ${f.open ? "opens" : "shuts"} ${ft.name}.` }, player.id);
   ctx.refreshRoom(player.location, player.id);
-  return selfAndViews(state, player, `You ${f.open ? "open" : "shut"} ${ft.name}.`);
+  const reqTail = next && req ? ` ${req.successText || `It yields to your ${attrLabel(req.attr)} ${req.value}.`}` : "";
+  return selfAndViews(state, player, `You ${f.open ? "open" : "shut"} ${ft.name}.${reqTail}`);
 }
 
 // `use <target>`: operate a switchable or door fixture here if it matches, else drink it.

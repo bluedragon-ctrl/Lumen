@@ -277,6 +277,12 @@ function buildExamineView(state, p, q) {
         }
         if (t.door) {
           lines.push(`it is ${f.open ? "open" : "shut"}`);
+          // An attribute-gated door tells the player up front what it takes to force it.
+          if (t.door.requires) {
+            const rq = t.door.requires;
+            const label = rq.attr.charAt(0).toUpperCase() + rq.attr.slice(1);
+            lines.push(`needs: ${label} ${rq.value} to open`);
+          }
           const callName = t.name.replace(/^(a|an|the)\s+/i, ""); // "a heavy trapdoor" → "heavy trapdoor"
           hints.push(`${f.open ? "Close" : "Open"} it with \`${f.open ? "close" : "open"} ${callName}\`.`);
         }
