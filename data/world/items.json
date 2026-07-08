@@ -652,6 +652,31 @@
       "effect": { "type": "heal-over-time", "name": "Regeneration", "magnitude": 3, "interval": 3, "duration": 24, "good": true }
     }
   },
+  "might-draught": {
+    "id": "might-draught",
+    "rarity": "uncommon",
+    "name": "a draught of iron sinew",
+    "description": "A thick, rust-red tincture that smells of hot metal and crushed chitin, a clot of slug-slime binding it so the strength keeps until it's wanted. It sits heavy in the gut, then floods the limbs with a borrowed, trembling power — for a while, you strike like something twice your size.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink it down. Your muscles cord and your grip tightens — the draught lends you a savage, borrowed strength.",
+      "effect": { "type": "attr-buff", "name": "Iron Sinew", "attrMod": { "might": 3 }, "duration": 60, "refresh": true, "good": true }
+    }
+  },
+  "schematic-might-draught": {
+    "id": "schematic-might-draught",
+    "name": "an iron-sinew method",
+    "keywords": ["method", "schematic", "sinew", "might", "draught"],
+    "description": "A strip of gut-skin in Vesper's precise hand — the rendering of chitin-spike and bug-tallow, bound in slug-slime, into a draught that lends the limbs a borrowed strength. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "recipe": "might-draught"
+  },
   "mana-tonic": {
     "id": "mana-tonic",
     "rarity": "uncommon",

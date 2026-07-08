@@ -655,6 +655,7 @@ class GameState {
       armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
       ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
       pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill

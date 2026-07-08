@@ -111,6 +111,13 @@ function effectiveAttributes(world, player) {
     if (!mod) continue;
     for (const [k, v] of Object.entries(mod)) attrs[k] = Math.max(0, (attrs[k] || 0) + v);
   }
+  // Temporary attribute buffs (e.g. a might draught): each active `attr-buff`
+  // status folds its `attrMod` in on top of gear, so the bonus flows through
+  // every read below — to-hit, melee damage, Ward, evasion — until it expires.
+  for (const s of player.states || []) {
+    if (s.type !== "attr-buff" || !s.attrMod) continue;
+    for (const [k, v] of Object.entries(s.attrMod)) attrs[k] = Math.max(0, (attrs[k] || 0) + v);
+  }
   return attrs;
 }
 
