@@ -666,6 +666,31 @@
       "effect": { "type": "attr-buff", "name": "Iron Sinew", "attrMod": { "might": 3 }, "duration": 60, "refresh": true, "good": true }
     }
   },
+  "insight-draught": {
+    "id": "insight-draught",
+    "rarity": "uncommon",
+    "name": "a philtre of the kindled mind",
+    "description": "A clear vial threaded with suspended glimmer dust and the coaxed, cold-green glow of a witchglow cap, so it holds a slow, thinking light that seems to turn of its own accord. Drunk down, it sharpens the edges of the world — thoughts run quick and clean, and for a while the dark seems a thing to be read rather than feared.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink it down. A cold clarity blooms behind your eyes — the world's edges sharpen and your thoughts run quick and bright.",
+      "effect": { "type": "attr-buff", "name": "Kindled Mind", "attrMod": { "intellect": 3 }, "duration": 60, "refresh": true, "good": true }
+    }
+  },
+  "schematic-insight-draught": {
+    "id": "schematic-insight-draught",
+    "name": "a kindled-mind method",
+    "keywords": ["method", "schematic", "kindled", "mind", "insight", "philtre"],
+    "description": "A strip of gut-skin in Vesper's precise hand — the steeping of chasm-moss, witchglow cap and suspended glimmer dust into a philtre that quickens the mind. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 20,
+    "stackable": true,
+    "recipe": "insight-draught"
+  },
   "schematic-might-draught": {
     "id": "schematic-might-draught",
     "name": "an iron-sinew method",

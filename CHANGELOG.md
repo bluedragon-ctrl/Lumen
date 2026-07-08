@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Malformed `fixtures.json` (`gate-warning`) broke data loading.** The
+  `gate-warning` fixture was missing its `"type"` field and closing brace, so
+  `verge-niche` was parsed as a nested property and `JSON.parse` failed at EOF —
+  `npm run validate` and the server's world load both errored. Closed the entry.
 - **Fixture targeting now honours the authored `keywords` array.** `use`/`open`/
   `close`/`examine` resolved a fixture only by exact instance id or a substring
   of its display name, silently ignoring `keywords` in `data/world/fixtures.json`
@@ -25,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **Philtre of the Kindled Mind — a temporary Intellect buff potion.** A second
+  `attr-buff` consumable (+3 Intellect for 60 ticks), matched to the Draught of
+  Iron Sinew. Crafted at the alchemy station from weeping chasm-moss, a witchglow
+  cap and glimmer dust — a scholar's brew — and Vesper the glimmer-mage sells the
+  schematic. Names/balance provisional, pending sign-off.
 - **Draught of Iron Sinew — a temporary Might buff potion.** A new `attr-buff`
   consumable effect raises an attribute for a duration; `effectiveAttributes`
   now folds active `attr-buff` states in on top of gear, so the bonus flows
