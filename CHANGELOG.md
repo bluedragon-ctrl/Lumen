@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **Malformed `fixtures.json` (`gate-warning`) broke data loading.** The
+  `gate-warning` fixture was missing its `"type"` field and closing brace, so
+  `verge-niche` was parsed as a nested property and `JSON.parse` failed at EOF —
+  `npm run validate` and the server's world load both errored. Closed the entry.
 - **Fixture targeting now honours the authored `keywords` array.** `use`/`open`/
   `close`/`examine` resolved a fixture only by exact instance id or a substring
   of its display name, silently ignoring `keywords` in `data/world/fixtures.json`
@@ -72,6 +76,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fully **dark at the Tide** (the false day has a false night). Zone `falselight`;
   names provisional pending sign-off. No bespoke fauna yet — the area's distinct
   monsters are the next content pass.
+- **Philtre of the Kindled Mind — a temporary Intellect buff potion.** A second
+  `attr-buff` consumable (+3 Intellect for 60 ticks), matched to the Draught of
+  Iron Sinew. Crafted at the alchemy station from weeping chasm-moss, a witchglow
+  cap and glimmer dust — a scholar's brew — and Vesper the glimmer-mage sells the
+  schematic. Names/balance provisional, pending sign-off.
+- **Draught of Iron Sinew — a temporary Might buff potion.** A new `attr-buff`
+  consumable effect raises an attribute for a duration; `effectiveAttributes`
+  now folds active `attr-buff` states in on top of gear, so the bonus flows
+  through to-hit, melee damage, Ward and evasion until it expires. The first
+  such potion (+3 Might for 60 ticks) is crafted at the alchemy station from
+  chitin-spike, bug-tallow and slug-slime (giving the underused slime binder a
+  second home); Vesper the glimmer-mage sells the schematic. Names/balance
+  provisional, pending sign-off.
 - **The approach to the hot-springs area — two depth-5 rooms east of the Gullet.**
   A side-mouth partway down the Gullet's switchback now opens east into **The
   Windway** (a long, winding passage carrying a warm, damp draught from somewhere

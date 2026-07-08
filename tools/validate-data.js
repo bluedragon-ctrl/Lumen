@@ -128,9 +128,11 @@ function main() {
   // status; _tickEffects mends the drinker each interval, as the Regeneration spell
   // does). `summon` conjures a friendly companion under the user's command (the
   // pet path — see commands.drink), mirroring the spell effect of the same name.
+  // `attr-buff` grants flat attribute bonuses for a duration (its `attrMod` is
+  // folded into effectiveAttributes while the status is live — see combat-math).
   // None is valid on a weapon onHit/onDamage trigger, so they live apart from
   // EFFECT_TYPES.
-  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time", "summon"];
+  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time", "summon", "attr-buff"];
   const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
   const RARITIES = ["common", "uncommon", "rare", "epic", "legendary"];
 
@@ -249,6 +251,16 @@ function main() {
         if (eff.mana != null && typeof eff.mana !== "number") errs.push(`item ${id}: effect.mana must be a number`);
         if (eff.damage != null && (typeof eff.damage !== "string" || !DICE_RE.test(eff.damage)))
           errs.push(`item ${id}: effect.damage "${eff.damage}" is not valid dice notation`);
+        // An `attr-buff` needs a numeric `attrMod` keyed by known attributes, and
+        // a duration (a permanent attribute buff belongs on gear, not a potion).
+        if (eff.type === "attr-buff") {
+          if (!eff.attrMod || typeof eff.attrMod !== "object") errs.push(`item ${id}: attr-buff effect needs an attrMod object`);
+          else for (const [k, v] of Object.entries(eff.attrMod)) {
+            if (!ATTRS.includes(k)) errs.push(`item ${id}: effect.attrMod unknown attribute "${k}" (known: ${ATTRS.join(", ")})`);
+            if (typeof v !== "number") errs.push(`item ${id}: effect.attrMod.${k} must be a number`);
+          }
+          if (eff.duration == null) errs.push(`item ${id}: attr-buff effect must set a duration (ticks)`);
+        }
         // A thrown bomb may burst (instant `damage`), leave a lingering `dot`
         // (corroding/poison cloud), or both — but it must do at least one.
         if (eff.type === "damage-room") {
