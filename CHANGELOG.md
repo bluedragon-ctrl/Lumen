@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **Canon lore for the Tide.** `docs/lore.md` gains a top-level section (after *The
+  Abyss*) defining the Tide as the Abyss's rhythm — an Abyss-wide cycle of darkness
+  rising and ebbing in phases (calm → stirring → flood → receding), biting harder the
+  deeper you are, that the creatures and prospectors alike keep their hours by. Framed
+  as **known but not understood**: its timing is lived-by, its cause is a deliberate
+  mystery (added to *Deliberately unknown*, let to rhyme with the dark of the Hollowing
+  without equating them). First prose home for the mechanic behind `data/world/tide.json`.
 - **Canon lore for the Gloaming (the hot-spring hollows).** `docs/lore.md` gains a
   section on the depth-5+ hot-spring biome east of the Gullet: its self-luminous
   Chasm-Moss "false sky", its standing of the Abyss's one lush, forageable place, the

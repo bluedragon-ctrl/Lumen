@@ -20,6 +20,33 @@ plunging far deeper than anyone has explored. Its importance is singular: it is 
 **only known source of glimmer**. Only its uppermost levels are mapped; everything
 below is rumour, and the danger rises with the depth.
 
+## The Tide
+
+The Abyss has depth, and it has a **rhythm**. The dark is not the same from one hour to the
+next: it **rises and ebbs** on a slow cycle that moves through the whole Abyss at once, and
+at its height the deep grows darker, colder, and hungrier than at its ebb. Delvers call it
+the **Tide** — it comes in and it goes out, and nothing that lives below is untouched by it.
+
+- **It is Abyss-wide, and it comes in phases.** Between tides lies the **calm**, when lights
+  hold and the dark keeps its distance — the deep at its most bearable. Then the Tide
+  **stirs and rises**: shadows lengthen, the weaker lights gutter, and the dark presses in
+  on the strong. At the **flood** it lies deepest, and even lit havens can fail. Then it
+  **recedes**, and the deep breathes out again.
+- **It bites harder the deeper you are.** Near the surface the Tide is a dimming and a
+  disquiet; far down it can drown a working in full dark and wake the things that hunt in
+  it. A depth walked safely at the ebb is another place at the flood.
+- **The creatures keep its hours.** Light-fearing things grow bold as the Tide comes in, and
+  the dark-taken are strongest at its height — a high Tide is the worst time to be caught
+  far down with a failing lamp. Prospectors time their descents and climbs by it; the
+  cautious are already climbing when the light starts to thin.
+
+**It is known, but not understood.** *That* the Tide comes, and roughly when, delvers can
+tell — they live and die by its timing. *What* it is, and what drives its cycle, no one
+knows (see *Deliberately unknown*). It may be the dark's own slow breathing; it may be
+something the Abyss does that has no name. Author it as a **known, reliable rhythm** — lean
+on its phases, its danger, and its timing freely — but never explain its cause, and let it
+**rhyme** with the dark of the Hollowing without asserting the two are one thing.
+
 ## Glimmer
 
 A magical mineral — the essential reagent of the age, worked into potions,
@@ -257,9 +284,8 @@ is built, root and branch, to punish exactly that. Its danger sits *beside* the 
 rather than on it — not the Hollowing, not glimmer's work, but plain hungry **ecology**
 wearing the face of a refuge.
 
-**It keeps the Abyss's hours.** When the **Tide** rises — the slow dark that comes and goes
-through the deep, drowning its lights — even the gloaming answers to it: the glow guttering
-out across the roof until the warm garden lies in full dark. Whether the moss draws its
+**It keeps the Abyss's hours.** When the **Tide** rises (see *The Tide*), even the gloaming
+answers to it: the glow gutters out across the roof until the warm garden lies in full dark. Whether the moss draws its
 light inward or the rising dark simply reaches it too, no one can say. Delvers know only
 that the safest-seeming place in the deep does not stay lit, and that to be caught beneath
 the dead canopy when the light goes is to learn what the warmth was gathering all along.
@@ -300,6 +326,8 @@ them:
 - Whether the Glimmer Dragon is real.
 - What the dark is, why the **Hollowing** takes some and spares others, and whether it is
   the same force as glimmer's mutation of the body or a different hand entirely.
+- What the **Tide** is and what drives its cycle. Its rhythm is known and lived-by; its
+  cause is not — and whether it is the dark's own breathing or something else, no one knows.
 
 ## Consistency rules for content authors
 
