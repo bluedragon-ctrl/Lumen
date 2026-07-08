@@ -25,7 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
-- **The Falselight — top floor of the hot-springs area (three depth-5 rooms
+- **Canon lore for the Gloaming (the hot-spring hollows).** `docs/lore.md` gains a
+  section on the depth-5+ hot-spring biome east of the Gullet: its self-luminous
+  Chasm-Moss "false sky", its standing of the Abyss's one lush, forageable place, the
+  light-as-lure inversion of the usual light-fearing ecology, its going fully dark at
+  the Tide, and its distinct fauna (ordinary animals grown strange — not the dark-taken
+  or the glimmer-warped). Names the area **the Gloaming** (previously the working title
+  "Falselight").
+- **The Gloaming — top floor of the hot-springs area (three depth-5 rooms
   behind the caged gate).** South through the gate (now a passable `door` — its
   lock has rusted through) opens the first level of the area teased east of the
   Gullet: **The False Dawn** (you step out under a warm, lit, green cavern),

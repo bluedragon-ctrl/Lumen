@@ -221,6 +221,62 @@ alchemist's bench into **gloom-silk**, a fine, faintly luminous thread — the r
 for deep-made cloth and woven gear. Exception to the light-dependent flora rule:
 it carries its own light with it.
 
+## The Gloaming — the hot-spring hollows
+
+Below the fifth floor, east of the Gullet, the Abyss changes its character. The cold dry
+dark gives way to **warmth and wet**: hot vents breathe steam into the air, water runs and
+gathers into steaming pools, and overhead the rock vanishes behind a **canopy of light**.
+To a delver climbing out of the black it looks like nothing so much as daylight under a
+green sky — the one place in the deep that looks *alive*, and *kind*. It is neither. Delvers
+call it **the Gloaming**, for the standing dusk-light that fills it and never breaks into a
+true day.
+
+**The false sky.** The canopy is Weeping Chasm-Moss — the same predatory filter-feeder that
+fringes the river-caves (see *River flora*) — but fed by the endless warm damp of the vents
+it has grown across a whole cavern roof, a hanging forest of itself glowing soft and
+overcast blue-white. It is not the sun and it is not glimmer; it is a plant, carrying its
+own light as its kind always has. Spread wide enough it *reads* as a sky: a dawn that never
+climbs and never sets. And it lowers the same hair-fine tendrils it always does — only here
+in their thousands, drifting down into the warm air. The ceiling that lights the hollow is
+also feeding on what the light draws up to it.
+
+**The one lush place.** Vegetation in the Abyss grows only where there is light, and here
+for once there is light in plenty — constant, generous, green. So things *grow*: fungi the
+size of trees, whose aged stalks harden into workable timber; soft ferns thick in the warm
+damp; pale luminous fruit on the canopy's lower fronds. It is the closest the deep comes to
+a garden, and it keeps a gentler trade than the rest of the Abyss — a place delvers come to
+**forage, gather, and weave** (its Chasm-Moss is the richest source of gloom-silk known)
+rather than to mine and kill.
+
+**The light is a lie.** The warmth and the glow are not sanctuary; they are **bait**. Where
+the cave-dark runs on light-*fearing* things, the Gloaming runs on light-*loving* ones —
+grazers that come to bask and feed, and hunters grown fat on what the standing dusk lures
+into the open. The vents that sweeten the air will **scald** the careless, and the canopy
+itself feeds. A delver reads the green light as safety and lets their guard down; the hollow
+is built, root and branch, to punish exactly that. Its danger sits *beside* the depth-ladder
+rather than on it — not the Hollowing, not glimmer's work, but plain hungry **ecology**
+wearing the face of a refuge.
+
+**It keeps the Abyss's hours.** When the **Tide** rises — the slow dark that comes and goes
+through the deep, drowning its lights — even the gloaming answers to it: the glow guttering
+out across the roof until the warm garden lies in full dark. Whether the moss draws its
+light inward or the rising dark simply reaches it too, no one can say. Delvers know only
+that the safest-seeming place in the deep does not stay lit, and that to be caught beneath
+the dead canopy when the light goes is to learn what the warmth was gathering all along.
+
+**Its creatures.** The fauna are a deliberate change of pace — not the pale eyeless horrors
+of the deep but ordinary animals grown strange in a warm, lit pocket: heavy basking newts,
+big slow insects on glassy wings, water-lizards, a scorpion of the scalding pools. Unusual
+for the Abyss, but *animals* — not the dark-taken, not the glimmer-warped. The Gloaming's
+threat is what they *do* in the light, not what the deep has made of them. *(Species names
+provisional.)*
+
+**Downward.** The Gloaming is not one room but a descent — hollows stacked down the wall of
+a great steaming gulf, the growth thickening and the air growing hotter the lower you go,
+toward warm water somewhere below. How far its own floor lies — and whether it has one, or
+simply opens onto the deeper dark like everywhere else — no one has followed it to learn.
+What waits at the foot of the Gloaming stays, for now, unspoken.
+
 ## The threat ladder (escalation by depth)
 
 A legible progression for hanging future content on:
