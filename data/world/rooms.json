@@ -1512,6 +1512,45 @@
     "groundItems": [],
     "spawns": []
   },
+  "d5.falselight.dawn": {
+    "id": "d5.falselight.dawn",
+    "zone": "falselight",
+    "tags": ["water"],
+    "name": "The False Dawn",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "The stair drops you out from under the barred arch and the world changes. The cold lets go all at once; the air here is warm and wet and heavy with green, and there is light — real, spreading, sourceless light, the soft grey-gold of an overcast dawn, and after the long black throat behind you it aches to look at. It takes a moment to see there is no sun in it: the glow falls from the cavern's roof, from a vast unbroken canopy of pale moss grown across the stone far overhead, breathing its own cold radiance and letting down hair-fine threads that drift and glisten in the rising steam. Under that false sky the rock runs green — fronds and cushions and dripping mats of it, thriving on the warmth and the wet under a light that never moves. Warm water threads away somewhere ahead, chuckling over stone. The barred mouth is behind you to the north; the green ground falls away east, toward the sound of a greater water.",
+    "exits": { "north": "d5.gatemouth", "east": "d5.falselight.brink" },
+    "fixtures": ["false-sky", "giant-mushroom-stand", "steam-fern-bed"],
+    "groundItems": [],
+    "spawns": [{ "mob": "basking-newt", "max": 2, "respawn": 200 }]
+  },
+  "d5.falselight.brink": {
+    "id": "d5.falselight.brink",
+    "zone": "falselight",
+    "tags": ["water"],
+    "name": "The Steaming Brink",
+    "depth": 5,
+    "ambientLight": 3,
+    "description": "East, the green ground runs out to a lip of wet stone and simply ends — the cavern floor is split by a great round gulf, a throat of warm dark that breathes steam up into the false day in slow, curling columns. Lean at the edge and look down: the moss-light reaches only so far, catching ledges and hanging gardens and the pale gleam of water on the walls before the drop swallows it whole. From far below comes the wash and knock of water, and fainter, under it, other sounds that are not water. Whatever lives down there, the light comes from above it and not from it — the sky is here, at the top, and the deep keeps its own counsel. There is no safe way over the edge from this lip; the rim runs on east, narrowing, to where the wall folds down. The false dawn lies back west.",
+    "exits": { "west": "d5.falselight.dawn", "east": "d5.falselight.descent" },
+    "fixtures": ["false-sky", "ember-fronds"],
+    "groundItems": [],
+    "spawns": [{ "mob": "the-gloamback", "max": 1, "respawn": 600 }, { "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
+  },
+  "d5.falselight.descent": {
+    "id": "d5.falselight.descent",
+    "zone": "falselight",
+    "tags": ["water"],
+    "name": "The Weeping Stair",
+    "depth": 5,
+    "ambientLight": 2,
+    "description": "The rim narrows to a ramp of slick, moss-grown stone where the cavern wall folds down and inward, and the false sky thins with it — the canopy does not reach past this lip, and ahead the glow gives out into a breathing dark. This is the way down: a steep natural chute, wet and green-slimed, dropping away in switchbacks below the reach of the light toward the next deep. Warm air pours up out of it, thick with steam and the smell of growing things and, under that, something ranker. No line has been rigged here and no stake driven; the descent is there for anyone with the nerve to take it, but it does not yet give up what waits at its foot. The brink lies back west, under the light.",
+    "exits": { "west": "d5.falselight.brink" },
+    "fixtures": ["false-sky"],
+    "groundItems": [],
+    "spawns": [{ "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
+  },
   "d6.camp": {
     "id": "d6.camp",
     "zone": "fifth-descent",

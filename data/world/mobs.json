@@ -2007,5 +2007,87 @@
     "shop": {
       "sells": [{ "template": "scroll-regeneration" }, { "template": "scroll-chorus-of-mending" }, { "template": "scroll-halo" }, { "template": "scroll-candlelight" }, { "template": "scroll-mage-armour" }, { "template": "regeneration-draught" }]
     }
+  },
+  "the-gloamback": {
+    "id": "the-gloamback",
+    "faction": "fauna",
+    "name": "the Gloamback",
+    "keywords": ["gloamback", "basker", "lurker", "newt", "mound"],
+    "description": "A basking newt grown vast and ancient — the thing the little ones in the shallows will never live long enough to become. It lies half-sunk in the warm water, a slab of pebbled hide the length of a boat, and its broad back is furred over with a living crust of the same luminous moss that hangs from the roof, so that at rest it is nothing but another glowing mound in a hollow full of them. Prey grazes up to the light. Then the mound opens an eye, and a mouth, and the light was never a safe place at all.",
+    "spawnMessage": "One of the glowing mounds along the water shifts and opens an eye — {name}, and it has been here the whole time.",
+    "maxHp": 52,
+    "speed": 9,
+    "armour": 4,
+    "ward": 1,
+    "attributes": { "might": 9, "vitality": 12, "intellect": 0, "wits": 3, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 12 },
+    "emitsLight": 1,
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 1,
+    "attack": { "damage": "2d6", "actionCost": 14 },
+    "xp": 38,
+    "shards": "3d6",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["sinks lower into the warm water until only its glowing back shows", "turns its slow, lamplit gaze on you", "gapes a mouth ringed with backward-hooked teeth, then closes it", "shrugs the moss on its back into a brighter glow"] }
+    ],
+    "loot": [
+      { "template": "weeping-chasm-moss", "chance": 1 }
+    ]
+  },
+  "basking-newt": {
+    "id": "basking-newt",
+    "faction": "fauna",
+    "name": "a basking newt",
+    "keywords": ["newt", "basking", "salamander"],
+    "description": "A heavy, soft-bodied newt the length of a forearm, its hide mottled warm amber and green — no cave-pale thing but an animal built for warmth and light. It lolls in the shallows and across the warm stone, cropping the luminous moss and soaking up the false dawn, and pays a delver little mind. In the dark it is lost: when the light goes it goes still, and waits for a day the Tide has taken.",
+    "spawnMessage": "{Name} hauls itself onto a warm rock and settles to bask.",
+    "maxHp": 10,
+    "speed": 9,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 2, "vitality": 4, "intellect": 0, "wits": 3, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 2, "harmedAbove": 12 },
+    "behavior": "wander",
+    "hostile": false,
+    "xp": 3,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 4, "messages": ["crops a mouthful of glowing moss", "spreads its toes against the warm stone", "blinks slowly in the false light", "slides into the shallows and out again"] },
+      { "type": "wander", "weight": 2, "verb": "waddles off to another warm rock", "scope": "zone" }
+    ],
+    "loot": [{ "template": "weeping-chasm-moss", "chance": 0.4 }]
+  },
+  "vent-scorpion": {
+    "id": "vent-scorpion",
+    "faction": "fauna",
+    "name": "a vent-scorpion",
+    "keywords": ["scorpion", "vent", "vent-scorpion"],
+    "description": "A broad, flat scorpion the span of two hands, its shell crusted grey-white with the mineral bloom of the hot vents it shelters in. It runs on scalding stone where nothing else will, claws held low and sting arched high over its back, and comes out for the basking and the wounded alike. The barb weeps a bead of clear venom that never quite dries.",
+    "spawnMessage": "{Name} scuttles out from a crack in the hot rock, sting raised.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 5, "vitality": 6, "intellect": 0, "wits": 4, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 12 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d3", "duration": 6, "chance": 1 }]
+    },
+    "xp": 12,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["arches its sting higher", "clicks its claws in warning", "sidles across the scalding stone", "flicks a bead of venom from the barb"] }
+    ],
+    "loot": [{ "template": "venom-gland", "chance": 0.7 }]
   }
 }

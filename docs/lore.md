@@ -20,6 +20,33 @@ plunging far deeper than anyone has explored. Its importance is singular: it is 
 **only known source of glimmer**. Only its uppermost levels are mapped; everything
 below is rumour, and the danger rises with the depth.
 
+## The Tide
+
+The Abyss has depth, and it has a **rhythm**. The dark is not the same from one hour to the
+next: it **rises and ebbs** on a slow cycle that moves through the whole Abyss at once, and
+at its height the deep grows darker, colder, and hungrier than at its ebb. Delvers call it
+the **Tide** — it comes in and it goes out, and nothing that lives below is untouched by it.
+
+- **It is Abyss-wide, and it comes in phases.** Between tides lies the **calm**, when lights
+  hold and the dark keeps its distance — the deep at its most bearable. Then the Tide
+  **stirs and rises**: shadows lengthen, the weaker lights gutter, and the dark presses in
+  on the strong. At the **flood** it lies deepest, and even lit havens can fail. Then it
+  **recedes**, and the deep breathes out again.
+- **It bites harder the deeper you are.** Near the surface the Tide is a dimming and a
+  disquiet; far down it can drown a working in full dark and wake the things that hunt in
+  it. A depth walked safely at the ebb is another place at the flood.
+- **The creatures keep its hours.** Light-fearing things grow bold as the Tide comes in, and
+  the dark-taken are strongest at its height — a high Tide is the worst time to be caught
+  far down with a failing lamp. Prospectors time their descents and climbs by it; the
+  cautious are already climbing when the light starts to thin.
+
+**It is known, but not understood.** *That* the Tide comes, and roughly when, delvers can
+tell — they live and die by its timing. *What* it is, and what drives its cycle, no one
+knows (see *Deliberately unknown*). It may be the dark's own slow breathing; it may be
+something the Abyss does that has no name. Author it as a **known, reliable rhythm** — lean
+on its phases, its danger, and its timing freely — but never explain its cause, and let it
+**rhyme** with the dark of the Hollowing without asserting the two are one thing.
+
 ## Glimmer
 
 A magical mineral — the essential reagent of the age, worked into potions,
@@ -221,6 +248,61 @@ alchemist's bench into **gloom-silk**, a fine, faintly luminous thread — the r
 for deep-made cloth and woven gear. Exception to the light-dependent flora rule:
 it carries its own light with it.
 
+## The Gloaming — the hot-spring hollows
+
+Below the fifth floor, east of the Gullet, the Abyss changes its character. The cold dry
+dark gives way to **warmth and wet**: hot vents breathe steam into the air, water runs and
+gathers into steaming pools, and overhead the rock vanishes behind a **canopy of light**.
+To a delver climbing out of the black it looks like nothing so much as daylight under a
+green sky — the one place in the deep that looks *alive*, and *kind*. It is neither. Delvers
+call it **the Gloaming**, for the standing dusk-light that fills it and never breaks into a
+true day.
+
+**The false sky.** The canopy is Weeping Chasm-Moss — the same predatory filter-feeder that
+fringes the river-caves (see *River flora*) — but fed by the endless warm damp of the vents
+it has grown across a whole cavern roof, a hanging forest of itself glowing soft and
+overcast blue-white. It is not the sun and it is not glimmer; it is a plant, carrying its
+own light as its kind always has. Spread wide enough it *reads* as a sky: a dawn that never
+climbs and never sets. And it lowers the same hair-fine tendrils it always does — only here
+in their thousands, drifting down into the warm air. The ceiling that lights the hollow is
+also feeding on what the light draws up to it.
+
+**The one lush place.** Vegetation in the Abyss grows only where there is light, and here
+for once there is light in plenty — constant, generous, green. So things *grow*: fungi the
+size of trees, whose aged stalks harden into workable timber; soft ferns thick in the warm
+damp; pale luminous fruit on the canopy's lower fronds. It is the closest the deep comes to
+a garden, and it keeps a gentler trade than the rest of the Abyss — a place delvers come to
+**forage, gather, and weave** (its Chasm-Moss is the richest source of gloom-silk known)
+rather than to mine and kill.
+
+**The light is a lie.** The warmth and the glow are not sanctuary; they are **bait**. Where
+the cave-dark runs on light-*fearing* things, the Gloaming runs on light-*loving* ones —
+grazers that come to bask and feed, and hunters grown fat on what the standing dusk lures
+into the open. The vents that sweeten the air will **scald** the careless, and the canopy
+itself feeds. A delver reads the green light as safety and lets their guard down; the hollow
+is built, root and branch, to punish exactly that. Its danger sits *beside* the depth-ladder
+rather than on it — not the Hollowing, not glimmer's work, but plain hungry **ecology**
+wearing the face of a refuge.
+
+**It keeps the Abyss's hours.** When the **Tide** rises (see *The Tide*), even the gloaming
+answers to it: the glow gutters out across the roof until the warm garden lies in full dark. Whether the moss draws its
+light inward or the rising dark simply reaches it too, no one can say. Delvers know only
+that the safest-seeming place in the deep does not stay lit, and that to be caught beneath
+the dead canopy when the light goes is to learn what the warmth was gathering all along.
+
+**Its creatures.** The fauna are a deliberate change of pace — not the pale eyeless horrors
+of the deep but ordinary animals grown strange in a warm, lit pocket: heavy basking newts,
+big slow insects on glassy wings, water-lizards, a scorpion of the scalding pools. Unusual
+for the Abyss, but *animals* — not the dark-taken, not the glimmer-warped. The Gloaming's
+threat is what they *do* in the light, not what the deep has made of them. *(Species names
+provisional.)*
+
+**Downward.** The Gloaming is not one room but a descent — hollows stacked down the wall of
+a great steaming gulf, the growth thickening and the air growing hotter the lower you go,
+toward warm water somewhere below. How far its own floor lies — and whether it has one, or
+simply opens onto the deeper dark like everywhere else — no one has followed it to learn.
+What waits at the foot of the Gloaming stays, for now, unspoken.
+
 ## The threat ladder (escalation by depth)
 
 A legible progression for hanging future content on:
@@ -244,6 +326,8 @@ them:
 - Whether the Glimmer Dragon is real.
 - What the dark is, why the **Hollowing** takes some and spares others, and whether it is
   the same force as glimmer's mutation of the body or a different hand entirely.
+- What the **Tide** is and what drives its cycle. Its rhythm is known and lived-by; its
+  cause is not — and whether it is the dark's own breathing or something else, no one knows.
 
 ## Consistency rules for content authors
 

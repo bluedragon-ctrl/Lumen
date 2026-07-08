@@ -1780,5 +1780,36 @@
         { "type": "damage-over-time", "name": "glimmer-burn", "damage": "1d3", "duration": 4, "chance": 1 }
       ]
     }
+  },
+  "fungal-hardwood": {
+    "id": "fungal-hardwood",
+    "name": "a length of fungal hardwood",
+    "keywords": ["hardwood", "fungal", "wood", "timber", "stalk", "haft", "shaft"],
+    "description": "A cut length of giant-mushroom stalk, dried hard and pale as seasoned ash and faintly veined with a cold blue-white glow. It is the nearest thing to timber the deep grows — light, dense, and true along the grain, raw stock for a shaft or a haft where honest wood would be a wonder.",
+    "type": "material",
+    "weight": 1,
+    "value": 6,
+    "stackable": true
+  },
+  "steam-fern": {
+    "id": "steam-fern",
+    "name": "a frond of steam-fern",
+    "keywords": ["steam-fern", "fern", "frond", "herb"],
+    "description": "A broad, soft frond of the pale fern that grows only in the warm damp, its underside beaded with the vents' breath. Crushed, it gives up a clean green sap that cools a burn and steadies a racing heart — a hedge-alchemist's mainstay, and one of the few true herbs the Abyss will grow.",
+    "type": "material",
+    "weight": 0,
+    "value": 6,
+    "stackable": true
+  },
+  "emberfruit": {
+    "id": "emberfruit",
+    "name": "an emberfruit",
+    "keywords": ["emberfruit", "fruit", "ember"],
+    "description": "A soft, thin-skinned fruit the size of a plum, warm to the hold and glowing a dim orange-gold from within like a coal banked low. It hangs from the lower fronds of the canopy where the false dawn is warmest — sweet and faintly resinous, good eating raw and better cooked, and the glow of it lingers in the flesh long after picking.",
+    "type": "material",
+    "filterGroup": "consumable",
+    "weight": 0,
+    "value": 4,
+    "stackable": true
   }
 }

@@ -29,6 +29,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Gloaming's first gatherables (three materials + harvest nodes).** The top
+  floor now rewards foraging, distributed to give each room a purpose: **the False
+  Dawn** carries a **stand of giant mushrooms** (`cut` for **fungal hardwood** — the
+  deep's only real timber, raw stock for future shafts/hafts) and a **bed of
+  steam-ferns** (`pick` for **steam-fern**, a warm-damp medicinal herb), while **the
+  Steaming Brink** hangs a **trailing canopy frond** heavy with **emberfruit** (a
+  warm, dim-glowing fruit) — reachable, but only by braving the Gloamback that shares
+  the rim. All three harvest nodes are Tide-honest (no `emitsLight`; the mushrooms'
+  and fruit's glow is flavour, so the whole floor still goes dark at the flood). No
+  recipes yet — the materials stand ready for a later crafting pass. Names provisional.
+- **The Gloaming's first fauna (three depth-5 mobs).** The three top-floor rooms are
+  now inhabited, pacing a deliberate lull-then-bite: **the False Dawn** holds only
+  **basking newts** (soft, harmless grazers cropping the moss — the oasis's calm face),
+  while **the Steaming Brink** and **the Weeping Stair** hold the threat. The gatekeeper
+  is **the Gloamback** (`the-gloamback`), a basking newt grown into a ~50-HP ambush apex
+  whose moss-crusted back glows like the safe canopy until it opens an eye — an elite
+  step above the depth-5 norm that tells a delver at once this is higher-level ground.
+  Between them roams the **vent-scorpion**, whose sting carries a venom
+  damage-over-time. Names provisional pending sign-off; no bespoke loot yet (they drop
+  existing materials).
+- **Canon lore for the Tide.** `docs/lore.md` gains a top-level section (after *The
+  Abyss*) defining the Tide as the Abyss's rhythm — an Abyss-wide cycle of darkness
+  rising and ebbing in phases (calm → stirring → flood → receding), biting harder the
+  deeper you are, that the creatures and prospectors alike keep their hours by. Framed
+  as **known but not understood**: its timing is lived-by, its cause is a deliberate
+  mystery (added to *Deliberately unknown*, let to rhyme with the dark of the Hollowing
+  without equating them). First prose home for the mechanic behind `data/world/tide.json`.
+- **Canon lore for the Gloaming (the hot-spring hollows).** `docs/lore.md` gains a
+  section on the depth-5+ hot-spring biome east of the Gullet: its self-luminous
+  Chasm-Moss "false sky", its standing of the Abyss's one lush, forageable place, the
+  light-as-lure inversion of the usual light-fearing ecology, its going fully dark at
+  the Tide, and its distinct fauna (ordinary animals grown strange — not the dark-taken
+  or the glimmer-warped). Names the area **the Gloaming** (previously the working title
+  "Falselight").
+- **The Gloaming — top floor of the hot-springs area (three depth-5 rooms
+  behind the caged gate).** South through the gate (now a passable `door` — its
+  lock has rusted through) opens the first level of the area teased east of the
+  Gullet: **The False Dawn** (you step out under a warm, lit, green cavern),
+  **The Steaming Brink** (the rim of a great steaming gulf — you can look down
+  but not descend), and **The Weeping Stair** (the way down, described but not
+  yet wired — the lower floors land next pass). The light is a **false sky**: a
+  self-luminous Weeping-Chasm-Moss canopy grown across the whole roof (new
+  `false-sky` fixture), glowing like overcast dawn — no sun, no glimmer. Rooms
+  sit at `ambientLight` 3/3/2, so the cavern reads as daylight in Calm and goes
+  fully **dark at the Tide** (the false day has a false night). Zone `falselight`;
+  names provisional pending sign-off. No bespoke fauna yet — the area's distinct
+  monsters are the next content pass.
 - **Philtre of the Kindled Mind — a temporary Intellect buff potion.** A second
   `attr-buff` consumable (+3 Intellect for 60 ticks), matched to the Draught of
   Iron Sinew. Crafted at the alchemy station from weeping chasm-moss, a witchglow
