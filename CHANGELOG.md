@@ -25,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   theirs for the visit. The room log now names what a search turns up.
 
 ### Added
+- **The Gloaming's first gatherables (three materials + harvest nodes).** The top
+  floor now rewards foraging, distributed to give each room a purpose: **the False
+  Dawn** carries a **stand of giant mushrooms** (`cut` for **fungal hardwood** — the
+  deep's only real timber, raw stock for future shafts/hafts) and a **bed of
+  steam-ferns** (`pick` for **steam-fern**, a warm-damp medicinal herb), while **the
+  Steaming Brink** hangs a **trailing canopy frond** heavy with **emberfruit** (a
+  warm, dim-glowing fruit) — reachable, but only by braving the Gloamback that shares
+  the rim. All three harvest nodes are Tide-honest (no `emitsLight`; the mushrooms'
+  and fruit's glow is flavour, so the whole floor still goes dark at the flood). No
+  recipes yet — the materials stand ready for a later crafting pass. Names provisional.
 - **The Gloaming's first fauna (three depth-5 mobs).** The three top-floor rooms are
   now inhabited, pacing a deliberate lull-then-bite: **the False Dawn** holds only
   **basking newts** (soft, harmless grazers cropping the moss — the oasis's calm face),

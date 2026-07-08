@@ -418,5 +418,29 @@
     "keywords": ["journal", "notes", "book", "ledger"],
     "description": "A thick journal lies open on the bench, written in a small, steady hand — no ravings, just work: wire gauges and joint diagrams, tallies of shard spent per subject, a thornbug's leg sketched rebuilt in coil. One margin, underlined twice: 'the wire does not tire. neither do they.' A later page, calmer still: 'flesh is scaffolding. bone is the instrument.' The most recent entry is a shopping list.",
     "type": "scenery"
+  },
+  "giant-mushroom-stand": {
+    "id": "giant-mushroom-stand",
+    "name": "a stand of giant mushrooms",
+    "keywords": ["mushroom", "mushrooms", "stand", "fungus", "cap", "stalk", "giant"],
+    "description": "Fungi the size of trees, their pale trunks packed close into a little grove under the false dawn — caps broad as cartwheels overhead, stalks gone hard and woody with age and dense enough to take an edge. Cut into one and it parts like seasoned timber, pale and dry, veined with a faint blue-white glow.",
+    "type": "resource",
+    "harvest": { "template": "fungal-hardwood", "verb": "cut", "yield": 1, "charges": 3, "respawn": 300, "energy": 13 }
+  },
+  "steam-fern-bed": {
+    "id": "steam-fern-bed",
+    "name": "a bed of steam-ferns",
+    "keywords": ["fern", "ferns", "steam-fern", "bed", "fronds"],
+    "description": "A deep bank of pale, broad-fronded ferns crowds the warm wet stone where a vent breathes steam up through it, the leaves nodding and dripping in the heat. They come away easily in the hand, sap beading green at the stem.",
+    "type": "scenery",
+    "harvest": { "template": "steam-fern", "verb": "pick", "yield": 1, "charges": 3, "respawn": 180, "energy": 8 }
+  },
+  "ember-fronds": {
+    "id": "ember-fronds",
+    "name": "a trailing frond of the canopy",
+    "keywords": ["frond", "fronds", "emberfruit", "fruit", "canopy"],
+    "description": "Here at the lip the moss-canopy lets its lower fronds down within reach, and they hang heavy with emberfruit — soft, dim-glowing globes of orange-gold clustered along the trailing green, warmed by the steam rising out of the gulf. Reach and pick, if the reaching is worth what shares the rim with you.",
+    "type": "scenery",
+    "harvest": { "template": "emberfruit", "verb": "pick", "yield": 1, "charges": 4, "respawn": 240, "energy": 9 }
   }
 }

@@ -1521,7 +1521,7 @@
     "ambientLight": 3,
     "description": "The stair drops you out from under the barred arch and the world changes. The cold lets go all at once; the air here is warm and wet and heavy with green, and there is light — real, spreading, sourceless light, the soft grey-gold of an overcast dawn, and after the long black throat behind you it aches to look at. It takes a moment to see there is no sun in it: the glow falls from the cavern's roof, from a vast unbroken canopy of pale moss grown across the stone far overhead, breathing its own cold radiance and letting down hair-fine threads that drift and glisten in the rising steam. Under that false sky the rock runs green — fronds and cushions and dripping mats of it, thriving on the warmth and the wet under a light that never moves. Warm water threads away somewhere ahead, chuckling over stone. The barred mouth is behind you to the north; the green ground falls away east, toward the sound of a greater water.",
     "exits": { "north": "d5.gatemouth", "east": "d5.falselight.brink" },
-    "fixtures": ["false-sky"],
+    "fixtures": ["false-sky", "giant-mushroom-stand", "steam-fern-bed"],
     "groundItems": [],
     "spawns": [{ "mob": "basking-newt", "max": 2, "respawn": 200 }]
   },
@@ -1534,7 +1534,7 @@
     "ambientLight": 3,
     "description": "East, the green ground runs out to a lip of wet stone and simply ends — the cavern floor is split by a great round gulf, a throat of warm dark that breathes steam up into the false day in slow, curling columns. Lean at the edge and look down: the moss-light reaches only so far, catching ledges and hanging gardens and the pale gleam of water on the walls before the drop swallows it whole. From far below comes the wash and knock of water, and fainter, under it, other sounds that are not water. Whatever lives down there, the light comes from above it and not from it — the sky is here, at the top, and the deep keeps its own counsel. There is no safe way over the edge from this lip; the rim runs on east, narrowing, to where the wall folds down. The false dawn lies back west.",
     "exits": { "west": "d5.falselight.dawn", "east": "d5.falselight.descent" },
-    "fixtures": ["false-sky"],
+    "fixtures": ["false-sky", "ember-fronds"],
     "groundItems": [],
     "spawns": [{ "mob": "the-gloamback", "max": 1, "respawn": 600 }, { "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
   },
