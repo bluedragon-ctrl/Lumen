@@ -53,6 +53,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   craftables, so anything `get`/`use`/`attack` can name, `examine` can too.
 
 ### Changed
+- **`list` marks wares that teach something you already know.** Schematics,
+  scrolls, and books in a trader's stock are now tagged `(known)` when you
+  already know every recipe/spell they'd teach — a warning against a wasted buy.
+- **`recipes` highlights components you have vs. those you're missing.** Each
+  input in the listing is now coloured on its own: green when you already hold
+  enough, red (annotated with the quantity you currently have) when you're short.
+  Shard costs get the same treatment, so the list reads as a shopping list of
+  what's still needed. The recipe name keeps its green/grey "can I make this now?"
+  signal.
 - **Items** — rarity updates (lantern, prospectors-blaze-lantern, crystal, scroll-glimmerskin, scroll-glimmer-spike, scroll-glimmer-storm, schematic-insight-draught, schematic-might-draught, schematic-searing-flare, schematic-barbed-bomb, schematic-glimmersteel-staff, schematic-glimmersteel-lamp, schematic-glimmersteel-bar, schematic-ring-of-sight, schematic-ring-of-wits, schematic-regeneration-draught, schematic-acid-bomb, chitin-plate, grub, cave-fish, rat-meat, chitin-helm, chitin-cuirass, heavy-chitin-plate, schematic-dense-chitin-cuirass, chitin-maul, shadow-heart, shadow-shard, hungering-dagger, glimmerglass-blade, emberfruit, iridescent-carapace).
 - **Levelling curve softened and mob XP re-priced by toughness.** `XP_GROWTH`
   drops from `2` → `1.7` in [server/config.js](server/config.js): the old

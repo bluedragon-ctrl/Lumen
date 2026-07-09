@@ -104,18 +104,31 @@ function recipes(state, player, filter) {
   recs.sort((a, b) =>
     craftSortKey(w.items[a.output.template]) - craftSortKey(w.items[b.output.template]) ||
     byName(a, b));
-  // One line per recipe; greyed (via `<#gray>` markup) when you lack the
-  // components/shards to make it. In the "elsewhere" block the station you'd
-  // need is appended, since those recipes span different stations.
-  // Affordable recipes lead with a green name; ones you can't make yet read fully
-  // grey (the station you'd need is appended in the "Elsewhere" block).
+  // One line per recipe. The name leads green when you can make it right now,
+  // grey when you can't. Each component is coloured on its own: green if you
+  // already hold enough, red (with the count you have) if you're short — so the
+  // list reads as a shopping list of what's still missing. Shards are checked
+  // the same way. In the "Elsewhere" block the station you'd need is appended,
+  // since those recipes span different stations.
   const fmt = (r, withStation) => {
-    const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
-    if (r.shards) ins.push(`${r.shards} shards`);
+    const parts = (r.inputs || []).map((i) => {
+      const need = i.qty || 1;
+      const have = countItem(player, i.template);
+      const nm = w.items[i.template].name;
+      return have >= need
+        ? `<#green>${need}× ${nm}<#reset>`
+        : `<#red>${need}× ${nm} (have ${have})<#reset>`;
+    });
+    if (r.shards) {
+      const have = player.shards || 0;
+      parts.push(have >= r.shards
+        ? `<#green>${r.shards} shards<#reset>`
+        : `<#red>${r.shards} shards (have ${have})<#reset>`);
+    }
     const where = withStation ? ` — at ${stationLabel(w, r.station)}` : "";
     const name = r.name || r.id;
-    const rest = `: ${ins.join(", ")} → ${w.items[r.output.template].name}${where}`;
-    return canAfford(player, r) ? `  <#green>${name}<#reset>${rest}` : `<#gray>  ${name}${rest}<#reset>`;
+    const nameTag = canAfford(player, r) ? `<#green>${name}<#reset>` : `<#gray>${name}<#reset>`;
+    return `  ${nameTag}: ${parts.join(", ")} → ${w.items[r.output.template].name}${where}`;
   };
   const hereRecs = recs.filter((r) => here.has(r.station));
   const awayRecs = recs.filter((r) => !here.has(r.station));
