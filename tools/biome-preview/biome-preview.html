@@ -14,12 +14,18 @@
      entry — this block is the staging area; the "Copy CSS" button emits it. */
   :root {
     --biome-ember: #e08a44;
+    --biome-water: #2a5cd0;
     --biome-rim: #f2c14e;
     --biome-mire: #a4e22a;
+    --biome-warren: #d1443c;
+    --biome-wraith: #9b6ae0;
   }
-  .biome-ember { --biome: var(--biome-ember); }
-  .biome-rim   { --biome: var(--biome-rim); }
-  .biome-mire  { --biome: var(--biome-mire); }
+  .biome-ember  { --biome: var(--biome-ember); }
+  .biome-water  { --biome: var(--biome-water); }
+  .biome-rim    { --biome: var(--biome-rim); }
+  .biome-mire   { --biome: var(--biome-mire); }
+  .biome-warren { --biome: var(--biome-warren); }
+  .biome-wraith { --biome: var(--biome-wraith); }
 
   /* --- tool chrome (distinct classes so it never collides with game CSS) --- */
   .lab { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; align-items: start; }
@@ -100,10 +106,16 @@
       room: { name: "The Sunless Landing", depth: 6, desc: "The glow comes in patches, from clumps of moss clinging to the dripping walls, and pools of warm dark lie between them. The air is hot, wet enough to drink, heavy with green rot.", here: [["item rarity-uncommon", "spore-cap"]] } },
     { key: "ember", label: "Ember", shipped: false, def: "#e08a44",
       room: { name: "Cinder Gullet", depth: 5, desc: "Heat climbs in sheets from a vent of molten rock below. The walls run orange and black, and the air tastes of struck flint. Shadows jump where the fire breathes.", here: [["mob hostile", "cinder-thing"]] } },
+    { key: "water", label: "Water", shipped: false, def: "#2a5cd0",
+      room: { name: "The Drowned Hollow", depth: 4, desc: "Black water fills the hollow past the knees and keeps rising, still and cold and deep. Something moves under the surface where the light can't reach.", here: [["mob hostile", "blind eel"]] } },
     { key: "rim", label: "Rim", shipped: false, def: "#f2c14e",
       room: { name: "The Rim Plaza", depth: 0, desc: "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering.", here: [["mob", "Hale the watchman"]] } },
     { key: "mire", label: "Slime", shipped: false, def: "#a4e22a",
       room: { name: "The Sump", depth: 7, desc: "The floor sweats a slick, acid film, and the slugs leave it glistening where they drag. The air is thick and sweetish and it stings the eyes.", here: [["mob hostile", "bloated slug"]] } },
+    { key: "warren", label: "Warren", shipped: false, def: "#d1443c",
+      room: { name: "The Sour Midden", depth: 2, desc: "The reek hits first — rot and old nesting packed into every crevice. The floor shifts with vermin, and the walls are slick with the leavings of the brood.", here: [["mob hostile", "brood-rat"]] } },
+    { key: "wraith", label: "Wraith", shipped: false, def: "#9b6ae0",
+      room: { name: "The Graveworker's Den", depth: 8, desc: "The dead are stacked and sorted here by patient, glyph-scarred hands. The air is dry and still, and it hums faintly with something that is not quite sound.", here: [["mob hostile", "graveworker"]] } },
   ];
   const BANDS = ["darkness", "void", "dim", "bright", "searing"];
 
