@@ -25,6 +25,9 @@
      (see the `.biome-*` rules). Umbral is a neon blue; gloaming a cave green. */
   --biome-umbral: #34b3ff;
   --biome-gloaming: #5cb87a;
+  /* Darkness-tainted Umbrals — the "grey ones", the nameless. Umbral's cyan-blue
+     pulled toward the dark, so the colour reads as "umbral, sickened". */
+  --biome-wraith: #7a5fd6;
 }
 
 * { box-sizing: border-box; }
@@ -225,6 +228,7 @@ body {
    collide: the biome adds an ambient glow + hue, the band still sets the mood. */
 .biome-umbral   { --biome: var(--biome-umbral); }
 .biome-gloaming { --biome: var(--biome-gloaming); }
+.biome-wraith   { --biome: var(--biome-wraith); }
 /* Ambient glow: a soft radial aura off the top edge + a faint inner ring, both
    in the biome hue, breathing slowly. z-index -1 keeps it above the panel
    background but behind the (non-positioned) room text, so nothing else needs
@@ -262,6 +266,7 @@ body {
 .light-void[class*="biome-"]::before,
 .light-darkness[class*="biome-"]::before { display: none; }
 .light-void[class*="biome-"] #room-name { color: #6b7882; text-shadow: none; }
+.light-darkness[class*="biome-"] #room-name { color: #5a6770; text-shadow: none; }
 @keyframes lumin-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(216, 200, 115, .28), inset 0 0 4px rgba(216, 200, 115, .10); }
   50%      { box-shadow: 0 0 10px rgba(216, 200, 115, .55), inset 0 0 7px rgba(216, 200, 115, .18); }

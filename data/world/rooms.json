@@ -1904,7 +1904,7 @@
   "d8.necropolis.gate": {
     "id": "d8.necropolis.gate",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Grave-Gate",
     "depth": 8,
     "ambientLight": 0,
@@ -1919,7 +1919,7 @@
   "d8.necropolis.causeway": {
     "id": "d8.necropolis.causeway",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Bone Causeway",
     "depth": 8,
     "ambientLight": -1,
@@ -1935,7 +1935,7 @@
   "d8.necropolis.niches": {
     "id": "d8.necropolis.niches",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Niche-Walls",
     "depth": 8,
     "ambientLight": -1,
@@ -1955,7 +1955,7 @@
   "d8.necropolis.plaza": {
     "id": "d8.necropolis.plaza",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Ancestor Plaza",
     "depth": 8,
     "ambientLight": 0,
@@ -1974,7 +1974,7 @@
   "d8.necropolis.ossuary": {
     "id": "d8.necropolis.ossuary",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Ossuary",
     "depth": 8,
     "ambientLight": -1,
@@ -1991,7 +1991,7 @@
   "d8.necropolis.procession": {
     "id": "d8.necropolis.procession",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Silent Procession",
     "depth": 8,
     "ambientLight": -1,
@@ -2007,7 +2007,7 @@
   "d8.necropolis.vault": {
     "id": "d8.necropolis.vault",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Tomb-Foot",
     "depth": 8,
     "ambientLight": 0,
@@ -2023,7 +2023,7 @@
   "d8.necropolis.crypt": {
     "id": "d8.necropolis.crypt",
     "zone": "umbral-necropolis",
-    "biome": "umbral",
+    "biome": "wraith",
     "name": "The Sealed Crypt",
     "depth": 8,
     "ambientLight": -2,
