@@ -53,6 +53,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   craftables, so anything `get`/`use`/`attack` can name, `examine` can too.
 
 ### Changed
+- **Levelling curve softened and mob XP re-priced by toughness.** `XP_GROWTH`
+  drops from `2` → `1.7` in [server/config.js](server/config.js): the old
+  doubling made level 10 cost 51,100 XP — more than every mob, room, and quest
+  combined — so no one could pass ~level 6 without heavy grinding. Level 10 now
+  sits at ~16,800 XP, so roughly three full clears of the depth-1–10 content reach
+  it (~level 9 on the current 75% of that content, level 10 once the remaining
+  content lands). Every mob's `xp` in `data/world/mobs.json` was re-derived from an
+  **effective-HP** power model — HP adjusted for evasion (hit-chance), armour (flat
+  soak) and ward (magical cut) plus a threat term for its damage — so a dodgy or
+  armoured mob is worth more than its raw HP suggests (e.g. the evasive Wisp 12→20)
+  and squishy-but-generous mobs ease down (nawpa 90→55). Totals are held roughly
+  constant; the curve change does the heavy lifting. Deep-floor mob *difficulty*
+  (not their XP) still wants a balancing pass.
 - **`search` finds are shared with everyone in the room.** When a delver searches
   out a hidden feature — a stashed item, a lurking mob, a hidden fixture or exit —
   it now becomes discovered for every other player present too, regardless of their
