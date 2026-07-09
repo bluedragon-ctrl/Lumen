@@ -31,7 +31,7 @@ module.exports = {
   // costs XP_GROWTH× the last. Each level gained grants POINTS_PER_LEVEL
   // attribute points to spend with `train`.
   XP_BASE: 100,
-  XP_GROWTH: 2,
+  XP_GROWTH: 1.7,
   POINTS_PER_LEVEL: 2,
   // One-off XP the first time a delver sets foot in a room (rewards descent;
   // each room pays once, tracked per player in `visitedRooms`). Crafting XP is

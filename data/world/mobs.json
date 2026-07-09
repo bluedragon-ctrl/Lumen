@@ -91,7 +91,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "hunt",
     "hostile": true,
-    "xp": 12,
+    "xp": 20,
     "shards": "1d4",
     "actions": [
       { "type": "cast", "weight": 7, "spell": "spark" },
@@ -162,7 +162,7 @@
     "hostile": true,
     "helper": true,
     "attack": { "damage": "1d4", "actionCost": 12 },
-    "xp": 14,
+    "xp": 9,
     "shards": "1d4",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -213,7 +213,7 @@
     "helper": true,
     "attack": { "damage": "1d4", "actionCost": 12 },
     "lightBane": { "above": 10, "damage": "1d2" },
-    "xp": 8,
+    "xp": 7,
     "shards": "1d3",
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -238,7 +238,7 @@
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 12 },
     "lightBane": { "above": 10, "damage": "1d3" },
-    "xp": 32,
+    "xp": 17,
     "shards": "2d6",
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -262,7 +262,7 @@
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 13 },
     "lightBane": { "above": 3, "damage": "1d2" },
-    "xp": 30,
+    "xp": 16,
     "shards": "2d6",
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -621,7 +621,7 @@
     "pursues": true,
     "pursueRange": 3,
     "attack": { "damage": "1d6", "actionCost": 12 },
-    "xp": 9,
+    "xp": 10,
     "shards": "1d4",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -654,7 +654,7 @@
     "pursues": true,
     "pursueRange": 3,
     "attack": { "damage": "1d10", "actionCost": 14, "bonus": 2 },
-    "xp": 36,
+    "xp": 25,
     "shards": "2d6",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -686,7 +686,7 @@
     "pursues": true,
     "pursueRange": 3,
     "attack": { "damage": "1d4", "actionCost": 12 },
-    "xp": 24,
+    "xp": 14,
     "shards": "1d6",
     "actions": [
       { "type": "cast", "weight": 5, "spell": "witchfire" },
@@ -721,7 +721,7 @@
     "pursueRange": 2,
     "attack": { "damage": "1d4", "actionCost": 13 },
     "spikes": { "damage": "1d2", "chance": 1 },
-    "xp": 10,
+    "xp": 11,
     "shards": "1d3",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -749,7 +749,7 @@
     "pursues": true,
     "pursueRange": 2,
     "attack": { "damage": "1d8", "actionCost": 15, "bonus": 1 },
-    "xp": 24,
+    "xp": 16,
     "shards": "1d6",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -780,7 +780,7 @@
     "pursues": true,
     "pursueRange": 2,
     "attack": { "damage": "1d6", "actionCost": 12 },
-    "xp": 12,
+    "xp": 10,
     "shards": "1d3",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -809,7 +809,7 @@
     "pursues": true,
     "pursueRange": 2,
     "attack": { "damage": "1d4", "actionCost": 12 },
-    "xp": 48,
+    "xp": 24,
     "shards": "3d6",
     "actions": [
       { "type": "summon", "weight": 3, "mob": "wired-skeleton", "count": 2, "max": 2, "verb": "snaps his fingers, and shard-wire hauls the dead upright" },
@@ -839,7 +839,7 @@
     "behavior": "lurk",
     "hostile": true,
     "ambush": true,
-    "xp": 10,
+    "xp": 9,
     "shards": "1d4",
     "attack": { "damage": "1d6", "actionCost": 12 },
     "actions": [
@@ -865,7 +865,7 @@
     "pursues": true,
     "pursueRange": 4,
     "attack": { "damage": "1d4", "actionCost": 12 },
-    "xp": 6,
+    "xp": 7,
     "shards": "1d2",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -888,7 +888,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
-    "xp": 10,
+    "xp": 12,
     "attack": { "damage": "1d4", "actionCost": 14 },
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -912,7 +912,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
-    "xp": 7,
+    "xp": 10,
     "attack": { "damage": "1d4", "actionCost": 13 },
     "spikes": { "damage": "1d3", "chance": 1 },
     "actions": [
@@ -940,7 +940,7 @@
     "helper": true,
     "pursues": true,
     "pursueRange": 2,
-    "xp": 18,
+    "xp": 25,
     "attack": { "damage": "3d4", "actionCost": 13 },
     "spikes": { "damage": "1d4", "chance": 1 },
     "actions": [
@@ -1043,7 +1043,7 @@
         { "type": "damage-over-time", "name": "acid-burn", "damage": "1d3", "duration": 5, "chance": 1 }
       ]
     },
-    "xp": 18,
+    "xp": 16,
     "shards": "1d4",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -1076,7 +1076,7 @@
         { "type": "damage-over-time", "name": "caustic-burn", "damage": "2d3", "duration": 6, "chance": 1 }
       ]
     },
-    "xp": 85,
+    "xp": 68,
     "shards": "4d6",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1107,7 +1107,7 @@
       "actionCost": 11,
       "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
     },
-    "xp": 9,
+    "xp": 8,
     "shards": "1d3",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1133,7 +1133,7 @@
       "actionCost": 12,
       "onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 6, "chance": 1 }]
     },
-    "xp": 22,
+    "xp": 15,
     "shards": "1d4",
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -1161,7 +1161,7 @@
     "behavior": "wander",
     "hostile": false,
     "lightBane": { "above": 2, "damage": "1d2" },
-    "xp": 4,
+    "xp": 2,
     "actions": [
       { "type": "flee", "lightAbove": 2, "verb": "flinches from the light and slips into a crack", "scope": "zone" },
       { "type": "idle", "weight": 6 },
@@ -1207,7 +1207,7 @@
     "behavior": "guard",
     "hostile": true,
     "attack": { "damage": "1d6", "actionCost": 12 },
-    "xp": 6,
+    "xp": 11,
     "actions": [
       { "type": "attack", "weight": 6 },
       { "type": "idle", "weight": 4 },
@@ -1231,7 +1231,7 @@
     "hostile": false,
     "helper": true,
     "skittish": { "chance": 0.4, "idle": 0.03, "verb": "slips away into the black water" },
-    "xp": 2,
+    "xp": 1,
     "actions": [
       { "type": "idle", "weight": 7 },
       { "type": "emote", "weight": 2, "messages": ["drifts in a slow, blind circle", "noses at the surface", "hangs still in the black water"] },
@@ -1256,7 +1256,7 @@
     "behavior": "wander",
     "hostile": false,
     "attack": { "damage": "2d4", "actionCost": 14 },
-    "xp": 30,
+    "xp": 55,
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 6 },
@@ -1287,7 +1287,7 @@
     "helper": true,
     "pursues": true,
     "pursueRange": 2,
-    "xp": 22,
+    "xp": 32,
     "attack": { "damage": "2d4", "actionCost": 14 },
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -1318,7 +1318,7 @@
     "pursueRange": 4,
     "attack": { "damage": "1d6", "actionCost": 13 },
     "lightBane": { "above": 2, "damage": "1d3" },
-    "xp": 18,
+    "xp": 14,
     "shards": "2d4",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1401,7 +1401,7 @@
     "hostile": false,
     "helper": true,
     "remembers": true,
-    "xp": 18,
+    "xp": 20,
     "attack": { "damage": "1d6", "actionCost": 11 },
     "spikes": { "damage": "1d4", "chance": 1 },
     "actions": [
@@ -1431,7 +1431,7 @@
     "pursueRange": 1,
     "attack": { "damage": "1d8", "actionCost": 13 },
     "spikes": { "damage": "1d3", "chance": 0.5 },
-    "xp": 32,
+    "xp": 30,
     "shards": "2d6",
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -1461,7 +1461,7 @@
     "pursueRange": 2,
     "attack": { "damage": "1d8", "actionCost": 13 },
     "lightBane": { "above": 6, "damage": "1d2" },
-    "xp": 22,
+    "xp": 36,
     "shards": "4d4",
     "actions": [
       { "type": "cast", "weight": 3, "spell": "glimmerskin" },
@@ -1495,7 +1495,7 @@
       "actionCost": 12,
       "onHit": [{ "type": "damage-over-time", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
     },
-    "xp": 22,
+    "xp": 18,
     "shards": "2d4",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1527,7 +1527,7 @@
       "actionCost": 12,
       "onHit": [{ "type": "damage-over-time", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
     },
-    "xp": 30,
+    "xp": 25,
     "shards": "2d4",
     "actions": [
       { "type": "cast", "weight": 4, "spell": "gloom-bolt" },
@@ -1554,7 +1554,7 @@
     "pursueRange": 2,
     "lightBane": { "above": 0, "damage": "1d4" },
     "attack": { "damage": "1d8", "bonus": 2, "actionCost": 13 },
-    "xp": 50,
+    "xp": 47,
     "shards": "2d6",
     "actions": [
       { "type": "cast", "weight": 4, "spell": "drink-light" },
@@ -1588,7 +1588,7 @@
     "emitsLight": -1,
     "lightBane": { "above": 0, "damage": "1d4" },
     "attack": { "damage": "1d6", "bonus": 1, "actionCost": 12 },
-    "xp": 12,
+    "xp": 20,
     "actions": [
       { "type": "cast", "weight": 3, "spell": "snuff" },
       { "type": "attack", "weight": 8 },
@@ -1621,7 +1621,7 @@
         { "type": "damage-over-time", "name": "gloom-rot", "damage": "1d4", "duration": 6, "chance": 1 }
       ]
     },
-    "xp": 80,
+    "xp": 49,
     "shards": "3d6",
     "actions": [
       { "type": "summon", "weight": 4, "mob": "gloom-crawler", "count": 1, "max": 3, "verb": "heaves along her swollen length, and the egg-strings split to spill a fresh skittering of brood" },
@@ -1656,7 +1656,7 @@
     "pursues": false,
     "lightBane": { "above": 6, "damage": "1d3" },
     "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
-    "xp": 90,
+    "xp": 55,
     "shards": "5d4",
     "actions": [
       { "type": "summon", "weight": 4, "mob": "glimmer-husk", "count": 1, "max": 2, "verb": "sets a worked plate on the stone and drags the cold glimmer up through it, until the dead shell shudders and stands" },
@@ -1700,7 +1700,7 @@
       "actionCost": 14,
       "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d2", "duration": 4, "chance": 1 }]
     },
-    "xp": 20,
+    "xp": 13,
     "shards": "1d4",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1734,7 +1734,7 @@
       "actionCost": 14,
       "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     },
-    "xp": 30,
+    "xp": 22,
     "shards": "2d4",
     "actions": [
       { "type": "attack", "weight": 7 },
@@ -1772,7 +1772,7 @@
       "actionCost": 12,
       "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     },
-    "xp": 28,
+    "xp": 21,
     "shards": "2d4",
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -1802,7 +1802,7 @@
     "pursueRange": 2,
     "lightBane": { "above": 6, "damage": "1d3" },
     "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
-    "xp": 80,
+    "xp": 59,
     "shards": "5d4",
     "actions": [
       { "type": "summon", "weight": 4, "mob": "grave-husk", "count": 1, "max": 3, "verb": "sets a clawed hand to a fallen husk and drags the cold dark up through it, until the dead thing shudders and climbs to its feet" },
@@ -1840,7 +1840,7 @@
     "pursueRange": 2,
     "lightBane": { "above": 0, "damage": "1d4" },
     "attack": { "damage": "1d10", "bonus": 2, "actionCost": 13 },
-    "xp": 120,
+    "xp": 98,
     "shards": "6d6",
     "actions": [
       { "type": "cast", "weight": 4, "spell": "drink-light" },
@@ -2027,7 +2027,7 @@
     "pursues": true,
     "pursueRange": 1,
     "attack": { "damage": "2d6", "actionCost": 14 },
-    "xp": 38,
+    "xp": 30,
     "shards": "3d6",
     "actions": [
       { "type": "attack", "weight": 8 },
@@ -2110,7 +2110,7 @@
       "actionCost": 8,
       "onHit": [{ "type": "damage-over-time", "name": "midge-bites", "damage": "1d2", "duration": 3, "chance": 0.5 }]
     },
-    "xp": 4,
+    "xp": 7,
     "actions": [
       { "type": "attack", "weight": 8 },
       { "type": "emote", "weight": 3, "messages": ["draws into a denser, whining knot", "settles on every patch of bare skin at once", "drifts toward the brightest of the moss-glow", "boils up thicker for a moment, then thins"] }
@@ -2138,7 +2138,7 @@
       "actionCost": 11,
       "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }]
     },
-    "xp": 44,
+    "xp": 31,
     "shards": "2d6",
     "actions": [
       { "type": "attack", "weight": 9 },
