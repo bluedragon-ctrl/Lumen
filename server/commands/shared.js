@@ -16,6 +16,34 @@ const quests = require("../quests");
 
 const cap = (s) => (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
 
+// Single-message result builders — the standard refusal / plain-line shapes.
+const err = (text) => [{ type: "error", text }];
+const logMsg = (text) => [{ type: "log", text }];
+
+// Broadcast one line to everyone else in the actor's room.
+const roomLog = (ctx, player, text, kind = "log") =>
+  ctx.toRoom(player.location, { type: kind, text }, player.id);
+
+// roomLog + refreshRoom — "others hear it and see the room change" in one step.
+function announce(ctx, player, text, kind = "log") {
+  roomLog(ctx, player, text, kind);
+  ctx.refreshRoom(player.location, player.id);
+}
+
+// Recompute the actor's room light AND push the updated view to bystanders.
+// Always a pair — recomputing without refreshing once left stale dark views
+// (the disconnect bug); this helper makes the invariant unforgettable.
+function relight(state, ctx, player) {
+  state.rooms[player.location].light = state.computeRoomLight(player.location);
+  ctx.refreshRoom(player.location, player.id);
+}
+
+// Consume one from a carried stack, removing the instance when it's the last.
+function consumeOne(player, inst) {
+  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
+  else player.inventory.splice(player.inventory.indexOf(inst), 1);
+}
+
 // Attributes a player can raise — with banked level-up points (`train`) or by an
 // admin (`@attr`). Single source of truth for both.
 const TRAINABLE = ["might", "vitality", "intellect", "wits", "perception"];
@@ -213,6 +241,7 @@ function stickToSurvivor(state, player, results) {
 
 module.exports = {
   cap, NOOP_CTX, TRAINABLE, questKill, selfAndViews, announceLevelUps,
+  err, logMsg, roomLog, announce, relight, consumeOne,
   STOP_WORDS, nameTokens, matchesQuery, parseTarget, itemMatches, findItem, findMobInRoom, findFixture,
   addToInventory, countItem, removeItem, joinList, stationLabel, equipItem,
   autoStand, restoreGain, roomHostiles, stickToSurvivor,

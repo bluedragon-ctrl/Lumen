@@ -80,6 +80,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   craftables, so anything `get`/`use`/`attack` can name, `examine` can too.
 
 ### Changed
+- **Command layer slimmed and re-modularised (no behaviour change).**
+  `server/commands.js` drops from 950 to 655 lines (−38% bytes): the consumable
+  cluster (`drink`/`eat`/`throw`, `refuel`, light-source toggling) moves to
+  `server/commands/consume.js` and the fixture cluster (`use`, `open`/`close`
+  doors, switches, restore springs) to `server/commands/fixtures.js`, so a task
+  touching one domain reads a fraction of the old file. New shared helpers
+  (`err`, `logMsg`, `roomLog`, `announce`, `relight`, `consumeOne` in
+  `server/commands/shared.js`) replace the repeated single-message, broadcast+
+  refresh, light-recompute+refresh, and stack-consume idioms across every
+  command module — `relight` also encodes the recompute-light-and-refresh
+  invariant from the disconnect fix as a single call. `learn` now normalises
+  scrolls, schematics, and books into one teach-list flow. Verified
+  byte-identical against `main` across a 90-command battery (messages,
+  broadcasts, and emitted events, seeded RNG).
 - **`list` marks wares that teach something you already know.** Schematics,
   scrolls, and books in a trader's stock are now tagged `(known)` when you
   already know every recipe/spell they'd teach — a warning against a wasted buy.

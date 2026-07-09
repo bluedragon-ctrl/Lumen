@@ -5,43 +5,42 @@
 const { makeItemInstance, sellValueOf } = require("../state");
 const quests = require("../quests");
 const {
-  selfAndViews, announceLevelUps, matchesQuery,
+  selfAndViews, err, logMsg, announce, announceLevelUps, matchesQuery,
   countItem, removeItem, addToInventory, stationLabel,
 } = require("./shared");
 
 function craft(state, player, arg, ctx) {
   const w = state.world;
-  if (!arg) return [{ type: "error", text: "Craft what? Try `recipes`." }];
+  if (!arg) return err("Craft what? Try `recipes`.");
   const entry = Object.entries(w.recipes).find(
     ([id, r]) => matchesQuery(arg, r.name || id, r.keywords, id)
   );
-  if (!entry) return [{ type: "error", text: `You know no recipe for "${arg}".` }];
+  if (!entry) return err(`You know no recipe for "${arg}".`);
   const [rid, r] = entry;
   const label = r.name || rid;
   if (!(player.knownRecipes || []).includes(rid))
-    return [{ type: "error", text: `You don't know how to make ${label}.` }];
+    return err(`You don't know how to make ${label}.`);
   // Must be at a fixture providing the recipe's station.
   const rt = state.rooms[player.location];
   const hasStation = rt.fixtures.some((f) => w.fixtures[f.template] && w.fixtures[f.template].station === r.station);
-  if (!hasStation) return [{ type: "error", text: `You need ${stationLabel(w, r.station)} to make ${label}.` }];
+  if (!hasStation) return err(`You need ${stationLabel(w, r.station)} to make ${label}.`);
   // Check material inputs and shard cost before consuming anything.
   for (const inp of r.inputs || []) {
     const need = inp.qty || 1;
     const have = countItem(player, inp.template);
     if (have < need)
-      return [{ type: "error", text: `You need ${need}× ${w.items[inp.template].name} (you have ${have}).` }];
+      return err(`You need ${need}× ${w.items[inp.template].name} (you have ${have}).`);
   }
   const cost = r.shards || 0;
   if ((player.shards || 0) < cost)
-    return [{ type: "error", text: `You need ${cost} shards (you have ${player.shards || 0}).` }];
+    return err(`You need ${cost} shards (you have ${player.shards || 0}).`);
   // Consume, then produce.
   for (const inp of r.inputs || []) removeItem(player, inp.template, inp.qty || 1);
   if (cost) player.shards -= cost;
   addToInventory(player, makeItemInstance({ template: r.output.template, qty: r.output.qty || 1 }, w), w);
   const qmsgs = quests.noteAcquire(state, player, r.output.template);
   const outName = w.items[r.output.template].name;
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} works at ${stationLabel(w, r.station)}.` }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, `${player.name} works at ${stationLabel(w, r.station)}.`);
   // Crafting XP = the output's sale value × quantity: it scales with the worth of
   // what you made (and thus the rarity/cost of its inputs), so spamming a cheap
   // recipe pays almost nothing. Award before building views so XP shows current.
@@ -77,7 +76,7 @@ function canAfford(player, r) {
 function recipes(state, player, filter) {
   const w = state.world;
   const known = player.knownRecipes || [];
-  if (!known.length) return [{ type: "log", text: "You know no recipes." }];
+  if (!known.length) return logMsg("You know no recipes.");
   const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
   let recs = known.map((rid) => w.recipes[rid]).filter(Boolean);
   // Optional filter word: substring match on the recipe name, its output item's
@@ -92,7 +91,7 @@ function recipes(state, player, filter) {
       itemName(r.output.template).toLowerCase().includes(q) ||
       (r.inputs || []).some((i) => i.template.toLowerCase().includes(q) || itemName(i.template).toLowerCase().includes(q))
     );
-    if (!recs.length) return [{ type: "log", text: `You know no recipes matching "${filter.trim()}".` }];
+    if (!recs.length) return logMsg(`You know no recipes matching "${filter.trim()}".`);
   }
   // Plain code-unit compare for the name tiebreak — `localeCompare` pulls in the
   // host locale's collation, which on some machines sorts the "ch" digraph after
@@ -135,7 +134,7 @@ function recipes(state, player, filter) {
   const lines = [q ? `<#gold>Recipes<#reset> (matching "${filter.trim()}")` : "<#gold>Recipes<#reset>"];
   if (hereRecs.length) lines.push("", "<#cyan>Here<#reset>", ...hereRecs.map((r) => fmt(r, false)));
   if (awayRecs.length) lines.push("", "<#cyan>Elsewhere<#reset>", ...awayRecs.map((r) => fmt(r, true)));
-  return [{ type: "log", text: lines.join("\n") }];
+  return logMsg(lines.join("\n"));
 }
 
 module.exports = { craft, recipes };

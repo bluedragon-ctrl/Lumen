@@ -7,7 +7,7 @@
 const { canSee } = require("../light");
 const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE } = require("../state");
 const quests = require("../quests");
-const { selfAndViews, parseTarget, itemMatches, findItem, addToInventory } = require("./shared");
+const { selfAndViews, err, logMsg, roomLog, consumeOne, parseTarget, itemMatches, findItem, addToInventory } = require("./shared");
 
 // A trader you can currently deal with: a mob in the room carrying a `shop` block,
 // visible in the present light. Returns { mob, t } or null.
@@ -55,7 +55,7 @@ function alreadyKnown(player, t) {
 
 function shopList(state, player, filter) {
   const sh = shopHere(state, player);
-  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  if (!sh) return err("There is no one here to trade with.");
   const w = state.world;
   // Quest-gated stock stays out of the list entirely until earned (offerUnlocked).
   let sells = (sh.t.shop.sells || []).filter((o) => offerUnlocked(player, o));
@@ -66,7 +66,7 @@ function shopList(state, player, filter) {
     sells = sells.filter(
       (o) => o.template.toLowerCase().includes(q) || w.items[o.template].name.toLowerCase().includes(q)
     );
-    if (!sells.length) return [{ type: "log", text: `${sh.t.name} has nothing for sale matching "${filter.trim()}".` }];
+    if (!sells.length) return logMsg(`${sh.t.name} has nothing for sale matching "${filter.trim()}".`);
   }
   const lines = [q ? `${sh.t.name} trades (matching "${filter.trim()}"):` : `${sh.t.name} trades:`];
   const purse = player.shards || 0;
@@ -85,36 +85,36 @@ function shopList(state, player, filter) {
   // when the player has narrowed the list to specific wares.
   if (!q) lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
   lines.push(`You have ${player.shards || 0} shards.`);
-  return [{ type: "log", text: lines.join("\n") }];
+  return logMsg(lines.join("\n"));
 }
 
 function buy(state, player, arg, ctx) {
-  if (!arg) return [{ type: "error", text: "Buy what?" }];
+  if (!arg) return err("Buy what?");
   const sh = shopHere(state, player);
-  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  if (!sh) return err("There is no one here to trade with.");
   const w = state.world;
   const ql = arg.toLowerCase();
   const offer = (sh.t.shop.sells || []).find(
     (s) => offerUnlocked(player, s) && (s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql))
   );
-  if (!offer) return [{ type: "error", text: `${sh.t.name} doesn't sell "${arg}".` }];
+  if (!offer) return err(`${sh.t.name} doesn't sell "${arg}".`);
   const name = w.items[offer.template].name;
   const price = buyPrice(offer, w.items[offer.template]);
   if ((player.shards || 0) < price)
-    return [{ type: "error", text: `You can't afford ${name} — ${price} shards, you have ${player.shards || 0}.` }];
+    return err(`You can't afford ${name} — ${price} shards, you have ${player.shards || 0}.`);
   player.shards -= price;
   addToInventory(player, makeItemInstance({ template: offer.template }, w), w);
   const qmsgs = quests.noteAcquire(state, player, offer.template);
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} buys ${name} from ${sh.t.name}.` }, player.id);
+  roomLog(ctx, player, `${player.name} buys ${name} from ${sh.t.name}.`);
   const out = selfAndViews(state, player, `You buy ${name} for ${price} shards. (${player.shards} left)`);
   out.push(...qmsgs);
   return out;
 }
 
 function sell(state, player, arg, ctx) {
-  if (!arg) return [{ type: "error", text: "Sell what?" }];
+  if (!arg) return err("Sell what?");
   const sh = shopHere(state, player);
-  if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
+  if (!sh) return err("There is no one here to trade with.");
   const w = state.world;
   const { all, keyword } = parseTarget(arg);
   // The trader buys any valued item at its sell value — no per-trader buy list.
@@ -132,21 +132,20 @@ function sell(state, player, arg, ctx) {
       total += unit * qty;
       sold.push(qty > 1 ? `${t.name} ×${qty}` : t.name);
     }
-    if (!sold.length) return [{ type: "error", text: keyword ? `${sh.t.name} won't buy any "${keyword}" from you.` : `${sh.t.name} won't buy anything you're carrying.` }];
+    if (!sold.length) return err(keyword ? `${sh.t.name} won't buy any "${keyword}" from you.` : `${sh.t.name} won't buy anything you're carrying.`);
     player.shards = (player.shards || 0) + total;
-    ctx.toRoom(player.location, { type: "log", text: `${player.name} trades with ${sh.t.name}.` }, player.id);
+    roomLog(ctx, player, `${player.name} trades with ${sh.t.name}.`);
     return selfAndViews(state, player, `You sell ${sold.join(", ")} for ${total} shards. (${player.shards} total)`);
   }
   const idx = findItem(player.inventory, w, arg);
-  if (idx < 0) return [{ type: "error", text: `You aren't carrying "${arg}".` }];
+  if (idx < 0) return err(`You aren't carrying "${arg}".`);
   const inst = player.inventory[idx];
   const t = w.items[inst.template];
   const price = sellValueOf(t);
-  if (!t.value || price <= 0) return [{ type: "error", text: `${sh.t.name} won't give you anything for ${t.name}.` }];
-  if (inst.qty != null && inst.qty > 1) inst.qty -= 1;
-  else player.inventory.splice(idx, 1);
+  if (!t.value || price <= 0) return err(`${sh.t.name} won't give you anything for ${t.name}.`);
+  consumeOne(player, inst);
   player.shards = (player.shards || 0) + price;
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} sells ${t.name} to ${sh.t.name}.` }, player.id);
+  roomLog(ctx, player, `${player.name} sells ${t.name} to ${sh.t.name}.`);
   return selfAndViews(state, player, `You sell ${t.name} for ${price} shards. (${player.shards} total)`);
 }
 

@@ -17,7 +17,7 @@ const { makeItemInstance, fixtureVisibleTo } = require("../state");
 const { canSee } = require("../light");
 const { rollDice } = require("../dice");
 const quests = require("../quests");
-const { selfAndViews, countItem, removeItem, addToInventory, matchesQuery } = require("./shared");
+const { selfAndViews, err, announce, countItem, removeItem, addToInventory, matchesQuery } = require("./shared");
 
 const RESOURCE_KINDS = ["mine", "harvest", "fish"];
 const resourceHandlers = {}; // { mine, harvest: gather, fish } — wired up below.
@@ -125,7 +125,7 @@ function workResource(state, player, arg, ctx, kind) {
   const w = state.world;
   const rt = state.rooms[player.location];
   const R = RESOURCE_SPECS[kind];
-  if (!canSee(player.perception, rt.light)) return [{ type: "error", text: R.dark }];
+  if (!canSee(player.perception, rt.light)) return err(R.dark);
   const fixtures = resourceFixtures(state, player, R.flag);
   // Hand off to a sibling verb when the player named something that isn't our
   // kind, or there's nothing of our kind here at all, so the wrong-verb instinct lands.
@@ -134,28 +134,28 @@ function workResource(state, player, arg, ctx, kind) {
     const redirect = resourceRedirect(state, player, arg, kind);
     if (redirect) return redirect(state, player, arg, ctx);
   }
-  if (!fixtures.length) return [{ type: "error", text: R.none }];
+  if (!fixtures.length) return err(R.none);
   let f;
   if (arg) {
     const ql = arg.toLowerCase();
     f = fixtures.find((v) => fixtureMatchesArg(state, v, ql));
-    if (!f) return [{ type: "error", text: R.notFound(arg) }];
+    if (!f) return err(R.notFound(arg));
   } else if (fixtures.length === 1) {
     f = fixtures[0];
   } else {
-    return [{ type: "error", text: R.which(fixtures.map((v) => w.fixtures[v.template].name).join(", ")) }];
+    return err(R.which(fixtures.map((v) => w.fixtures[v.template].name).join(", ")));
   }
   const ft = w.fixtures[f.template];
   const spec = ft[R.flag];
-  if (f.charges <= 0) return [{ type: "error", text: R.depleted(ft) }];
+  if (f.charges <= 0) return err(R.depleted(ft));
   // Fishing needs bait in the pack before anything else is spent.
   if (R.bait) {
     const bait = spec.bait || "grub";
     if (countItem(player, bait) < 1)
-      return [{ type: "error", text: `You have no bait — you need ${w.items[bait].name} to work the line.` }];
+      return err(`You have no bait — you need ${w.items[bait].name} to work the line.`);
   }
   const cost = spec.energy || player.speed; // ~one tick's worth of effort per action
-  if (player.energy < cost) return [{ type: "error", text: R.spent }];
+  if (player.energy < cost) return err(R.spent);
   player.energy -= cost;
   // Fishing: bait is lost to the water, catch or no — then a chance to miss.
   if (R.bait) {
@@ -181,8 +181,7 @@ function workResource(state, player, arg, ctx, kind) {
     label = drop.qty > 1 ? `${drop.qty} ${it.name}` : it.name;
   }
   const qmsgs = quests.noteAcquire(state, player, drop.template);
-  ctx.toRoom(player.location, { type: "log", text: R.roomLine(player.name, label, ft.name, spec) }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, R.roomLine(player.name, label, ft.name, spec));
   const tail = f.charges <= 0 ? R.last : "";
   const out = selfAndViews(state, player, `${R.success(label, spec)}${tail}`);
   out.push(...qmsgs);

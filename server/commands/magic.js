@@ -7,7 +7,7 @@
 const { effectiveAttributes, spellScaleBonus, durationScaleBonus } = require("../state");
 const { canSee } = require("../light");
 const {
-  selfAndViews, matchesQuery, findMobInRoom, questKill,
+  selfAndViews, err, logMsg, announce, matchesQuery, findMobInRoom, questKill,
   autoStand, roomHostiles, stickToSurvivor, joinList,
 } = require("./shared");
 
@@ -45,7 +45,7 @@ function fmtAmount(spec) {
 function spellList(state, player) {
   const w = state.world;
   const known = player.knownSpells || [];
-  if (!known.length) return [{ type: "log", text: "You know no spells. Study a scroll to learn one." }];
+  if (!known.length) return logMsg("You know no spells. Study a scroll to learn one.");
   const lines = ["<#gold>Spells<#reset>", ""];
   for (const id of known) {
     const s = w.spells[id];
@@ -107,7 +107,7 @@ function spellList(state, player) {
     lines.push(`  <#green>${s.name}<#reset>: ${cost}${tail}`);
   }
   lines.push("", `<#gray>Mana: ${Math.floor(player.mana || 0)}/${player.maxMana}.<#reset>`);
-  return [{ type: "log", text: lines.join("\n") }];
+  return logMsg(lines.join("\n"));
 }
 
 // `cast <spell> [at] <target>`: spend mana to hurl a known spell at a creature
@@ -116,7 +116,7 @@ function spellList(state, player) {
 // may reflavour its landed-hit lines via `messages` ({self, room} templates).
 function cast(state, player, arg, ctx) {
   const w = state.world;
-  if (!arg) return [{ type: "error", text: "Cast what? Try `spells`." }];
+  if (!arg) return err("Cast what? Try `spells`.");
   const tokens = arg.trim().split(/\s+/);
   // Match the longest leading run of tokens that names a known spell (spell
   // names are usually one word); the remainder is the target.
@@ -136,7 +136,7 @@ function cast(state, player, arg, ctx) {
     // name can't be told apart from a bare target tail, so this is the honest guess.
     const atIdx = tokens.findIndex((tk) => tk.toLowerCase() === "at");
     const tried = (atIdx > 0 ? tokens.slice(0, atIdx) : tokens).join(" ");
-    return [{ type: "error", text: `You don't know any spell called "${tried}". Try \`spells\`.` }];
+    return err(`You don't know any spell called "${tried}". Try \`spells\`.`);
   }
   const spell = w.spells[spellId];
   const eff = spell.effect || {};
@@ -146,7 +146,7 @@ function cast(state, player, arg, ctx) {
   // a refusal. The validator enforces the same sets on the data at build time.
   if (eff.type !== "summon" && !(spell.hostile ? HOSTILE_EFFECTS : SUPPORT_EFFECTS).includes(eff.type)) {
     console.warn(`[lumen] spell ${spellId}: no ${spell.hostile ? "hostile" : "support"} cast path for effect type "${eff.type}"`);
-    return [{ type: "error", text: `You reach for ${spell.name}, but the weave slips from your grasp and comes to nothing.` }];
+    return err(`You reach for ${spell.name}, but the weave slips from your grasp and comes to nothing.`);
   }
 
   if (rest[0] && rest[0].toLowerCase() === "at") rest = rest.slice(1); // `cast spark at lightbug`
@@ -155,7 +155,7 @@ function cast(state, player, arg, ctx) {
   // Mana, shards, and any material component are priced in one place (state.costShortfall);
   // refuse here, before anything is spent, if the caster can't pay.
   const short = state.costShortfall(player, spell);
-  if (short) return [{ type: "error", text: short }];
+  if (short) return err(short);
 
   autoStand(player); // rouse before casting, so a sleeping caster regains sight to aim
 
@@ -179,14 +179,14 @@ function cast(state, player, arg, ctx) {
   let mob;
   if (targetQ) {
     mob = findMobInRoom(state, player, targetQ, false);
-    if (!mob) return [{ type: "error", text: `You see no "${targetQ}" here to target.` }];
+    if (!mob) return err(`You see no "${targetQ}" here to target.`);
   } else {
     // No explicit target: fall back to the foe you're already engaged with — the
     // pending attack target shown in the Inspect pane — so `cast spark` mid-fight
     // strikes the current foe without having to name it again.
     const pendId = player.pending && player.pending.type === "attack" ? player.pending.targetId : null;
     mob = pendId ? state.rooms[player.location].mobs.find((m) => m.id === pendId) : null;
-    if (!mob) return [{ type: "error", text: `Cast ${spell.name} at what?` }];
+    if (!mob) return err(`Cast ${spell.name} at what?`);
   }
 
   const mt = w.mobs[mob.template];
@@ -222,8 +222,7 @@ function cast(state, player, arg, ctx) {
     selfText = fillTemplate(msgs.self || "You hurl {spell} at {target} for {damage} damage.", vars);
   }
 
-  ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, roomText, "combat");
   const out = selfAndViews(state, player, selfText, "combat");
   out.push(...tail);
   // Deliver castSpell's side-effects: a rousted sleeper broadcasts through the
@@ -263,7 +262,7 @@ const DEFAULT_BURST_FLAVOUR = { hitVerb: "sears", killVerb: "burns apart", room:
 function castBurst(state, player, spell, ctx) {
   const targets = roomHostiles(state, player);
   if (!targets.length)
-    return [{ type: "error", text: `There's nothing here for ${spell.name} to catch — best save the mana.` }];
+    return err(`There's nothing here for ${spell.name} to catch — best save the mana.`);
 
   const verb = spell.name.toLowerCase();
   const msgs = spell.messages || {};
@@ -290,8 +289,7 @@ function castBurst(state, player, spell, ctx) {
   const vars = { caster: player.name, spell: spell.name, verb };
   const roomText = fillTemplate(msgs.room || `{caster} looses ${flav.room} {verb} and ${flav.wave}!`, vars);
   const selfText = fillTemplate(msgs.self || `You loose {spell}; ${flav.self}.`, vars) + outcome;
-  ctx.toRoom(player.location, { type: "combat", text: roomText }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, roomText, "combat");
   const out = selfAndViews(state, player, selfText, "combat");
   out.push(...qmsgs);
   // Of the resolver's side-effects only the wake-ups need forwarding — the
@@ -315,7 +313,7 @@ function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
   const ql = (targetQ || "").trim().toLowerCase();
   const selfWords = ["", "self", "me", "myself", player.name.toLowerCase()];
   if (selfOnly && !selfWords.includes(ql))
-    return [{ type: "error", text: `${spell.name} can only be laid on your own skin.` }];
+    return err(`${spell.name} can only be laid on your own skin.`);
 
   let target = null;
   if (selfWords.includes(ql)) {
@@ -325,7 +323,7 @@ function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
       (o) => o.id !== player.id && o.hp > 0 && matchesQuery(ql, o.name, null, o.id)
     );
     if (other) {
-      if (!see) return [{ type: "error", text: "It is too dark to make out your target." }];
+      if (!see) return err("It is too dark to make out your target.");
       target = { kind: "player", actor: other, id: other.id, name: other.name };
     } else {
       const mob = rt.mobs.find((m) => {
@@ -338,15 +336,14 @@ function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
       }
     }
   }
-  if (!target) return [{ type: "error", text: `You see no "${targetQ}" here to mend.` }];
+  if (!target) return err(`You see no "${targetQ}" here to mend.`);
 
   const events = [];
   const res = state.castBeneficial(player, spell, target, events);
   const verb = spell.name.toLowerCase();
   const targetName = target.isSelf ? "themselves" : target.name; // for the room's view
 
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.` }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, `${player.name} weaves ${verb} over ${targetName}, and a soft light settles in.`);
   // Forward the take-hold only when it landed on an ALLY — it confirms the buff
   // and refreshes their vitals panel at once. A self-cast (or a mob target) is
   // already fully narrated by the lines above and below.
@@ -397,8 +394,7 @@ function castSupportAll(state, player, spell, ctx) {
   const results = state.castRoomBeneficial(player, spell, targets, events);
   const verb = spell.name.toLowerCase();
 
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} weaves ${verb} wide over everyone beside them, and a soft light settles across the room.` }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, `${player.name} weaves ${verb} wide over everyone beside them, and a soft light settles across the room.`);
   // Forward each ally delver's take-hold (confirmation + a prompt vitals
   // refresh); the caster and allied creatures are narrated right here instead.
   for (const ev of events) if (ev.type === "effect-applied" && ev.playerId !== player.id) ctx.emit(ev);
@@ -450,13 +446,11 @@ function castSummon(state, player, spell, ctx) {
   const comp = (spell.itemCost || [])[0];
   const compName = comp && w.items[comp.template] ? w.items[comp.template].name.replace(/^an? /i, "") : null;
   if (compName) {
-    ctx.toRoom(player.location, { type: "log", text: `${player.name} sets a ${compName} down and works glimmer into it until it shudders and stands: ${name}.` }, player.id);
-    ctx.refreshRoom(player.location, player.id);
+    announce(ctx, player, `${player.name} sets a ${compName} down and works glimmer into it until it shudders and stands: ${name}.`);
     const replaced = res.replaced ? ` Your previous ${bare} slumps into dead shell.` : "";
     return selfAndViews(state, player, `You bind raw glimmer into the ${compName}, and ${name} grinds upright to stand watch.${replaced}`);
   }
-  ctx.toRoom(player.location, { type: "log", text: `${player.name} traces a binding-glyph, and ${name} coalesces from the gloom.` }, player.id);
-  ctx.refreshRoom(player.location, player.id);
+  announce(ctx, player, `${player.name} traces a binding-glyph, and ${name} coalesces from the gloom.`);
   const replaced = res.replaced ? ` Your previous ${bare} unravels into motes.` : "";
   return selfAndViews(state, player, `You weave the glimmer into shape, and ${name} answers your call.${replaced}`);
 }
