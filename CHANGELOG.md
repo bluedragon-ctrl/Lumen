@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Garrick's shop stocks a regeneration draught and iron bars.** Garrick the
+  quartermaster (`rim-shopkeeper`) now sells the `regeneration-draught` (a
+  slow heal-over-time tincture) and `iron-bar` (smith's raw stock) alongside his
+  usual light, armour, and oil.
 - **Attribute-gated doors (`door.requires`).** A door fixture can now gate
   *opening* on an **effective** attribute score — `{ attr, value, failText?,
   successText? }` in its `door` block. The door only yields to a delver whose
