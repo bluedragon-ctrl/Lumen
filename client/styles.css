@@ -21,6 +21,10 @@
   --rarity-rare: #5b9bd5;
   --rarity-epic: #a974d6;
   --rarity-legendary: #d99a4e;
+  /* Biome accents — a cosmetic tint the Inspect window wears for tagged rooms
+     (see the `.biome-*` rules). Umbral is a neon blue; gloaming a cave green. */
+  --biome-umbral: #34b3ff;
+  --biome-gloaming: #5cb87a;
 }
 
 * { box-sizing: border-box; }
@@ -171,8 +175,10 @@ body {
 /* Light bands — the live atmospheric tint of the room view */
 .light-darkness { background: #050607; color: #4a525b; }
 .light-darkness #room-name { color: #5a6770; }
-.light-dim { background: #0d1014; color: #9aa3ad; filter: saturate(.55) brightness(.92); }
-.light-bright { background: #141a20; color: var(--text); }
+/* `--desc` is the band's base reading colour, exposed so a biome tint can nudge
+   the description text toward its hue relative to the band (see `.biome-*`). */
+.light-dim { background: #0d1014; color: #9aa3ad; filter: saturate(.55) brightness(.92); --desc: #9aa3ad; }
+.light-bright { background: #141a20; color: var(--text); --desc: var(--text); }
 /* searing: light is painful. Keep the panel dark, but blast the text with a
    shimmering white bloom (overexposed feel) plus a pulsing glare overlay. */
 .light-searing { background: #0a0c0f; color: #eef3f9; }
@@ -213,12 +219,56 @@ body {
   0%, 100% { transform: translate(0, 0); }
   50%      { transform: translate(-.3px, .4px); }
 }
+
+/* Biome tint — a cosmetic accent for rooms with a `biome` tag, layered OVER the
+   light band. It owns ::before (searing/void own ::after) so the two never
+   collide: the biome adds an ambient glow + hue, the band still sets the mood. */
+.biome-umbral   { --biome: var(--biome-umbral); }
+.biome-gloaming { --biome: var(--biome-gloaming); }
+/* Ambient glow: a soft radial aura off the top edge + a faint inner ring, both
+   in the biome hue, breathing slowly. z-index -1 keeps it above the panel
+   background but behind the (non-positioned) room text, so nothing else needs
+   a stacking tweak. */
+[class*="biome-"]::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: -1;
+  background: radial-gradient(130% 90% at 50% 0%,
+    color-mix(in srgb, var(--biome) 22%, transparent) 0%,
+    color-mix(in srgb, var(--biome) 7%, transparent) 34%,
+    transparent 66%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--biome) 32%, transparent);
+  border-radius: inherit;
+  animation: biome-breathe 6s ease-in-out infinite;
+}
+/* The room name takes the hue + a matching bloom. */
+[class*="biome-"] #room-name {
+  color: var(--biome);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--biome) 55%, transparent);
+}
+/* Description text: nudge the band's reading colour TOWARD the biome hue. The
+   biome is first lightened toward near-white (56%) so the shift doesn't drag the
+   text darker, then mixed in at 28% — both in oklab to stay clean, not muddy.
+   Scoped to readable bands, so searing/void keep their verbatim text colour. */
+.light-dim[class*="biome-"] .room-desc,
+.light-bright[class*="biome-"] .room-desc {
+  color: color-mix(in oklab,
+    color-mix(in oklab, var(--biome), #eaf0f6 56%) 28%,
+    var(--desc));
+}
+@keyframes biome-breathe { 0%, 100% { opacity: .8; } 50% { opacity: 1; } }
+/* Recede where sight fails or hurts: searing's white bloom wins, and in
+   darkness/void you can't see anyway, so the tint drops out entirely. */
+.light-searing[class*="biome-"] #room-name { color: #fff; text-shadow: none; }
+.light-searing[class*="biome-"]::before { opacity: .35; }
+.light-void[class*="biome-"]::before,
+.light-darkness[class*="biome-"]::before { display: none; }
+.light-void[class*="biome-"] #room-name { color: #6b7882; text-shadow: none; }
 @keyframes lumin-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(216, 200, 115, .28), inset 0 0 4px rgba(216, 200, 115, .10); }
   50%      { box-shadow: 0 0 10px rgba(216, 200, 115, .55), inset 0 0 7px rgba(216, 200, 115, .18); }
 }
 @media (prefers-reduced-motion: reduce) {
   .light-searing #room-name, .light-searing .room-desc, .light-searing::after { animation: none; }
+  [class*="biome-"]::before { animation: none; }
   .light-void #room-name, .light-void .room-desc { animation: none; }
   .light-void::after {
     animation: none;

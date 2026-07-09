@@ -1101,6 +1101,7 @@
   "d3.umbral.dwelling": {
     "id": "d3.umbral.dwelling",
     "zone": "third-umbral",
+    "biome": "umbral",
     "name": "Mallki's Hollow",
     "depth": 3,
     "ambientLight": 0,
@@ -1554,6 +1555,7 @@
   "d6.gloaming.landing": {
     "id": "d6.gloaming.landing",
     "zone": "gloaming",
+    "biome": "gloaming",
     "name": "The Sunless Landing",
     "depth": 6,
     "ambientLight": 2,

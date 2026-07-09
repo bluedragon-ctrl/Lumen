@@ -308,6 +308,13 @@ consoleEl.addEventListener("scroll", () => {
 });
 
 // --- Inspect (room) --------------------------------------------------------
+// The Inspect pane's class carries two cosmetic axes: the live light band and an
+// optional biome tint (a blue glow for umbral, green for gloaming — see the
+// `.biome-*` rules in styles.css). Both the room view and the examine view use this.
+function paneClass(room) {
+  return "pane light-" + room.light.band + (room.biome ? " biome-" + room.biome : "");
+}
+
 function renderRoom(room) {
   // A reactive refresh (mob entered, someone healed, light flickered) must not
   // yank the Inspect window out of an examine view the player opened. Skip the
@@ -326,7 +333,7 @@ function renderRoom(room) {
   $("examine-view").hidden = true;
   $("room-view").hidden = false;
   const inspect = $("inspect");
-  inspect.className = "pane light-" + room.light.band;
+  inspect.className = paneClass(room);
   $("room-name").textContent = room.name;
   $("light-meter").textContent =
     `light: ${room.light.band} (${room.light.value})` +
@@ -382,9 +389,9 @@ function renderExamine(e) {
   examinedId = e.id;
   examinedRoomBound = roomHasEntity(lastRoom, e.id);
 
-  // Tint the examine view by the current room's light band, so detail text reads
-  // gray in dim → washed/shimmering in searing, aligned with the room view.
-  $("inspect").className = "pane light-" + (lastRoom ? lastRoom.light.band : "unknown");
+  // Tint the examine view by the current room's light band (and biome), so detail
+  // text reads gray in dim → washed/shimmering in searing, aligned with the room view.
+  $("inspect").className = lastRoom ? paneClass(lastRoom) : "pane light-unknown";
   $("room-view").hidden = true;
   $("examine-view").hidden = false;
 
