@@ -34,7 +34,7 @@ function main() {
   // Cosmetic room biomes — the Inspect window tints itself for these (see the
   // `.biome-*` rules in client/styles.css). Add a name here and a matching CSS
   // rule there to introduce a new one.
-  const BIOMES = ["umbral", "gloaming"];
+  const BIOMES = ["umbral", "gloaming", "wraith", "rim", "water", "slime", "mutant", "ember"];
 
   // The Tide's phase vocabulary is data-driven (tide.json `phases`); mob action /
   // reaction `phase` gates below validate against it (falling back to the engine
