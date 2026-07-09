@@ -34,6 +34,25 @@ function offerUnlocked(player, offer) {
   return !!(player.quests && player.quests.done && player.quests.done.includes(offer.requiresQuest));
 }
 
+// Does the player already know everything a teachable ware would teach? Marks
+// schematics/scrolls/books in `list` so a shopper can see, before buying, that a
+// recipe or spell is nothing new. Items that teach nothing return false. The
+// same known/unknown rules the `learn` command consumes on: `teaches` (book,
+// several entries), `scroll.spell` (one spell), `recipe` (one recipe).
+function alreadyKnown(player, t) {
+  const knownR = player.knownRecipes || [];
+  const knownS = player.knownSpells || [];
+  if (t.teaches) {
+    const recipes = t.teaches.recipes || [];
+    const spells = t.teaches.spells || [];
+    if (!recipes.length && !spells.length) return false;
+    return recipes.every((r) => knownR.includes(r)) && spells.every((s) => knownS.includes(s));
+  }
+  if (t.scroll && t.scroll.spell) return knownS.includes(t.scroll.spell);
+  if (t.recipe) return knownR.includes(t.recipe);
+  return false;
+}
+
 function shopList(state, player, filter) {
   const sh = shopHere(state, player);
   if (!sh) return [{ type: "error", text: "There is no one here to trade with." }];
@@ -54,9 +73,12 @@ function shopList(state, player, filter) {
   if (sells.length) {
     lines.push("Sells (you buy):");
     for (const o of sells) {
-      const price = buyPrice(o, w.items[o.template]);
-      const line = `  ${w.items[o.template].name} — ${price} shards`;
-      lines.push(price > purse ? `<#gray>${line}` : line);
+      const item = w.items[o.template];
+      const price = buyPrice(o, item);
+      // Flag teachables you'd gain nothing from, so `(known)` warns before a wasted buy.
+      const known = alreadyKnown(player, item) ? " (known)" : "";
+      const line = `  ${item.name} — ${price} shards`;
+      lines.push(price > purse ? `<#gray>${line}${known}` : `${line}${known ? `<#gray>${known}<#reset>` : ""}`);
     }
   }
   // The generic sell-rate blurb is about selling, not the filtered view — skip it
