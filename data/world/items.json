@@ -17,7 +17,8 @@
     "slot": "light",
     "weight": 2,
     "value": 30,
-    "light": { "output": 3, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
+    "light": { "output": 3, "fuelMax": 600, "burnPerTick": 1, "fuelItem": "lamp-oil", "refuelPerUnit": 300 },
+    "rarity": "uncommon"
   },
   "glimmersteel-lamp": {
     "id": "glimmersteel-lamp",
@@ -33,7 +34,7 @@
   },
   "prospectors-blaze-lantern": {
     "id": "prospectors-blaze-lantern",
-    "rarity": "uncommon",
+    "rarity": "rare",
     "name": "the Prospector's blaze-lantern",
     "keywords": ["lantern", "blaze", "lamp", "prospector", "light"],
     "description": "A heavy lantern a dead hand built for digging fast and getting out — the shutters thrown wide and the wick doubled, the brass scorched black around the glass. Lit, it does not glow so much as roar, throwing a searing white glare that fills a working end to end and sends the pale things flowing for the dark. In its glare a chamber gives up what a dimmer light lets lie — a seam in the rock, a crack, the glint of a dropped tool — so a delver who carries it learns to see more sharply for it. But it drinks oil the way it throws light: five times a brass lantern's thirst, a full fill gone in the time it takes to clear a chamber. You light it when the dark closes in, and you put it out before it leaves you blind in more ways than one.",
@@ -300,7 +301,8 @@
     "weight": 1,
     "value": 70,
     "sellValue": 70,
-    "stackable": true
+    "stackable": true,
+    "rarity": "uncommon"
   },
   "luminescent-gland": {
     "id": "luminescent-gland",
@@ -424,7 +426,8 @@
     "weight": 0,
     "value": 75,
     "stackable": true,
-    "scroll": { "spell": "glimmerskin" }
+    "scroll": { "spell": "glimmerskin" },
+    "rarity": "uncommon"
   },
   "scroll-candlelight": {
     "id": "scroll-candlelight",
@@ -514,7 +517,8 @@
     "weight": 0,
     "value": 90,
     "stackable": true,
-    "scroll": { "spell": "glimmer-spike" }
+    "scroll": { "spell": "glimmer-spike" },
+    "rarity": "uncommon"
   },
   "scroll-witchfire": {
     "id": "scroll-witchfire",
@@ -544,7 +548,8 @@
     "weight": 0,
     "value": 110,
     "stackable": true,
-    "scroll": { "spell": "glimmer-storm" }
+    "scroll": { "spell": "glimmer-storm" },
+    "rarity": "uncommon"
   },
   "scroll-flame-burst": {
     "id": "scroll-flame-burst",
@@ -689,7 +694,8 @@
     "weight": 0,
     "value": 20,
     "stackable": true,
-    "recipe": "insight-draught"
+    "recipe": "insight-draught",
+    "rarity": "uncommon"
   },
   "schematic-might-draught": {
     "id": "schematic-might-draught",
@@ -700,7 +706,8 @@
     "weight": 0,
     "value": 20,
     "stackable": true,
-    "recipe": "might-draught"
+    "recipe": "might-draught",
+    "rarity": "uncommon"
   },
   "mana-tonic": {
     "id": "mana-tonic",
@@ -951,7 +958,8 @@
     "weight": 0,
     "value": 5,
     "stackable": true,
-    "recipe": "searing-flare"
+    "recipe": "searing-flare",
+    "rarity": "uncommon"
   },
   "schematic-barbed-bomb": {
     "id": "schematic-barbed-bomb",
@@ -962,7 +970,8 @@
     "weight": 0,
     "value": 12,
     "stackable": true,
-    "recipe": "craft-barbed-bomb"
+    "recipe": "craft-barbed-bomb",
+    "rarity": "uncommon"
   },
   "schematic-render-oil": {
     "id": "schematic-render-oil",
@@ -992,7 +1001,8 @@
     "weight": 0,
     "value": 80,
     "stackable": true,
-    "recipe": "craft-glimmersteel-staff"
+    "recipe": "craft-glimmersteel-staff",
+    "rarity": "rare"
   },
   "schematic-glimmersteel-lamp": {
     "id": "schematic-glimmersteel-lamp",
@@ -1002,7 +1012,8 @@
     "weight": 0,
     "value": 30,
     "stackable": true,
-    "recipe": "craft-glimmersteel-lamp"
+    "recipe": "craft-glimmersteel-lamp",
+    "rarity": "rare"
   },
   "schematic-glimmersteel-bar": {
     "id": "schematic-glimmersteel-bar",
@@ -1012,7 +1023,8 @@
     "weight": 0,
     "value": 40,
     "stackable": true,
-    "recipe": "glimmersteel"
+    "recipe": "glimmersteel",
+    "rarity": "uncommon"
   },
   "schematic-glimmerglass": {
     "id": "schematic-glimmerglass",
@@ -1062,7 +1074,8 @@
     "weight": 0,
     "value": 60,
     "stackable": true,
-    "recipe": "forge-ring-of-sight"
+    "recipe": "forge-ring-of-sight",
+    "rarity": "uncommon"
   },
   "schematic-ring-of-wits": {
     "id": "schematic-ring-of-wits",
@@ -1072,7 +1085,8 @@
     "weight": 0,
     "value": 60,
     "stackable": true,
-    "recipe": "forge-ring-of-wits"
+    "recipe": "forge-ring-of-wits",
+    "rarity": "uncommon"
   },
   "schematic-regeneration-draught": {
     "id": "schematic-regeneration-draught",
@@ -1082,7 +1096,8 @@
     "weight": 0,
     "value": 30,
     "stackable": true,
-    "recipe": "regeneration-draught"
+    "recipe": "regeneration-draught",
+    "rarity": "uncommon"
   },
   "schematic-mana-tonic": {
     "id": "schematic-mana-tonic",
@@ -1102,7 +1117,8 @@
     "weight": 0,
     "value": 25,
     "stackable": true,
-    "recipe": "acid-bomb"
+    "recipe": "acid-bomb",
+    "rarity": "uncommon"
   },
   "book-of-cooking": {
     "id": "book-of-cooking",
@@ -1131,7 +1147,8 @@
     "type": "material",
     "weight": 1,
     "value": 9,
-    "stackable": true
+    "stackable": true,
+    "rarity": "uncommon"
   },
   "dense-chitin-plate": {
     "id": "dense-chitin-plate",
@@ -1203,27 +1220,21 @@
     "id": "grub",
     "name": "a dead grub",
     "description": "A pale, soft larva, limp and finger-length. Cheap food in a pinch, and the surest bait for what swims in the deep pools.",
-    "type": "consumable",
+    "type": "material",
     "weight": 0,
     "value": 2,
     "stackable": true,
-    "consumable": {
-      "flavour": "You swallow the raw grub down whole, trying not to taste it. Cold and soft, it is barely a mouthful — but it is something.",
-      "effect": { "type": "restore", "hp": 1 }
-    }
+    "consumable": { "flavour": "You swallow the raw grub down whole, trying not to taste it. Cold and soft, it is barely a mouthful — but it is something.", "effect": { "type": "restore", "hp": 1 } }
   },
   "cave-fish": {
     "id": "cave-fish",
     "name": "a blind cave-fish",
     "description": "A pale, eyeless fish hauled dripping from the black water, no longer than a hand. The flesh is cold and faintly translucent. Edible raw at a pinch, and far better over a fire — a staple catch for any camp that learns the trick of the line.",
-    "type": "consumable",
+    "type": "material",
     "weight": 1,
     "value": 5,
     "stackable": true,
-    "consumable": {
-      "flavour": "You eat the raw cave-fish in cold, soft mouthfuls. It is bland and faintly bitter, but it fills the hollow under your ribs.",
-      "effect": { "type": "restore", "hp": 2 }
-    }
+    "consumable": { "flavour": "You eat the raw cave-fish in cold, soft mouthfuls. It is bland and faintly bitter, but it fills the hollow under your ribs.", "effect": { "type": "restore", "hp": 2 } }
   },
   "roasted-grubs": {
     "id": "roasted-grubs",
@@ -1268,14 +1279,11 @@
     "id": "rat-meat",
     "name": "a cut of rat-meat",
     "description": "A stringy, dark haunch off a giant rat. Gamey and tough raw — but meat is meat this near the dark, and cooked down in a broth it eats honest enough. Maeve buys it without asking where it came from.",
-    "type": "consumable",
+    "type": "material",
     "weight": 1,
     "value": 3,
     "stackable": true,
-    "consumable": {
-      "flavour": "You gnaw the raw rat-meat down. It is tough and gamey and cold, but it takes the worst edge off your hunger.",
-      "effect": { "type": "restore", "hp": 2 }
-    }
+    "consumable": { "flavour": "You gnaw the raw rat-meat down. It is tough and gamey and cold, but it takes the worst edge off your hunger.", "effect": { "type": "restore", "hp": 2 } }
   },
   "cooked-skewer": {
     "id": "cooked-skewer",
@@ -1370,7 +1378,8 @@
     "slot": "head",
     "weight": 2,
     "value": 24,
-    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 3, "attrMod": { "wits": -1 } }
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 3, "attrMod": { "wits": -1 } },
+    "rarity": "uncommon"
   },
   "chitin-cuirass": {
     "id": "chitin-cuirass",
@@ -1380,7 +1389,8 @@
     "slot": "body",
     "weight": 6,
     "value": 40,
-    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 6, "attrMod": { "wits": -1 } }
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "maxHp": 6, "attrMod": { "wits": -1 } },
+    "rarity": "uncommon"
   },
   "heavy-chitin-plate": {
     "id": "heavy-chitin-plate",
@@ -1390,7 +1400,8 @@
     "slot": "body",
     "weight": 9,
     "value": 60,
-    "armour": { "armour": 3, "ward": 0, "speedPenalty": 0, "maxHp": 5, "attrMod": { "wits": -3 } }
+    "armour": { "armour": 3, "ward": 0, "speedPenalty": 0, "maxHp": 5, "attrMod": { "wits": -3 } },
+    "rarity": "rare"
   },
   "dense-chitin-cuirass": {
     "id": "dense-chitin-cuirass",
@@ -1413,7 +1424,8 @@
     "weight": 0,
     "value": 45,
     "stackable": true,
-    "recipe": "forge-dense-chitin-cuirass"
+    "recipe": "forge-dense-chitin-cuirass",
+    "rarity": "rare"
   },
   "chitin-maul": {
     "id": "chitin-maul",
@@ -1423,7 +1435,8 @@
     "slot": "hand",
     "weight": 4,
     "value": 34,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } }
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } },
+    "rarity": "uncommon"
   },
   "weeping-lash": {
     "id": "weeping-lash",
@@ -1596,11 +1609,12 @@
     "description": "A knot of living dark, cut cold from the Starving Dark where its centre coiled thickest — no bigger than a fist, and heavier than a thing that size has any right to be. It drinks the light off your hands as you hold it, sheds a chill that has nothing to do with the deep, and never quite sits still in the palm. The Umbrals' glimmer-craft can bind such a heart into worked steel, if a delver knows the trick of it — and Mallki, of all the deep-folk, is the one to ask.",
     "type": "material",
     "weight": 1,
-    "value": 70
+    "value": 120,
+    "rarity": "rare"
   },
   "shadow-shard": {
     "id": "shadow-shard",
-    "rarity": "rare",
+    "rarity": "uncommon",
     "name": "a shadow shard",
     "keywords": ["shadow", "shard", "void", "dark", "splinter"],
     "description": "A splinter of the void made solid — left where a void shadow was unmade by the light, its cold centre crystallised in the instant of its dying. It is black past black, so cold it aches in the palm, and it drinks the glow from the air the way the living dark once did. The deep-folk prize such splinters: there is a glimmer-craft in binding a slain shadow's hunger into worked steel and cloth, though the recipes are not yet a delver's to know. Until then, a trader will pay handsomely for so rare a thing.",
@@ -1709,13 +1723,8 @@
     "slot": "hand",
     "weight": 1,
     "value": 90,
-    "weapon": {
-      "damage": { "physical": "1d4" },
-      "actionCost": 10,
-      "scale": { "attr": "perception", "per": 6 },
-      "crit": 0.05,
-      "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
-    }
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 10, "scale": { "attr": "perception", "per": 6 }, "crit": 0.05, "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }] },
+    "rarity": "rare"
   },
   "glimmerglass-blade": {
     "id": "glimmerglass-blade",
@@ -1726,12 +1735,8 @@
     "slot": "hand",
     "weight": 2,
     "value": 110,
-    "weapon": {
-      "damage": { "physical": "1d8" },
-      "actionCost": 11,
-      "crit": 0.1,
-      "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }]
-    }
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 11, "crit": 0.1, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
+    "rarity": "rare"
   },
   "brood-caul": {
     "id": "brood-caul",
@@ -1809,7 +1814,7 @@
     "type": "material",
     "filterGroup": "consumable",
     "weight": 0,
-    "value": 4,
+    "value": 6,
     "stackable": true
   },
   "iridescent-carapace": {
@@ -1820,7 +1825,8 @@
     "type": "material",
     "weight": 1,
     "value": 14,
-    "stackable": true
+    "stackable": true,
+    "rarity": "uncommon"
   },
   "spring-salt": {
     "id": "spring-salt",

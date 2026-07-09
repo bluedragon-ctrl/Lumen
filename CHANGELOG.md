@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   craftables, so anything `get`/`use`/`attack` can name, `examine` can too.
 
 ### Changed
+- **Items** — rarity updates (lantern, prospectors-blaze-lantern, crystal, scroll-glimmerskin, scroll-glimmer-spike, scroll-glimmer-storm, schematic-insight-draught, schematic-might-draught, schematic-searing-flare, schematic-barbed-bomb, schematic-glimmersteel-staff, schematic-glimmersteel-lamp, schematic-glimmersteel-bar, schematic-ring-of-sight, schematic-ring-of-wits, schematic-regeneration-draught, schematic-acid-bomb, chitin-plate, grub, cave-fish, rat-meat, chitin-helm, chitin-cuirass, heavy-chitin-plate, schematic-dense-chitin-cuirass, chitin-maul, shadow-heart, shadow-shard, hungering-dagger, glimmerglass-blade, emberfruit, iridescent-carapace).
 - **Levelling curve softened and mob XP re-priced by toughness.** `XP_GROWTH`
   drops from `2` → `1.7` in [server/config.js](server/config.js): the old
   doubling made level 10 cost 51,100 XP — more than every mob, room, and quest
