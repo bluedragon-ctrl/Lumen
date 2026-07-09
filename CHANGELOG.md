@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   glow — a neon-blue `"umbral"` or a cave-green `"gloaming"` — layered *over* the
   existing light band, so searing and deep-dark behave exactly as before (the tint
   recedes under `searing` and switches off under `void`/`darkness`). The biome
-  colours the room name, an ambient aura, and gently the description text. First
-  two rooms tagged: **Mallki's Hollow** (umbral) and **The Sunless Landing**
-  (gloaming). Enum-checked by the validator (`BIOMES`); palette and rules live in
-  `client/styles.css` (`.biome-*`). No gameplay effect. See
-  [docs/data-model.md](docs/data-model.md) → *Room*.
+  colours the room name, an ambient aura, and gently the description text. Tagged
+  so far: the **umbral** rooms (Mallki's Hollow, the Umbral Sanctuary, and the
+  Umbral Necropolis) and the **gloaming** rooms (the whole Gloaming gulf and the
+  Falselight approach above it) — 26 rooms across five zones. Enum-checked by the
+  validator (`BIOMES`); palette and rules live in `client/styles.css` (`.biome-*`).
+  No gameplay effect. See [docs/data-model.md](docs/data-model.md) → *Room*.
 - **Login screen (pick / create / delete a prospector).** The client now opens on
   a visual login screen instead of a bare name prompt: existing prospectors are
   listed (each with their level) one click to enter, a field creates a new one,

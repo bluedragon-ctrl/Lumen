@@ -1516,6 +1516,7 @@
   "d5.falselight.dawn": {
     "id": "d5.falselight.dawn",
     "zone": "falselight",
+    "biome": "gloaming",
     "tags": ["water"],
     "name": "The False Dawn",
     "depth": 5,
@@ -1529,6 +1530,7 @@
   "d5.falselight.brink": {
     "id": "d5.falselight.brink",
     "zone": "falselight",
+    "biome": "gloaming",
     "tags": ["water"],
     "name": "The Steaming Brink",
     "depth": 5,
@@ -1542,6 +1544,7 @@
   "d5.falselight.descent": {
     "id": "d5.falselight.descent",
     "zone": "falselight",
+    "biome": "gloaming",
     "tags": ["water"],
     "name": "The Weeping Stair",
     "depth": 5,
@@ -1568,6 +1571,7 @@
   "d6.gloaming.gallery": {
     "id": "d6.gloaming.gallery",
     "zone": "gloaming",
+    "biome": "gloaming",
     "name": "The Fungal Gallery",
     "depth": 6,
     "ambientLight": 2,
@@ -1580,6 +1584,7 @@
   "d6.gloaming.terraces": {
     "id": "d6.gloaming.terraces",
     "zone": "gloaming",
+    "biome": "gloaming",
     "tags": ["water"],
     "name": "The Steaming Terraces",
     "depth": 6,
@@ -1593,6 +1598,7 @@
   "d6.gloaming.hollow": {
     "id": "d6.gloaming.hollow",
     "zone": "gloaming",
+    "biome": "gloaming",
     "name": "The Droning Hollow",
     "depth": 6,
     "ambientLight": 3,
@@ -1605,6 +1611,7 @@
   "d6.gloaming.larder": {
     "id": "d6.gloaming.larder",
     "zone": "gloaming",
+    "biome": "gloaming",
     "name": "The Shucked Crawl",
     "depth": 6,
     "ambientLight": 1,
@@ -1617,6 +1624,7 @@
   "d6.gloaming.throat": {
     "id": "d6.gloaming.throat",
     "zone": "gloaming",
+    "biome": "gloaming",
     "tags": ["water"],
     "name": "The Gulf Throat",
     "depth": 6,
@@ -1896,6 +1904,7 @@
   "d8.necropolis.gate": {
     "id": "d8.necropolis.gate",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Grave-Gate",
     "depth": 8,
     "ambientLight": 0,
@@ -1910,6 +1919,7 @@
   "d8.necropolis.causeway": {
     "id": "d8.necropolis.causeway",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Bone Causeway",
     "depth": 8,
     "ambientLight": -1,
@@ -1925,6 +1935,7 @@
   "d8.necropolis.niches": {
     "id": "d8.necropolis.niches",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Niche-Walls",
     "depth": 8,
     "ambientLight": -1,
@@ -1944,6 +1955,7 @@
   "d8.necropolis.plaza": {
     "id": "d8.necropolis.plaza",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Ancestor Plaza",
     "depth": 8,
     "ambientLight": 0,
@@ -1962,6 +1974,7 @@
   "d8.necropolis.ossuary": {
     "id": "d8.necropolis.ossuary",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Ossuary",
     "depth": 8,
     "ambientLight": -1,
@@ -1978,6 +1991,7 @@
   "d8.necropolis.procession": {
     "id": "d8.necropolis.procession",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Silent Procession",
     "depth": 8,
     "ambientLight": -1,
@@ -1993,6 +2007,7 @@
   "d8.necropolis.vault": {
     "id": "d8.necropolis.vault",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Tomb-Foot",
     "depth": 8,
     "ambientLight": 0,
@@ -2008,6 +2023,7 @@
   "d8.necropolis.crypt": {
     "id": "d8.necropolis.crypt",
     "zone": "umbral-necropolis",
+    "biome": "umbral",
     "name": "The Sealed Crypt",
     "depth": 8,
     "ambientLight": -2,
@@ -2183,6 +2199,7 @@
   "d9.sanctuary.landing": {
     "id": "d9.sanctuary.landing",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "name": "The Sanctuary Threshold",
     "depth": 9,
     "ambientLight": 1,
@@ -2195,6 +2212,7 @@
   "d9.sanctuary.hall": {
     "id": "d9.sanctuary.hall",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "name": "The Warded Hall",
     "depth": 9,
     "ambientLight": 1,
@@ -2207,6 +2225,7 @@
   "d9.sanctuary.shrine": {
     "id": "d9.sanctuary.shrine",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "name": "The Umbral Shrine",
     "depth": 9,
     "ambientLight": 1,
@@ -2221,6 +2240,7 @@
   "d9.sanctuary.garden": {
     "id": "d9.sanctuary.garden",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "tags": ["grazing"],
     "name": "The Glow Garden",
     "depth": 9,
@@ -2238,6 +2258,7 @@
   "d9.sanctuary.hollow": {
     "id": "d9.sanctuary.hollow",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "tags": ["grazing"],
     "name": "The Grub Hollow",
     "depth": 9,
@@ -2256,6 +2277,7 @@
   "d9.sanctuary.cistern": {
     "id": "d9.sanctuary.cistern",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "tags": ["grazing", "water"],
     "name": "The Kept Cistern",
     "depth": 9,
@@ -2272,6 +2294,7 @@
   "d9.sanctuary.basin": {
     "id": "d9.sanctuary.basin",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "tags": ["water"],
     "name": "The Plunge Basin",
     "depth": 9,
@@ -2289,6 +2312,7 @@
   "d9.sanctuary.run": {
     "id": "d9.sanctuary.run",
     "zone": "umbral-sanctuary",
+    "biome": "umbral",
     "name": "The Centipede Run",
     "depth": 9,
     "ambientLight": 0,
