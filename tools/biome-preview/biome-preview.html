@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lumen — biome preview</title>
+<!-- The REAL game stylesheet (served by biome-preview.js). The preview pane
+     below uses the game's own classes, so the mechanism, light bands, and any
+     shipped biome tokens render exactly as in the client — no drift. -->
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  /* Proposed biomes not yet in client/styles.css. Adding a biome to the game is
+     literally these two lines (a token + a `.biome-*` rule) plus a BIOMES enum
+     entry — this block is the staging area; the "Copy CSS" button emits it. */
+  :root {
+    --biome-ember: #e08a44;
+    --biome-rim: #f2c14e;
+    --biome-mire: #a4e22a;
+  }
+  .biome-ember { --biome: var(--biome-ember); }
+  .biome-rim   { --biome: var(--biome-rim); }
+  .biome-mire  { --biome: var(--biome-mire); }
+
+  /* --- tool chrome (distinct classes so it never collides with game CSS) --- */
+  .lab { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; align-items: start; }
+  .lab h1 { grid-column: 1 / -1; margin: 0 0 2px; font-size: 20px; font-weight: 700; color: #eef2f6; }
+  .lab .sub { grid-column: 1 / -1; margin: 0 0 14px; font-size: 12.5px; color: var(--muted); max-width: 80ch; line-height: 1.5; }
+  .panel { border: 1px solid var(--edge); border-radius: 8px; background: #0e1218; padding: 14px; }
+  .panel + .panel { margin-top: 14px; }
+  .panel h2 { margin: 0 0 10px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { font: 12px/1 ui-monospace, Consolas, monospace; color: var(--text); background: var(--panel-2); border: 1px solid var(--edge); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+  .seg button:hover { border-color: var(--accent); }
+  .seg button[aria-pressed="true"] { border-color: var(--accent); color: #fff; background: #16202a; box-shadow: 0 0 0 1px rgba(127,176,208,.4); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pick { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .pick input[type="color"] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--edge); border-radius: 5px; background: none; cursor: pointer; }
+  .pick .nm { flex: 1; font-size: 13px; }
+  .pick .badge { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--edge); border-radius: 4px; padding: 1px 5px; }
+  .pick .badge.shipped { color: var(--rarity-uncommon); border-color: #2f5b3f; }
+  .pick input[type="text"] { width: 82px; font: 12px ui-monospace, Consolas, monospace; color: var(--text); background: var(--panel-2); border: 1px solid var(--edge); border-radius: 5px; padding: 5px 6px; }
+  .previewwrap { position: sticky; top: 22px; }
+  .previewwrap .pane { max-width: 100%; }
+  .hint { font-size: 11.5px; color: var(--muted); margin: 10px 2px 0; line-height: 1.5; }
+  .copybtn { font: 12px ui-monospace, Consolas, monospace; color: #fff; background: #16202a; border: 1px solid var(--accent); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+  .copybtn:hover { background: #1b2836; }
+  #css-out { width: 100%; margin-top: 10px; min-height: 150px; font: 11.5px/1.5 ui-monospace, Consolas, monospace; color: #cdd6df; background: var(--panel-2); border: 1px solid var(--edge); border-radius: 6px; padding: 10px; white-space: pre; overflow: auto; resize: vertical; }
+  @media (max-width: 760px) { .lab { grid-template-columns: 1fr; } .previewwrap { position: static; } }
+</style>
+</head>
+<body>
+  <div class="lab">
+    <h1>Biome preview</h1>
+    <p class="sub">Live over the real <code>client/styles.css</code>. Pick a biome and a light band to see the pane; drag a colour to test a new hue. Description tint (28%) and text brightness (56% lift) are baked into the shipped CSS, so they're fixed here — this bench is for the hue. When happy, <strong>Copy CSS</strong> and paste into <code>client/styles.css</code> + add the name to <code>BIOMES</code> in <code>tools/validate-data.js</code>.</p>
+
+    <div>
+      <div class="panel">
+        <h2>Biome</h2>
+        <div class="seg" id="seg-biome"></div>
+      </div>
+      <div class="panel">
+        <h2>Light band</h2>
+        <div class="seg" id="seg-band"></div>
+        <p class="hint">The tint recedes under <code>searing</code> and switches off under <code>void</code>/<code>darkness</code> — try them to confirm the shipped behaviour.</p>
+      </div>
+      <div class="panel">
+        <h2>Colours</h2>
+        <div id="picks"></div>
+      </div>
+      <div class="panel">
+        <h2>Export</h2>
+        <button class="copybtn" id="copy">Copy CSS + enum</button>
+        <textarea id="css-out" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="previewwrap">
+      <section class="pane">
+        <div id="inspect" class="light-bright biome-umbral">
+          <header class="inspect-head">
+            <span id="room-name">Mallki's Hollow</span>
+            <span id="light-meter" class="light-meter">light: bright · depth 3</span>
+          </header>
+          <p id="room-desc" class="room-desc"></p>
+          <div class="row" id="row-exits"></div>
+          <div class="row" id="row-here"></div>
+        </div>
+      </section>
+      <p class="hint">The preview pane above is the game's own markup and classes, styled by the live <code>/styles.css</code>. What you see is what the client renders.</p>
+    </div>
+  </div>
+
+<script>
+  // key, label, whether it's already in client/styles.css, default hue, and a
+  // sample room so the pane reads like the real thing.
+  const BIOMES = [
+    { key: "umbral", label: "Umbral", shipped: true, def: "#34b3ff",
+      room: { name: "Mallki's Hollow", depth: 3, desc: "A cold glimmer-lamp throws a soft, heatless blue over shelves of river-shells and neat stacks of dried fungus. There are no torches and no flame; the light here is kept low and kind.", here: [["item rarity-rare", "umbral shard"], ["mob", "Mallki the qhatuq"]] } },
+    { key: "gloaming", label: "Gloaming", shipped: true, def: "#5cb87a",
+      room: { name: "The Sunless Landing", depth: 6, desc: "The glow comes in patches, from clumps of moss clinging to the dripping walls, and pools of warm dark lie between them. The air is hot, wet enough to drink, heavy with green rot.", here: [["item rarity-uncommon", "spore-cap"]] } },
+    { key: "ember", label: "Ember", shipped: false, def: "#e08a44",
+      room: { name: "Cinder Gullet", depth: 5, desc: "Heat climbs in sheets from a vent of molten rock below. The walls run orange and black, and the air tastes of struck flint. Shadows jump where the fire breathes.", here: [["mob hostile", "cinder-thing"]] } },
+    { key: "rim", label: "Rim", shipped: false, def: "#f2c14e",
+      room: { name: "The Rim Plaza", depth: 0, desc: "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering.", here: [["mob", "Hale the watchman"]] } },
+    { key: "mire", label: "Slime", shipped: false, def: "#a4e22a",
+      room: { name: "The Sump", depth: 7, desc: "The floor sweats a slick, acid film, and the slugs leave it glistening where they drag. The air is thick and sweetish and it stings the eyes.", here: [["mob hostile", "bloated slug"]] } },
+  ];
+  const BANDS = ["darkness", "void", "dim", "bright", "searing"];
+
+  const $ = (id) => document.getElementById(id);
+  const root = document.documentElement;
+  let biome = "umbral", band = "bright";
+
+  // Seed every biome var on :root (shipped ones already have a value from the
+  // real CSS; read it so the picker starts from the true shipped hue).
+  const colors = {};
+  for (const b of BIOMES) {
+    const live = getComputedStyle(root).getPropertyValue("--biome-" + b.key).trim();
+    colors[b.key] = /^#/.test(live) ? live : b.def;
+    root.style.setProperty("--biome-" + b.key, colors[b.key]);
+  }
+
+  function buildSeg(el, items, get, set) {
+    el.innerHTML = "";
+    for (const it of items) {
+      const b = document.createElement("button");
+      b.textContent = it.label;
+      b.setAttribute("aria-pressed", String(get() === it.value));
+      b.addEventListener("click", () => { set(it.value); render(); });
+      el.appendChild(b);
+    }
+  }
+
+  function chip(cls, text) {
+    const s = document.createElement("span");
+    s.className = "chip " + cls;
+    s.textContent = text;
+    return s;
+  }
+
+  function render() {
+    const b = BIOMES.find((x) => x.key === biome);
+    $("inspect").className = "pane light-" + band + (biome === "none" ? "" : " biome-" + biome);
+    // segments (re-mark pressed state)
+    for (const el of document.querySelectorAll("#seg-biome button")) el.setAttribute("aria-pressed", String(el.textContent === (b ? b.label : "None")));
+    for (const el of document.querySelectorAll("#seg-band button")) el.setAttribute("aria-pressed", String(el.textContent === band));
+
+    const room = b ? b.room : { name: "Bare Chamber", depth: 1, desc: "A plain worked hollow, no biome tag — the pane wears only its light band.", here: [] };
+    $("room-name").textContent = room.name;
+    const dark = band === "void" || band === "darkness";
+    $("light-meter").textContent = `light: ${band}` + (room.depth != null ? ` · depth ${room.depth}` : "") + (dark ? " ⚠ blind" : "");
+    const desc = $("room-desc");
+    if (dark) { desc.className = "room-desc placeholder"; desc.textContent = "It is too dark to see. You can make out nothing here — a light source would help."; }
+    else { desc.className = "room-desc"; desc.textContent = room.desc; }
+
+    const ex = $("row-exits"); ex.innerHTML = "";
+    const here = $("row-here"); here.innerHTML = "";
+    if (!dark) {
+      const l1 = document.createElement("span"); l1.className = "label"; l1.textContent = "exits"; ex.appendChild(l1);
+      ex.appendChild(chip("exit", "north → deeper"));
+      const l2 = document.createElement("span"); l2.className = "label"; l2.textContent = "here"; here.appendChild(l2);
+      for (const [cls, t] of room.here) here.appendChild(chip(cls, t));
+    }
+  }
+
+  function buildPicks() {
+    const wrap = $("picks");
+    wrap.innerHTML = "";
+    for (const b of BIOMES) {
+      const row = document.createElement("div"); row.className = "pick";
+      const color = document.createElement("input"); color.type = "color"; color.value = colors[b.key];
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = b.label;
+      const badge = document.createElement("span"); badge.className = "badge" + (b.shipped ? " shipped" : ""); badge.textContent = b.shipped ? "shipped" : "proposed";
+      const hex = document.createElement("input"); hex.type = "text"; hex.value = colors[b.key];
+      const apply = (v) => {
+        if (!/^#[0-9a-fA-F]{6}$/.test(v)) return;
+        colors[b.key] = v.toLowerCase();
+        root.style.setProperty("--biome-" + b.key, colors[b.key]);
+        color.value = colors[b.key]; hex.value = colors[b.key];
+        if (biome !== b.key) { biome = b.key; render(); } else render();
+      };
+      color.addEventListener("input", () => apply(color.value));
+      hex.addEventListener("change", () => apply(hex.value.trim()));
+      row.append(color, nm, badge, hex);
+      wrap.appendChild(row);
+    }
+  }
+
+  function exportCSS() {
+    const tokens = BIOMES.map((b) => `  --biome-${b.key}: ${colors[b.key]};`).join("\n");
+    const pad = Math.max(...BIOMES.map((b) => b.key.length));
+    const rules = BIOMES.map((b) => `.biome-${b.key.padEnd(pad)} { --biome: var(--biome-${b.key}); }`).join("\n");
+    const enumLine = `const BIOMES = [${BIOMES.map((b) => `"${b.key}"`).join(", ")}];`;
+    return `/* client/styles.css — :root tokens */\n${tokens}\n\n/* client/styles.css — rules (near the other .biome-* rules) */\n${rules}\n\n/* tools/validate-data.js */\n${enumLine}`;
+  }
+
+  buildSeg($("seg-biome"), [...BIOMES.map((b) => ({ label: b.label, value: b.key })), { label: "None", value: "none" }], () => biome, (v) => biome = v);
+  buildSeg($("seg-band"), BANDS.map((v) => ({ label: v, value: v })), () => band, (v) => band = v);
+  buildPicks();
+  $("css-out").value = exportCSS();
+  $("copy").addEventListener("click", async () => {
+    const css = exportCSS();
+    $("css-out").value = css;
+    try { await navigator.clipboard.writeText(css); $("copy").textContent = "Copied ✓"; setTimeout(() => $("copy").textContent = "Copy CSS + enum", 1400); }
+    catch { $("css-out").select(); }
+  });
+  render();
+</script>
+</body>
+</html>

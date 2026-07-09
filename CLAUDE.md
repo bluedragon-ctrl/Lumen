@@ -64,6 +64,12 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   per-room `spawns` (mob / max / respawn) and `groundItems` (template / qty /
   hidden / respawn) in `data/world/rooms.json`; validates and can open a PR via
   `gh`.
+- `tools/biome-preview/` — browser-based biome colour lab (`npm run
+  preview-biomes` or `tools/biome-preview/start.bat`, port 3943). **Read-only.**
+  Links the live `client/styles.css` so the preview pane renders exactly what the
+  client does; pick a biome + light band, drag colours to test a new hue, and
+  copy the token/rule/enum CSS to paste into `client/styles.css` +
+  `tools/validate-data.js` (`BIOMES`). Writes nothing.
 - `DESIGN.md` — pillars and design intent. `docs/lore.md` — **canon world & lore**;
   the reference for authored/AI-generated content (consistency rules included).
   `CHANGELOG.md` — keep-a-changelog.

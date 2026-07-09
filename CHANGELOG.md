@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Falselight approach above it) — 26 rooms across five zones. Enum-checked by the
   validator (`BIOMES`); palette and rules live in `client/styles.css` (`.biome-*`).
   No gameplay effect. See [docs/data-model.md](docs/data-model.md) → *Room*.
+- **Biome colour lab (`tools/biome-preview/`).** A read-only, browser-based bench
+  for designing room biomes (`npm run preview-biomes` / `start.bat`, port 3943).
+  It links the live `client/styles.css`, so the preview pane renders exactly what
+  the client does — no drift; pick a biome and light band, drag colours to test a
+  new hue (shipped biomes plus proposed ember/rim/slime), and copy paste-ready
+  token/rule/`BIOMES` CSS. Writes nothing.
 - **Login screen (pick / create / delete a prospector).** The client now opens on
   a visual login screen instead of a bare name prompt: existing prospectors are
   listed (each with their level) one click to enter, a field creates a new one,

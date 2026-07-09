@@ -31,6 +31,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/depth-viewer/depth-viewer.js"],
       "port": 3942
+    },
+    {
+      "name": "biome-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/biome-preview/biome-preview.js"],
+      "port": 3943
     }
   ]
 }
