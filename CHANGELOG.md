@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Login screen (pick / create / delete a prospector).** The client now opens on
+  a visual login screen instead of a bare name prompt: existing prospectors are
+  listed (each with their level) one click to enter, a field creates a new one,
+  and a `✕` deletes one behind a confirmation step (permanent, dev-only — no
+  passwords yet). Creation
+  and deletion are available to anyone at the screen (mirroring the dev-only
+  intent); deleting an admin account, or a prospector who is currently logged in,
+  is refused.
+  A separate **Log in as Admin** entry is shown only when `SHOW_ADMIN_LOGIN` is
+  on in `server/config.js` (default; set `SHOW_ADMIN_LOGIN=0` in the environment
+  to hide it — the admin account still boots, but can't be entered from the
+  client). New login-phase protocol frames: `accounts` (server roster),
+  `create-account` / `delete-account` (client). See [server/README.md](README.md)
+  → *Login*.
 - **Attribute-gated doors (`door.requires`).** A door fixture can now gate
   *opening* on an **effective** attribute score — `{ attr, value, failText?,
   successText? }` in its `door` block. The door only yields to a delver whose

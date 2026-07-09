@@ -47,11 +47,12 @@ function connect() {
   ws.onclose = () => {
     authed = false;
     setPrompt();
+    showLogin(); // fall back to the login screen while we're not in-game
     if (loggedOff) {
-      addLine("[logged off — you may close this tab, or reload the page to return]", "system");
+      showLoginMsg("You have logged off. Reload the page to return.");
       return; // a deliberate quit: don't auto-retry the connection.
     }
-    addLine("[disconnected — retrying in 2s]", "error");
+    showLoginMsg("Disconnected — reconnecting…");
     setTimeout(connect, 2000);
   };
   ws.onmessage = (e) => handle(JSON.parse(e.data));
@@ -65,19 +66,123 @@ function sendCommand(text) {
 function sendLogin(name) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name }));
 }
+function sendCreateAccount(name) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name }));
+}
+function sendDeleteAccount(name) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "delete-account", name }));
+}
 function setPrompt() {
   cmdEl.placeholder = authed
     ? 'type a command — try "look", "down", "light", "help"'
-    : 'enter your delver name (or "admin") and press Enter';
+    : 'enter your prospector name (or "admin") and press Enter';
 }
+
+// --- Login screen ----------------------------------------------------------
+// Pick / create / delete a prospector before the game loads. The server owns the
+// roster (an `accounts` frame on connect and after every create/delete); the
+// screen just renders it and posts back login/create/delete intents.
+const loginEl = $("login");
+const loginListEl = $("login-list");
+const loginMsgEl = $("login-msg");
+const loginNameEl = $("login-name");
+const loginAdminEl = $("login-admin");
+let adminName = null; // who the "Log in as Admin" button logs in as
+let pendingDelete = null; // prospector awaiting delete confirmation
+
+function showLogin() { loginEl.hidden = false; }
+function hideLogin() {
+  loginEl.hidden = true;
+  showLoginMsg(null);
+  cmdEl.focus();
+}
+function showLoginMsg(text, kind) {
+  if (!text) { loginMsgEl.hidden = true; loginMsgEl.textContent = ""; return; }
+  loginMsgEl.hidden = false;
+  loginMsgEl.textContent = text;
+  loginMsgEl.className = "login-msg" + (kind ? " " + kind : "");
+}
+
+function renderLogin(msg) {
+  authed = false;
+  showLogin();
+  adminName = msg.adminName || null;
+  loginAdminEl.hidden = !msg.showAdmin;
+
+  loginListEl.innerHTML = "";
+  const prospectors = msg.accounts || [];
+  if (!prospectors.length) {
+    const li = document.createElement("li");
+    li.className = "login-empty";
+    li.textContent = "No prospectors yet — create one below.";
+    loginListEl.appendChild(li);
+  }
+  for (const { name, level } of prospectors) {
+    const li = document.createElement("li");
+    li.className = "login-row";
+    const pick = document.createElement("button");
+    pick.type = "button";
+    pick.className = "login-pick";
+    const nm = document.createElement("span");
+    nm.className = "login-pick-name";
+    nm.textContent = name;
+    const lvl = document.createElement("span");
+    lvl.className = "login-lvl";
+    lvl.textContent = "Lv " + (level ?? 1);
+    pick.append(nm, lvl);
+    pick.addEventListener("click", () => { showLoginMsg(null); sendLogin(name); });
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "login-del";
+    del.title = `Delete ${name}`;
+    del.setAttribute("aria-label", `Delete ${name}`);
+    del.textContent = "✕";
+    del.addEventListener("click", () => askDelete(name));
+    li.appendChild(pick);
+    li.appendChild(del);
+    loginListEl.appendChild(li);
+  }
+
+  // A `notice` rides the frame after a create/delete succeeds; clear the input
+  // so the just-created name doesn't linger. Otherwise clear any stale status
+  // (e.g. the "Connecting…" line) now the fresh roster is in.
+  if (msg.notice) { showLoginMsg(msg.notice, "ok"); loginNameEl.value = ""; }
+  else showLoginMsg(null);
+}
+
+// Delete needs a confirmation step — it removes the character permanently.
+function askDelete(name) {
+  pendingDelete = name;
+  $("login-confirm-text").textContent =
+    `Delete prospector “${name}”? This removes their character permanently and cannot be undone.`;
+  $("login-confirm").hidden = false;
+}
+function closeConfirm() { pendingDelete = null; $("login-confirm").hidden = true; }
+
+$("login-create").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = loginNameEl.value.trim();
+  if (!name) return;
+  showLoginMsg(null);
+  sendCreateAccount(name);
+});
+loginAdminEl.addEventListener("click", () => { showLoginMsg(null); sendLogin(adminName || "admin"); });
+$("login-confirm-cancel").addEventListener("click", closeConfirm);
+$("login-confirm-delete").addEventListener("click", () => {
+  if (pendingDelete) sendDeleteAccount(pendingDelete);
+  closeConfirm();
+});
 
 // --- Message handling ------------------------------------------------------
 function handle(msg) {
   switch (msg.type) {
-    case "login-required": authed = false; setPrompt(); addLine(msg.text, "system"); break;
-    case "authenticated": authed = true; setPrompt(); break;
+    case "accounts": renderLogin(msg); break;
+    case "authenticated": authed = true; setPrompt(); hideLogin(); break;
     case "system": addLine(msg.text, "system"); break;
-    case "error": addLine(msg.text, "error"); break;
+    // Before login the console is hidden behind the login screen, so surface
+    // login errors (bad name, already-logged-in, delete refused) on the screen
+    // itself; once in-game they scroll past in the console as before.
+    case "error": if (!authed) showLoginMsg(msg.text, "error"); else addLine(msg.text, "error"); break;
     case "log": addLine(msg.text, "log"); break;
     case "goodbye": addLine(msg.text, "system"); loggedOff = true; if (ws) ws.close(); break;
     case "combat": addLine(msg.text, "combat"); break;
@@ -507,6 +612,7 @@ document.addEventListener("keydown", (ev) => {
 });
 
 document.addEventListener("keydown", (ev) => {
+  if (!authed) return; // login screen owns the keyboard until we're in-game
   if (document.activeElement === cmdEl) return;
   if (ev.ctrlKey || ev.metaKey || ev.altKey || ev.key.length !== 1) return;
   cmdEl.focus();
@@ -516,12 +622,7 @@ cmdEl.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") {
     const text = cmdEl.value.trim();
     if (!text) return;
-    if (!authed) {
-      addLine("> " + text, "echo");
-      sendLogin(text);
-      cmdEl.value = "";
-      return;
-    }
+    if (!authed) { cmdEl.value = ""; return; } // login happens on the login screen
     addLine("> " + text, "echo");
     sendCommand(text);
     history.push(text);
@@ -547,4 +648,6 @@ $("inv-filters").addEventListener("click", e => {
 });
 
 setPrompt();
+showLogin();
+showLoginMsg("Connecting…");
 connect();

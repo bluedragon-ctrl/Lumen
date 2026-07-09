@@ -74,4 +74,38 @@ function listNames() {
   return fs.readdirSync(PLAYERS_DIR).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5));
 }
 
-module.exports = { validateName, exists, load, save, saveAsync, listNames, PLAYERS_DIR };
+// Every account paired with its admin flag, so the login screen can offer
+// admins as a separate (hideable) option and never list them among the
+// pickable prospectors. Reads each file once — fine at dev scale (a handful of
+// characters); a corrupt file is treated as a non-admin prospector rather than
+// blocking the whole list.
+function summaries() {
+  return listNames().map((key) => {
+    // Filenames are lowercased (see keyOf); prefer the character's stored display
+    // name so the roster shows "Kara", not "kara". Falls back to the filename for
+    // an unreadable file (treated as a non-admin prospector rather than blocking the
+    // whole list).
+    let name = key, isAdmin = false, level = 1;
+    try {
+      const data = load(key);
+      if (data && typeof data.name === "string") name = data.name;
+      isAdmin = !!data.isAdmin;
+      if (Number.isFinite(data.level)) level = data.level;
+    } catch {
+      /* unreadable file — surface the filename, assume non-admin, level 1 */
+    }
+    return { name, isAdmin, level };
+  });
+}
+
+// Permanently delete a character file (login-screen delete; dev affordance).
+// Returns false if there was nothing to remove.
+function remove(name) {
+  const f = fileOf(name);
+  if (!fs.existsSync(f)) return false;
+  fs.unlinkSync(f);
+  lastSaved.delete(keyOf(name));
+  return true;
+}
+
+module.exports = { validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR };

@@ -7,6 +7,39 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <!-- Login screen: pick, create, or delete a prospector before the game loads.
+       Dev-only, name-only (no passwords). The "Log in as Admin" entry is
+       hideable via SHOW_ADMIN_LOGIN in server/config.js. Shown as a full-screen
+       overlay until the server confirms authentication. -->
+  <div id="login" class="login-screen" hidden>
+    <div class="login-card">
+      <h1 class="login-title">Lumen</h1>
+      <p class="login-sub">A descent into light and dark. Choose your prospector.</p>
+      <p id="login-msg" class="login-msg" hidden></p>
+
+      <ul id="login-list" class="login-list" aria-label="Prospectors"></ul>
+
+      <form id="login-create" class="login-create">
+        <input id="login-name" type="text" autocomplete="off" autocapitalize="off"
+               spellcheck="false" maxlength="20" placeholder="new prospector name" />
+        <button type="submit" class="login-btn">Create</button>
+      </form>
+
+      <button id="login-admin" class="login-btn login-admin" type="button" hidden>Log in as Admin</button>
+    </div>
+
+    <!-- Delete confirmation -->
+    <div id="login-confirm" class="login-confirm" hidden>
+      <div class="login-card login-confirm-card">
+        <p id="login-confirm-text" class="login-confirm-text"></p>
+        <div class="login-confirm-actions">
+          <button id="login-confirm-cancel" class="login-btn ghost" type="button">Cancel</button>
+          <button id="login-confirm-delete" class="login-btn danger" type="button">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main id="app">
     <!-- Console: append-only event/history log -->
     <section id="console" class="pane" aria-label="Console">

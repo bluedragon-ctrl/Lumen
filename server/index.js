@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { WebSocketServer } = require("ws");
 
-const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION } = require("./config");
+const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION, SHOW_ADMIN_LOGIN } = require("./config");
 const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView, buildExamineView } = require("./render");
@@ -126,6 +126,59 @@ const httpServer = http.createServer(serveClient);
 // ---------------------------------------------------------------------------
 const wss = new WebSocketServer({ server: httpServer });
 
+// The login-screen roster: pickable prospectors, plus whether an admin login is
+// on offer. Admin accounts are never listed among the prospectors — they're
+// reached only via the separate (config-hideable) admin option, whose name we
+// hand back so the client's one-click button knows who to log in as.
+function accountsPayload(notice) {
+  const prospectors = [];
+  let adminName = null;
+  for (const a of accounts.summaries()) {
+    if (a.isAdmin) adminName = adminName || a.name;
+    else prospectors.push({ name: a.name, level: a.level });
+  }
+  prospectors.sort((a, b) => a.name.localeCompare(b.name));
+  return {
+    type: "accounts",
+    accounts: prospectors,
+    showAdmin: SHOW_ADMIN_LOGIN && adminName != null,
+    adminName: SHOW_ADMIN_LOGIN ? adminName : null,
+    notice: notice || null,
+  };
+}
+
+// Create a fresh character from the login screen (dev affordance — no passwords,
+// anyone at the screen may add a prospector). Mirrors admin `@create-player`,
+// then refreshes the caller's roster so the new name appears.
+function createAccount(ws, rawName) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
+  accounts.save(state.createCharacter(v.name, {}));
+  console.log(`[lumen] created prospector "${v.name}" from the login screen.`);
+  send(ws, accountsPayload(`Created prospector "${v.name}".`));
+}
+
+// Permanently delete a character from the login screen. Guarded against the two
+// cases that would corrupt live state: an admin account (never deletable here)
+// and a prospector who is currently logged in.
+function deleteAccount(ws, rawName) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (!accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `No prospector named "${v.name}".` });
+  if (accounts.load(v.name).isAdmin)
+    return void send(ws, { type: "error", text: "The admin account can't be deleted." });
+  for (const p of state.players.values()) {
+    if (p.name.toLowerCase() === v.name.toLowerCase())
+      return void send(ws, { type: "error", text: `"${p.name}" is currently logged in — can't delete them.` });
+  }
+  accounts.remove(v.name);
+  console.log(`[lumen] deleted prospector "${v.name}" from the login screen.`);
+  send(ws, accountsPayload(`Deleted prospector "${v.name}".`));
+}
+
 function login(ws, rawName) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
@@ -136,10 +189,15 @@ function login(ws, rawName) {
   if (!accounts.exists(v.name)) {
     return void send(ws, {
       type: "error",
-      text: `No delver named "${v.name}". Ask an admin to create your account.`,
+      text: `No prospector named "${v.name}".`,
     });
   }
-  const player = state.admit(accounts.load(v.name));
+  const data = accounts.load(v.name);
+  // Admin logins can be switched off in config; the account still exists and
+  // boots, but it can't be entered from the client.
+  if (data.isAdmin && !SHOW_ADMIN_LOGIN)
+    return void send(ws, { type: "error", text: "Admin login is disabled." });
+  const player = state.admit(data);
   ws.playerId = player.id;
   connections.set(player.id, ws);
   state.rooms[player.location].light = state.computeRoomLight(player.location);
@@ -157,7 +215,7 @@ function login(ws, rawName) {
 
 wss.on("connection", (ws) => {
   ws.playerId = null; // null until authenticated
-  send(ws, { type: "login-required", text: 'Enter your delver name (or "admin"):' });
+  send(ws, accountsPayload()); // seed the login screen with the current roster
 
   ws.on("message", (raw) => {
     let msg;
@@ -166,11 +224,20 @@ wss.on("connection", (ws) => {
     } catch {
       return void send(ws, { type: "error", text: "malformed message (expected JSON)" });
     }
-    // Login phase: the first input is the player's name.
+    // Login phase: the socket drives the login screen (pick / create / delete)
+    // until a successful login attaches a playerId.
     if (!ws.playerId) {
-      const name = msg.type === "login" ? msg.name : msg.type === "command" ? msg.text : null;
-      if (name == null) return void send(ws, { type: "error", text: "Please enter your name." });
-      return void login(ws, name);
+      switch (msg.type) {
+        case "login":
+          if (typeof msg.name !== "string") return void send(ws, { type: "error", text: "Please choose a prospector." });
+          return void login(ws, msg.name);
+        case "create-account":
+          return void createAccount(ws, msg.name);
+        case "delete-account":
+          return void deleteAccount(ws, msg.name);
+        default:
+          return void send(ws, { type: "error", text: "Please choose or create a prospector first." });
+      }
     }
     const player = state.players.get(ws.playerId);
     if (msg.type === "command" && typeof msg.text === "string") {

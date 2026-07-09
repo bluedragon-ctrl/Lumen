@@ -15,6 +15,17 @@ module.exports = {
   CLIENT_DIR: path.resolve(__dirname, "..", "client"),
   VERSION: require("../package.json").version,
 
+  // The login screen offers a one-click "Log in as Admin" entry (a dev
+  // affordance — login is name-only, no passwords). Set SHOW_ADMIN_LOGIN to
+  // 0/false/no/off in the environment to hide it: the admin account still
+  // exists and boots as normal, but it's dropped from the login screen and any
+  // attempt to log in as an admin account is refused. Everything else on the
+  // screen (pick / create / delete a delver) stays available.
+  SHOW_ADMIN_LOGIN:
+    process.env.SHOW_ADMIN_LOGIN == null
+      ? true
+      : !/^(0|false|no|off)$/i.test(process.env.SHOW_ADMIN_LOGIN.trim()),
+
   // Leveling: `xp` is a lifetime total. The XP increment for level N→N+1 is
   // XP_BASE * XP_GROWTH^(N-1) — so 1→2 costs XP_BASE, and each further level
   // costs XP_GROWTH× the last. Each level gained grants POINTS_PER_LEVEL
