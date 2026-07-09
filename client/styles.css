@@ -319,3 +319,88 @@ body {
 @media (max-width: 720px) {
   #app { grid-template-columns: 1fr; grid-template-areas: "console" "inspect" "player" "status" "command"; grid-template-rows: 1fr auto auto auto auto; }
 }
+
+/* Login screen ----------------------------------------------------------- */
+/* A full-screen overlay shown before the game loads: pick / create / delete a
+   prospector (dev-only, name-only). Sits above #app until authentication. */
+.login-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  background: radial-gradient(120% 120% at 50% 0%, #12171d 0%, var(--bg) 70%);
+}
+/* An explicit `display:flex` above outranks the UA `[hidden]` rule, so restore
+   hiding at higher specificity — otherwise the overlay (and the delete modal)
+   would stay on screen even when toggled off. */
+.login-screen[hidden], .login-confirm[hidden] { display: none; }
+.login-card {
+  width: 100%; max-width: 420px;
+  background: var(--panel); border: 1px solid var(--edge); border-radius: 10px;
+  padding: 26px 24px; box-shadow: 0 18px 48px rgba(0, 0, 0, .5);
+}
+.login-title {
+  margin: 0; font-size: 30px; font-weight: 700; letter-spacing: .12em;
+  text-align: center; color: var(--lumin);
+  text-shadow: 0 0 18px rgba(216, 200, 115, .35);
+}
+.login-sub { margin: 6px 0 18px; text-align: center; color: var(--muted); font-size: 13px; }
+
+.login-msg {
+  margin: 0 0 14px; padding: 8px 10px; border-radius: 6px; font-size: 13px;
+  background: var(--panel-2); border: 1px solid var(--edge); color: var(--system);
+}
+.login-msg.error { color: var(--combat); border-color: rgba(201, 138, 138, .5); }
+.login-msg.ok { color: var(--rarity-uncommon); border-color: rgba(92, 184, 122, .5); }
+
+.login-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.login-empty { color: var(--muted); font-style: italic; text-align: center; padding: 10px 0; }
+.login-row { display: flex; gap: 6px; }
+.login-pick {
+  flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  text-align: left; padding: 10px 12px;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--edge); border-radius: 6px; cursor: pointer;
+  font: inherit; transition: border-color .12s, color .12s, background .12s;
+}
+.login-pick:hover { border-color: var(--accent); color: var(--accent); }
+.login-pick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.login-lvl { flex: 0 0 auto; font-size: 12px; color: var(--muted); }
+.login-pick:hover .login-lvl { color: var(--accent); }
+.login-del {
+  flex: 0 0 auto; width: 38px;
+  background: var(--panel-2); color: var(--muted);
+  border: 1px solid var(--edge); border-radius: 6px; cursor: pointer; font: inherit;
+  transition: border-color .12s, color .12s;
+}
+.login-del:hover { border-color: var(--hostile); color: var(--hostile); }
+
+.login-create { display: flex; gap: 6px; margin-bottom: 12px; }
+#login-name {
+  flex: 1; padding: 10px 12px;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--edge); border-radius: 6px; font: inherit;
+}
+#login-name:focus { outline: none; border-color: var(--accent); }
+
+.login-btn {
+  padding: 10px 16px; font: inherit; cursor: pointer;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--edge); border-radius: 6px;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.login-btn:hover { border-color: var(--accent); color: var(--accent); }
+.login-admin { display: block; width: 100%; margin-top: 4px; color: var(--lumin); }
+.login-admin:hover { border-color: var(--lumin); color: var(--lumin); }
+.login-btn.ghost:hover { border-color: var(--muted); color: var(--text); }
+.login-btn.danger { color: var(--hostile); }
+.login-btn.danger:hover { border-color: var(--hostile); color: #fff; background: rgba(208, 127, 127, .18); }
+
+/* Delete confirmation — a modal within the overlay. */
+.login-confirm {
+  position: fixed; inset: 0; z-index: 110;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; background: rgba(0, 0, 0, .6);
+}
+.login-confirm-card { max-width: 380px; }
+.login-confirm-text { margin: 0 0 18px; color: var(--text); line-height: 1.5; }
+.login-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }

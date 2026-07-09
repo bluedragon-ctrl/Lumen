@@ -84,11 +84,11 @@
   "Umbral and human alike," and abandoned camps are named environmental
   storytelling. Roster: **hollowed prospectors** (early/mid-stage husks going
   through the motions of a dead camp — cold forge, dead hearth), and a **claim-mad
-  survivor** boss who fights *like a delver*: wears armour, throws a flare to blind
+  survivor** boss who fights *like a prospector*: wears armour, throws a flare to blind
   *you*, drinks a potion mid-fight.
 - **Light twist:** first enemy that uses the player's own toolkit (light-as-weapon
   pointed back at you).
-- **Loot hook:** delver gear/schematics; a register quest thread for Fenn the reeve (his
+- **Loot hook:** prospector gear/schematics; a register quest thread for Fenn the reeve (his
   dialogue already keeps "the roll of the ones who stopped coming up").
 - **Review:** Strong and lore-perfect. Differentiate the husks from the Umbral
   Necropolis's — these are **human** and mid-stage, not the necropolis's deep
@@ -116,7 +116,7 @@
 - **Problem it fixes:** `tremor-mole` is near-invisible today. It spawns in just two
   rooms (one near the top, one at the deep waterfall), has **empty loot**, does
   nothing memorable, and **flees at `lightAbove: 1`** — the faintest light sends it
-  digging, so a delver carrying any real light never actually *sees* one. The
+  digging, so a prospector carrying any real light never actually *sees* one. The
   creature is designed to be missed.
 - **The refinement — give the species an ecology and a home:**
   - **Bold young (commonly visible):** a `young-tremor-mole` variant that is *not*
@@ -147,7 +147,7 @@
 
 ## 5. Human Bandit Camp — the living-human enemy class · BUILT
 - **Depth:** ~1–2 · **Theme:** hostile living humans · **Lift:** JSON + server (new faction) · **Verdict:** ✅ **BUILT** ("The Seized Working")
-- Claim-jumpers / deserters preying on delvers. Fits the frontier tone (the Rim has
+- Claim-jumpers / deserters preying on prospectors. Fits the frontier tone (the Rim has
   "no formal law"; Hale is the only watch). Introduces **sane, hostile humans**
   early — tactical fighters in armour, coordinated, who may use flares/potions.
 - **Pairs well with #2:** mundane human greed at 1–2 → tragic dark-taken humans at
@@ -177,7 +177,7 @@
   captain; drops **the Foreman's brigandine**), and **the camp warder** (a hedge-mage who lights
   the camp and fights from range with Witchfire/Spark and a self-cast Mage Armour; drops **a
   warder's staff**). The whole crew fights as a **coordinated unit** — every outlaw is a `helper`
-  (assist: attack one and its roommates pile on) and `pursues` up to **3 rooms** (a fleeing delver
+  (assist: attack one and its roommates pile on) and `pursues` up to **3 rooms** (a fleeing prospector
   is run down through the camp and out into the approach, the Foreman included). Sentries/prospectors
   drop, at a low chance, a camp's ordinary supplies — an iron weapon, lamp-oil, a torch, or simple
   cooked food. No new mob-uses-items code was needed — the roster is built

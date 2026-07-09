@@ -24,7 +24,7 @@ below is rumour, and the danger rises with the depth.
 
 The Abyss has depth, and it has a **rhythm**. The dark is not the same from one hour to the
 next: it **rises and ebbs** on a slow cycle that moves through the whole Abyss at once, and
-at its height the deep grows darker, colder, and hungrier than at its ebb. Delvers call it
+at its height the deep grows darker, colder, and hungrier than at its ebb. Prospectors call it
 the **Tide** — it comes in and it goes out, and nothing that lives below is untouched by it.
 
 - **It is Abyss-wide, and it comes in phases.** Between tides lies the **calm**, when lights
@@ -40,7 +40,7 @@ the **Tide** — it comes in and it goes out, and nothing that lives below is un
   far down with a failing lamp. Prospectors time their descents and climbs by it; the
   cautious are already climbing when the light starts to thin.
 
-**It is known, but not understood.** *That* the Tide comes, and roughly when, delvers can
+**It is known, but not understood.** *That* the Tide comes, and roughly when, prospectors can
 tell — they live and die by its timing. *What* it is, and what drives its cycle, no one
 knows (see *Deliberately unknown*). It may be the dark's own slow breathing; it may be
 something the Abyss does that has no name. Author it as a **known, reliable rhythm** — lean
@@ -79,13 +79,13 @@ Rule of thumb for authored spells: a spell that **consumes shards** (`shardCost`
 glimmer-craft; one that costs **mana only** is the human tradition — keep its flavour
 text clear of glimmer-as-medium.
 
-Both traditions are **learnable** — a delver studies them, pays a cost, and casts at
+Both traditions are **learnable** — a prospector studies them, pays a cost, and casts at
 will. There is a **third kind of magic that is not a tradition at all**: the things of
 the deep simply *do* it. A living shadow drinks a room dark; a beast steeped too long in
 that dark learns to fling a little of it back. These are **the deep's own workings** —
 innate, never taught, never paid for in mana or shards (mob-only spells carry
 `manaCost 0` and no `shardCost`: *Snuff*, *Drink the Light*, *Gloom Bolt*). They are not
-a school a delver could enrol in but a property of the deep itself, and the further down
+a school a prospector could enrol in but a property of the deep itself, and the further down
 you go the more of them you meet. Author them as something a creature *is*, not something
 it *knows*; their flavour may **gesture** at the dark as their source but must never
 explain it (see *Deliberately unknown*).
@@ -94,9 +94,12 @@ explain it (see *Deliberately unknown*).
 
 A gold-rush, in everything but the metal. Word of glimmer has drawn
 fortune-seekers, sellswords, alchemists, and the desperate from across the world to
-prospect the Abyss. **Delvers are prospectors** — think permits, rich-seam rumours,
-boomtown prices, sudden fortunes, and the many who never come back up. This framing
-should colour the tone of all surface content.
+prospect the Abyss. Those who go down are **prospectors** (the player among them) —
+think permits, rich-seam rumours, boomtown prices, sudden fortunes, and the many who
+never come back up. This framing should colour the tone of all surface content.
+
+> **Terminology:** the people who descend are **prospectors**. Use that word in
+> all player-facing content and lore; the older synonym *delver* is retired.
 
 ## The Rim
 
@@ -120,9 +123,9 @@ A subterranean humanoid race native to the Abyss — there long before the Rush.
   ordinary underground-ecosystem traits — NOT caused by glimmer.)*
 - **Culture:** they craft with glimmer and are quiet masters of **stonemasonry**,
   carving reliefs into the cave walls. This explains the worked passages, old
-  stonework, and carvings delvers find below.
+  stonework, and carvings prospectors find below.
 - **Settlements:** Umbral **villages** lie deeper in the Abyss. The first Umbral a
-  delver meets on the descent is **Mallki the qhatuq** (trader), who keeps a
+  prospector meets on the descent is **Mallki the qhatuq** (trader), who keeps a
   lamp-lit hollow and a tended fungus garden beside the underground river of the
   third floor. Far below, past the warded sanctuary and its kept fields, the deepest
   known village was **lost to the dark** (see *The Hollowing*) — a place the surviving
@@ -130,7 +133,7 @@ A subterranean humanoid race native to the Abyss — there long before the Rush.
 - **Language:** the Umbral tongue draws on **Quechua** roots for its flavour —
   soft, rounded, sparse. A few words surface in their speech and place-names
   (*qhatuq* — trader; *paqcha* — waterfall; *yaku-runa* — "water-folk", their name
-  for the delvers who follow the river down). Keep it to a word or two; Umbrals
+  for the prospectors who follow the river down). Keep it to a word or two; Umbrals
   speak little to outsiders, and content should never render a whole translated
   sentence.
 - **The quiet tension:** glimmer matters to the Umbrals too. The Rush is, unspoken,
@@ -253,8 +256,8 @@ it carries its own light with it.
 Below the fifth floor, east of the Gullet, the Abyss changes its character. The cold dry
 dark gives way to **warmth and wet**: hot vents breathe steam into the air, water runs and
 gathers into steaming pools, and overhead the rock vanishes behind a **canopy of light**.
-To a delver climbing out of the black it looks like nothing so much as daylight under a
-green sky — the one place in the deep that looks *alive*, and *kind*. It is neither. Delvers
+To a prospector climbing out of the black it looks like nothing so much as daylight under a
+green sky — the one place in the deep that looks *alive*, and *kind*. It is neither. Prospectors
 call it **the Gloaming**, for the standing dusk-light that fills it and never breaks into a
 true day.
 
@@ -271,7 +274,7 @@ also feeding on what the light draws up to it.
 for once there is light in plenty — constant, generous, green. So things *grow*: fungi the
 size of trees, whose aged stalks harden into workable timber; soft ferns thick in the warm
 damp; pale luminous fruit on the canopy's lower fronds. It is the closest the deep comes to
-a garden, and it keeps a gentler trade than the rest of the Abyss — a place delvers come to
+a garden, and it keeps a gentler trade than the rest of the Abyss — a place prospectors come to
 **forage, gather, and weave** (its Chasm-Moss is the richest source of gloom-silk known)
 rather than to mine and kill.
 
@@ -279,14 +282,14 @@ rather than to mine and kill.
 the cave-dark runs on light-*fearing* things, the Gloaming runs on light-*loving* ones —
 grazers that come to bask and feed, and hunters grown fat on what the standing dusk lures
 into the open. The vents that sweeten the air will **scald** the careless, and the canopy
-itself feeds. A delver reads the green light as safety and lets their guard down; the hollow
+itself feeds. A prospector reads the green light as safety and lets their guard down; the hollow
 is built, root and branch, to punish exactly that. Its danger sits *beside* the depth-ladder
 rather than on it — not the Hollowing, not glimmer's work, but plain hungry **ecology**
 wearing the face of a refuge.
 
 **It keeps the Abyss's hours.** When the **Tide** rises (see *The Tide*), even the gloaming
 answers to it: the glow gutters out across the roof until the warm garden lies in full dark. Whether the moss draws its
-light inward or the rising dark simply reaches it too, no one can say. Delvers know only
+light inward or the rising dark simply reaches it too, no one can say. Prospectors know only
 that the safest-seeming place in the deep does not stay lit, and that to be caught beneath
 the dead canopy when the light goes is to learn what the warmth was gathering all along.
 

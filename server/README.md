@@ -44,18 +44,33 @@ JSON messages over a single socket per player.
 
 ### Login
 
-On connect the server sends `{ "type": "login-required", "text": "…" }`. The
-client's first input is the player **name** (name-only identity for now):
+On connect (and after every create/delete) the server sends the login-screen
+roster; the client renders it as a pick / create / delete screen (dev-only,
+name-only identity — no passwords):
 
 ```json
-{ "type": "login", "name": "admin" }      // client → server
-{ "type": "authenticated", "name": "admin", "admin": true }  // server → client (on success)
+// server → client: the roster (each prospector carries their level)
+{ "type": "accounts",
+  "accounts": [{ "name": "Bob", "level": 3 }, { "name": "Kara", "level": 1 }],
+  "showAdmin": true, "adminName": "admin", "notice": null }
+
+// client → server: pick, create, or delete a prospector
+{ "type": "login", "name": "Bob" }
+{ "type": "create-account", "name": "Kara" }
+{ "type": "delete-account", "name": "Kara" }
+
+// server → client: on a successful login
+{ "type": "authenticated", "name": "Bob", "admin": false }
 ```
 
-Unknown names are rejected (admin-only account creation; admins use
-`@create-player <name>`). The `admin` account is auto-created on first boot.
-Accounts persist as one JSON file per character under `data/runtime/players/`
-(gitignored), saved on disconnect and periodically.
+Admin accounts never appear in `accounts` — they're offered separately via
+`adminName`, and the whole admin option is hidden (and admin logins refused)
+when `SHOW_ADMIN_LOGIN` is off in `server/config.js` (env: `SHOW_ADMIN_LOGIN=0`).
+Delete is refused for admin accounts and for any prospector currently logged in.
+The `admin` account is auto-created on first boot; admins can also create
+prospectors in-game with `@create-player <name>`. Accounts persist as one JSON file
+per character under `data/runtime/players/` (gitignored), saved on disconnect
+and periodically.
 
 ### Commands
 
