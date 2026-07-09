@@ -2,6 +2,7 @@
   "d0.plaza": {
     "id": "d0.plaza",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Rim Plaza",
     "description": "The heart of the Rim — a boomtown thrown up in a single season at the very lip of the abyss, all green timber and oiled canvas crowded onto bare rock. Prospectors from a dozen distant lands jostle and haggle here, every other voice talking glimmer: who struck a rich seam, who went down and never came up. Iron lanterns sway on their chains, and a cold updraft breathes up from the dark to set the light shivering. Lanes lead off to the inn in the north, the market east, and the craftsmen's row to the west. Southward the cobbles give way to the descent.",
@@ -15,6 +16,7 @@
   "d0.inn": {
     "id": "d0.inn",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Lantern's Rest",
     "description": "Warmth and low talk spill from a long common room. A great hearth throws orange light across crowded benches, and the smell of broth and tallow hangs thick. Delvers nurse their drinks here between descents, trading rumours of what waits below. The plaza lies back through the door to the south.",
@@ -32,6 +34,7 @@
   "d0.cellar": {
     "id": "d0.cellar",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Inn Cellar",
     "description": "A cramped, earthen-floored cellar that smells less of stores than of straw and warm vermin. Casks and broth-crocks are shoved to one wall to clear the rest: a long pen of stacked crates and chicken-wire where dog-sized rats churn over a trough of kitchen scraps and gnawed bones, fat and unhurried and entirely unafraid of people. A cleaver and a coil of twine hang by the ladder, and the straw in the corner is dark with old stains. Whatever Maeve tells the delvers upstairs, the broth-pot's meat is bred down here. The ladder climbs back up to the common room.",
     "depth": 0,
@@ -44,6 +47,7 @@
   "d0.market": {
     "id": "d0.market",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Rim Market",
     "description": "An open lane of stalls under oiled canvas, crowding both sides so a delver threads between them — torches, coils of rope, racks of plain steel. The quartermaster trades from the busiest stall in what a delver needs and buys back what they haul up — shards, glimmer, whatever the dark gives up — from those who come up at all. The plaza lies west; past the last stalls the soft glow of the lightbug hatchery draws you north, a rutted lane of prospectors' lodgings runs east toward the town's landward gate, and a plank-and-canvas registry office leans against the lane's south side.",
@@ -57,6 +61,7 @@
   "d0.claims": {
     "id": "d0.claims",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Reeve's Office",
     "description": "A plank-and-canvas annex leaning against the market's south side, smelling of ink, tallow, and old paper. A wall of pigeonholes stuffed with permits and licenses climbs to the canvas roof, and a notice board by the door-flap hangs crowded with postings — bounties, standing orders, and notices — in Fenn's careful copy-hand. Behind the counter, a chained ledger holds the name of every soul who went below — come up and gone, or quiet too long. The market lane lies back north.",
@@ -70,6 +75,7 @@
   "d0.hatchery": {
     "id": "d0.hatchery",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Lightbug Hatchery",
     "description": "A long shed of stacked glass cells aglow with captive lightbugs, their massed shimmer washing the canvas walls a soft blue-white. Down in the abyss the bugs drift wild; here the Rim breeds them — for the steady, fuel-free light a delver can carry, and for the luminous glands the alchemists prize. Wick, who works all three of the Rim's farming sheds out of here, moves along the cells with a long gauze net. The market lies back south; a smell of churned moss and livestock drifts in from the stockpens to the north, and to the west the bug-glow bleeds through into the mushroom beds.",
     "depth": 0,
@@ -85,6 +91,7 @@
   "d0.corral": {
     "id": "d0.corral",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["grazing"],
     "name": "The Stockpens",
     "description": "A canvas-roofed yard of low stone pens, hazed blue at one end by the glow leaking through from the hatchery. Here the Rim keeps its stonebugs — squat, grazing boulders of grey plate, fattened on troughs of lit moss and broken down for meat, shell, and tallow when the broth-pots run low. The ground is churned soft with their slow tracks, and the air is thick with the warm-earth reek of the herd. Wick tends the pens out of the hatchery to the south, between her other chores; new hands sharpen their nerve on the penned bugs before they ever take the descent. The hatchery lies back south, and a gap in the back wall opens east onto the strip of dead ground behind the pens.",
@@ -98,6 +105,7 @@
   "d0.backpens": {
     "id": "d0.backpens",
     "zone": "rim",
+    "biome": "rim",
     "name": "Behind the Stockpens",
     "description": "East of the pens the made ground gives out into a strip of bare rock the builders never bothered to floor — a dead-end yard of rubble and old straw, walled on three sides by the stone backs of the stockpens. The herd-reek thins here, and something sourer creeps in under it: a sharp, chemical sting, like crushed beetle. The dirt is scored with long drag-marks, all of them running the same way, toward the base of the north wall — and there a heavy stonebug shell lies cracked open and licked clean. The pens are back west.",
     "depth": 0,
@@ -113,6 +121,7 @@
   "d0.burrow": {
     "id": "d0.burrow",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Drag-Burrow",
     "description": "A burrow gnawed back into the fault-rock, close and lightless, the walls slick with a film that stings the eyes. This is where the dragging ends: stonebug shells lie heaped and split along the floor, the meat scraped from them, loose chitin plates strewn where they fell. The sour venom-reek is thick enough to taste, and a cold draft breathes through a hairline seam in the back wall — the same dark that splits the Riven Yard, come up under the pens. Somewhere in the black the thing that made this nest shifts its hundred legs against the stone. The crack back out lies south.",
     "depth": 0,
@@ -129,6 +138,7 @@
   "d0.fault": {
     "id": "d0.fault",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Riven Yard",
     "depth": 0,
     "ambientLight": 2,
@@ -142,6 +152,7 @@
   "d0.mushroomfarm": {
     "id": "d0.mushroomfarm",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Mushroom Beds",
     "description": "Stacked timber beds of dark, dampened soil run the length of a low canvas lean-to, each one furred with the plump, ivory palecaps the Rim cooks down for broth. There are no lanterns here — the beds drink the blue bug-light bleeding through the shared wall from the hatchery, for in the dark, fungus grows only where the light reaches. Pale grubs inch over the richest beds, fattening on the crop; Wick lets them be, and picks them off for bait when they grow bold. The hatchery is back east.",
     "depth": 0,
@@ -158,6 +169,7 @@
   "d0.mageshed": {
     "id": "d0.mageshed",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Mage's Shed",
     "description": "A timber shed set a little apart from the lodging-lane's clamour, crammed with the trappings of the arcane — shelves of stoppered glass, a pestle grey with ground glimmer, and an alchemist's bench of coils and cold burners. Vesper keeps her workshop here, one of the scholar-mages the glimmer drew to the Rim; she studies the mineral's strange light, and trades in what her craft can make of it. A banded trapdoor is sunk into the floorboards, leading down to wherever she does her louder work. The prospectors' lane lies back north, the market beyond it.",
     "depth": 0,
@@ -170,6 +182,7 @@
   "d0.training": {
     "id": "d0.training",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Warded Cellar",
     "description": "A low stone cellar dug beneath the shed, the rough walls chalked from floor to ceiling with sigils and crossings-out — Vesper's working notes, written large. This is where she lets a delver learn the feel of a spell with something fighting back: a wisp coaxed loose from the glimmer and pinned inside a warding ring scored into the floor, snapping its cold light at anything that comes near. The only way up is the ladder back through the trapdoor.",
     "depth": 0,
@@ -182,6 +195,7 @@
   "d0.street": {
     "id": "d0.street",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "Prospectors' Walk",
     "description": "A rutted dirt street running east off the market, both sides crowded with the leaning plank-and-tarpaulin sheds where the prospectors doss between delves — bunks stacked three high, wet gear steaming on lines, the low murmur of folk who came down with the Rush and never went back up. This is where the Rim actually sleeps. The market stalls lie back west, Vesper's shed sits apart to the south, and the street runs on east to the town's landward gate.",
@@ -195,6 +209,7 @@
   "d0.roadgate": {
     "id": "d0.roadgate",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Landward Gate",
     "description": "The street gives out at the settlement's landward wall, where a heavy iron gate stands chained and padlocked across the old road — the way the Rush first came down, and the only way overland back out to the wider world. It hasn't been swung open in a long while: the chain is orange with rust, and the lane beyond lies dark and untravelled. For now there is nowhere to go but back west, into the lamplight.",
@@ -208,6 +223,7 @@
   "d0.workshop": {
     "id": "d0.workshop",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Craftsmen's Row",
     "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
@@ -221,6 +237,7 @@
   "d0.gate": {
     "id": "d0.gate",
     "zone": "rim",
+    "biome": "rim",
     "tags": ["patrol"],
     "name": "The Descent Gate",
     "description": "The lanterns thin out here, at the edge of the settlement. A low stone arch frames the path south, and beyond it the ground falls away into shadow. A weathered sign warns delvers to count their light before they go down. The plaza is north.",
@@ -234,6 +251,7 @@
   "d0.descent": {
     "id": "d0.descent",
     "zone": "rim",
+    "biome": "rim",
     "name": "The Mouth of the Shaft",
     "description": "The path ends at a great black throat in the rock — the way down. A timber winch and a frayed rope lean over the drop, and the last of the rim-light dies a few feet past the edge. The cold from below is constant now. The gate lies north; the abyss waits down.",
     "depth": 0,
@@ -1028,6 +1046,7 @@
   "d3.landing": {
     "id": "d3.landing",
     "zone": "third",
+    "biome": "water",
     "tags": ["water"],
     "name": "The River Stair",
     "depth": 3,
@@ -1041,6 +1060,7 @@
   "d3.shallows": {
     "id": "d3.shallows",
     "zone": "third",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Pale Shallows",
     "depth": 3,
@@ -1057,6 +1077,7 @@
   "d3.pools": {
     "id": "d3.pools",
     "zone": "third",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Still Pools",
     "depth": 3,
@@ -1070,6 +1091,7 @@
   "d3.falls": {
     "id": "d3.falls",
     "zone": "third",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Sunless Falls",
     "depth": 3,
@@ -1083,6 +1105,7 @@
   "d3.cave": {
     "id": "d3.cave",
     "zone": "third",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Plunge Cave",
     "depth": 3,
@@ -1143,6 +1166,7 @@
   "d4.lake.strand": {
     "id": "d4.lake.strand",
     "zone": "fourth-lake",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Drowned Strand",
     "depth": 4,
@@ -1161,6 +1185,7 @@
   "d4.lake.shallows": {
     "id": "d4.lake.shallows",
     "zone": "fourth-lake",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Black Shallows",
     "depth": 4,
@@ -1177,6 +1202,7 @@
   "d4.lake.narrows": {
     "id": "d4.lake.narrows",
     "zone": "fourth-lake",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Shorewalk Narrows",
     "depth": 4,
@@ -1192,6 +1218,7 @@
   "d4.lake.farshore": {
     "id": "d4.lake.farshore",
     "zone": "fourth-lake",
+    "biome": "water",
     "tags": ["water"],
     "name": "The Far Bank",
     "depth": 4,
@@ -1207,6 +1234,7 @@
   "d4.lake.causeway": {
     "id": "d4.lake.causeway",
     "zone": "fourth-lake",
+    "biome": "water",
     "name": "The Gravel Spit",
     "depth": 4,
     "ambientLight": 1,
@@ -1221,6 +1249,7 @@
   "d4.lake.islet": {
     "id": "d4.lake.islet",
     "zone": "fourth-lake",
+    "biome": "water",
     "name": "The King's Reach",
     "depth": 4,
     "ambientLight": 1,
@@ -1278,6 +1307,7 @@
   "d4.lake.shrine": {
     "id": "d4.lake.shrine",
     "zone": "fourth-lake",
+    "biome": "water",
     "name": "Behind the Paqcha",
     "depth": 4,
     "ambientLight": 0,
@@ -1652,6 +1682,7 @@
   "d7.throat": {
     "id": "d7.throat",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "Where the Dark Goes Bad",
     "depth": 7,
     "ambientLight": -1,
@@ -1669,6 +1700,7 @@
   "d7.hall": {
     "id": "d7.hall",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Crawling Hall",
     "depth": 7,
     "ambientLight": 0,
@@ -1685,6 +1717,7 @@
   "d7.drift": {
     "id": "d7.drift",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Moulting Drift",
     "depth": 7,
     "ambientLight": 0,
@@ -1703,6 +1736,7 @@
   "d7.midden": {
     "id": "d7.midden",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Bone Field",
     "depth": 7,
     "ambientLight": 0,
@@ -1721,6 +1755,7 @@
   "d7.gallery": {
     "id": "d7.gallery",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Long Gallery",
     "depth": 7,
     "ambientLight": 0,
@@ -1736,6 +1771,7 @@
   "d7.brood": {
     "id": "d7.brood",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Brood-Heart",
     "depth": 7,
     "ambientLight": 0,
@@ -1751,6 +1787,7 @@
   "d7.chasm": {
     "id": "d7.chasm",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Black Chimney",
     "depth": 7,
     "ambientLight": 0,
@@ -1764,6 +1801,7 @@
   "d7.hush": {
     "id": "d7.hush",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Hush",
     "depth": 7,
     "ambientLight": 0,
@@ -1778,6 +1816,7 @@
   "d7.relict": {
     "id": "d7.relict",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Last Claim",
     "depth": 7,
     "ambientLight": 0,
@@ -1793,6 +1832,7 @@
   "d7.lair": {
     "id": "d7.lair",
     "zone": "gloom-warren",
+    "biome": "mutant",
     "name": "The Drowned Black",
     "depth": 7,
     "ambientLight": 0,
@@ -1808,6 +1848,7 @@
   "d8.drop": {
     "id": "d8.drop",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Sounding Drop",
     "depth": 8,
     "ambientLight": 0,
@@ -1822,6 +1863,7 @@
   "d8.cistern": {
     "id": "d8.cistern",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "tags": ["water"],
     "name": "The Cistern",
     "depth": 8,
@@ -1841,6 +1883,7 @@
   "d8.plungefoot": {
     "id": "d8.plungefoot",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "tags": ["water"],
     "name": "The Plunge Foot",
     "depth": 8,
@@ -1858,6 +1901,7 @@
   "d8.ledge": {
     "id": "d8.ledge",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "tags": ["water"],
     "name": "The Chasm Ledge",
     "depth": 8,
@@ -2046,6 +2090,7 @@
   "d8.silt": {
     "id": "d8.silt",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "Silt Crawl",
     "depth": 8,
     "ambientLight": 0,
@@ -2062,6 +2107,7 @@
   "d8.backwash": {
     "id": "d8.backwash",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "tags": ["water"],
     "name": "The Backwash",
     "depth": 8,
@@ -2078,6 +2124,7 @@
   "d8.broodsump": {
     "id": "d8.broodsump",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "Broodsump",
     "depth": 8,
     "ambientLight": 0,
@@ -2094,6 +2141,7 @@
   "d8.cache": {
     "id": "d8.cache",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Drowned Cache",
     "depth": 8,
     "ambientLight": 0,
@@ -2111,6 +2159,7 @@
   "d8.steps": {
     "id": "d8.steps",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "tags": ["water"],
     "name": "The Weeping Steps",
     "depth": 8,
@@ -2124,6 +2173,7 @@
   "d8.reliefs": {
     "id": "d8.reliefs",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Waking Reliefs",
     "depth": 8,
     "ambientLight": 0,
@@ -2141,6 +2191,7 @@
   "d8.watch": {
     "id": "d8.watch",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Hollow Watch",
     "depth": 8,
     "ambientLight": 0,
@@ -2155,6 +2206,7 @@
   "d8.stair": {
     "id": "d8.stair",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Umbral Stair",
     "depth": 8,
     "ambientLight": 0,
@@ -2167,6 +2219,7 @@
   "d8.camp": {
     "id": "d8.camp",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Prospectors' Last Camp",
     "depth": 8,
     "ambientLight": 0,
@@ -2182,6 +2235,7 @@
   "d8.grotto": {
     "id": "d8.grotto",
     "zone": "sunken-warren",
+    "biome": "mutant",
     "name": "The Slug Grotto",
     "depth": 8,
     "ambientLight": 1,
@@ -2329,6 +2383,7 @@
   "d8.midden.seam": {
     "id": "d8.midden.seam",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Sour Seam",
     "depth": 8,
     "ambientLight": 0,
@@ -2344,6 +2399,7 @@
   "d8.midden.pit": {
     "id": "d8.midden.pit",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Reeking Midden",
     "depth": 8,
     "ambientLight": 0,
@@ -2362,6 +2418,7 @@
   "d8.midden.gorge": {
     "id": "d8.midden.gorge",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Gorge Pools",
     "depth": 8,
     "ambientLight": 0,
@@ -2383,6 +2440,7 @@
   "d8.midden.alcove": {
     "id": "d8.midden.alcove",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Witchglow Cleft",
     "depth": 8,
     "ambientLight": 1,
@@ -2399,6 +2457,7 @@
   "d8.midden.descent": {
     "id": "d8.midden.descent",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Sour Descent",
     "depth": 8,
     "ambientLight": 0,
@@ -2414,6 +2473,7 @@
   "d8.midden.lair": {
     "id": "d8.midden.lair",
     "zone": "sour-midden",
+    "biome": "slime",
     "name": "The Glut's Pit",
     "depth": 8,
     "ambientLight": 0,

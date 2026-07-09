@@ -28,6 +28,11 @@
   /* Darkness-tainted Umbrals — the "grey ones", the nameless. Umbral's cyan-blue
      pulled toward the dark, so the colour reads as "umbral, sickened". */
   --biome-wraith: #7a5fd6;
+  --biome-rim: #f2c14e;    /* lantern gold — the surface town */
+  --biome-water: #2a5cd0;  /* deep water — the lakes and drowned reaches */
+  --biome-slime: #a4e22a;  /* toxic acid-lime — the slug middens */
+  --biome-mutant: #c0392b; /* blood-crimson — the dark-warped vermin nests */
+  --biome-ember: #e08a44;  /* lava orange — volcanic/heat (upcoming content) */
 }
 
 * { box-sizing: border-box; }
@@ -229,6 +234,11 @@ body {
 .biome-umbral   { --biome: var(--biome-umbral); }
 .biome-gloaming { --biome: var(--biome-gloaming); }
 .biome-wraith   { --biome: var(--biome-wraith); }
+.biome-rim      { --biome: var(--biome-rim); }
+.biome-water    { --biome: var(--biome-water); }
+.biome-slime    { --biome: var(--biome-slime); }
+.biome-mutant   { --biome: var(--biome-mutant); }
+.biome-ember    { --biome: var(--biome-ember); }
 /* Ambient glow: a soft radial aura off the top edge + a faint inner ring, both
    in the biome hue, breathing slowly. z-index -1 keeps it above the panel
    background but behind the (non-positioned) room text, so nothing else needs

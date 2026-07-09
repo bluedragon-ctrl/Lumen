@@ -11,19 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   glow layered *over* the existing light band, so searing and deep-dark behave
   exactly as before (the tint recedes under `searing` and switches off under
   `void`/`darkness`). The biome colours the room name, an ambient aura, and gently
-  the description text. Three biomes so far: **umbral** (neon blue — the living
-  deep-folk: Mallki's Hollow and the Umbral Sanctuary), **gloaming** (cave green —
-  the Gloaming gulf and the Falselight approach), and **wraith** (a cold violet,
-  umbral's blue sickened by the dark — the Umbral Necropolis and its
-  darkness-tainted, nameless dead). 26 rooms across five zones. Enum-checked by
-  the validator (`BIOMES`); palette and rules live in `client/styles.css`
+  the description text. Seven biomes, 86 rooms: **umbral** (neon blue — the living
+  deep-folk), **wraith** (cold violet, umbral's blue sickened by the dark — the
+  Umbral Necropolis), **gloaming** (cave green — the gulf and the Falselight
+  approach), **slime** (acid-lime — the sour-midden slug warren), **mutant**
+  (blood-crimson — the dark-warped vermin nests of the sunken and gloom warrens),
+  **water** (deep blue — the fourth-depth lake and the river stair), and **rim**
+  (lantern gold — the surface town). An eighth, **ember** (lava orange), is defined
+  but untagged, reserved for upcoming volcanic content. Enum-checked by the
+  validator (`BIOMES`); palette and rules live in `client/styles.css`
   (`.biome-*`). No gameplay effect. See [docs/data-model.md](docs/data-model.md) → *Room*.
 - **Biome colour lab (`tools/biome-preview/`).** A read-only, browser-based bench
   for designing room biomes (`npm run preview-biomes` / `start.bat`, port 3943).
   It links the live `client/styles.css`, so the preview pane renders exactly what
-  the client does — no drift; pick a biome and light band, drag colours to test a
-  new hue (shipped umbral/gloaming/wraith plus proposed ember/water/rim/slime/mutant),
-  and copy paste-ready token/rule/`BIOMES` CSS. Writes nothing.
+  the client does — no drift; pick any of the eight biomes and a light band, drag
+  colours to test a new hue, and copy paste-ready token/rule/`BIOMES` CSS. Writes
+  nothing.
 - **Login screen (pick / create / delete a prospector).** The client now opens on
   a visual login screen instead of a bare name prompt: existing prospectors are
   listed (each with their level) one click to enter, a field creates a new one,
