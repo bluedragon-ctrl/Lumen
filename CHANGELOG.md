@@ -109,6 +109,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   own Perception or light: the searcher is pointing it out. Permanent secrets
   (fixtures/exits) land on each onlooker's record; ephemeral item/mob reveals join
   theirs for the visit. The room log now names what a search turns up.
+- **`server/state.js` split into subsystem mixins (no behaviour change).** The
+  GameState class drops from 2,017 to 1,016 lines by relocating three method
+  clusters into mixin files alongside the existing `state-mobai.js`:
+  [server/state-tide.js](server/state-tide.js) (the Tide world clock — phases,
+  lamp-tending, tide spawns/sweeps/creep/emotes),
+  [server/state-spells.js](server/state-spells.js) (cast resolution, the shared
+  hostile/beneficial effect cores, `detonateRoom`, and the summon lifecycle), and
+  [server/state-effects.js](server/state-effects.js) (status effects, restores,
+  out-of-combat mob regen, room effects). Pure relocation — every method stays a
+  `GameState` method at runtime via the established `mixin()` copy, and a
+  command + tick A/B battery (casts, summons, forced tide phases, DoTs, OOC
+  regen) is byte-identical against `main`.
 
 ### Added
 - **The Gloaming descends — depth 6, the insect floor (six rooms).** The Weeping
