@@ -31,6 +31,11 @@ function main() {
 
   const errs = [];
 
+  // Cosmetic room biomes — the Inspect window tints itself for these (see the
+  // `.biome-*` rules in client/styles.css). Add a name here and a matching CSS
+  // rule there to introduce a new one.
+  const BIOMES = ["umbral", "gloaming"];
+
   // The Tide's phase vocabulary is data-driven (tide.json `phases`); mob action /
   // reaction `phase` gates below validate against it (falling back to the engine
   // default PHASES if a world omits the list).
@@ -53,6 +58,11 @@ function main() {
     else if (Number(dm[1]) !== r.depth)
       errs.push(`room ${id}: id depth prefix d${dm[1]} disagrees with depth field (${r.depth})`);
     if (r.zone != null && typeof r.zone !== "string") errs.push(`room ${id}: zone must be a string`);
+    // Optional biome: a purely cosmetic tag that tints the Inspect window (a blue
+    // glow for umbral, a green one for gloaming). Enum-checked so a typo can't
+    // silently render as no tint; the matching CSS lives in client/styles.css.
+    if (r.biome != null && !BIOMES.includes(r.biome))
+      errs.push(`room ${id}: unknown biome "${r.biome}" (known: ${BIOMES.join(", ")})`);
     // Free-form room tags (e.g. "water", "outdoor") — gate tag-aware wander/flee
     // destinations (a mob's requireTags/forbidTags). Must be an array of strings.
     if (r.tags != null && (!Array.isArray(r.tags) || !r.tags.every((g) => typeof g === "string")))

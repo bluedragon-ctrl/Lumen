@@ -119,6 +119,8 @@ function buildRoomView(state, p) {
       id: room.id,
       name: room.name,
       depth: room.depth,
+      // Cosmetic biome tag (optional) — the client tints the Inspect window for it.
+      biome: room.biome,
       light: { value: light, band: bandOf(light) },
       canSee: see,
       harmed: isHarmedByLight(p.perception, light),

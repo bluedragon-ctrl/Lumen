@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Room biomes tint the Inspect window (`biome`).** A room may carry an optional,
+  purely cosmetic `biome` tag that gives the Inspect window an ambient coloured
+  glow — a neon-blue `"umbral"` or a cave-green `"gloaming"` — layered *over* the
+  existing light band, so searing and deep-dark behave exactly as before (the tint
+  recedes under `searing` and switches off under `void`/`darkness`). The biome
+  colours the room name, an ambient aura, and gently the description text. First
+  two rooms tagged: **Mallki's Hollow** (umbral) and **The Sunless Landing**
+  (gloaming). Enum-checked by the validator (`BIOMES`); palette and rules live in
+  `client/styles.css` (`.biome-*`). No gameplay effect. See
+  [docs/data-model.md](docs/data-model.md) → *Room*.
 - **Login screen (pick / create / delete a prospector).** The client now opens on
   a visual login screen instead of a bare name prompt: existing prospectors are
   listed (each with their level) one click to enter, a field creates a new one,
