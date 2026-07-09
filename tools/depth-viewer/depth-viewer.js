@@ -9,7 +9,7 @@
  *   DEPTH_VIEWER_PORT                          # override the port
  *
  * This tool never writes anything — it only reads data/world/*.json. To EDIT
- * spawn rules use tools/spawn-editor/; to edit mob stats use tools/mob-editor/.
+ * spawn rules use tools/room-editor/; to edit mob stats use tools/mob-editor/.
  */
 "use strict";
 const http = require("http");

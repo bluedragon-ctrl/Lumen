@@ -21,9 +21,9 @@
       "port": 3939
     },
     {
-      "name": "spawn-editor",
+      "name": "room-editor",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["tools/spawn-editor/spawn-editor.js"],
+      "runtimeArgs": ["tools/room-editor/room-editor.js"],
       "port": 3940
     },
     {

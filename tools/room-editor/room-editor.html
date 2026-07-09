@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lumen — room spawn & item editor</title>
+<title>Lumen — room editor</title>
 <style>
   :root { --bg:#0b0d10; --panel:#12161b; --panel2:#171c23; --ink:#cdd3da; --dim:#8b95a1; --line:#252c35; --accent:#e0b15e; --good:#6fcf97; --bad:#e06f6f; }
   * { box-sizing: border-box; }
@@ -26,6 +26,9 @@
   .roomhead { margin:0 0 1rem; }
   .roomhead .t { color:var(--accent); font-size:16px; }
   .roomhead .d { color:var(--dim); font-size:12px; }
+  .field { display:flex; align-items:center; gap:.6rem; margin:0 0 .5rem; }
+  .field label { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; min-width:5rem; }
+  .field select { max-width:220px; }
   h2.section { color:var(--accent); font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin:1.5rem 0 .5rem; }
   h2.section:first-of-type { margin-top:0; }
   table.rowtable { width:100%; border-collapse:collapse; margin-bottom:1rem; }
@@ -54,8 +57,8 @@
 </head>
 <body>
 <header>
-  <h1>Lumen &middot; room spawn &amp; item editor</h1>
-  <span class="sub">data/world/rooms.json &mdash; spawn rules (mob / max / respawn) &amp; ground items (template / qty / hidden / respawn)</span>
+  <h1>Lumen &middot; room editor</h1>
+  <span class="sub">data/world/rooms.json &mdash; biome, spawn rules (mob / max / respawn) &amp; ground items (template / qty / hidden / respawn)</span>
   <span class="sub" id="dirtycount"></span>
 </header>
 <div class="wrap">
@@ -72,16 +75,18 @@ let original = {};   // pristine rooms, parsed from disk
 let rooms = {};      // working copy
 let mobIds = [];     // for the mob datalist
 let itemIds = [];    // for the item datalist
+let biomes = [];     // biome names offered in the picker
 let current = null;  // selected room id
 
 const $ = (s, r=document) => r.querySelector(s);
 const el = (tag, props={}, ...kids) => { const n = Object.assign(document.createElement(tag), props); for (const k of kids) n.append(k); return n; };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const eqField = (id, field) => JSON.stringify(original[id][field] || []) === JSON.stringify(rooms[id][field] || []);
+const eqBiome = (id) => (original[id].biome || "") === (rooms[id].biome || "");
 
 async function load() {
   const r = await (await fetch("/api/rooms")).json();
-  original = r.rooms; rooms = clone(r.rooms); mobIds = r.mobIds || []; itemIds = r.itemIds || [];
+  original = r.rooms; rooms = clone(r.rooms); mobIds = r.mobIds || []; itemIds = r.itemIds || []; biomes = r.biomes || [];
   const dl = $("#mobids"); dl.textContent = "";
   for (const id of mobIds) dl.append(el("option", { value: id }));
   const idl = $("#itemids"); idl.textContent = "";
@@ -90,7 +95,7 @@ async function load() {
   renderList(); renderForm();
 }
 
-function isDirty(id) { return !eqField(id, "spawns") || !eqField(id, "groundItems"); }
+function isDirty(id) { return !eqField(id, "spawns") || !eqField(id, "groundItems") || !eqBiome(id); }
 function dirtyIds() { return Object.keys(rooms).filter(isDirty); }
 
 function renderList() {
@@ -121,6 +126,8 @@ function renderForm() {
   head.append(el("div", { className:"d", textContent: current + (room.zone ? "  ·  zone: " + room.zone : "") + "  ·  depth " + (room.depth ?? "?") }));
   main.append(head);
 
+  main.append(biomeField(room));
+
   main.append(el("h2", { className:"section", textContent:"Spawns" }));
   main.append(spawnTable(room));
   main.append(el("p", { className:"hint", textContent: "max = population cap kept in this room. respawn = ticks between refills (1 tick = 1s); leave blank for a one-time spawn that never refills." }));
@@ -131,6 +138,19 @@ function renderForm() {
 
   main.append(actionBar());
   main.append(el("div", { id:"out" }));
+}
+
+function biomeField(room) {
+  const wrap = el("div", { className:"field" });
+  wrap.append(el("label", { textContent:"Biome" }));
+  const sel = el("select");
+  sel.append(el("option", { value:"", textContent:"(none)" }));
+  for (const b of biomes) sel.append(el("option", { value:b, textContent:b }));
+  sel.value = room.biome || "";
+  sel.onchange = () => { if (sel.value === "") delete room.biome; else room.biome = sel.value; touch(); };
+  wrap.append(sel);
+  wrap.append(el("span", { className:"hint", textContent:"cosmetic Inspect-window tint; no gameplay effect" }));
+  return wrap;
 }
 
 function spawnTable(room) {
@@ -219,7 +239,7 @@ function actionBar() {
   const bar = el("div", { className:"bar" });
   const type = el("select", { id:"type" });
   for (const t of ["chore","fix","feat"]) type.append(el("option", { value:t, textContent:t }));
-  const summary = el("input", { type:"text", className:"summary", id:"summary", placeholder:'commit summary (e.g. "faster rat respawn in the cellar")' });
+  const summary = el("input", { type:"text", className:"summary", id:"summary", placeholder:'commit summary (e.g. "tag the lake rooms with the water biome")' });
   const validateBtn = el("button", { className:"ghost", textContent:"Validate & preview" });
   const prBtn = el("button", { textContent:"Create pull request" });
   validateBtn.onclick = () => save("validate", validateBtn, prBtn);
@@ -253,7 +273,7 @@ async function save(mode) {
 
 function renderValidate(out, r) {
   if (r.error) return msg(out, "err", r.error);
-  if (!r.changed || !r.changed.length) return msg(out, "ok", "No spawn or ground-item changes to save.");
+  if (!r.changed || !r.changed.length) return msg(out, "ok", "No room changes to save.");
   msg(out, r.ok ? "ok" : "err", (r.ok ? "✓ Validation passed. " : "✗ Validation FAILED. ") + "Changed rooms: " + r.changed.join(", ") + "\n\n" + (r.validate||""));
   if (r.diff) out.append(diffBlock(r.diff));
 }

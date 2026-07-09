@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Room editor (was the spawn-editor).** `tools/spawn-editor/` is renamed to
+  `tools/room-editor/` (`npm run edit-rooms`, port 3940) and now also sets a
+  room's cosmetic `biome` tag — pick from the eight biomes or clear it — alongside
+  the existing spawn-rule and ground-item editing. Still source-preserving: only
+  the changed field(s) are re-serialised; the `biome` line is inserted after
+  `zone` (or removed when cleared).
 - **Room biomes tint the Inspect window (`biome`).** A room may carry an optional,
   purely cosmetic `biome` tag that gives the Inspect window an ambient coloured
   glow layered *over* the existing light band, so searing and deep-dark behave
