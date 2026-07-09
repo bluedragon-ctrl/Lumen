@@ -1,27 +1,28 @@
 #!/usr/bin/env node
 /**
- * Lumen room spawn & ground-item editor — a local, browser-based form for
- * editing, per room in `data/world/rooms.json`, the `spawns` rules (mob / max
- * / respawn) and the `groundItems` list (template / qty / hidden / respawn),
- * and opening a pull request with the result.
+ * Lumen room editor — a local, browser-based form for editing, per room in
+ * `data/world/rooms.json`, the `spawns` rules (mob / max / respawn), the
+ * `groundItems` list (template / qty / hidden / respawn), and the cosmetic
+ * `biome` tag — then opening a pull request with the result.
  *
- *   node tools/spawn-editor/spawn-editor.js   # serves http://localhost:3940
- *   MOB_EDITOR_PORT / SPAWN_EDITOR_PORT       # override the port
+ *   node tools/room-editor/room-editor.js   # serves http://localhost:3940
+ *   ROOM_EDITOR_PORT / SPAWN_EDITOR_PORT    # override the port
  *
- * Both fields live on the ROOM, not the mob/item template (one mob or item
- * template can be placed in many rooms, each with its own cap/qty and its own
- * respawn cadence) — so this is a sibling of the mob stat editor
- * (`tools/mob-editor/`) and the item template editor (`tools/item-editor/`).
+ * These fields live on the ROOM, not the mob/item template (one template can be
+ * placed in many rooms, each with its own cap/qty/cadence) — so this is a
+ * sibling of the mob stat editor (`tools/mob-editor/`) and the item template
+ * editor (`tools/item-editor/`).
  *
  *   • "Validate & preview"  — writes the file, runs `npm run validate`, shows
  *     the exact `git diff`, then RESTORES the file so your tree stays clean.
  *   • "Create pull request" — writes, validates, then branches, commits
  *     (Conventional Commit), pushes, and opens a PR via `gh`.
  *
- * Diff hygiene: this edits ONLY the `spawns` and `groundItems` fields of each
- * room. A changed room keeps every other field's source text byte-for-byte;
- * only the field(s) that actually changed are re-serialised (1 entry inline,
- * 2+ one-per-line, matching the file's house style).
+ * Diff hygiene: this edits ONLY the `spawns`, `groundItems`, and `biome` fields
+ * of each room. A changed room keeps every other field's source text
+ * byte-for-byte; only the field(s) that actually changed are re-serialised
+ * (arrays: 1 entry inline, 2+ one-per-line, matching the file's house style;
+ * `biome`: a one-line field inserted after `zone`, or removed when cleared).
  */
 "use strict";
 const http = require("http");
@@ -29,15 +30,19 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 
-const ROOT = path.resolve(__dirname, "..", ".."); // tools/spawn-editor/ -> repo root
+const ROOT = path.resolve(__dirname, "..", ".."); // tools/room-editor/ -> repo root
 const ROOMS_PATH = path.join(ROOT, "data", "world", "rooms.json");
 const MOBS_PATH = path.join(ROOT, "data", "world", "mobs.json");
 const ITEMS_PATH = path.join(ROOT, "data", "world", "items.json");
 const CHANGELOG_PATH = path.join(ROOT, "CHANGELOG.md");
-const PAGE_PATH = path.join(__dirname, "spawn-editor.html");
-const PORT = Number(process.env.SPAWN_EDITOR_PORT) || 3940;
+const PAGE_PATH = path.join(__dirname, "room-editor.html");
+const PORT = Number(process.env.ROOM_EDITOR_PORT || process.env.SPAWN_EDITOR_PORT) || 3940;
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
-const ROOM_ARRAY_FIELDS = ["spawns", "groundItems"]; // room fields this editor may re-serialise
+const ROOM_ARRAY_FIELDS = ["spawns", "groundItems"]; // room array fields this editor may re-serialise
+const ROOM_SCALAR_FIELDS = ["biome"];                // optional scalar room fields it may set/clear
+// Cosmetic biome tags offered in the UI. Keep in sync with BIOMES in
+// tools/validate-data.js (the validator is the source of truth).
+const BIOMES = ["umbral", "wraith", "gloaming", "slime", "mutant", "water", "rim", "ember"];
 
 // ---------------------------------------------------------------------------
 // Source-preserving (de)serialisation of rooms.json
@@ -107,12 +112,20 @@ function scanString(raw, i) {
 // Locate one field's value span within an object's source text (text starts
 // with "{"). Returns { start, end } or null.
 function fieldValueSpan(text, key) {
+  const span = fieldSpan(text, key);
+  return span ? { start: span.valueStart, end: span.valueEnd } : null;
+}
+
+// Locate one field within an object's source text. Returns
+// { keyStart, valueStart, valueEnd } or null.
+function fieldSpan(text, key) {
   const n = text.length;
   let i = text.indexOf("{") + 1;
   while (i < n) {
     while (i < n && /[\s,]/.test(text[i])) i++;
     if (i >= n || text[i] === "}") break;
     if (text[i] !== '"') break;
+    const keyStart = i;
     i++;
     let k = "";
     while (i < n) {
@@ -124,9 +137,9 @@ function fieldValueSpan(text, key) {
     while (i < n && /\s/.test(text[i])) i++;
     i++; // ':'
     while (i < n && /\s/.test(text[i])) i++;
-    const start = i;
+    const valueStart = i;
     i = scanValue(text, i);
-    if (k === key) return { start, end: i };
+    if (k === key) return { keyStart, valueStart, valueEnd: i };
   }
   return null;
 }
@@ -174,6 +187,47 @@ function spliceField(roomText, key, arr, nl) {
   return before + "," + nl + `    ${JSON.stringify(key)}: ` + val + nl + "  }";
 }
 
+// Set / replace / insert / remove a scalar field (e.g. `biome`), preserving
+// every other byte. A falsy value clears the field (removing its whole line);
+// a new value is inserted as its own line right after `zone` (or `id`), so it
+// lands where the existing biome tags already sit.
+function spliceScalar(roomText, key, value, nl) {
+  const span = fieldSpan(roomText, key);
+  const clear = value === undefined || value === null || value === "";
+  if (clear) {
+    if (!span) return roomText;
+    let s = span.keyStart, e = span.valueEnd;
+    if (roomText[e] === ",") {
+      // trailing comma → remove this field's whole line. Back `s` over the line's
+      // own indentation only (NOT the preceding newline — that terminates the line
+      // above and must stay), and `e` past the comma and this line's newline.
+      e++;
+      while (e < roomText.length && roomText[e] !== "\n") e++;
+      if (roomText[e] === "\n") e++;
+      while (s > 0 && (roomText[s - 1] === " " || roomText[s - 1] === "\t")) s--;
+      return roomText.slice(0, s) + roomText.slice(e);
+    }
+    // no trailing comma → field is last; drop the preceding comma too
+    let p = s;
+    while (p > 0 && /\s/.test(roomText[p - 1])) p--;
+    if (roomText[p - 1] === ",") p--;
+    return roomText.slice(0, p) + roomText.slice(e);
+  }
+  const val = JSON.stringify(value);
+  if (span) return roomText.slice(0, span.valueStart) + val + roomText.slice(span.valueEnd);
+  const anchor = fieldSpan(roomText, "zone") || fieldSpan(roomText, "id");
+  if (!anchor) {
+    const close = roomText.lastIndexOf("}");
+    const before = roomText.slice(0, close).replace(/\s*$/, "");
+    return before + "," + nl + `    ${JSON.stringify(key)}: ${val}` + nl + "  }";
+  }
+  let p = anchor.valueEnd;
+  if (roomText[p] === ",") p++;
+  while (p < roomText.length && roomText[p] !== "\n") p++;
+  if (roomText[p] === "\n") p++;
+  return roomText.slice(0, p) + `    ${JSON.stringify(key)}: ${val},` + nl + roomText.slice(p);
+}
+
 function deepEqual(a, b) {
   if (a === b) return true;
   if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
@@ -187,8 +241,10 @@ function deepEqual(a, b) {
   return ak.every((k) => has(b, k) && deepEqual(a[k], b[k]));
 }
 
+const scalarEq = (a, b) => (a ?? "") === (b ?? "");
+
 // Re-assemble rooms.json: unchanged rooms keep exact source text; rooms whose
-// spawns and/or groundItems changed get only those field(s) re-serialised.
+// spawns / groundItems / biome changed get only those field(s) re-serialised.
 function buildFile(newRooms, origRaw) {
   const nl = origRaw.includes("\r\n") ? "\r\n" : "\n";
   const entries = topLevelEntries(origRaw);
@@ -209,6 +265,11 @@ function buildFile(newRooms, origRaw) {
           valueText = spliceField(valueText, field, newRooms[k][field] || [], nl);
         }
       }
+      for (const field of ROOM_SCALAR_FIELDS) {
+        if (!scalarEq((orig[k] || {})[field], newRooms[k][field])) {
+          valueText = spliceScalar(valueText, field, newRooms[k][field], nl);
+        }
+      }
     } else valueText = serRoomValue(newRooms[k], nl);
     return `  ${JSON.stringify(k)}: ${valueText}`;
   });
@@ -216,13 +277,15 @@ function buildFile(newRooms, origRaw) {
   return "{" + nl + parts.join("," + nl) + nl + "}" + eofNL;
 }
 
-// Which room ids have a changed `spawns` and/or `groundItems`?
+// Which room ids have a changed `spawns`, `groundItems`, and/or `biome`?
 function changedRooms(orig, next) {
   const ids = new Set([...Object.keys(orig), ...Object.keys(next)]);
   const out = [];
   for (const id of ids) {
     if (!has(next, id) || !has(orig, id)) continue;
-    const changed = ROOM_ARRAY_FIELDS.some((f) => !deepEqual(orig[id][f] || [], next[id][f] || []));
+    const changed =
+      ROOM_ARRAY_FIELDS.some((f) => !deepEqual(orig[id][f] || [], next[id][f] || [])) ||
+      ROOM_SCALAR_FIELDS.some((f) => !scalarEq(orig[id][f], next[id][f]));
     if (changed) out.push(id);
   }
   return out;
@@ -246,7 +309,7 @@ function run(cmd, args) {
 }
 
 function slugify(s) {
-  return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "spawns";
+  return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "rooms";
 }
 
 // Insert a bullet under `## [Unreleased]` › `### Changed` (created after the
@@ -305,7 +368,7 @@ function handlePR(newRooms, summary, type) {
   const origRaw = fs.readFileSync(ROOMS_PATH, "utf8");
   const orig = JSON.parse(origRaw);
   const changed = changedRooms(orig, newRooms);
-  if (!changed.length) return { ok: false, error: "No spawn or ground-item changes to commit." };
+  if (!changed.length) return { ok: false, error: "No room changes to commit." };
 
   const owned = new Set(["data/world/rooms.json", "CHANGELOG.md"]);
   const dirty = git(["status", "--porcelain"]) // "XY path"
@@ -327,13 +390,13 @@ function handlePR(newRooms, summary, type) {
 
   const subject = `${type}: ${summary}`;
   const branch = `${type}/${slugify(summary)}-${Date.now().toString(36)}`;
-  const changelogLine = `**Room spawns/items** — ${summary} (${changed.join(", ")}).`;
+  const changelogLine = `**Room edits** — ${summary} (${changed.join(", ")}).`;
 
   try {
     git(["checkout", "-b", branch]);
     updateChangelog(changelogLine);
     git(["add", "data/world/rooms.json", "CHANGELOG.md"]);
-    const body = `Edited via the room spawn & ground-item editor (\`tools/spawn-editor/\`).\n\n**Rooms changed:** ${changed.join(", ")}\n\n${summary}`;
+    const body = `Edited via the room editor (\`tools/room-editor/\`).\n\n**Rooms changed:** ${changed.join(", ")}\n\n${summary}`;
     git(["commit", "-m", subject, "-m", body]);
     git(["push", "-u", "origin", branch]);
     const pr = run("gh", ["pr", "create", "--base", "main", "--head", branch, "--title", subject, "--body", body]);
@@ -372,7 +435,7 @@ const server = http.createServer(async (req, res) => {
       const rooms = JSON.parse(fs.readFileSync(ROOMS_PATH, "utf8"));
       const mobIds = Object.keys(JSON.parse(fs.readFileSync(MOBS_PATH, "utf8")));
       const itemIds = Object.keys(JSON.parse(fs.readFileSync(ITEMS_PATH, "utf8")));
-      return void sendJSON(res, 200, { ok: true, rooms, mobIds, itemIds });
+      return void sendJSON(res, 200, { ok: true, rooms, mobIds, itemIds, biomes: BIOMES });
     }
     if (req.method === "POST" && req.url === "/api/save") {
       const body = JSON.parse(await readBody(req));
@@ -392,11 +455,11 @@ const server = http.createServer(async (req, res) => {
 });
 
 // Exposed for require()-ing / tests; the server only listens when run directly.
-module.exports = { topLevelEntries, fieldValueSpan, serArray, spliceField, deepEqual, buildFile, changedRooms };
+module.exports = { topLevelEntries, fieldValueSpan, fieldSpan, serArray, spliceField, spliceScalar, deepEqual, buildFile, changedRooms };
 
 if (require.main === module) {
   server.listen(PORT, () => {
-    console.log(`[spawn-editor] editing ${path.relative(ROOT, ROOMS_PATH)}`);
-    console.log(`[spawn-editor] open  http://localhost:${PORT}`);
+    console.log(`[room-editor] editing ${path.relative(ROOT, ROOMS_PATH)}`);
+    console.log(`[room-editor] open  http://localhost:${PORT}`);
   });
 }

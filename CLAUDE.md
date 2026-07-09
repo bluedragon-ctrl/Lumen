@@ -59,11 +59,11 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   edit-recipes` or double-click `tools/recipe-editor/start.bat`, port 3942).
   Edits `data/world/recipes.json` (name, station, shards, inputs, output);
   validates and can open a PR via `gh`.
-- `tools/spawn-editor/` — browser-based room spawn & ground-item editor (`npm run
-  edit-spawns` or `tools/spawn-editor/start.bat`, port 3940). Edits the
-  per-room `spawns` (mob / max / respawn) and `groundItems` (template / qty /
-  hidden / respawn) in `data/world/rooms.json`; validates and can open a PR via
-  `gh`.
+- `tools/room-editor/` — browser-based room editor (`npm run edit-rooms` or
+  `tools/room-editor/start.bat`, port 3940). Edits the per-room `biome` (cosmetic
+  Inspect tint), `spawns` (mob / max / respawn), and `groundItems` (template /
+  qty / hidden / respawn) in `data/world/rooms.json`; validates and can open a PR
+  via `gh`. (Formerly the spawn-editor.)
 - `tools/biome-preview/` — browser-based biome colour lab (`npm run
   preview-biomes` or `tools/biome-preview/start.bat`, port 3943). **Read-only.**
   Links the live `client/styles.css` so the preview pane renders exactly what the
