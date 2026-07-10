@@ -128,7 +128,14 @@ body {
 #jump-pill[hidden] { display: none; }
 
 /* Inspect (room view, tinted by light) --------------------------------- */
-#inspect { grid-area: inspect; padding: 10px 12px; position: relative; transition: background .4s, color .4s, filter .4s; }
+/* `isolation: isolate` pins a stacking context here permanently. Without it,
+   only `.light-dim` (via its `filter`) makes #inspect a stacking context, so the
+   biome glow — `[class*="biome-"]::before { z-index: -1 }` — would render above
+   the opaque panel background only in dim rooms and pop out the instant light
+   crossed into another band. Isolating keeps the glow painting identically in
+   every band, so a light change only animates the transitioned background/filter
+   instead of tearing the whole tint layer in and out. */
+#inspect { grid-area: inspect; padding: 10px 12px; position: relative; isolation: isolate; transition: background .4s, color .4s, filter .4s; }
 .inspect-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
 /* Neutral off-white by default so an untagged room reads as neutral — a biome
    tag then overrides this with its hue (see `.biome-*`). Blue here looked like
