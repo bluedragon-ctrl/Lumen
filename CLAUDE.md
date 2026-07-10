@@ -16,7 +16,9 @@ pull request:
    clock. Both must exit 0.
 4. Commit with [Conventional Commits](https://www.conventionalcommits.org/)
    (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`, `test:`, `perf:`).
-5. Update `CHANGELOG.md` under `[Unreleased]` as part of the change.
+5. Update `CHANGELOG.md` under `[Unreleased]` **and bump the PATCH version** in
+   `VERSION` + `package.json` (lockstep) as part of the change. Minor bumps are
+   the maintainer's milestone call — never bump them yourself.
 6. Push the branch and open a PR into `main` with `gh`.
 7. **The maintainer reviews and merges** (squash), then deletes the branch.
    Do not self-merge unless explicitly told to.
@@ -54,12 +56,12 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   `docs/superpowers/specs/` + `plans/` — written designs for shipped and upcoming
   systems (aggro, summoning, room effects…). Read the spec before touching its system.
 - `tools/validate-data.js` — pre-commit data validator.
-- `tools/release.js` — release cutter (`npm run release`, or double-click
-  `tools/release.bat`). Derives the next SemVer
-  from the Conventional Commit history since the last tag, stamps `VERSION` /
-  `package.json` / `CHANGELOG.md`, commits on a `chore/release-x.y.z` branch, and
-  pushes + opens the PR via `gh` (compare-URL fallback if `gh` is absent). Tagging
-  after merge stays manual. See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a release*.
+- `tools/release.js` — milestone cutter (`npm run release`, or double-click
+  `tools/release.bat`). Patch versions land per-PR; this cuts a milestone MINOR:
+  stamps `VERSION` / `package.json` / `CHANGELOG.md`, commits on a
+  `chore/release-x.y.z` branch, and pushes + opens the PR via `gh` (compare-URL
+  fallback if `gh` is absent). Tagging after merge stays manual, milestones only.
+  See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a milestone*.
 - Browser-based world editors — each starts via its npm script or
   `tools/<name>/start.bat`, validates before saving, and can open a PR via `gh`:
 
