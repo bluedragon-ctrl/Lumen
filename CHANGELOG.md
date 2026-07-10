@@ -5,7 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **The deep rat nest — a mutated mini-dungeon off the gloaming.** A dry crack
+  south of *The Gulf Throat* (`d6.gloaming.throat`) opens into an eight-room warren
+  in the `mutant` biome (`deep-nest` zone): the reeking mouth, a gnawed run and
+  bone-midden, the seething warren, a chimney that bores up toward the rim, a
+  glimmer-glut where the warp takes hold, and the king's court leading to the
+  brood-throne. Two new mid-tier bosses hold it — **Maw, the Rat-King** (a knotted
+  living-crown patriarch, lieutenant) and **the Brood-Mother** (the true source of
+  the vermin, apex) — alongside a new mutated **warp-rat** and swarms of the
+  existing giant- and brood-rats.
+
 ### Changed
+- **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the
+  Brood-Mother*, but the real mother now dwells deep in the rat nest; Gnaw is
+  reframed as a lone warden guarding the surface warren (her den renamed, stats
+  trimmed) — one of the mother's oversized get, not their origin.
 - **Inspect header reads neutral for untagged rooms.** The room name in the Inspect
   window defaulted to the theme's light-blue accent, which looked like the Umbral
   biome tint. Untagged rooms now use a neutral off-white; biome-tagged rooms still
