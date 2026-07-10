@@ -56,3 +56,18 @@ test("blindAbove: a delver (no blindAbove) is never dazzled by bright light", ()
   assert.equal(noticeChance(human, 6), 1);   // clear — bright light does not blind a player
   assert.equal(hitChance(human, 6), 1);
 });
+
+// --- negative light: darkvision pierces darkness (0); the void (<0) is different -
+test("void light: a plain darkvision creature (blindBelow 0) is blind in the void", () => {
+  const natural = { blindBelow: 0, dimBelow: 0, harmedAbove: 9 };
+  assert.equal(canSee(natural, 0), true);    // pitch darkness — sees fine
+  assert.equal(canSee(natural, -1), false);  // the void is anti-light: blind (e.g. a Tide-flood)
+  assert.equal(noticeChance(natural, -1), 0);
+});
+
+test("void light: a void-native creature (blindBelow -20) sees clearly in the deepest dark", () => {
+  const voidborn = { blindBelow: -20, dimBelow: -20, harmedAbove: 3 };
+  assert.equal(canSee(voidborn, -6), true);      // deep Tide in its own crypt — still sees
+  assert.equal(noticeChance(voidborn, -6), 1);   // clearly, not dimly (dimBelow -20)
+  assert.equal(hitChance(voidborn, -6), 1);
+});
