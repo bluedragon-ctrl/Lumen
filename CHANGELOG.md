@@ -5,6 +5,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Inspect header reads neutral for untagged rooms.** The room name in the Inspect
+  window defaulted to the theme's light-blue accent, which looked like the Umbral
+  biome tint. Untagged rooms now use a neutral off-white; biome-tagged rooms still
+  override with their own hue.
+
 ### Fixed
 - **Void-native creatures no longer go blind in their own dark.** Now that room light
   runs negative (void rooms sit at −1/−2 ambient and the Tide floods the deep to −4/−6),
