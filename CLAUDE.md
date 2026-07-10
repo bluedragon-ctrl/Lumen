@@ -69,7 +69,7 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   | `tools/room-editor/` | `npm run edit-rooms` | 3940 | `rooms.json` `biome` / `spawns` / `groundItems` (was the spawn-editor) |
   | `tools/item-editor/` | `npm run edit-items` | 3941 | `items.json` |
   | `tools/recipe-editor/` | `npm run edit-recipes` | 3942 | `recipes.json` (name, station, shards, inputs, output) |
-  | `tools/depth-viewer/` | `npm run view-depths` | 3942 (clashes with recipe-editor — override via `DEPTH_VIEWER_PORT`) | nothing — read-only depth map |
+  | `tools/depth-viewer/` | `npm run view-depths` | 3944 (`DEPTH_VIEWER_PORT` overrides) | nothing — read-only depth map |
   | `tools/biome-preview/` | `npm run preview-biomes` | 3943 | nothing — read-only colour lab; links live `client/styles.css`, emits CSS to paste into `styles.css` + `validate-data.js` (`BIOMES`) |
 
 - `DESIGN.md` — pillars and design intent (living record with shipped/deferred
