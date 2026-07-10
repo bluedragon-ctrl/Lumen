@@ -1285,6 +1285,27 @@
     "stackable": true,
     "consumable": { "flavour": "You gnaw the raw rat-meat down. It is tough and gamey and cold, but it takes the worst edge off your hunger.", "effect": { "type": "restore", "hp": 2 } }
   },
+  "rat-king-crown": {
+    "id": "rat-king-crown",
+    "name": "the Rat-King's crown",
+    "keywords": ["crown", "rat-king", "king", "trophy"],
+    "description": "The knotted mass of tails and glimmer-warped bone that grew from Maw's shoulders, hacked free and gone stiff — a dozen lesser rats fused into a single grisly circlet, still faintly shimmering where the deep's glimmer got into the bone. It is proof past argument that the thing is dead, and a curiosity morbid enough that a Rim trader will pay well to hang it over a bar.",
+    "type": "treasure",
+    "weight": 2,
+    "value": 70,
+    "sellValue": 55,
+    "rarity": "uncommon"
+  },
+  "warp-fang": {
+    "id": "warp-fang",
+    "name": "a great warp-fang",
+    "keywords": ["fang", "tooth", "warp-fang", "warp"],
+    "description": "A single curved incisor prised from the Brood-Mother's jaw — as long as a forearm and heavier than bone has any right to be, its enamel gone translucent and veined through with cold blue-white glimmer that the deep worked into her over long ages. It hums faintly against the palm. The Umbrals' glimmer-craft could bind a fang like this into an edge or a haft that holds the light, if a delver knew the trick of it — but that knowing is not yet theirs to have.",
+    "type": "material",
+    "weight": 2,
+    "value": 100,
+    "rarity": "rare"
+  },
   "cooked-skewer": {
     "id": "cooked-skewer",
     "name": "a bug-meat skewer",

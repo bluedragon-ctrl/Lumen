@@ -138,7 +138,11 @@ function move(state, player, dir, ctx) {
     if (r.died) { enterDied = true; break; } // _respawn already moved + re-rendered them
   }
   if (enterDied) return []; // death views were emitted; suppress the normal arrival output
-  const msgs = selfAndViews(state, player, `You go ${dir}.${tail}${followTail}${effectTail}`);
+  // A room may give a specific exit its own departure line (a chute you slide down,
+  // a rope you haul yourself up) in place of the plain "You go <dir>." — flavour only,
+  // shown to the mover; the exit still works like any other.
+  const goLine = (room.exitMessages && room.exitMessages[dir]) || `You go ${dir}.`;
+  const msgs = selfAndViews(state, player, `${goLine}${tail}${followTail}${effectTail}`);
   announceLevelUps(player, ups, ctx, msgs);
   msgs.push(...qmsgs);
   return msgs;

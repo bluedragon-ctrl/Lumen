@@ -711,7 +711,7 @@
     "zone": "abyss",
     "tags": ["nest"],
     "name": "The Brood-Nest",
-    "description": "The rat-run opens into the nest itself: a stinking, bone-littered hollow where the brood packs thickest. A single witchglow cluster has rooted in the damp of the far wall, breathing a faint, cold-green light over the heaving nests — enough to glint off a hundred small eyes. The run climbs north; a gnawed hole east lets onto the brood-mother's den.",
+    "description": "The rat-run opens into the nest itself: a stinking, bone-littered hollow where the brood packs thickest. A single witchglow cluster has rooted in the damp of the far wall, breathing a faint, cold-green light over the heaving nests — enough to glint off a hundred small eyes. The run climbs north; a gnawed hole east lets onto the warden's den.",
     "depth": 1,
     "ambientLight": 0,
     "exits": { "north": "d1.ratrun", "east": "d1.den" },
@@ -729,14 +729,30 @@
     "zone": "abyss",
     "biome": "mutant",
     "tags": ["nest"],
-    "name": "The Brood-Mother's Den",
-    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests.",
+    "name": "The Warden's Den",
+    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the warren-warden, largest of the vermin that boil up this near the rim, though not their source: whatever mothers them keeps to the deep dark, far below. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests. At the back of the den the floor falls away into a raw, dark sink — the throat the vermin climb out of, dropping away down toward wherever they are bred.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "d1.cut", "west": "d1.brood" },
+    "exits": { "north": "d1.cut", "west": "d1.brood", "down": "d2.sink" },
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 600 }]
+  },
+  "d2.sink": {
+    "id": "d2.sink",
+    "zone": "abyss",
+    "biome": "mutant",
+    "name": "The Vermin-Sink",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The warden's floor gives out here into a wide, gnawed sink in the rock — a raw shaft dropping sheer and lightless into a warmth that reeks of musk and old blood, rising from somewhere very far down. The rim is greasy with the passage of countless small bodies climbing up out of the dark. This is where they come from, and it is no place for the living: the litter of those who found that out is scattered about the lip — a snapped ladder, a cracked helm, a prospector's boot with the foot still in it, none of it dragged back up. The shaft is a smooth, steepening chute; whatever goes down it does not climb back. The warden's den lies back up; the drop falls away down.",
+    "exits": { "up": "d1.den", "down": "d6.nest.chimney" },
+    "exitMessages": {
+      "down": "You lower yourself over the lip — and the rock tilts, and takes you. The chute steepens and there is no stopping it: a long, roaring, helpless slide through a gnawed throat of stone, blind in the dark, the reek rushing up thicker and warmer the deeper you drop, until the floor finally kicks out from under you and pitches you sprawling into the heart of the nest, far below. There is no climbing back up that."
+    },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
   },
   "d2.descent": {
     "id": "d2.descent",
@@ -1650,11 +1666,153 @@
     "name": "The Gulf Throat",
     "depth": 6,
     "ambientLight": 1,
-    "description": "South, the terraces pinch to a lip of streaming stone and the floor opens under it — another throat of the gulf, dropping away into steam and boiling dark, the wash and knock of hot water rising loud out of it from somewhere further down still. The moss does not reach here; the last of the glow dies at the rim, and below it there is only the breathing black and the heat pouring up. This is the way on, for a delve with more rope and more nerve than this one — no line has been rigged, no stake driven, and the deep below keeps whatever it keeps. The bright terraces lie back north.",
-    "exits": { "north": "d6.gloaming.terraces" },
+    "description": "South, the terraces pinch to a lip of streaming stone and the floor opens under it — another throat of the gulf, dropping away into steam and boiling dark, the wash and knock of hot water rising loud out of it from somewhere further down still. The moss does not reach here; the last of the glow dies at the rim, and below it there is only the breathing black and the heat pouring up. This is the way on, for a delve with more rope and more nerve than this one — no line has been rigged, no stake driven, and the deep below keeps whatever it keeps. Off to one side, a dry crack breaks away south, out of the wet and into warm rock, and out of it pours an animal reek and the dry scrabble of a great many small feet. The bright terraces lie back north.",
+    "exits": { "north": "d6.gloaming.terraces", "south": "d6.nest.mouth" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
+  },
+  "d6.nest.mouth": {
+    "id": "d6.nest.mouth",
+    "zone": "deep-nest",
+    "biome": "gloaming",
+    "name": "The Reeking Mouth",
+    "depth": 6,
+    "ambientLight": 1,
+    "description": "The gnawed crack off the throat opens into a low, dry chamber, and here the gloaming ends. Behind you the last cold-green glow and the wet breath of the gulf; ahead, the moss gives out entirely and the air turns warm and close and animal — a reek of musk and droppings and old bone, and under it the ceaseless dry scrabble of a great many small feet. The floor is worn smooth and greasy, scored everywhere with gnaw-marks. Something enormous denned down here long ago and never stopped breeding. Just inside the lip, half-dragged into the nesting, lie the picked-over remains of someone who came down and got no further — a burst pack, a guttered lamp, a glint of gear among the bones. The throat climbs back north; a rat-run drops away south into the dark.",
+    "exits": { "north": "d6.gloaming.throat", "south": "d6.nest.run" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "torch", "qty": 1, "fuel": 80, "hidden": { "perception": 3 }, "respawn": 900 },
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 3 }, "respawn": 900 }
+    ],
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 90 }]
+  },
+  "d6.nest.run": {
+    "id": "d6.nest.run",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Gnawed Run",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "A long side-gallery the vermin have worn into a highway — the floor packed hard and slick with their running, the walls padded with shredded nesting and scored to the raw rock with generations of teeth. The dark is total, and it seethes: small shapes scatter from your light only to circle back at its edge, and the squealing never quite stops. Here and there a few shards lie trodden into the greasy floor, where a purse burst and its owner did not stop to gather it. A bone-choked side-pocket opens east; the run climbs back north to the mouth, and drops south into the warren proper.",
+    "exits": { "north": "d6.nest.mouth", "east": "d6.nest.midden", "south": "d6.nest.warren" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "shards", "qty": 4, "hidden": { "perception": 3 }, "respawn": 600 }
+    ],
+    "spawns": [
+      { "mob": "giant-rat", "max": 4, "respawn": 60 },
+      { "mob": "brood-rat", "max": 1, "respawn": 180 }
+    ]
+  },
+  "d6.nest.midden": {
+    "id": "d6.nest.midden",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Bone Midden",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "A dead-end pocket where the nest heaps what it cannot eat: a slope of gnawed bone and cracked shell and the corroded ruin of gear, dragged down here run by run and picked clean. Prospectors' bones lie among the rats', and here and there something not yet rusted through glints in the dark. The run lies back west.",
+    "exits": { "west": "d6.nest.run" },
+    "fixtures": ["bone-pile"],
+    "groundItems": [
+      { "template": "shards", "qty": 5, "respawn": 600 },
+      { "template": "crystal", "qty": 1, "respawn": 1200 }
+    ],
+    "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 90 }]
+  },
+  "d6.nest.warren": {
+    "id": "d6.nest.warren",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Seething Warren",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "The run opens into the warren's heart, and the floor here is not stone but a living, heaving carpet of vermin — nests packed rim to rim, mounded high with shredded bedding and squirming young, the whole reeking mass boiling over itself in the dark. Bigger shapes move through it, unhurried: the warp of the nest, grown wrong and bold on the deep's own glimmer. A prospector lies half-sunk in the nests where the brood pulled them down, mostly bone now, a blade still fast in the grip of one hand. A gnawed shaft breaks off east; the way runs on south, deeper and warmer; the run climbs back north.",
+    "exits": { "north": "d6.nest.run", "east": "d6.nest.chimney", "south": "d6.nest.glut" },
+    "fixtures": [],
+    "groundItems": [
+      { "template": "short-sword", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1200 },
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 5 }, "respawn": 900 }
+    ],
+    "spawns": [
+      { "mob": "giant-rat", "max": 4, "respawn": 60 },
+      { "mob": "warp-rat", "max": 2, "respawn": 150 },
+      { "mob": "brood-rat", "max": 1, "respawn": 200 }
+    ]
+  },
+  "d6.nest.chimney": {
+    "id": "d6.nest.chimney",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Gnawed Chimney",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "A tall, narrow flue in the rock, gnawed and rubbed smooth and rising sheer out of sight overhead — a vermin-road bored straight up through the deep, run by run, toward the far-off rim. A steady trickle of the nest climbs it: young rats swarming up into the dark above, off to plague warrens far higher than this one. Now and again something too big for the climb comes down it instead, in a rattle of scree, and arrives hard at the bottom among the bones already there. For anything your size the shaft is a one-way road — the rats run its rubbed-smooth walls, but there is no purchase in them for a climb back up. The draught that falls down it is faintly less foul than the nest's, and carries, very distantly, a colder air. The warren lies back west.",
+    "exits": { "west": "d6.nest.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "giant-rat", "max": 3, "respawn": 60 },
+      { "mob": "warp-rat", "max": 1, "respawn": 180 }
+    ]
+  },
+  "d6.nest.glut": {
+    "id": "d6.nest.glut",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Glimmer-Glut",
+    "depth": 6,
+    "ambientLight": 2,
+    "description": "Here the nest presses up against a raw seam of glimmer that crusts the whole south wall, lit cold and faint by its own deep glow — never worked by any hand, only gnawed at, licked, gorged upon. This is the root of the warp: the vermin that feed here longest swell and sicken and change, and the floor is thick with them, the biggest and the wrongest of the brood, their hides shimmering in the crust-light. The warren lies back north; a low, warm reek pours from a hole to the south, where something larger holds court.",
+    "exits": { "north": "d6.nest.warren", "south": "d6.nest.court" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "warp-rat", "max": 3, "respawn": 120 },
+      { "mob": "giant-rat", "max": 2, "respawn": 90 }
+    ]
+  },
+  "d6.nest.court": {
+    "id": "d6.nest.court",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The King's Court",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "A round, high-domed chamber worn smooth by the passage of countless bodies, and packed to the walls with the nest's rank and file — but they part, here, and keep their distance from the mound of matted nesting at its heart. This is where the king holds the deep runs: nothing reaches the mother beyond except past him. Bones and stripped gear lie trodden into the floor. One wall is split by a fat seam of raw glimmer, richer than any thin crust back in the glut — a whole crystal's worth of cold blue-white light caught in the stone, the lode the Rush dreamed of, and the king squats his court around it. The glut lies back north; a last low hole breathes warm and close to the south.",
+    "exits": { "north": "d6.nest.glut", "south": "d6.nest.throne" },
+    "fixtures": ["glimmer-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "rat-king", "max": 1, "respawn": 600 },
+      { "mob": "warp-rat", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d6.nest.throne": {
+    "id": "d6.nest.throne",
+    "zone": "deep-nest",
+    "biome": "mutant",
+    "tags": ["nest"],
+    "name": "The Brood-Throne",
+    "depth": 6,
+    "ambientLight": 0,
+    "description": "The deepest hollow of the nest, and the warmest — a low, reeking vault heaped waist-deep in bedding and bone, the air thick enough to chew. Here, half-fused to the stone she has never left, heaves the source of it all: a mountain of pale, glimmer-swollen flesh, birthing litter on litter into the dark, sending them up and up toward a rim she will never see. She turns a blind white eye toward your light and does not run; she has nowhere she needs to go. Dragged up against the nesting at her flank is the cold cache of those the brood hauled down before you — packs and bones and gear gone green with damp, tumbled where she could keep it close. The only way out is back north, past the king.",
+    "exits": { "north": "d6.nest.court" },
+    "fixtures": ["bone-pile"],
+    "groundItems": [
+      { "template": "iron-helm", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1800 },
+      { "template": "regeneration-draught", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1800 },
+      { "template": "crystal", "qty": 2, "hidden": { "perception": 5 }, "respawn": 1800 }
+    ],
+    "spawns": [{ "mob": "brood-mother", "max": 1, "respawn": 900 }]
   },
   "d6.camp": {
     "id": "d6.camp",

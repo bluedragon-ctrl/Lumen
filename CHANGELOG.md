@@ -5,7 +5,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **The deep rat nest — a mutated mini-dungeon off the gloaming.** A dry crack
+  south of *The Gulf Throat* (`d6.gloaming.throat`) opens into an eight-room warren
+  in the `mutant` biome (`deep-nest` zone): the reeking mouth, a gnawed run and
+  bone-midden, the seething warren, a chimney that bores up toward the rim, a
+  glimmer-glut where the warp takes hold, and the king's court leading to the
+  brood-throne. Two new mid-tier bosses hold it — **Maw, the Rat-King** (a knotted
+  living-crown patriarch, lieutenant) and **the Brood-Mother** (the true source of
+  the vermin, apex) — alongside a new mutated **warp-rat** and swarms of the
+  existing giant- and brood-rats.
+- **A one-way plunge into the nest from the rim.** A raw sink at the back of the
+  Warden's Den (`d1.den`) drops to *The Vermin-Sink* (`d2.sink`, depth 2, `mutant`,
+  mobless) — a warning threshold that makes plain it is no place for the living. Its
+  down exit is a **one-way slide** into *The Gnawed Chimney* deep in the nest: you
+  can turn back from the lip, but once you commit to the chute there is no climbing
+  back up.
+- **Per-exit departure flavour (`exitMessages`).** Rooms may now give a single exit
+  its own "You go …" line for the mover (a chute you slide down, a rope you haul up)
+  in place of the generic one; bystanders still see the plain leave/arrive. Flavour
+  only — validated against real exits.
+- **Dead-adventurers' remains in the rat nest.** A handful of `search`-gated finds
+  (perception 3–5) scattered across the depth-6 nest — a guttered torch and lamp-oil
+  at the reeking mouth, spilled shards along the run, a fallen prospector's short
+  sword and oil in the seething warren — plus a **rich `glimmer-vein`** (whole-crystal
+  yield) set into the wall of Maw's court for players who clear the lieutenant.
+- **Boss loot for the rat nest.** Maw, the Rat-King drops **the Rat-King's crown**
+  (a grisly, sellable trophy) guaranteed; the Brood-Mother drops **a great warp-fang**
+  (rare glimmer-craft material, forward-hooked to a not-yet-known recipe) plus a
+  guaranteed crystal. Her throne also hides a dead-delvers' cache — an iron helm, a
+  regeneration draught, and crystals behind a `search` (perception 4–5).
+
 ### Changed
+- **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the
+  Brood-Mother*, but the real mother now dwells deep in the rat nest; Gnaw is
+  reframed as a lone warden guarding the surface warren (her den renamed, stats
+  trimmed) — one of the mother's oversized get, not their origin.
 - **Inspect header reads neutral for untagged rooms.** The room name in the Inspect
   window defaulted to the theme's light-blue accent, which looked like the Umbral
   biome tint. Untagged rooms now use a neutral off-white; biome-tagged rooms still

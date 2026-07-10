@@ -287,4 +287,21 @@ test("move(): a fatal enter effect fells the player and suppresses the arrival o
   assert.ok(ctx.emitted.some((e) => e.type === "death-begin")); // death-begin dispatched via ctx.emit
 });
 
+test("move(): a room's exitMessages replaces the mover's 'You go <dir>' line", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  state.world.rooms["test.bright"].exitMessages = { north: "You slide away north through a long, gnawed chute." };
+  const ctx = recordingCtx();
+  const msgs = execute(state, player, "north", ctx);
+  assert.equal(player.location, "test.dark");
+  assert.ok(msgs.some((m) => m.text && m.text.includes("You slide away north through a long, gnawed chute.")));
+  assert.ok(!msgs.some((m) => m.text && m.text.includes("You go north."))); // the generic line is replaced
+});
+
+test("move(): without exitMessages the mover sees the plain 'You go <dir>' line", () => {
+  const { state, player } = gsWithPlayer("test.bright");
+  const ctx = recordingCtx();
+  const msgs = execute(state, player, "north", ctx);
+  assert.ok(msgs.some((m) => m.text && m.text.includes("You go north.")));
+});
+
 module.exports = { makeTestWorld, gsWithPlayer };
