@@ -37,6 +37,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/biome-preview/biome-preview.js"],
       "port": 3943
+    },
+    {
+      "name": "map-3d",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/map-3d/map-3d.js"],
+      "port": 3945
     }
   ]
 }

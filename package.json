@@ -1,6 +1,6 @@
 {
   "name": "lumen",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A browser-based MUD of descent, light, and survival.",
   "type": "commonjs",
   "main": "server/index.js",
@@ -14,6 +14,7 @@
     "edit-recipes": "node tools/recipe-editor/recipe-editor.js",
     "edit-rooms": "node tools/room-editor/room-editor.js",
     "view-depths": "node tools/depth-viewer/depth-viewer.js",
+    "view-map": "node tools/map-3d/map-3d.js",
     "preview-biomes": "node tools/biome-preview/biome-preview.js"
   },
   "engines": {

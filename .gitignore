@@ -17,6 +17,9 @@ data/runtime/
 data/save/
 *.snapshot.json
 
+# Generated artifacts (rebuilt on demand from current data)
+tools/map-3d/lumen-map.html
+
 # Editor / OS
 .vscode/
 .idea/
