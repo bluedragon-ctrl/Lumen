@@ -31,7 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   non-fleeing eyeless deep hunters — **pallid-hunter** and **crypt-lurker**
   (`blindAbove` 5), **cave-centipede**, **centipede-broodmother**, **grave-husk**, and
   **bound-husk** (`blindAbove` 6). Players carry no `blindAbove`, so bright light never
-  blinds a delver. Validator enforces `blindAbove > harmedAbove`.
+  blinds a delver. Validator enforces `blindAbove > harmedAbove`. The **mob-editor**
+  (`tools/mob-editor/`) now exposes the full perception band — `blindBelow`, `dimBelow`,
+  `harmedAbove`, and the optional `blindAbove` — with inline hints; a blank `blindAbove`
+  stays absent rather than writing a `0`.
 - **3D world map viewer (`tools/map-3d/`).** A local, read-only, browser-based 3D model of the
   whole world: every room is a node labelled with its **name and id**, exits are edges, and depth
   is the vertical axis (warm lantern-gold at the surface fading to cold abyssal blue deep down).

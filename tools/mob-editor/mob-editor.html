@@ -65,7 +65,14 @@
 const KNOWN = ["id","name","description","maxHp","speed","armour","ward","xp","emitsLight","shards","faction","hostile","behavior","posture","helper","ambush","remembers","pursues","pursueRange","pursueVerb","attributes","perception"];
 const NUMS = ["maxHp","speed","armour","ward","xp","emitsLight"];
 const ATTRS = ["might","vitality","intellect","wits","perception"];
-const PERC = ["blindBelow","dimBelow","harmedAbove"];
+const PERC = ["blindBelow","dimBelow","harmedAbove","blindAbove"];
+// Light-ascending band; hints keep the (optional, validator-gated) fields honest.
+const PERC_LABELS = {
+  blindBelow:  "blindBelow (blind below this light; 0 = darkvision, negative = sees into the void)",
+  dimBelow:    "dimBelow (clear sight at/above; partial between blindBelow and this)",
+  harmedAbove: "harmedAbove (glare — harmed & impaired above this light)",
+  blindAbove:  "blindAbove (optional — dazzled blind above; leave blank for none, must exceed harmedAbove)",
+};
 const BEHAVIOR_OPTS = ["wander","guard","hunt","passive"];
 const POSTURE_OPTS = ["standing","sitting","sleeping"];
 // present-only-when-true behaviour flags, with editor labels
@@ -173,7 +180,7 @@ function renderForm() {
   const perc = el("fieldset"); perc.append(el("legend", {}, "Perception band"));
   const pg = el("div", { className:"grid" });
   m.perception = m.perception || {};
-  for (const k of PERC) pg.append(field(k, numInput(m.perception, k)));
+  for (const k of PERC) pg.append(field(PERC_LABELS[k] || k, numInput(m.perception, k)));
   perc.append(pg); main.append(perc);
 
   // --- advanced (raw JSON for everything else) ---
