@@ -5,7 +5,7 @@
  * (hidden ones flagged), ground items, fixtures, and spawns resolved to mob
  * names (with population cap and respawn cadence).
  *
- *   node tools/depth-viewer/depth-viewer.js   # serves http://localhost:3942
+ *   node tools/depth-viewer/depth-viewer.js   # serves http://localhost:3944
  *   DEPTH_VIEWER_PORT                          # override the port
  *
  * This tool never writes anything — it only reads data/world/*.json. To EDIT
@@ -21,7 +21,7 @@ const ROOMS_PATH = path.join(ROOT, "data", "world", "rooms.json");
 const MOBS_PATH = path.join(ROOT, "data", "world", "mobs.json");
 const ITEMS_PATH = path.join(ROOT, "data", "world", "items.json");
 const PAGE_PATH = path.join(__dirname, "depth-viewer.html");
-const PORT = Number(process.env.DEPTH_VIEWER_PORT) || 3942;
+const PORT = Number(process.env.DEPTH_VIEWER_PORT) || 3944;
 
 function readJSON(p) {
   return JSON.parse(fs.readFileSync(p, "utf8"));
