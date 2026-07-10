@@ -1679,10 +1679,13 @@
     "name": "The Reeking Mouth",
     "depth": 6,
     "ambientLight": 1,
-    "description": "The gnawed crack off the throat opens into a low, dry chamber, and here the gloaming ends. Behind you the last cold-green glow and the wet breath of the gulf; ahead, the moss gives out entirely and the air turns warm and close and animal — a reek of musk and droppings and old bone, and under it the ceaseless dry scrabble of a great many small feet. The floor is worn smooth and greasy, scored everywhere with gnaw-marks. Something enormous denned down here long ago and never stopped breeding. The throat climbs back north; a rat-run drops away south into the dark.",
+    "description": "The gnawed crack off the throat opens into a low, dry chamber, and here the gloaming ends. Behind you the last cold-green glow and the wet breath of the gulf; ahead, the moss gives out entirely and the air turns warm and close and animal — a reek of musk and droppings and old bone, and under it the ceaseless dry scrabble of a great many small feet. The floor is worn smooth and greasy, scored everywhere with gnaw-marks. Something enormous denned down here long ago and never stopped breeding. Just inside the lip, half-dragged into the nesting, lie the picked-over remains of someone who came down and got no further — a burst pack, a guttered lamp, a glint of gear among the bones. The throat climbs back north; a rat-run drops away south into the dark.",
     "exits": { "north": "d6.gloaming.throat", "south": "d6.nest.run" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "torch", "qty": 1, "fuel": 80, "hidden": { "perception": 3 }, "respawn": 900 },
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 3 }, "respawn": 900 }
+    ],
     "spawns": [{ "mob": "giant-rat", "max": 2, "respawn": 90 }]
   },
   "d6.nest.run": {
@@ -1693,10 +1696,12 @@
     "name": "The Gnawed Run",
     "depth": 6,
     "ambientLight": 0,
-    "description": "A long side-gallery the vermin have worn into a highway — the floor packed hard and slick with their running, the walls padded with shredded nesting and scored to the raw rock with generations of teeth. The dark is total, and it seethes: small shapes scatter from your light only to circle back at its edge, and the squealing never quite stops. A bone-choked side-pocket opens east; the run climbs back north to the mouth, and drops south into the warren proper.",
+    "description": "A long side-gallery the vermin have worn into a highway — the floor packed hard and slick with their running, the walls padded with shredded nesting and scored to the raw rock with generations of teeth. The dark is total, and it seethes: small shapes scatter from your light only to circle back at its edge, and the squealing never quite stops. Here and there a few shards lie trodden into the greasy floor, where a purse burst and its owner did not stop to gather it. A bone-choked side-pocket opens east; the run climbs back north to the mouth, and drops south into the warren proper.",
     "exits": { "north": "d6.nest.mouth", "east": "d6.nest.midden", "south": "d6.nest.warren" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "shards", "qty": 4, "hidden": { "perception": 3 }, "respawn": 600 }
+    ],
     "spawns": [
       { "mob": "giant-rat", "max": 4, "respawn": 60 },
       { "mob": "brood-rat", "max": 1, "respawn": 180 }
@@ -1727,10 +1732,13 @@
     "name": "The Seething Warren",
     "depth": 6,
     "ambientLight": 0,
-    "description": "The run opens into the warren's heart, and the floor here is not stone but a living, heaving carpet of vermin — nests packed rim to rim, mounded high with shredded bedding and squirming young, the whole reeking mass boiling over itself in the dark. Bigger shapes move through it, unhurried: the warp of the nest, grown wrong and bold on the deep's own glimmer. A gnawed shaft breaks off east; the way runs on south, deeper and warmer; the run climbs back north.",
+    "description": "The run opens into the warren's heart, and the floor here is not stone but a living, heaving carpet of vermin — nests packed rim to rim, mounded high with shredded bedding and squirming young, the whole reeking mass boiling over itself in the dark. Bigger shapes move through it, unhurried: the warp of the nest, grown wrong and bold on the deep's own glimmer. A prospector lies half-sunk in the nests where the brood pulled them down, mostly bone now, a blade still fast in the grip of one hand. A gnawed shaft breaks off east; the way runs on south, deeper and warmer; the run climbs back north.",
     "exits": { "north": "d6.nest.run", "east": "d6.nest.chimney", "south": "d6.nest.glut" },
     "fixtures": [],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "short-sword", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1200 },
+      { "template": "lamp-oil", "qty": 1, "hidden": { "perception": 5 }, "respawn": 900 }
+    ],
     "spawns": [
       { "mob": "giant-rat", "max": 4, "respawn": 60 },
       { "mob": "warp-rat", "max": 2, "respawn": 150 },
@@ -1779,9 +1787,9 @@
     "name": "The King's Court",
     "depth": 6,
     "ambientLight": 0,
-    "description": "A round, high-domed chamber worn smooth by the passage of countless bodies, and packed to the walls with the nest's rank and file — but they part, here, and keep their distance from the mound of matted nesting at its heart. This is where the king holds the deep runs: nothing reaches the mother beyond except past him. Bones and stripped gear lie trodden into the floor. The glut lies back north; a last low hole breathes warm and close to the south.",
+    "description": "A round, high-domed chamber worn smooth by the passage of countless bodies, and packed to the walls with the nest's rank and file — but they part, here, and keep their distance from the mound of matted nesting at its heart. This is where the king holds the deep runs: nothing reaches the mother beyond except past him. Bones and stripped gear lie trodden into the floor. One wall is split by a fat seam of raw glimmer, richer than any thin crust back in the glut — a whole crystal's worth of cold blue-white light caught in the stone, the lode the Rush dreamed of, and the king squats his court around it. The glut lies back north; a last low hole breathes warm and close to the south.",
     "exits": { "north": "d6.nest.glut", "south": "d6.nest.throne" },
-    "fixtures": [],
+    "fixtures": ["glimmer-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "rat-king", "max": 1, "respawn": 600 },

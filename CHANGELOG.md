@@ -25,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its own "You go …" line for the mover (a chute you slide down, a rope you haul up)
   in place of the generic one; bystanders still see the plain leave/arrive. Flavour
   only — validated against real exits.
+- **Dead-adventurers' remains in the rat nest.** A handful of `search`-gated finds
+  (perception 3–5) scattered across the depth-6 nest — a guttered torch and lamp-oil
+  at the reeking mouth, spilled shards along the run, a fallen prospector's short
+  sword and oil in the seething warren — plus a **rich `glimmer-vein`** (whole-crystal
+  yield) set into the wall of Maw's court for players who clear the lieutenant.
 
 ### Changed
 - **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the
