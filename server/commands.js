@@ -337,7 +337,7 @@ function attack(state, player, arg) {
   const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
   // Switch the Inspect window to the target the instant you engage, rather than
   // waiting for the first swing to resolve on a later tick — combat then keeps
-  // this view refreshed each swing (see the attack event in index.js). Returns
+  // this view refreshed each swing (see the attack event in events.js). Returns
   // null in the dark, where there is nothing to pin.
   const view = buildExamineView(state, player, mob.id);
   const out = woke ? [{ type: "log", text: "You scramble to your feet." }, ready] : [ready];
@@ -465,7 +465,7 @@ function talk(state, player, arg, ctx) {
     const r = state.reactToPlayer(mob, player);
     if (r) {
       // Reaction lines may end in quoted speech, so only punctuate when needed
-      // (mirrors the mob-react renderer in index.js).
+      // (mirrors the mob-react renderer in events.js).
       const punct = (s) => (/["!?.]$/.test(s) ? s : `${s}.`);
       msgs.push({ type: "log", text: punct(`${cap(t.name)} ${r.textTarget}`) });
       roomLog(ctx, player, punct(`${cap(t.name)} ${r.textRoom.replace(/\{name\}/g, player.name)}`));

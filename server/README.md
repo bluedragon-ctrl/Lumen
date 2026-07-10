@@ -33,6 +33,8 @@ dev console** — a bare WebSocket tester so the server is previewable.
 - **`world.js`** — `loadWorld()`: reads static content into a frozen object.
 - **`state.js`** — `GameState`: authoritative dynamic state (players, per-room
   mob/item instances), light computation, tick advance, snapshotting.
+- **`events.js`** — event rendering: turns engine events (tick + command) into
+  client messages, one handler per event type.
 - **`index.js`** — HTTP + WebSocket server, connection handling, tick loop.
 
 Dynamic state is snapshotted to `data/runtime/` (gitignored) every

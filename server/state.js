@@ -344,7 +344,7 @@ class GameState {
   /** Credit `amount` lifetime XP to a player and resolve any level-ups it
    *  crosses. Mutates `xp`, `level` and `unspentPoints`; returns one
    *  `{ level, points }` per level gained (a big award can cross several). The
-   *  caller narrates/broadcasts these (see index.js `level-up` handling). */
+   *  caller narrates/broadcasts these (see events.js `level-up` handling). */
   awardXp(player, amount) {
     player.xp = (player.xp || 0) + (amount || 0);
     const ups = [];
