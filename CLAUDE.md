@@ -10,8 +10,10 @@ pull request:
 
 1. Branch off `main`: `feat/…`, `fix/…`, `docs/…`, `refactor/…`, or `chore/…`.
 2. Make the change on that branch.
-3. **Run `npm run validate`** (`node tools/validate-data.js`) before committing —
-   it checks JSON validity, cross-references, and room reachability. Must exit 0.
+3. **Run `npm run validate`** (`node tools/validate-data.js`) **and `npm test`**
+   before committing — the validator checks JSON validity, cross-references, and
+   room reachability; the tests cover light, combat, pathfinding, and the world
+   clock. Both must exit 0.
 4. Commit with [Conventional Commits](https://www.conventionalcommits.org/)
    (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`, `test:`, `perf:`).
 5. Update `CHANGELOG.md` under `[Unreleased]` as part of the change.
@@ -31,17 +33,26 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
 
 ## Layout
 
-> **This is a small codebase** — the spine is `server/commands.js`, `server/state.js`,
-> and `data/world/*.json` (each a few hundred lines). Read these directly rather than
-> spawning search agents; don't re-read a file an agent already reported on. The command
-> dispatcher is the `switch` in `commands.js`; the tick loop is `advance()` in `state.js`.
+> **This is a small codebase** — read files directly rather than spawning search
+> agents, and don't re-read a file an agent already reported on. The spine:
+> `server/commands.js` (dispatcher, delegating verbs to `server/commands/*.js`),
+> `server/state.js` (`GameState` core; the tick loop is `advance()`) with its
+> `server/state-*.js` mixins (mob AI, tide, spells, effects), and
+> `data/world/*.json`. Systems-as-implemented reference: [server/README.md](server/README.md).
 
-- `server/` — game server (tick loop, combat, light, commands, state). See
-  [server/README.md](server/README.md).
-- `data/world/*.json` — rooms, mobs, items, fixtures, recipes, spells.
-  `data/templates/player.json` — new-player seed (inventory, `startEquipment`,
-  known recipes). Data model: [docs/data-model.md](docs/data-model.md).
+- `server/` — game server (tick loop, light, combat, factions, quests, tide,
+  spells, commands, state). See [server/README.md](server/README.md).
+- `data/world/*.json` — rooms, mobs, items, fixtures, recipes, spells, quests,
+  tide. `data/templates/player.json` — new-player seed (inventory,
+  `startEquipment`, known recipes).
 - `client/` — vanilla 4-pane browser client.
+- `test/` — `node --test` suite (`npm test`): light, combat, pathfinding, world clock.
+- `docs/` — [data-model.md](docs/data-model.md) (JSON schemas),
+  [templates-quickref.md](docs/templates-quickref.md) (**start here when authoring
+  content** — condensed field reference), [lore.md](docs/lore.md) (**canon world &
+  lore**, consistency rules included), [side-areas.md](docs/side-areas.md), and
+  `docs/superpowers/specs/` + `plans/` — written designs for shipped and upcoming
+  systems (aggro, summoning, room effects…). Read the spec before touching its system.
 - `tools/validate-data.js` — pre-commit data validator.
 - `tools/release.js` — release cutter (`npm run release`, or double-click
   `tools/release.bat`). Derives the next SemVer
@@ -49,35 +60,29 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   `package.json` / `CHANGELOG.md`, commits on a `chore/release-x.y.z` branch, and
   pushes + opens the PR via `gh` (compare-URL fallback if `gh` is absent). Tagging
   after merge stays manual. See [CONTRIBUTING.md](CONTRIBUTING.md) → *Cutting a release*.
-- `tools/mob-editor/` — browser-based NPC stat editor (`npm run edit-mobs` or
-  double-click `tools/mob-editor/start.bat`, port 3939). Edits
-  `data/world/mobs.json`; validates and can open a PR via `gh`.
-- `tools/item-editor/` — browser-based item editor (`npm run edit-items` or
-  double-click `tools/item-editor/start.bat`, port 3941). Edits
-  `data/world/items.json`; validates and can open a PR via `gh`.
-- `tools/recipe-editor/` — browser-based crafting-recipe editor (`npm run
-  edit-recipes` or double-click `tools/recipe-editor/start.bat`, port 3942).
-  Edits `data/world/recipes.json` (name, station, shards, inputs, output);
-  validates and can open a PR via `gh`.
-- `tools/room-editor/` — browser-based room editor (`npm run edit-rooms` or
-  `tools/room-editor/start.bat`, port 3940). Edits the per-room `biome` (cosmetic
-  Inspect tint), `spawns` (mob / max / respawn), and `groundItems` (template /
-  qty / hidden / respawn) in `data/world/rooms.json`; validates and can open a PR
-  via `gh`. (Formerly the spawn-editor.)
-- `tools/biome-preview/` — browser-based biome colour lab (`npm run
-  preview-biomes` or `tools/biome-preview/start.bat`, port 3943). **Read-only.**
-  Links the live `client/styles.css` so the preview pane renders exactly what the
-  client does; pick a biome + light band, drag colours to test a new hue, and
-  copy the token/rule/enum CSS to paste into `client/styles.css` +
-  `tools/validate-data.js` (`BIOMES`). Writes nothing.
-- `DESIGN.md` — pillars and design intent. `docs/lore.md` — **canon world & lore**;
-  the reference for authored/AI-generated content (consistency rules included).
+- Browser-based world editors — each starts via its npm script or
+  `tools/<name>/start.bat`, validates before saving, and can open a PR via `gh`:
+
+  | Tool | Script | Port | Edits |
+  |---|---|---|---|
+  | `tools/mob-editor/` | `npm run edit-mobs` | 3939 | `mobs.json` NPC stats |
+  | `tools/room-editor/` | `npm run edit-rooms` | 3940 | `rooms.json` `biome` / `spawns` / `groundItems` (was the spawn-editor) |
+  | `tools/item-editor/` | `npm run edit-items` | 3941 | `items.json` |
+  | `tools/recipe-editor/` | `npm run edit-recipes` | 3942 | `recipes.json` (name, station, shards, inputs, output) |
+  | `tools/depth-viewer/` | `npm run view-depths` | 3942 (clashes with recipe-editor — override via `DEPTH_VIEWER_PORT`) | nothing — read-only depth map |
+  | `tools/biome-preview/` | `npm run preview-biomes` | 3943 | nothing — read-only colour lab; links live `client/styles.css`, emits CSS to paste into `styles.css` + `validate-data.js` (`BIOMES`) |
+
+- `DESIGN.md` — pillars and design intent (living record with shipped/deferred
+  markers; mechanics detail lives in `server/README.md`).
   `CHANGELOG.md` — keep-a-changelog.
 
 ## Conventions & gotchas
 
 - **Data-driven first.** New content (items, mobs, spells, recipes) should be JSON
   edits, not new code, wherever the existing systems support it.
+- **No content without approval.** Build mechanics freely, but names, lore,
+  items, mobs, and placement need the maintainer's explicit yes *before* they are
+  written into `data/world/*` or `docs/lore.md`. Draft and propose; don't land.
 - **Equipment slots are dynamic** — a slot exists once an item declares it
   (`hand`, `body`, `head`, `light` currently). Seed empty slots in
   `startEquipment` so `unequip <slot>` works from a fresh character.
