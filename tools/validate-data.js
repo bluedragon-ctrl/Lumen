@@ -82,6 +82,18 @@ function main() {
       if (typeof h.perception !== "number" || h.perception <= 0)
         errs.push(`room ${id}: hiddenExit ${dir} perception must be a positive number`);
     }
+    // Optional per-exit departure flavour (move() shows it to the mover instead of
+    // "You go <dir>."). Object of dir -> non-empty string; each dir must be a real exit.
+    if (r.exitMessages != null) {
+      if (typeof r.exitMessages !== "object" || Array.isArray(r.exitMessages))
+        errs.push(`room ${id}: exitMessages must be an object of dir -> message`);
+      else for (const [dir, msg] of Object.entries(r.exitMessages)) {
+        if (typeof msg !== "string" || !msg.trim())
+          errs.push(`room ${id}: exitMessage ${dir} must be a non-empty string`);
+        if (!(r.exits && r.exits[dir]))
+          errs.push(`room ${id}: exitMessage ${dir} has no matching exit`);
+      }
+    }
     for (const f of r.fixtures || []) {
       // A fixture entry is a template string, or an object { template, hidden }.
       const fid = typeof f === "string" ? f : f.template;

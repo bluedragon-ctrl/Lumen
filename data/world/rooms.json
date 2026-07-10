@@ -730,13 +730,29 @@
     "biome": "mutant",
     "tags": ["nest"],
     "name": "The Warden's Den",
-    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the warren-warden, largest of the vermin that boil up this near the rim, though not their source: whatever mothers them keeps to the deep dark, far below. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests.",
+    "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the warren-warden, largest of the vermin that boil up this near the rim, though not their source: whatever mothers them keeps to the deep dark, far below. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests. At the back of the den the floor falls away into a raw, dark sink — the throat the vermin climb out of, dropping away down toward wherever they are bred.",
     "depth": 1,
     "ambientLight": 0,
-    "exits": { "north": "d1.cut", "west": "d1.brood" },
+    "exits": { "north": "d1.cut", "west": "d1.brood", "down": "d2.sink" },
     "fixtures": ["bone-pile"],
     "groundItems": [],
     "spawns": [{ "mob": "gnaw", "max": 1, "respawn": 600 }]
+  },
+  "d2.sink": {
+    "id": "d2.sink",
+    "zone": "abyss",
+    "biome": "mutant",
+    "name": "The Vermin-Sink",
+    "depth": 2,
+    "ambientLight": 0,
+    "description": "The warden's floor gives out here into a wide, gnawed sink in the rock — a raw shaft dropping sheer and lightless into a warmth that reeks of musk and old blood, rising from somewhere very far down. The rim is greasy with the passage of countless small bodies climbing up out of the dark. This is where they come from, and it is no place for the living: the litter of those who found that out is scattered about the lip — a snapped ladder, a cracked helm, a prospector's boot with the foot still in it, none of it dragged back up. The shaft is a smooth, steepening chute; whatever goes down it does not climb back. The warden's den lies back up; the drop falls away down.",
+    "exits": { "up": "d1.den", "down": "d6.nest.chimney" },
+    "exitMessages": {
+      "down": "You lower yourself over the lip — and the rock tilts, and takes you. The chute steepens and there is no stopping it: a long, roaring, helpless slide through a gnawed throat of stone, blind in the dark, the reek rushing up thicker and warmer the deeper you drop, until the floor finally kicks out from under you and pitches you sprawling into the heart of the nest, far below. There is no climbing back up that."
+    },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
   },
   "d2.descent": {
     "id": "d2.descent",
@@ -1729,7 +1745,7 @@
     "name": "The Gnawed Chimney",
     "depth": 6,
     "ambientLight": 0,
-    "description": "A tall, narrow flue in the rock, gnawed and rubbed smooth and rising sheer out of sight overhead — a vermin-road bored straight up through the deep, run by run, toward the far-off rim. A steady trickle of the nest climbs it: young rats swarming up into the dark above, off to plague warrens far higher than this one. The draught that falls down it is faintly less foul than the nest's, and carries, very distantly, a colder air. The warren lies back west.",
+    "description": "A tall, narrow flue in the rock, gnawed and rubbed smooth and rising sheer out of sight overhead — a vermin-road bored straight up through the deep, run by run, toward the far-off rim. A steady trickle of the nest climbs it: young rats swarming up into the dark above, off to plague warrens far higher than this one. Now and again something too big for the climb comes down it instead, in a rattle of scree, and arrives hard at the bottom among the bones already there. For anything your size the shaft is a one-way road — the rats run its rubbed-smooth walls, but there is no purchase in them for a climb back up. The draught that falls down it is faintly less foul than the nest's, and carries, very distantly, a colder air. The warren lies back west.",
     "exits": { "west": "d6.nest.warren" },
     "fixtures": [],
     "groundItems": [],

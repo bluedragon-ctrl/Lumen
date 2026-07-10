@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   living-crown patriarch, lieutenant) and **the Brood-Mother** (the true source of
   the vermin, apex) — alongside a new mutated **warp-rat** and swarms of the
   existing giant- and brood-rats.
+- **A one-way plunge into the nest from the rim.** A raw sink at the back of the
+  Warden's Den (`d1.den`) drops to *The Vermin-Sink* (`d2.sink`, depth 2, `mutant`,
+  mobless) — a warning threshold that makes plain it is no place for the living. Its
+  down exit is a **one-way slide** into *The Gnawed Chimney* deep in the nest: you
+  can turn back from the lip, but once you commit to the chute there is no climbing
+  back up.
+- **Per-exit departure flavour (`exitMessages`).** Rooms may now give a single exit
+  its own "You go …" line for the mover (a chute you slide down, a rope you haul up)
+  in place of the generic one; bystanders still see the plain leave/arrive. Flavour
+  only — validated against real exits.
 
 ### Changed
 - **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the
