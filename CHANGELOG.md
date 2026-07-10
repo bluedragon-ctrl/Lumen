@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   state mixins), the missing `quests.json`/`tide.json` and docs pointers
   (`templates-quickref.md`, `side-areas.md`, `docs/superpowers/`), the
   depth-viewer, a compact tools table, and the no-content-without-approval rule.
+### Fixed
+- **Depth viewer default port moved 3942 → 3944.** `tools/depth-viewer/` collided
+  with the recipe editor (both defaulted to 3942), so the two tools couldn't run
+  at the same time. The viewer now serves on 3944 (`DEPTH_VIEWER_PORT` still
+  overrides); `start.bat` and `.claude/launch.json` updated to match.
 
 ### Added
 - **Room editor (was the spawn-editor).** `tools/spawn-editor/` is renamed to

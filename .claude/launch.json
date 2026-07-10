@@ -30,7 +30,7 @@
       "name": "depth-viewer",
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/depth-viewer/depth-viewer.js"],
-      "port": 3942
+      "port": 3944
     },
     {
       "name": "biome-preview",
