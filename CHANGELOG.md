@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **DESIGN.md & CLAUDE.md refreshed to match the shipped game.** DESIGN.md is now
+  a living intent record with shipped/partial/deferred markers: the `void` light
+  band and the Tide join §3.1/§6.3's light formula, and new intent sections cover
+  the Tide, magic & spells, shards & economy, rest/posture recovery, search &
+  detection-based aggro, and factions (§3.9–3.14); the Open/Deferred list is
+  brought current (mechanics detail stays in `server/README.md`). CLAUDE.md gains
+  `npm test` in the pre-commit checklist, the real server layout (command modules,
+  state mixins), the missing `quests.json`/`tide.json` and docs pointers
+  (`templates-quickref.md`, `side-areas.md`, `docs/superpowers/`), the
+  depth-viewer, a compact tools table, and the no-content-without-approval rule.
 ### Fixed
 - **Depth viewer default port moved 3942 → 3944.** `tools/depth-viewer/` collided
   with the recipe editor (both defaulted to 3942), so the two tools couldn't run
