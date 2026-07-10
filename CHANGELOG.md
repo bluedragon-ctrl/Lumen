@@ -21,6 +21,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `umbral-chitin-warden`, `pallid-hunter`).
 
 ### Added
+- **Void leech — a second Tide predator that drinks a caster dry.** A small, fragile
+  glass-cannon of the Starving Dark that the Tide looses *only where the void runs
+  deepest* (room light **≤ −4**), alongside the shallower void-shadow. Where a shadow
+  savages, a leech **drinks mana** — its innate mob-only cast *Leech Warmth* siphons a
+  delver's will (`mana-drain` effect: mana only, **no HP damage**) — and the deep breeds
+  them in far greater numbers (worldwide cap **10** to the shadow's 5). Frail (12 HP,
+  0 armour/ward) and light-bit like all its kin, but a swarm can leave a mage hollow
+  and spellless in the black. Two supporting mechanics landed with it:
+  - **`tide.predator` may now be an array of rules** (single-rule form still works),
+    each with its own `mob`, `chance`, `cap`, `faction`, `noSpoils`, and a new **`maxLight`**
+    gate — the light level *at or below which* that predator births (default `-1`, the
+    old "anywhere the delver's light has failed"). Caps are now **per-mob**, so each
+    predator swarms to its own ceiling independently.
+  - **`mana-drain` hostile spell effect** (mob-castable): drinks the target's mana via
+    the existing `_drainMana` primitive, rolling `drain` dice scaled by the caster's
+    attribute; only a player carries mana, so it finds nothing on a mob.
 - **`perception.blindAbove` — light can now *dazzle* a dark-adapted hunter blind.**
   The bright-side mirror of `blindBelow`: above this cap a creature's `noticeChance`
   and `hitChance` both collapse (to 0 and 5%), so a delver hauling strong light can

@@ -195,28 +195,40 @@ class TideMixin {
   }
 
   /** The Tide's living teeth, per tick (called from advance only while in a dark
-   *  phase). The dark itself births a predator beside a delver who has let their
-   *  light fail: every room holding a living player whose effective light is below 0
-   *  (the void band) has `tide.predator.chance` to spawn one `predator.mob` right
-   *  there. Capped at `predator.cap` shadows worldwide, so a long dark mounts pressure
-   *  toward the cap rather than flooding. A lit camp (light ≥ 0) is never a birthplace
-   *  — keeping a flame is the whole counterplay — and a shadow that strays into light
+   *  phase). `tide.predator` is one rule or an ARRAY of them — several predators
+   *  sharing the dark, each ticked independently (its own mob, cap and light
+   *  threshold), so a deeper, more numerous swarm can pool where the void runs
+   *  deepest alongside the shallower hunters. */
+  _tideCreepTick(events) {
+    const cfg = this.tide.predator;
+    if (!cfg) return;
+    for (const rule of Array.isArray(cfg) ? cfg : [cfg]) this._tideCreepRule(rule, events);
+  }
+
+  /** One predator rule's per-tick creep. The dark itself births the mob beside a
+   *  delver who has let their light fail: every room holding a living player whose
+   *  effective light is at or below the rule's `maxLight` (default -1 — anywhere the
+   *  delver's own light has failed; a deeper predator sets it lower, e.g. -4) has
+   *  `chance` to spawn one right there. Capped at `cap` of THIS mob worldwide, so a
+   *  long dark mounts pressure toward the cap rather than flooding, and each predator
+   *  swarms to its own ceiling. A room brighter than `maxLight` is never a birthplace
+   *  — keeping a flame is the whole counterplay — and a spawn that strays into light
    *  is seared by its lightBane as usual. Spawns are tagged `tideSpawn`, so the ebb's
    *  `_tideSweep` reclaims any still abroad; they carry no `origin` (never repop, and
    *  their pursuit is unleashed — the dark does not give up). */
-  _tideCreepTick(events) {
-    const cfg = this.tide.predator;
+  _tideCreepRule(cfg, events) {
     if (!cfg || !cfg.mob || !this.world.mobs[cfg.mob]) return;
     const cap = cfg.cap != null ? cfg.cap : 5;
-    let alive = 0; // living tide-spawned shadows already abroad (the global cap)
+    const maxLight = cfg.maxLight != null ? cfg.maxLight : -1;
+    let alive = 0; // living tide-spawned mobs of THIS template already abroad (the cap)
     for (const rt of Object.values(this.rooms))
-      for (const m of rt.mobs) if (m.tideSpawn && m.hp > 0) alive++;
+      for (const m of rt.mobs) if (m.tideSpawn && m.hp > 0 && m.template === cfg.mob) alive++;
     if (alive >= cap) return;
     const chance = cfg.chance != null ? cfg.chance : 0.05;
     const t = this.world.mobs[cfg.mob];
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       if (alive >= cap) break;
-      if (rt.light >= 0) continue; // the dark only births where a delver's light has failed
+      if (rt.light > maxLight) continue; // only where the dark is deep enough for this predator
       if (!this.playersIn(roomId).some((p) => p.hp > 0)) continue; // beside a living delver
       if (Math.random() >= chance) continue;
       const m = makeMobInstance(cfg.mob, this.world);

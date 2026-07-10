@@ -31,6 +31,7 @@ function makeCombatWorld() {
       hex: { id: "hex", name: "Hex", hostile: true, effect: { type: "weaken", name: "Hex", duration: 5 } },
       snuff: { id: "snuff", name: "Snuff", hostile: true, effect: { type: "douse", name: "Snuff" } },
       leech: { id: "leech", name: "Leech", hostile: true, effect: { type: "drain", damage: "6", healFactor: 0.5 } },
+      siphon: { id: "siphon", name: "Leech Warmth", hostile: true, effect: { type: "mana-drain", drain: "4" } },
     },
     fixtures: {}, recipes: {}, quests: {},
     playerTemplate: {
@@ -218,6 +219,38 @@ test("drain: a player-cast drain heals the player (engine path for a future scro
   assert.ok(result.killed, "the drain still kills");
   assert.equal(p.hp, p.maxHp - 10 + 3, "player healed floor(6 * 0.5) = 3");
   assert.equal(result.drained, 3, "result reports the heal for narration");
+});
+
+// --- Mana drain (void leech's Leech Warmth) ----------------------------------
+
+test("mana-drain: a leech drinks the player's mana and deals no HP damage", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const caster = addMob(state, "caster");
+  p.hp = 100; p.maxMana = 10; p.mana = 10;
+  const events = [];
+  state._mobCast(caster, state.world.mobs.caster, "arena", events, [pdesc(p)], "siphon");
+  assert.equal(p.mana, 6, "player lost the rolled 4 mana");
+  assert.equal(p.hp, 100, "no HP damage — a leech only drinks will");
+  const ev = events.find((e) => e.type === "mob-cast");
+  assert.equal(ev.manaDrain, true);
+  assert.equal(ev.manaDrained, 4, "mob-cast event carries the mana drained");
+  assert.ok(ev.damage === 0 && !ev.killed, "the cast deals and threatens no HP");
+  assert.ok(has(events, "vitals"), "the drained delver's mana bar is refreshed");
+});
+
+test("mana-drain: a wrung-dry delver loses nothing more (no vitals refresh)", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const caster = addMob(state, "caster");
+  p.hp = 100; p.maxMana = 10; p.mana = 0; // already spent dry
+  const events = [];
+  state._mobCast(caster, state.world.mobs.caster, "arena", events, [pdesc(p)], "siphon");
+  assert.equal(p.mana, 0);
+  const ev = events.find((e) => e.type === "mob-cast");
+  assert.equal(ev.manaDrain, true);
+  assert.equal(ev.manaDrained, 0, "found nothing to drink");
+  assert.ok(!has(events, "vitals"), "no bar refresh when nothing was drained");
 });
 
 // --- Shared target selection ------------------------------------------------

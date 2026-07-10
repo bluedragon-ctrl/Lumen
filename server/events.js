@@ -274,6 +274,9 @@ function createDispatcher({
       let youLine;
       if (ev.resisted) youLine = `${cap(who)} hurls ${ev.spellName} at you, but your ward turns it aside.`;
       else if (ev.doused) youLine = `${cap(who)} reaches out, and your light gutters and dies — the dark rushes in.`;
+      else if (ev.manaDrain) youLine = ev.manaDrained > 0
+        ? `${cap(who)} settles against you and drinks — the warmth of your will drains away (-${ev.manaDrained} mana).`
+        : `${cap(who)} settles against you and drinks, but finds no warmth left to take.`;
       else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
       else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
       if (ev.drained > 0) youLine += ` Your stolen warmth closes ${seen ? "its" : "their"} wounds.`;
@@ -284,6 +287,8 @@ function createDispatcher({
         const an = mobNameFor(o, ev);
         const line = ev.doused
           ? `${cap(an)} reaches for ${ev.targetName} and snuffs their light.`
+          : ev.manaDrain
+          ? `${cap(an)} settles against ${ev.targetName} and drinks.`
           : `${cap(an)} hurls ${ev.spellName} at ${ev.targetName}.`;
         sendToPlayer(o.id, { type: "combat", text: line });
       }
