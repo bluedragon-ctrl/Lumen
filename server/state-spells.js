@@ -223,6 +223,15 @@ class SpellsMixin {
         const damage = Math.max(1, rollDice(eff.damage) + spellScaleBonus(attrs, eff.scale));
         return { kind: "damage", damage, drainFactor: eff.healFactor || 0.5 };
       }
+      case "mana-drain": {
+        // A siphon of will (a void leech's Leech Warmth): drinks the target's mana
+        // rather than wounding them — no HP damage at all. Only a spellcaster (a
+        // player) carries any mana, so it finds nothing on a mob. The amount rolls
+        // from `drain` (dice), scaled by the caster's attribute. The drain itself is
+        // caller-side: only the caller knows the target actor and narrates it.
+        const amount = Math.max(1, rollDice(eff.drain || eff.damage) + spellScaleBonus(attrs, eff.scale));
+        return { kind: "mana-drain", amount };
+      }
       case "damage-over-time": {
         // A clinging burn (Witchfire): no immediate blow, but a DoT whose length
         // scales with the caster (more total damage, a longer-lasting mark)

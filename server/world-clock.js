@@ -57,10 +57,14 @@ const DEFAULT_TIDE = {
     calm: "<#cyan>The abyss settles. The dark has receded — for now.<#reset>",
   },
   // The dark grows teeth: during a tidePhase, each tick every room where a living
-  // delver stands in failed light (room light < 0) has `chance` to birth one `mob`
-  // right beside them, up to `cap` worldwide. The ebb reclaims them (tide-spawned).
-  // Set predator:null to leave the Tide toothless (the darkening cycle only).
-  predator: { mob: "void-shadow", chance: 0.05, cap: 5, faction: "wild", noSpoils: false },
+  // delver stands in dark enough light has `chance` to birth one `mob` right beside
+  // them, up to `cap` of that mob worldwide. `maxLight` is the light level at or
+  // below which the mob will birth (default -1 — anywhere the delver's own light has
+  // failed); a deeper predator raises the bar (e.g. -4, only the drowned deep). The
+  // ebb reclaims them (tide-spawned). `predator` may be a single rule (as here) or an
+  // ARRAY of rules — several predators sharing the dark, each with its own mob, cap,
+  // chance and light threshold. Set predator:null to leave the Tide toothless.
+  predator: { mob: "void-shadow", chance: 0.05, cap: 5, faction: "wild", noSpoils: false, maxLight: -1 },
   // Optional onset roster: mobs the Tide looses across whole depth bands the instant
   // it comes in (as opposed to the per-tick creep above). Each rule:
   // { mob, minDepth, maxDepth, count, maxLight, faction, noSpoils }. Empty by default.
@@ -84,9 +88,12 @@ function resolveTide(world) {
   for (const key of ["darkening", "lamp", "phaseMessages", "emotes"]) {
     if (authored[key]) merged[key] = { ...DEFAULT_TIDE[key], ...authored[key] };
   }
-  // predator is either an object (merged) or explicitly null (toothless).
+  // predator is a single rule (merged over the default), an ARRAY of rules (a whole
+  // roster of predators — passed through verbatim, each rule self-contained), or
+  // explicitly null (toothless).
   if (Object.prototype.hasOwnProperty.call(authored, "predator")) {
-    merged.predator = authored.predator ? { ...DEFAULT_TIDE.predator, ...authored.predator } : null;
+    const p = authored.predator;
+    merged.predator = Array.isArray(p) ? p : p ? { ...DEFAULT_TIDE.predator, ...p } : null;
   }
   return merged;
 }

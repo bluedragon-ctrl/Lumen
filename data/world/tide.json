@@ -22,7 +22,10 @@
     "receding": "<#cyan>The Tide turns. The dark loosens its grip and begins to ebb.<#reset>",
     "calm": "<#cyan>The abyss settles. The dark has receded — for now.<#reset>"
   },
-  "predator": { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false },
+  "predator": [
+    { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false, "maxLight": -1 },
+    { "mob": "void-leech", "chance": 0.05, "cap": 10, "faction": "wild", "noSpoils": false, "maxLight": -4 }
+  ],
   "spawns": [],
   "emotes": {
     "stirring": {

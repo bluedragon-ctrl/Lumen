@@ -354,6 +354,58 @@ test("Tide creep: the ebb sweeps every shadow back into the dark", () => {
   assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 0);
 });
 
+// A creep world with TWO predators: the shallow shadow (maxLight -1, anywhere the
+// delver's light has failed) and the deeper leech (maxLight -4, only the drowned
+// deep). `shallow` (depth 0) drops to -2 during the Tide; `deep` (depth 6) to -4.
+function makeTwoPredatorWorld() {
+  const w = makeCreepWorld();
+  w.rooms.shallow = { id: "shallow", name: "Shallow", description: "", depth: 0, ambientLight: 0, exits: {} };
+  w.mobs["void-leech"] = {
+    id: "void-leech", name: "a void leech", faction: "wild", maxHp: 12, speed: 12,
+    hostile: true, pursues: true, emitsLight: -1, xp: 8,
+    perception: { blindBelow: -20, dimBelow: -20, harmedAbove: 0 },
+    lightBane: { above: 0, damage: "1d6" },
+  };
+  w.tide = {
+    predator: [
+      { mob: "void-shadow", chance: 0.05, cap: 5, faction: "wild", maxLight: -1 },
+      { mob: "void-leech", chance: 0.05, cap: 10, faction: "wild", maxLight: -4 },
+    ],
+  };
+  return w;
+}
+
+test("Tide creep: the deeper predator's maxLight gate holds it to the drowned deep", () => {
+  const s = new GameState(makeTwoPredatorWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Shallow", "shallow"); // depth 0 → light -2 during the Tide
+  admitAt(s, "Deep", "deep"); // depth 6 → light -4 during the Tide
+  assert.equal(s.rooms.shallow.light, -2, "the shallow dips only to -2");
+  assert.equal(s.rooms.deep.light, -4, "the deep plunges to -4");
+
+  withRandom(0, () => s._tideCreepTick([])); // 0 < chance → always spawns where eligible
+  // The shadow (maxLight -1) births in both rooms; the leech (maxLight -4) only in the deep.
+  assert.equal(s.rooms.shallow.mobs.filter((m) => m.template === "void-shadow").length, 1);
+  assert.equal(s.rooms.shallow.mobs.filter((m) => m.template === "void-leech").length, 0, "-2 is too shallow for a leech");
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 1);
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-leech").length, 1, "the deep is dark enough for the leech");
+});
+
+test("Tide creep: each predator swarms to its OWN cap, independently", () => {
+  const s = new GameState(makeTwoPredatorWorld());
+  s.forceTidePhase("tide");
+  admitAt(s, "Deep", "deep");
+  // Pin the shadow at its cap of 5; the leech (cap 10) should still be free to birth.
+  for (let i = 0; i < 5; i++) {
+    const inst = require("../server/instances").makeMobInstance("void-shadow", s.world);
+    inst.tideSpawn = true;
+    s.rooms.deep.mobs.push(inst);
+  }
+  withRandom(0, () => s._tideCreepTick([]));
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-shadow").length, 5, "the shadow cap still holds");
+  assert.equal(s.rooms.deep.mobs.filter((m) => m.template === "void-leech").length, 1, "the leech is unaffected by the shadow's cap");
+});
+
 // --- NPC Tide reactions: phase + carried-light gating ----------------------
 
 function makeLightWorld() {

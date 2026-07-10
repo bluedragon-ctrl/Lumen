@@ -377,7 +377,7 @@ function main() {
         } else {
           // A hostile cast resolves through the shared per-type core (see
           // state._applyHostileSpellEffect) — only these kinds land from a mob.
-          const MOB_CASTABLE = ["damage", "douse", "damage-over-time", "drain"];
+          const MOB_CASTABLE = ["damage", "douse", "damage-over-time", "drain", "mana-drain"];
           const t = (spells[a.spell].effect || {}).type;
           if (!MOB_CASTABLE.includes(t))
             errs.push(`mob ${id}: hostile cast spell ${a.spell} has effect "${t}" a mob can't cast (use one of ${MOB_CASTABLE.join(", ")})`);
@@ -534,7 +534,7 @@ function main() {
   // instantaneous (dice + optional attribute scaling); `emit-light`,
   // `heal-over-time` and `protect` are statuses (heal pulses on an interval;
   // protect grants timed armour/ward).
-  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "drain", "emit-light", "heal-over-time", "protect", "restore", "sleep", "summon", "cleanse"];
+  const SPELL_EFFECT_TYPES = ["damage", "damage-over-time", "damage-room", "douse", "drain", "mana-drain", "emit-light", "heal-over-time", "protect", "restore", "sleep", "summon", "cleanse"];
   // Effect types each PLAYER cast path resolves — must mirror the runtime sets
   // in server/commands/magic.js (HOSTILE_EFFECTS / SUPPORT_EFFECTS). A spell a
   // player can come to know must fall inside them, or `cast` refuses it.
@@ -587,7 +587,7 @@ function main() {
         errs.push(`spell ${id}: a hostile spell cannot target "self"`);
       if (t === "damage-room" && sp.target !== "room")
         errs.push(`spell ${id}: a damage-room effect must have target "room"`);
-      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse", "drain"].includes(t) && sp.target !== "creature")
+      if (sp.hostile && ["damage", "damage-over-time", "sleep", "douse", "drain", "mana-drain"].includes(t) && sp.target !== "creature")
         errs.push(`spell ${id}: hostile effect "${t}" is single-target — target must be "creature"`);
     }
     // Optional narration overrides: an object of template strings by known key.
@@ -787,14 +787,20 @@ function main() {
     }
     // A `chance` knob is a probability in (0, 1].
     const chkChance = (v, where) => { if (v != null && (typeof v !== "number" || v <= 0 || v > 1)) errs.push(`tide: ${where} must be a number in (0, 1]`); };
-    // The per-tick creep predator (or null for a toothless Tide).
+    // The per-tick creep predator(s) — one rule, an array of rules, or null (a
+    // toothless Tide). Each rule is validated the same way; `where` names it.
     if (tide.predator != null) {
-      const pr = tide.predator;
-      if (!has(mobs, pr.mob)) errs.push(`tide: predator.mob references missing mob ${pr.mob}`);
-      chkChance(pr.chance, "predator.chance");
-      if (pr.cap != null && (typeof pr.cap !== "number" || pr.cap < 0)) errs.push("tide: predator.cap must be a non-negative number");
-      if (pr.faction != null && !FACTIONS.includes(pr.faction)) errs.push(`tide: predator.faction "${pr.faction}" is not one of ${FACTIONS.join(", ")}`);
-      if (pr.noSpoils != null && typeof pr.noSpoils !== "boolean") errs.push("tide: predator.noSpoils must be a boolean");
+      const chkPredator = (pr, where) => {
+        if (!pr || typeof pr !== "object") return errs.push(`tide: ${where} must be an object`);
+        if (!has(mobs, pr.mob)) errs.push(`tide: ${where}.mob references missing mob ${pr.mob}`);
+        chkChance(pr.chance, `${where}.chance`);
+        if (pr.cap != null && (typeof pr.cap !== "number" || pr.cap < 0)) errs.push(`tide: ${where}.cap must be a non-negative number`);
+        if (pr.maxLight != null && typeof pr.maxLight !== "number") errs.push(`tide: ${where}.maxLight must be a number`);
+        if (pr.faction != null && !FACTIONS.includes(pr.faction)) errs.push(`tide: ${where}.faction "${pr.faction}" is not one of ${FACTIONS.join(", ")}`);
+        if (pr.noSpoils != null && typeof pr.noSpoils !== "boolean") errs.push(`tide: ${where}.noSpoils must be a boolean`);
+      };
+      if (Array.isArray(tide.predator)) tide.predator.forEach((pr, i) => chkPredator(pr, `predator[${i}]`));
+      else chkPredator(tide.predator, "predator");
     }
     // The onset roster the dark looses across depth bands.
     if (tide.spawns != null) {

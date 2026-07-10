@@ -601,7 +601,10 @@ resolved config off `state.tide`.
     "onMessage": "Lamps flare to life…", "offMessage": "The lamps are snuffed out…"
   },
   "phaseMessages": { "tide": "<#red>The Tide comes in…<#reset>" },
-  "predator": { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false },
+  "predator": [
+    { "mob": "void-shadow", "chance": 0.05, "cap": 5, "faction": "wild", "noSpoils": false, "maxLight": -1 },
+    { "mob": "void-leech", "chance": 0.05, "cap": 10, "faction": "wild", "noSpoils": false, "maxLight": -4 }
+  ],
   "spawns": [],
   "emotes": {
     "tide": { "everyTicks": 20, "chance": 0.5, "requireDark": true, "lines": ["The dark presses close…"] }
@@ -617,7 +620,7 @@ resolved config off `state.tide`.
 | `darkening` | block | The depth-scaled light offset a phase folds into a room's ambient (always ≤ 0). A **tidePhase** applies `max(deepCap, tideBase − floor(depth / tideDepthDivisor))`; an **edgePhase** applies the flat `edgeOffset`; any other phase applies 0. |
 | `lamp` | block | Lamp-tending NPCs (factions `rim`/`umbral`) throw a room's switchable light fixtures on when the Tide enters an `onPhases` phase and snuff the Tide-lit ones on an `offPhases` phase; `onMessage`/`offMessage` narrate it. A phase in neither list leaves lamps as they are. |
 | `phaseMessages` | map | One world-wide line per phase change, keyed by the phase being entered. A phase with no entry announces nothing. Supports the client colour tags (`<#red>…<#reset>`). |
-| `predator` | block\|null | The per-tick **creep**: while in a tidePhase, each tick every room where a living delver stands in failed light (room light `< 0`) has `chance` to birth one `mob` beside them, up to `cap` worldwide. `faction` (default `wild`) and `noSpoils` tag the spawn. `null` = a toothless Tide (darkening only). Tide-spawned mobs are reclaimed by the ebb. |
+| `predator` | rule \| rule[] \| null | The per-tick **creep**: while in a tidePhase, each tick every room where a living delver stands in dark enough light has `chance` to birth one `mob` beside them, up to `cap` of that mob worldwide. `maxLight` (default `-1`) is the light level *at or below which* the mob births — anywhere the delver's own light has failed by default; a deeper predator raises the bar (e.g. `-4`, only the drowned deep). `faction` (default `wild`) and `noSpoils` tag the spawn. May be a single rule or an **array** of rules — several predators sharing the dark, each with its own mob, cap, chance and threshold, ticked independently. `null` = a toothless Tide (darkening only). Tide-spawned mobs are reclaimed by the ebb. |
 | `spawns` | Rule[] | Optional **onset roster**: mobs the dark pours across whole depth bands the instant it comes in. Each rule `{ mob, minDepth?, maxDepth?, count?, maxLight?, faction?, noSpoils? }`; a rule skips any room already brighter than `maxLight` (a lit camp keeps the hunters out). Empty by default. |
 | `emotes` | map | Ambient atmospheric lines the Tide itself performs, keyed by phase: `{ everyTicks, chance, requireDark, lines[] }`. Fires at most once per `everyTicks`, per occupied room, gated by `chance` and (if `requireDark`) a failed-light room. Flavour that belongs to the Tide, not a mob. |
 
@@ -710,7 +713,7 @@ with the `hostile` flag (which decides *eligibility* for `room`):
 | `false` | `self`     | Self-only weave — naming anyone else is refused outright. |
 | `false` | `creature` | The classic support targeting: self by default, an ally delver, or any creature you can see. |
 | `false` | `room`     | Lays the full caster-baked effect on the caster **and every ally present** — co-located delvers and mobs of factions *allied* to the caster's side (your summons and pets, the rim watch in town). Healer-aggro fires per ally mended. |
-| `true`  | `creature` | Single-target attack (`damage`, `damage-over-time`, `sleep`, mob-only `douse`). |
+| `true`  | `creature` | Single-target attack (`damage`, `drain` (damage + heal the caster by `healFactor`), `damage-over-time`, `sleep`, mob-only `douse`, mob-only `mana-drain` (drinks the target's mana — no HP damage; a void leech's *Leech Warmth*)). |
 | `true`  | `room`     | Blasts every eligible foe at once (`damage-room` only). |
 
 Summons are `target: "self"` (they conjure at the caster). The validator

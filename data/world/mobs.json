@@ -1599,6 +1599,33 @@
       { "template": "shadow-shard", "chance": 0.05 }
     ]
   },
+  "void-leech": {
+    "id": "void-leech",
+    "name": "a void leech",
+    "keywords": ["void", "leech", "leach", "mote", "dark"],
+    "description": "The least of the Starving Dark's get, and never one where there could be ten — a mote of hungry black no bigger than a clenched fist, wept out of the drowned air only where the Tide has pooled at its very deepest. It does not sear or savage as its shadow-kin do; it drifts close and settles, and drinks — drawing the warmth of will straight out of a delver, the spark a caster burns to work by. Frail as smoke, a single blow bursts it, but the deep dark breeds them faster than a hand can strike a light, and a cloud of them can leave a mage hollow and wrung dry in the black. When the Tide recedes they thin back into the air that bore them.",
+    "spawnMessage": "A mote of hungry dark peels loose from the black and drifts against you — {name}.",
+    "despawnVerb": "thins back into the dark",
+    "maxHp": 12,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 3, "vitality": 3, "intellect": 5, "wits": 8, "perception": 8 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 0 },
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 2,
+    "emitsLight": -1,
+    "lightBane": { "above": 0, "damage": "1d6" },
+    "xp": 8,
+    "actions": [
+      { "type": "cast", "weight": 8, "spell": "leech-warmth" },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": ["clings closer, and a cold, drinking pull tugs at the marrow of your will", "pulses once, dim and glutted", "drifts against your skin, patient and hungry", "shivers — a fleck of dark drinking the dark"] }
+    ],
+    "loot": []
+  },
   "pale-mother": {
     "id": "pale-mother",
     "name": "the Pale Mother",

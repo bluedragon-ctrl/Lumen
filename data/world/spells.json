@@ -301,5 +301,14 @@
     "hostile": true,
     "target": "creature",
     "effect": { "type": "damage", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
+  },
+  "leech-warmth": {
+    "id": "leech-warmth",
+    "name": "Leech Warmth",
+    "description": "Not a blow but a thirst. The void leech settles against a delver and drinks — not blood, not heat, but the warmth of will itself, the same spark a mage burns to shape a weave. One leech takes little; a swarm of them, clinging in the dark, can wring a caster dry before a flame can be struck. It leaves no wound, only the cold, hollow ache of a will spent that was never spent, and a spellbook gone useless in the black.",
+    "manaCost": 0,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "mana-drain", "drain": "1d3", "scale": { "attr": "intellect", "per": 4 } }
   }
 }

@@ -836,6 +836,7 @@ class MobAIMixin {
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
     let damage = 0, effectName = null, doused = false, drainFactor = 0;
+    let manaDrain = false, manaDrained = 0;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),
       // scaled by the mob's own attributes; no sourceId — a mob credits no one.
@@ -843,6 +844,11 @@ class MobAIMixin {
       if (applied.kind === "damage") {
         damage = applied.damage; // dealt through the shared sink below, after the cast event
         drainFactor = applied.drainFactor || 0;
+      } else if (applied.kind === "mana-drain") {
+        // A leech drinks the delver's mana (a mob carries none). No HP damage — a
+        // dedicated event field narrates the siphon; the drink lands right here.
+        manaDrain = true;
+        manaDrained = isPlayer ? this._drainMana(target.actor, applied.amount) : 0;
       } else if (applied.kind === "douse") {
         // The delver must relight (a turn) or fight blind; the room darkens
         // immediately, recomputed below so the band is fresh.
@@ -865,7 +871,7 @@ class MobAIMixin {
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
-      spellName: spell.name, resisted, damage, effectName, doused, killed, drained,
+      spellName: spell.name, resisted, damage, effectName, doused, killed, drained, manaDrain, manaDrained,
       targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
     if (damage > 0) {
@@ -874,6 +880,7 @@ class MobAIMixin {
       if (isPlayer) this._hurtPlayer(target.actor, damage, events, { silent: true });
       else this._hurtMob(target.actor, roomId, damage, events, { silent: true, threatTo: m.id, killer: this._killerPlayerFor({ id: m.id, kind: "mob", actor: m }) });
     }
+    if (manaDrained > 0) events.push({ type: "vitals", playerId: target.id }); // refresh the drained delver's mana bar
     if (drained > 0) m.hp += drained;
     return { targetDied: killed, attackerDied: false };
   }
