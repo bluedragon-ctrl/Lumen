@@ -165,7 +165,9 @@ Lets an NPC single out **one player** and address them directly. Fires two ways:
 
 **Perception band** (gates sight & combat accuracy): `blindBelow` = min light to
 see at all (0 = darkvision); `dimBelow` = light for clear sight (partial between);
-`harmedAbove` = max comfortable light (glare above). Deep-dwellers: low
+`harmedAbove` = max comfortable light (glare above); optional `blindAbove` = light
+that **dazzles it blind** (must exceed `harmedAbove`; a delver hauling strong light
+can slip past — the bright-side mirror of dark stealth). Deep-dwellers: low
 `harmedAbove`. Place power on the **threat ladder** by depth — see lore.
 
 ---

@@ -66,9 +66,17 @@ Every actor (player + mob) carries:
   but not harmful). Defaults to `blindBelow` (no partial tier) if omitted.
 - **`harmedAbove`** — maximum comfortable light. Above it the actor is harmed and
   dazzled by glare. Deep-dwellers have low values (bright light hurts them).
+- **`blindAbove`** *(optional)* — the bright-side twin of `blindBelow`: light past
+  this level **dazzles the actor blind** (combat accuracy drops to 5% and it can no
+  longer *notice* an enemy — see the aggro table). Must sit above `harmedAbove` (it
+  caps the glare band). Reserved for dark-adapted creatures; players carry none, so
+  strong light never blinds a delver — it lets one **slip past** a light-hating
+  hunter, the mirror of sneaking past a lantern-blind human in the dark. Omit for
+  actors with no upper limit.
 
-These define four visibility tiers used for **combat accuracy** (see the server
-README): can't-see (5%) · partial/dim (50%) · clear (100%) · glare (50%).
+These define the visibility tiers used for **combat accuracy** (see the server
+README): can't-see (5%) · partial/dim (50%) · clear (100%) · glare (50%) · dazzled
+(5%, `blindAbove` only).
 
 Example actors:
 
@@ -402,6 +410,7 @@ Each mob instance carries two per-enemy tables, both keyed by **any combatant id
   | Mob's sight (light vs its `perception` band) | gain per action |
   |---|---|
   | below `blindBelow` (blind / dark) | **0** — never noticed; can be passed |
+  | above `blindAbove` (dazzled by glare) | **0** — never noticed; can be passed |
   | dim, or glare above `harmedAbove` (impaired) | **0.5** — builds ~2× slower |
   | clear | **1.0** |
 

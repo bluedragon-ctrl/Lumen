@@ -5,7 +5,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Void-native creatures no longer go blind in their own dark.** Now that room light
+  runs negative (void rooms sit at −1/−2 ambient and the Tide floods the deep to −4/−6),
+  every creature with `blindBelow: 0` was blinded the instant light dipped below pitch
+  dark — including six that were blind *at home even at calm*. The scale now reads
+  cleanly: `0` is darkness (darkvision pierces it), **below `0` is the void** — active
+  anti-light that ordinary darkvision can't see through, so cave fauna are struck blind
+  when the Tide floods a passage (intended — that is when the void-shadows rule). But
+  creatures that *are* the void, or whose home already is, now see clearly into it
+  (`blindBelow`/`dimBelow` → −20, matching `void-shadow`): the pure dark (`the-starving-dark`,
+  `interred-dark`), the interred undead (`grave-husk`, `bound-husk`, `crypt-lurker`,
+  `aya-keeper`), the deep lurkers and crawlers (`cave-lurker`, `gloom-crawler` + elders),
+  and the apex deep-dwellers (`pale-king`, `pale-mother`, `nawpa`, `yana`, `umbral-trader`,
+  `umbral-chitin-warden`, `pallid-hunter`).
+
 ### Added
+- **`perception.blindAbove` — light can now *dazzle* a dark-adapted hunter blind.**
+  The bright-side mirror of `blindBelow`: above this cap a creature's `noticeChance`
+  and `hitChance` both collapse (to 0 and 5%), so a delver hauling strong light can
+  **slip past it** — a second stealth axis alongside sneaking through the dark. It's
+  earned, not free: it takes bright, fuel-hungry light (a torch only *glares* these
+  hunters; the `prospectors-blaze-lantern` at 5 fuel/tick blinds them), and that same
+  glare rouses the light-hungry fauna and draws worse. Applied to a curated set of
+  non-fleeing eyeless deep hunters — **pallid-hunter** and **crypt-lurker**
+  (`blindAbove` 5), **cave-centipede**, **centipede-broodmother**, **grave-husk**, and
+  **bound-husk** (`blindAbove` 6). Players carry no `blindAbove`, so bright light never
+  blinds a delver. Validator enforces `blindAbove > harmedAbove`. The **mob-editor**
+  (`tools/mob-editor/`) now exposes the full perception band — `blindBelow`, `dimBelow`,
+  `harmedAbove`, and the optional `blindAbove` — with inline hints; a blank `blindAbove`
+  stays absent rather than writing a `0`.
 - **3D world map viewer (`tools/map-3d/`).** A local, read-only, browser-based 3D model of the
   whole world: every room is a node labelled with its **name and id**, exits are edges, and depth
   is the vertical axis (warm lantern-gold at the surface fading to cold abyssal blue deep down).
