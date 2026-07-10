@@ -48,6 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   no Three.js, no CDN), so `node tools/map-3d/map-3d.js --build` bakes the live data into a
   single self-contained `lumen-map.html` you can open offline.
 
+### Changed
+- **Room edits** — biome referesh (d1.spire.roost, d1.den, d3.landing, d3.shallows, d3.pools, d3.falls, d3.cave, d4.lake.strand, d4.lake.shallows, d4.lake.narrows, d4.lake.farshore, d4.lake.causeway, d4.lake.islet, d4.lake.shrine, d7.throat, d8.grotto, d9.sanctuary.landing, d9.sanctuary.hall, d9.sanctuary.garden, d9.sanctuary.hollow, d9.sanctuary.cistern, d9.sanctuary.basin, d9.sanctuary.run, d10.camp.picket, d10.camp.commons, d10.camp.bench, d10.camp.ropehead).
+
 ## [0.6.0] - 2026-07-10
 ### Changed
 - **Versioning resynced to 0.6.0; the version now moves with every PR.** The

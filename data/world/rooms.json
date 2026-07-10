@@ -532,6 +532,7 @@
   "d1.spire.roost": {
     "id": "d1.spire.roost",
     "zone": "abyss",
+    "biome": "mutant",
     "name": "The Brood Vault",
     "description": "A great reeking bell of a chamber off the gallery, hollowed by nothing but the slow work of the colony, and utterly without light — the dark here is total, close, and full of the dry rustle of an unthinkable number of wings. At its heart, hung head-down and vast, roosts the thing the whole spire orbits: old, scarred, and patient. Disturb it and the walls will come alive. The only way out is back east to the gallery.",
     "depth": 1,
@@ -726,6 +727,7 @@
   "d1.den": {
     "id": "d1.den",
     "zone": "abyss",
+    "biome": "mutant",
     "tags": ["nest"],
     "name": "The Brood-Mother's Den",
     "description": "The passage opens into a fetid hollow heaped with gnawed bones and the ruin of those who came before. Here, swollen and scarred among her midden, squats Gnaw — the brood-mother, mother of the rats that plague the rim. She fixes you with small, black eyes and does not run. The passage north is behind you; a gnawed hole in the west wall breathes the warm reek of the warren where her brood nests.",
@@ -1046,7 +1048,6 @@
   "d3.landing": {
     "id": "d3.landing",
     "zone": "third",
-    "biome": "water",
     "tags": ["water"],
     "name": "The River Stair",
     "depth": 3,
@@ -1060,7 +1061,6 @@
   "d3.shallows": {
     "id": "d3.shallows",
     "zone": "third",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Pale Shallows",
     "depth": 3,
@@ -1077,7 +1077,6 @@
   "d3.pools": {
     "id": "d3.pools",
     "zone": "third",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Still Pools",
     "depth": 3,
@@ -1091,7 +1090,6 @@
   "d3.falls": {
     "id": "d3.falls",
     "zone": "third",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Sunless Falls",
     "depth": 3,
@@ -1105,7 +1103,6 @@
   "d3.cave": {
     "id": "d3.cave",
     "zone": "third",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Plunge Cave",
     "depth": 3,
@@ -1166,7 +1163,6 @@
   "d4.lake.strand": {
     "id": "d4.lake.strand",
     "zone": "fourth-lake",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Drowned Strand",
     "depth": 4,
@@ -1185,7 +1181,6 @@
   "d4.lake.shallows": {
     "id": "d4.lake.shallows",
     "zone": "fourth-lake",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Black Shallows",
     "depth": 4,
@@ -1202,7 +1197,6 @@
   "d4.lake.narrows": {
     "id": "d4.lake.narrows",
     "zone": "fourth-lake",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Shorewalk Narrows",
     "depth": 4,
@@ -1218,7 +1212,6 @@
   "d4.lake.farshore": {
     "id": "d4.lake.farshore",
     "zone": "fourth-lake",
-    "biome": "water",
     "tags": ["water"],
     "name": "The Far Bank",
     "depth": 4,
@@ -1234,7 +1227,6 @@
   "d4.lake.causeway": {
     "id": "d4.lake.causeway",
     "zone": "fourth-lake",
-    "biome": "water",
     "name": "The Gravel Spit",
     "depth": 4,
     "ambientLight": 1,
@@ -1249,7 +1241,6 @@
   "d4.lake.islet": {
     "id": "d4.lake.islet",
     "zone": "fourth-lake",
-    "biome": "water",
     "name": "The King's Reach",
     "depth": 4,
     "ambientLight": 1,
@@ -1307,7 +1298,7 @@
   "d4.lake.shrine": {
     "id": "d4.lake.shrine",
     "zone": "fourth-lake",
-    "biome": "water",
+    "biome": "umbral",
     "name": "Behind the Paqcha",
     "depth": 4,
     "ambientLight": 0,
@@ -1682,7 +1673,7 @@
   "d7.throat": {
     "id": "d7.throat",
     "zone": "gloom-warren",
-    "biome": "mutant",
+    "biome": "wraith",
     "name": "Where the Dark Goes Bad",
     "depth": 7,
     "ambientLight": -1,
@@ -2235,7 +2226,7 @@
   "d8.grotto": {
     "id": "d8.grotto",
     "zone": "sunken-warren",
-    "biome": "mutant",
+    "biome": "slime",
     "name": "The Slug Grotto",
     "depth": 8,
     "ambientLight": 1,
@@ -2253,7 +2244,6 @@
   "d9.sanctuary.landing": {
     "id": "d9.sanctuary.landing",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "name": "The Sanctuary Threshold",
     "depth": 9,
     "ambientLight": 1,
@@ -2266,7 +2256,6 @@
   "d9.sanctuary.hall": {
     "id": "d9.sanctuary.hall",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "name": "The Warded Hall",
     "depth": 9,
     "ambientLight": 1,
@@ -2294,7 +2283,6 @@
   "d9.sanctuary.garden": {
     "id": "d9.sanctuary.garden",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "tags": ["grazing"],
     "name": "The Glow Garden",
     "depth": 9,
@@ -2312,7 +2300,6 @@
   "d9.sanctuary.hollow": {
     "id": "d9.sanctuary.hollow",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "tags": ["grazing"],
     "name": "The Grub Hollow",
     "depth": 9,
@@ -2331,7 +2318,6 @@
   "d9.sanctuary.cistern": {
     "id": "d9.sanctuary.cistern",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "tags": ["grazing", "water"],
     "name": "The Kept Cistern",
     "depth": 9,
@@ -2348,7 +2334,6 @@
   "d9.sanctuary.basin": {
     "id": "d9.sanctuary.basin",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "tags": ["water"],
     "name": "The Plunge Basin",
     "depth": 9,
@@ -2366,7 +2351,6 @@
   "d9.sanctuary.run": {
     "id": "d9.sanctuary.run",
     "zone": "umbral-sanctuary",
-    "biome": "umbral",
     "name": "The Centipede Run",
     "depth": 9,
     "ambientLight": 0,
@@ -2578,6 +2562,7 @@
   "d10.camp.picket": {
     "id": "d10.camp.picket",
     "zone": "frontline-camp",
+    "biome": "rim",
     "name": "The Lastlight Picket",
     "depth": 10,
     "ambientLight": 1,
@@ -2592,6 +2577,7 @@
   "d10.camp.commons": {
     "id": "d10.camp.commons",
     "zone": "frontline-camp",
+    "biome": "rim",
     "name": "The Lastlight Common",
     "depth": 10,
     "ambientLight": 2,
@@ -2608,6 +2594,7 @@
   "d10.camp.bench": {
     "id": "d10.camp.bench",
     "zone": "frontline-camp",
+    "biome": "rim",
     "name": "Corvane's Bench",
     "depth": 10,
     "ambientLight": 2,
@@ -2622,6 +2609,7 @@
   "d10.camp.ropehead": {
     "id": "d10.camp.ropehead",
     "zone": "frontline-camp",
+    "biome": "rim",
     "name": "The Rope-Head",
     "depth": 10,
     "ambientLight": 1,
