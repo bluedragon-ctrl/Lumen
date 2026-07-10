@@ -73,6 +73,7 @@ branch before committing. Full conventions live in [CONTRIBUTING.md](CONTRIBUTIN
   | `tools/recipe-editor/` | `npm run edit-recipes` | 3942 | `recipes.json` (name, station, shards, inputs, output) |
   | `tools/depth-viewer/` | `npm run view-depths` | 3944 (`DEPTH_VIEWER_PORT` overrides) | nothing — read-only depth map |
   | `tools/biome-preview/` | `npm run preview-biomes` | 3943 | nothing — read-only colour lab; links live `client/styles.css`, emits CSS to paste into `styles.css` + `validate-data.js` (`BIOMES`) |
+  | `tools/map-3d/` | `npm run view-map` | 3945 (`MAP_3D_PORT` overrides) | nothing — read-only rotatable/zoomable 3D world map; `--build` bakes a standalone `lumen-map.html` |
 
 - `DESIGN.md` — pillars and design intent (living record with shipped/deferred
   markers; mechanics detail lives in `server/README.md`).
