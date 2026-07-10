@@ -5,7 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-07-10
 ### Changed
+- **Versioning resynced to 0.6.0; the version now moves with every PR.** The
+  release-batch scheme had stalled at 0.2.0 while ~200 PRs landed. From now on
+  every PR bumps the **PATCH** in `VERSION` + `package.json` as part of the
+  change (same rule as the changelog); the **MINOR** is a maintainer milestone
+  cut with `npm run release` and tagged `vX.Y.0` — patch versions are not
+  tagged. See [CONTRIBUTING.md](CONTRIBUTING.md) → *Versioning*.
 - **DESIGN.md & CLAUDE.md refreshed to match the shipped game.** DESIGN.md is now
   a living intent record with shipped/partial/deferred markers: the `void` light
   band and the Tide join §3.1/§6.3's light formula, and new intent sections cover
@@ -2984,5 +2992,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   light system, attributes & combat, world model, interface spec, architecture.
 - `VERSION`, `CHANGELOG.md`, `.gitignore`, `CONTRIBUTING.md`.
 
-[Unreleased]: https://github.com/bluedragon-ctrl/Lumen/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/bluedragon-ctrl/Lumen/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/bluedragon-ctrl/Lumen/compare/v0.1.0...v0.6.0
 [0.1.0]: https://github.com/bluedragon-ctrl/Lumen/releases/tag/v0.1.0

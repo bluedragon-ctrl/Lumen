@@ -31,6 +31,13 @@ function main() {
 
   const errs = [];
 
+  // VERSION and package.json move in lockstep (bumped together in every PR —
+  // see CONTRIBUTING.md → Versioning); catch drift before it lands.
+  const versionFile = fs.readFileSync(path.join(ROOT, "VERSION"), "utf8").trim();
+  const pkgVersion = read("package.json").version;
+  if (versionFile !== pkgVersion)
+    errs.push(`VERSION (${versionFile}) and package.json version (${pkgVersion}) disagree`);
+
   // Cosmetic room biomes — the Inspect window tints itself for these (see the
   // `.biome-*` rules in client/styles.css). Add a name here and a matching CSS
   // rule there to introduce a new one.

@@ -22,7 +22,8 @@
  * ready-to-click compare URL — nothing is lost, you just open the PR by hand.
  *
  * Bump policy (CONTRIBUTING.md → Versioning):
- *   pre-1.0:  any feat (or breaking) since last tag → MINOR, else → PATCH.
+ *   PATCH versions land per-PR, not here — this script cuts milestones.
+ *   pre-1.0:  a milestone is always a MINOR.
  *   1.x+:     breaking → MAJOR, feat → MINOR, else → PATCH.
  *   1.0.0 (first stable) is always a deliberate explicit version, never automatic.
  *
@@ -96,12 +97,14 @@ function parse(v) {
 }
 
 // Classify the bump from Conventional Commit subjects since the last tag.
+// Patches land per-PR, so a milestone cut is a MINOR pre-1.0 regardless of
+// what landed; post-1.0 the commits still decide MAJOR vs MINOR vs PATCH.
 function detectBump(commits, current) {
+  if (current.major === 0) return "minor"; // pre-1.0: a milestone is a MINOR
   const breaking = commits.some(
     (c) => /^[a-z]+(\(.+?\))?!:/.test(c) || /BREAKING[ -]CHANGE/.test(c)
   );
   const feat = commits.some((c) => /^feat(\(.+?\))?!?:/.test(c));
-  if (current.major === 0) return feat || breaking ? "minor" : "patch"; // pre-1.0
   if (breaking) return "major";
   if (feat) return "minor";
   return "patch";

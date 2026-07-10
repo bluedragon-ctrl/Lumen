@@ -1,8 +1,8 @@
 # Contributing to Lumen
 
-This documents the working conventions for the project. (Branch protection is
-not yet enforced via GitHub settings — these are the agreed conventions we
-follow by hand.)
+This documents the working conventions for the project. Branch protection is
+enforced via GitHub settings: `main` accepts only pull requests (admins
+included), and force-pushes and deletion are blocked.
 
 ## Branching
 
@@ -22,7 +22,8 @@ follow by hand.)
 3. **Review before merge.** The maintainer reviews each PR. Automated tests are
    deferred for now.
 4. Squash or merge into `main`; delete the branch.
-5. Update `CHANGELOG.md` under `[Unreleased]` as part of the PR.
+5. Update `CHANGELOG.md` under `[Unreleased]` **and bump the PATCH version** in
+   `VERSION` + `package.json` as part of the PR (see *Versioning*).
 
 ## Commit messages
 
@@ -38,24 +39,29 @@ Types: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `perf`.
 
 ## Versioning
 
-- [Semantic Versioning](https://semver.org/): **MAJOR.MINOR.PATCH**, starting at `0.1.0`.
-- Pre-1.0 — design and APIs may change between minor versions.
-  - **PATCH** — fixes/small tweaks.
-  - **MINOR** — new systems/features.
-  - **MAJOR** — first stable, complete, playable release (`1.0.0`).
-- The canonical version lives in **`VERSION`** (kept in lockstep with `package.json`).
+- [Semantic Versioning](https://semver.org/): **MAJOR.MINOR.PATCH**. The
+  canonical version lives in **`VERSION`** (kept in lockstep with `package.json`).
+- **Every PR bumps the PATCH** in `VERSION` + `package.json` as part of the
+  change — same rule as the changelog. The version on `main` always identifies
+  the current build. (If a parallel PR takes the number first, rebase and
+  re-bump — the conflict is one line in each file.)
+- **MINOR is a milestone**, the maintainer's call — cut when the game feels a
+  real step closer to done, not per feature. Milestones are cut with
+  `npm run release` (below) and are the only versions that get git tags.
+- **`1.0.0`** is the deliberate first stable, complete, playable release —
+  never chosen automatically.
 
-### Cutting a release — `npm run release`
+### Cutting a milestone — `npm run release`
 
-Versions are cut from the **Conventional Commit history**, not bumped per-PR.
-`[Unreleased]` accumulates merged PRs; a release batches them into one version.
+Patch versions land continuously per-PR; a release batches the accumulated
+`[Unreleased]` notes into a **milestone MINOR** (`0.6.14 → 0.7.0`).
 
 `tools/release.js` (`npm run release`, or double-click `tools/release.bat` — which
 previews the bump and asks before committing) automates the version *number* while
 leaving your hand-written changelog *prose* untouched. It:
 
-1. reads the commits since the last `v*` tag and picks the bump per the policy above
-   (pre-1.0: any `feat` → MINOR, else PATCH);
+1. bumps the MINOR (pre-1.0 a milestone is always a MINOR; post-1.0 the level is
+   detected from the Conventional Commits since the last tag);
 2. writes the new version to `VERSION` and `package.json`;
 3. stamps `CHANGELOG.md` — leaves a fresh empty `[Unreleased]` on top and moves your
    existing notes under a new `## [x.y.z] - YYYY-MM-DD` header (prose unchanged);
@@ -63,11 +69,12 @@ leaving your hand-written changelog *prose* untouched. It:
    **pushes and opens a PR into `main`** via `gh` (falling back to printing a
    ready-to-click compare URL if `gh` isn't installed).
 
-Review and merge the PR as usual, then **tag the merge commit** (`git tag v0.2.0
-&& git push origin v0.2.0`) — the release is the tag. (The script can't tag for
-you because a squash-merge changes the commit SHA.)
+Review and merge the PR as usual, then **tag the merge commit** (`git tag v0.7.0
+&& git push origin v0.7.0`) — the milestone is the tag; patch versions are not
+tagged. (The script can't tag for you because a squash-merge changes the commit
+SHA.)
 
 Useful flags: `--dry-run` (preview, touch nothing), `--major`/`--minor`/`--patch`
-(override the detected level), an explicit `1.0.0` (the deliberate first-stable cut),
+(override the level), an explicit `1.0.0` (the deliberate first-stable cut),
 `--no-pr` (branch + commit but don't push/open a PR), `--no-commit` (write files
 only). `1.0.0` is never chosen automatically.
