@@ -322,6 +322,14 @@ function main() {
     // A calm mob roused to attack once room light exceeds `above` (inverse of flee).
     if (m.lightAggro && typeof m.lightAggro.above !== "number")
       errs.push(`mob ${id}: lightAggro.above must be a number`);
+    // Dark-adapted sight cap: light past `blindAbove` dazzles the creature blind
+    // (bright-side mirror of blindBelow). Must sit above the glare band it caps.
+    if (m.perception && m.perception.blindAbove != null) {
+      const ba = m.perception.blindAbove;
+      if (typeof ba !== "number") errs.push(`mob ${id}: perception.blindAbove must be a number`);
+      else if (m.perception.harmedAbove != null && ba <= m.perception.harmedAbove)
+        errs.push(`mob ${id}: perception.blindAbove (${ba}) must be greater than harmedAbove (${m.perception.harmedAbove})`);
+    }
     // Authored starting posture — a dozing/resting mob is inert until struck.
     if (m.posture != null && !["standing", "sitting", "sleeping"].includes(m.posture))
       errs.push(`mob ${id}: posture must be "standing", "sitting", or "sleeping"`);

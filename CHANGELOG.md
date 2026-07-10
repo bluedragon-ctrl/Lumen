@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`perception.blindAbove` — light can now *dazzle* a dark-adapted hunter blind.**
+  The bright-side mirror of `blindBelow`: above this cap a creature's `noticeChance`
+  and `hitChance` both collapse (to 0 and 5%), so a delver hauling strong light can
+  **slip past it** — a second stealth axis alongside sneaking through the dark. It's
+  earned, not free: it takes bright, fuel-hungry light (a torch only *glares* these
+  hunters; the `prospectors-blaze-lantern` at 5 fuel/tick blinds them), and that same
+  glare rouses the light-hungry fauna and draws worse. Applied to a curated set of
+  non-fleeing eyeless deep hunters — **pallid-hunter** and **crypt-lurker**
+  (`blindAbove` 5), **cave-centipede**, **centipede-broodmother**, **grave-husk**, and
+  **bound-husk** (`blindAbove` 6). Players carry no `blindAbove`, so bright light never
+  blinds a delver. Validator enforces `blindAbove > harmedAbove`.
 - **3D world map viewer (`tools/map-3d/`).** A local, read-only, browser-based 3D model of the
   whole world: every room is a node labelled with its **name and id**, exits are edges, and depth
   is the vertical axis (warm lantern-gold at the surface fading to cold abyssal blue deep down).

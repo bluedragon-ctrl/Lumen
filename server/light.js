@@ -30,8 +30,12 @@ function effectiveLight(ambient, sourceOutputs = []) {
   return clampLight((ambient || 0) + sum);
 }
 
-/** Can an actor with the given perception band see at this light level? */
+/** Can an actor with the given perception band see at this light level? A
+ *  dark-adapted creature with `blindAbove` is *dazzled* by light past that band
+ *  (the bright-side mirror of `blindBelow`) and sees nothing — players carry no
+ *  `blindAbove`, so glare never blinds a delver. */
 function canSee(perception, light) {
+  if (perception && perception.blindAbove != null && light > perception.blindAbove) return false;
   return light >= (perception ? perception.blindBelow : 1);
 }
 
@@ -46,12 +50,15 @@ function isHarmedByLight(perception, light) {
  *   partial / dim (blindBelow .. below dimBelow) → 0.5
  *   clear (dimBelow .. harmedAbove)              → 1.0
  *   glare (above harmedAbove)                    → 0.5
+ *   dazzled (above blindAbove)                   → 0.05 (flailing, mirror of dark)
  * `dimBelow` defaults to `blindBelow` (no partial tier) when an actor omits it.
+ * `blindAbove` is optional (dark-adapted creatures only) — the bright-side cap.
  */
 function hitChance(perception, light) {
   const blindBelow = perception ? perception.blindBelow : 1;
   const dimBelow = perception && perception.dimBelow != null ? perception.dimBelow : blindBelow;
   if (light < blindBelow) return 0.05;
+  if (perception && perception.blindAbove != null && light > perception.blindAbove) return 0.05;
   if (isHarmedByLight(perception, light)) return 0.5;
   if (light < dimBelow) return 0.5;
   return 1.0;
@@ -66,11 +73,15 @@ function hitChance(perception, light) {
  *   can't see (below blindBelow)                → 0   (undetected)
  *   partial / dim, or glare (above harmedAbove)  → 0.5 (builds slowly)
  *   clear (dimBelow .. harmedAbove)              → 1.0 (noticed fast)
+ *   dazzled (above blindAbove)                   → 0   (undetected — stealth in glare)
+ * The `blindAbove` cap is the bright-side twin of `blindBelow`'s hard zero: it is
+ * what lets a delver hauling strong light slip past a dark-adapted hunter.
  */
 function noticeChance(perception, light) {
   const blindBelow = perception ? perception.blindBelow : 1;
   const dimBelow = perception && perception.dimBelow != null ? perception.dimBelow : blindBelow;
   if (light < blindBelow) return 0;
+  if (perception && perception.blindAbove != null && light > perception.blindAbove) return 0;
   if (isHarmedByLight(perception, light)) return 0.5;
   if (light < dimBelow) return 0.5;
   return 1.0;
