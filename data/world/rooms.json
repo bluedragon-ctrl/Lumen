@@ -1804,10 +1804,14 @@
     "name": "The Brood-Throne",
     "depth": 6,
     "ambientLight": 0,
-    "description": "The deepest hollow of the nest, and the warmest — a low, reeking vault heaped waist-deep in bedding and bone, the air thick enough to chew. Here, half-fused to the stone she has never left, heaves the source of it all: a mountain of pale, glimmer-swollen flesh, birthing litter on litter into the dark, sending them up and up toward a rim she will never see. She turns a blind white eye toward your light and does not run; she has nowhere she needs to go. The only way out is back north, past the king.",
+    "description": "The deepest hollow of the nest, and the warmest — a low, reeking vault heaped waist-deep in bedding and bone, the air thick enough to chew. Here, half-fused to the stone she has never left, heaves the source of it all: a mountain of pale, glimmer-swollen flesh, birthing litter on litter into the dark, sending them up and up toward a rim she will never see. She turns a blind white eye toward your light and does not run; she has nowhere she needs to go. Dragged up against the nesting at her flank is the cold cache of those the brood hauled down before you — packs and bones and gear gone green with damp, tumbled where she could keep it close. The only way out is back north, past the king.",
     "exits": { "north": "d6.nest.court" },
     "fixtures": ["bone-pile"],
-    "groundItems": [],
+    "groundItems": [
+      { "template": "iron-helm", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1800 },
+      { "template": "regeneration-draught", "qty": 1, "hidden": { "perception": 4 }, "respawn": 1800 },
+      { "template": "crystal", "qty": 2, "hidden": { "perception": 5 }, "respawn": 1800 }
+    ],
     "spawns": [{ "mob": "brood-mother", "max": 1, "respawn": 900 }]
   },
   "d6.camp": {

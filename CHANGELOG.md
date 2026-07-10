@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at the reeking mouth, spilled shards along the run, a fallen prospector's short
   sword and oil in the seething warren — plus a **rich `glimmer-vein`** (whole-crystal
   yield) set into the wall of Maw's court for players who clear the lieutenant.
+- **Boss loot for the rat nest.** Maw, the Rat-King drops **the Rat-King's crown**
+  (a grisly, sellable trophy) guaranteed; the Brood-Mother drops **a great warp-fang**
+  (rare glimmer-craft material, forward-hooked to a not-yet-known recipe) plus a
+  guaranteed crystal. Her throne also hides a dead-delvers' cache — an iron helm, a
+  regeneration draught, and crystals behind a `search` (perception 4–5).
 
 ### Changed
 - **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the

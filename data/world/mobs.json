@@ -231,7 +231,7 @@
       { "type": "idle", "weight": 2 },
       { "type": "emote", "weight": 2, "messages": ["shakes his living crown, and a dozen throats hiss at once", "drags a cracked delver's bone across the floor", "rears up, the knotted mass of his kin writhing about his flanks", "lets out a low, rattling shriek that the whole nest answers"] }
     ],
-    "loot": [{ "template": "crystal", "chance": 0.4 }, { "template": "rat-meat", "chance": 1 }, { "template": "glimmer-dust", "chance": 0.5 }]
+    "loot": [{ "template": "rat-king-crown", "chance": 1 }, { "template": "crystal", "chance": 0.5 }, { "template": "glimmer-dust", "chance": 0.5 }, { "template": "rat-meat", "chance": 1 }]
   },
   "brood-mother": {
     "id": "brood-mother",
@@ -258,7 +258,7 @@
       { "type": "idle", "weight": 2 },
       { "type": "emote", "weight": 2, "messages": ["heaves her flanks, birthing another blind, squirming litter", "turns a blind, glimmer-white eye toward the warmth of you", "lets out a low, endless, rattling groan that fills the nest", "drags herself a hand's-breadth across the midden and settles again"] }
     ],
-    "loot": [{ "template": "crystal", "chance": 0.6 }, { "template": "rat-meat", "chance": 1 }, { "template": "glimmer-dust", "chance": 0.5 }]
+    "loot": [{ "template": "warp-fang", "chance": 1 }, { "template": "crystal", "chance": 1 }, { "template": "glimmer-dust", "chance": 0.5 }, { "template": "rat-meat", "chance": 1 }]
   },
   "cave-bat": {
     "id": "cave-bat",
