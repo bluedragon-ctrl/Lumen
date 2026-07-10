@@ -5,6 +5,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Depth viewer default port moved 3942 → 3944.** `tools/depth-viewer/` collided
+  with the recipe editor (both defaulted to 3942), so the two tools couldn't run
+  at the same time. The viewer now serves on 3944 (`DEPTH_VIEWER_PORT` still
+  overrides); `start.bat` and `.claude/launch.json` updated to match.
+
 ### Added
 - **Room editor (was the spawn-editor).** `tools/spawn-editor/` is renamed to
   `tools/room-editor/` (`npm run edit-rooms`, port 3940) and now also sets a
