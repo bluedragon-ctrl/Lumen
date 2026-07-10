@@ -6,7 +6,7 @@
  * This is a PURE module: every function takes `(state, player, …)`, mutates
  * `player.quests`, and RETURNS an array of message objects (`{ type, text }`) for
  * the caller (a command handler in commands.js, or the tick event dispatcher in
- * index.js) to deliver. It never touches `ws`/`ctx` itself — so the same progress
+ * events.js) to deliver. It never touches `ws`/`ctx` itself — so the same progress
  * logic serves both the command path and the combat-tick path.
  *
  *   player.quests = {

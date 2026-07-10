@@ -50,7 +50,7 @@ const TRAINABLE = ["might", "vitality", "intellect", "wits", "perception"];
 
 // Credit quest kill-progress for a kill landed BY this player on the command path
 // (a spell or thrown bomb, where the death is returned inline rather than as a
-// tick event). Melee/DoT kills are credited in index.js, so a kill never counts
+// tick event). Melee/DoT kills are credited in events.js, so a kill never counts
 // twice. Returns the player-facing quest messages to append after the views.
 function questKill(state, player, death) {
   return death && death.victimTemplate ? quests.noteKill(state, player, death.victimTemplate) : [];
@@ -68,7 +68,7 @@ const selfAndViews = (state, player, line, kind = "log") => [
 
 // Append gold level-up lines for `ups` to a command's outgoing messages and
 // broadcast each to the room — the command-path mirror of the kill handler's
-// gold hail (index.js). Call AFTER awarding XP but the player view in `out`
+// gold hail (events.js). Call AFTER awarding XP but the player view in `out`
 // must already reflect the new level (build views after awardXp).
 function announceLevelUps(player, ups, ctx, out) {
   for (const up of ups || []) {

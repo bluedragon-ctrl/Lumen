@@ -152,6 +152,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GameState` method at runtime via the established `mixin()` copy, and a
   command + tick A/B battery (casts, summons, forced tide phases, DoTs, OOC
   regen) is byte-identical against `main`.
+- **Event rendering extracted from `server/index.js` (no behaviour change).**
+  The ~500-line event-rendering layer — `EVENT_HANDLERS` (one handler per engine
+  event type), the flavour tables, the light-gated room broadcast helpers, and
+  the mob/player death handlers — moves verbatim into
+  [server/events.js](server/events.js), the narration sibling of `render.js`'s
+  views. `index.js` drops from 827 to 331 lines and keeps only transport:
+  HTTP/WebSocket serving, login, view coalescing, and the tick loop; it wires
+  the dispatcher once at startup via `createDispatcher(...)`. Verified with a
+  live two-client WebSocket battery (combat both directions, mob death + loot +
+  quest credit, aggro engage, tide phase turn + HUD frames, disconnect
+  broadcast, view refreshes) — all handler paths fire, server log clean.
 
 ### Added
 - **The Gloaming descends — depth 6, the insect floor (six rooms).** The Weeping
