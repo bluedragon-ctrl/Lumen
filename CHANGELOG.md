@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- **The Inspect window's biome tint no longer tears when light changes.** The biome
+  glow (`[class*="biome-"]::before`, `z-index: -1`) only paints above the pane's opaque
+  background when `#inspect` forms a stacking context — and the only light band that
+  gave it one was `dim` (via its `filter`). So the glow rendered in dim rooms but popped
+  out the instant light crossed into another band (e.g. a luminous mob wandering in and
+  lifting the room from dim to bright). `#inspect` now carries `isolation: isolate` for a
+  permanent stacking context, so the tint paints identically in every band and a light
+  change only animates the already-transitioned background/filter instead of tearing the
+  whole glow layer in and out.
 - **Void-native creatures no longer go blind in their own dark.** Now that room light
   runs negative (void rooms sit at −1/−2 ambient and the Tide floods the deep to −4/−6),
   every creature with `blindBelow: 0` was blinded the instant light dipped below pitch
