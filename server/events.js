@@ -149,7 +149,9 @@ function createDispatcher({
       broadcastRoom(ev.roomId, ev, (n) => `${cap(n)}'s wounds close over. (+${ev.amount})`, { refreshRoom: true }),
 
     "effect-expired": (ev) => withPlayer(ev.playerId, (player) => {
-      const msg = ev.effectType === "emit-light" ? "The light beneath your skin fades." : `Your ${ev.name} fades.`;
+      const msg = ev.effectType === "emit-light" ? "The light beneath your skin fades."
+        : ev.effectType === "immobilize" ? "The grip on you slackens — you can move again."
+        : `Your ${ev.name} fades.`;
       sendToPlayer(ev.playerId, { type: "log", text: msg });
       refreshViews(player);
       // Others in the room may notice a glow going out / the room dimming.
@@ -158,7 +160,10 @@ function createDispatcher({
 
     "effect-applied": (ev) => withPlayer(ev.playerId, (player) => {
       // A trigger (e.g. a venomous bite) just landed a status effect on a player.
-      sendToPlayer(ev.playerId, { type: "log", text: `The ${ev.name} takes hold.` });
+      const text = ev.effectType === "immobilize"
+        ? "Thorned coils clamp around you — you're held fast and can't leave!"
+        : `The ${ev.name} takes hold.`;
+      sendToPlayer(ev.playerId, { type: "log", text });
       markPlayerView(ev.playerId);
     }),
 

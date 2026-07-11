@@ -302,9 +302,14 @@ provisional.)*
 
 **Downward.** The Gloaming is not one room but a descent — hollows stacked down the wall of
 a great steaming gulf, the growth thickening and the air growing hotter the lower you go,
-toward warm water somewhere below. How far its own floor lies — and whether it has one, or
-simply opens onto the deeper dark like everywhere else — no one has followed it to learn.
-What waits at the foot of the Gloaming stays, for now, unspoken.
+toward warm water somewhere below. In the lower reaches the growth stops merely *feeding* and
+starts *hunting*: the same **fruit-bearing plants** that hang the canopy with sweet luminous
+fruit above, given years and meat enough, mature into **carnivorous** blooms — rooted,
+patient, disguised among the honest ferns, still bearing their overripe fruit as they take
+whatever leans too close to the sweetness. They cannot follow; they do not need to, in a
+place built to make a prospector stand still and let their guard down. How far the Gloaming's own floor lies — and
+whether it has one, or simply opens onto the deeper dark like everywhere else — no one has
+followed it to learn. What waits at the foot of the Gloaming stays, for now, unspoken.
 
 ## The threat ladder (escalation by depth)
 

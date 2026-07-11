@@ -691,12 +691,14 @@ class GameState {
     return events;
   }
 
-  /** Narrate a status effect taking hold on an actor (player or mob). */
-  _narrateEffectApplied(events, who, name) {
+  /** Narrate a status effect taking hold on an actor (player or mob). `effectType`
+   *  lets the renderer word a non-standard status (e.g. an `immobilize` grip) that
+   *  the generic "the X takes hold" line doesn't fit. */
+  _narrateEffectApplied(events, who, name, effectType) {
     if (who.kind === "mob")
-      events.push({ type: "mob-effect-applied", roomId: who.roomId, mobId: who.id, mobName: who.name, name, emitsLight: who.emitsLight, light: this.rooms[who.roomId].light });
+      events.push({ type: "mob-effect-applied", roomId: who.roomId, mobId: who.id, mobName: who.name, name, effectType, emitsLight: who.emitsLight, light: this.rooms[who.roomId].light });
     else
-      events.push({ type: "effect-applied", playerId: who.id, name });
+      events.push({ type: "effect-applied", playerId: who.id, name, effectType });
   }
 
   /** Roll an effect spec's `chance` (default 1). True → it fires this hit. */
@@ -723,7 +725,7 @@ class GameState {
     }
     const s = creditId ? { ...spec, sourceId: creditId } : spec;
     this.applyEffect(target.actor, s);
-    this._narrateEffectApplied(events, target, s.name || s.type);
+    this._narrateEffectApplied(events, target, s.name || s.type, s.type);
     return null;
   }
 

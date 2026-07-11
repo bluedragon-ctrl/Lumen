@@ -1599,7 +1599,7 @@
     "name": "The Sunless Landing",
     "depth": 6,
     "ambientLight": 2,
-    "description": "The chute spits you out onto a shelf of wet black stone and lets go. You are inside the gulf now, under the false sky rather than beneath it — far overhead the moss-canopy is only a pale, unreachable smear, and down here the day it makes barely arrives: the glow comes in patches, from clumps of the same moss clinging to the dripping walls, and pools of warm dark lie between them. The air is hotter than the stair above, wet enough to drink, heavy with green rot and a low, ceaseless drone of small wings. Ways lead off into the steam — east into a reek of fungus, south where the stone steps down toward the sound of boiling water. The chute climbs back the way you came, up toward the light.",
+    "description": "The chute spits you out onto a shelf of wet black stone and lets go. You are inside the gulf now, under the false sky rather than beneath it — far overhead the moss-canopy is only a pale, unreachable smear — its trailing fronds and the emberfruit clustered on them no more than distant pinpricks of gold, far out of reach — and down here the day it makes barely arrives: the glow comes in patches, from clumps of the same moss clinging to the dripping walls, and pools of warm dark lie between them. The air is hotter than the stair above, wet enough to drink, heavy with green rot and a low, ceaseless drone of small wings. Ways lead off into the steam — east into a reek of fungus, south where the stone steps down toward the sound of boiling water. The chute climbs back the way you came, up toward the light.",
     "exits": { "up": "d5.falselight.descent", "east": "d6.gloaming.gallery", "south": "d6.gloaming.terraces" },
     "fixtures": [],
     "groundItems": [],
@@ -1639,9 +1639,9 @@
     "name": "The Droning Hollow",
     "depth": 6,
     "ambientLight": 3,
-    "description": "West, the gulf-dark gives way to light — a wide bank of the pale moss has taken this whole wall and burns cold and bright, the one true glow this deep, and after the patched dimness it is almost warm to stand in. The air is alive with it: clouds of glowing midges hang and turn in the radiance, whining, thick enough to breathe, drawn up out of the dark to the only day left down here. It is beautiful. It is also a lure, and every animal in the gulf that eats the things the light draws knows this hollow by heart — the moss lights a stage, and something is always waiting in the wings of it. A low crawl runs back north into the dark behind the glow; the terraces lie east.",
+    "description": "West, the gulf-dark gives way to light — a wide bank of the pale moss has taken this whole wall and burns cold and bright, the one true glow this deep, and after the patched dimness it is almost warm to stand in. Here the canopy dips low enough to reach, its trailing fronds hung heavy with emberfruit — soft, dim-glowing globes of orange-gold, the sweetest forage in the deep. The air is alive with it: clouds of glowing midges hang and turn in the radiance, whining, thick enough to breathe, drawn up out of the dark to the only day left down here. It is beautiful. It is also a lure, and every animal in the gulf that eats the things the light draws knows this hollow by heart — the moss lights a stage, and something is always waiting in the wings of it. A low crawl runs back north into the dark behind the glow; the terraces lie east.",
     "exits": { "east": "d6.gloaming.terraces", "north": "d6.gloaming.larder" },
-    "fixtures": ["glowing-moss-bank"],
+    "fixtures": ["glowing-moss-bank", "ember-fronds"],
     "groundItems": [],
     "spawns": [{ "mob": "glow-midge", "max": 2, "respawn": 150 }, { "mob": "steam-mantis", "max": 1, "respawn": 600 }]
   },
@@ -1666,8 +1666,8 @@
     "name": "The Gulf Throat",
     "depth": 6,
     "ambientLight": 1,
-    "description": "South, the terraces pinch to a lip of streaming stone and the floor opens under it — another throat of the gulf, dropping away into steam and boiling dark, the wash and knock of hot water rising loud out of it from somewhere further down still. The moss does not reach here; the last of the glow dies at the rim, and below it there is only the breathing black and the heat pouring up. This is the way on, for a delve with more rope and more nerve than this one — no line has been rigged, no stake driven, and the deep below keeps whatever it keeps. Off to one side, a dry crack breaks away south, out of the wet and into warm rock, and out of it pours an animal reek and the dry scrabble of a great many small feet. The bright terraces lie back north.",
-    "exits": { "north": "d6.gloaming.terraces", "south": "d6.nest.mouth" },
+    "description": "South, the terraces pinch to a lip of streaming stone and the floor opens under it — another throat of the gulf, dropping away into steam and boiling dark, the wash and knock of hot water rising loud out of it from somewhere further down still. The moss does not reach here; the last of the glow dies at the rim, and below it there is only the breathing black and the heat pouring up. This is the way on, and a line hangs down it now — rope rigged and staked at the lip by some braver delve, paying out into the steam toward warm water and, they say, more of the green somewhere further down. Off to one side, a dry crack breaks away south, out of the wet and into warm rock, and out of it pours an animal reek and the dry scrabble of a great many small feet. The bright terraces lie back north.",
+    "exits": { "north": "d6.gloaming.terraces", "south": "d6.nest.mouth", "down": "d7.gloaming.landing" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
@@ -1826,6 +1826,121 @@
     "groundItems": [
       { "template": "lamp-oil", "qty": 1, "respawn": 600 }
     ],
+    "spawns": []
+  },
+  "d7.gloaming.landing": {
+    "id": "d7.gloaming.landing",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Lower Landing",
+    "depth": 7,
+    "ambientLight": 2,
+    "description": "The line pays out and sets you down on a broad shelf a full stage below the throat, and the gulf has closed in around you. The false sky hangs nearer here — the moss-canopy droops low and heavy overhead, its light thickened to a green underwater dusk — and the heat has doubled: the air is a wet, breathing warmth that beads on the stone and runs off it. And everything grows. Cushions of moss and fat pale ferns crowd every ledge, the low fronds overhead hang heavy with dim-gold emberfruit, and grubs work the rot between them, too fat and content to mind you. It has the still, close hush of a hothouse, and the same feeling of being watched by nothing you can name. The line climbs back up toward the throat; the growth swallows a way south into a green dark, and east the shelf steps down toward a reek of hot water.",
+    "exits": { "up": "d6.gloaming.throat", "south": "d7.gloaming.thicket", "east": "d7.gloaming.pools" },
+    "fixtures": ["false-sky", "glowing-moss-bank", "ember-fronds"],
+    "groundItems": [],
+    "spawns": [{ "mob": "grub", "max": 2, "respawn": 120 }]
+  },
+  "d7.gloaming.thicket": {
+    "id": "d7.gloaming.thicket",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Green Choke",
+    "depth": 7,
+    "ambientLight": 1,
+    "description": "South, the growth closes over the path outright. Ferns stand higher than a man and the fungal stalks lean together overhead until the canopy is lost behind them and the light chokes down to a green murk you feel your way through. Everything here reaches: fronds lean into the warmth of you, tendrils stir where there is no wind, and more than one pale bloom among the leaves is too fleshy and too still, set about its rim with a fringe of inward-curving thorns. In this light there is no telling which of the plants are only plants — not until one moves. The landing lies back north; the choke thins west into a brighter pocket, and thickens south into worse.",
+    "exits": { "north": "d7.gloaming.landing", "west": "d7.gloaming.bower", "south": "d7.gloaming.snare" },
+    "fixtures": ["false-sky", "steam-fern-bed"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "ember-snapper", "max": 2, "respawn": 220, "hidden": { "perception": 3 } },
+      { "mob": "grub", "max": 1, "respawn": 150 }
+    ]
+  },
+  "d7.gloaming.bower": {
+    "id": "d7.gloaming.bower",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Fruiting Bower",
+    "depth": 7,
+    "ambientLight": 3,
+    "description": "West, the stalks open into a bright bloom of a chamber where the canopy has come down low enough to touch — a bower of hanging fronds heavy with emberfruit, dim-glowing globes of orange-gold dripping their warm light into the air. It is the loveliest thing in the deep, and it hums: clouds of glow-midges turn in the fruit-light, drunk on the sugar, and the whole pocket glows like a lantern someone left burning under the world. Here the fruiting plants are young and honest, still only fronds and fruit; what they come to, given years and meat, waits in the choke behind you. Old mushroom-trunks stand thick enough to cut, and the ferns grow lush and unbitten. There is no way on from here — only back east into the choke. A good place to gather, if the midges will let you keep your hands free.",
+    "exits": { "east": "d7.gloaming.thicket" },
+    "fixtures": ["false-sky", "ember-fronds", "giant-mushroom-stand", "steam-fern-bed"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "glow-midge", "max": 2, "respawn": 150 },
+      { "mob": "grub", "max": 1, "respawn": 150 }
+    ]
+  },
+  "d7.gloaming.snare": {
+    "id": "d7.gloaming.snare",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Snare",
+    "depth": 7,
+    "ambientLight": 1,
+    "description": "The choke tightens to its heart. Here the carnivorous growth has won outright: the floor is a mat of root and rot studded with wide, waiting blooms, and the bones of what they have caught lie half-dissolved among the stems — a picked ribcage, the emptied shell of a scorpion, one boot. Sap strings the air, sweetish and rank enough to taste. The thorny mouths turn toward the warmth of you as you pass, slow as sunflowers tracking a sun, and the fronds settle closed behind you soft as a held breath. Nothing here gives chase; nothing here has ever needed to. The choke lies back north; a gap in the growth falls away east toward a wider dark.",
+    "exits": { "north": "d7.gloaming.thicket", "east": "d7.gloaming.hollow" },
+    "fixtures": ["false-sky"],
+    "groundItems": [],
+    "spawns": [{ "mob": "ember-snapper", "max": 3, "respawn": 200, "hidden": { "perception": 3 } }]
+  },
+  "d7.gloaming.pools": {
+    "id": "d7.gloaming.pools",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "tags": ["water"],
+    "name": "The Scalded Steps",
+    "depth": 7,
+    "ambientLight": 1,
+    "description": "East off the landing the shelf steps down into water again — a fall of terraced pools deeper and hotter than any above, brimming and green-lit and breathing scalding steam up into the dark. The growth thins where the heat is fiercest: only a grey crust of dried salt and a few blistered ferns hold the ledges, and the slick stone between them is treacherous, a scald waiting on a careless foot. Flat pale scorpions run the hot rock where little else will, out for the basking and the wounded alike. The landing lies back west; south, the steps run down toward a wider, choked hollow where the light gathers.",
+    "exits": { "west": "d7.gloaming.landing", "south": "d7.gloaming.hollow" },
+    "fixtures": ["steaming-pool", "salt-crust"],
+    "groundItems": [],
+    "spawns": [{ "mob": "vent-scorpion", "max": 2, "respawn": 200 }]
+  },
+  "d7.gloaming.hollow": {
+    "id": "d7.gloaming.hollow",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Choked Hollow",
+    "depth": 7,
+    "ambientLight": 2,
+    "description": "The ways converge in a wide hollow where the canopy lifts and opens and the cold-green light pools bright — the one true glow this deep, and every hungry thing in the lower gulf knows it by heart. The growth ranks thick around the light's edge — moss and fern and low fronds hung heavy with emberfruit — and among them the odd too-fleshy bloom that is no fruit at all, and something is always waiting in it: the light lures the midges, the midges draw the grazers, and the grazers draw whatever is patient enough to stand still in the green and let its food come walking in. Ways run back north to the scalded steps and west into the snare; east a low gap breathes silk and warm water, and at the hollow's far lip the floor gives way downward into a sodden dark.",
+    "exits": { "north": "d7.gloaming.pools", "west": "d7.gloaming.snare", "east": "d7.gloaming.weave", "down": "d7.gloaming.maw" },
+    "fixtures": ["false-sky", "glowing-moss-bank", "ember-fronds"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "steam-mantis", "max": 1, "respawn": 600 },
+      { "mob": "ember-snapper", "max": 1, "respawn": 300, "hidden": { "perception": 4 } }
+    ]
+  },
+  "d7.gloaming.weave": {
+    "id": "d7.gloaming.weave",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "tags": ["water"],
+    "name": "The Weeping Weave",
+    "depth": 7,
+    "ambientLight": 2,
+    "description": "The east gap opens into a dripping bay where the Weeping Chasm-Moss has run riot — a whole wall and roof of it, the richest curtain of the stuff a prospector could dream of, its hair-fine threads hanging in their thousands and glowing a soft blue-white through the steam. It is a fortune in gloom-silk for the pulling. It is also exactly the kind of quiet, generous, easy place the Gloaming keeps its teeth in, and the moss is not the only thing here that has grown patient and still and glad of the warmth. The hollow lies back west.",
+    "exits": { "west": "d7.gloaming.hollow" },
+    "fixtures": ["weeping-moss-curtain", "false-sky"],
+    "groundItems": [],
+    "spawns": [{ "mob": "ember-snapper", "max": 1, "respawn": 260, "hidden": { "perception": 4 } }]
+  },
+  "d7.gloaming.maw": {
+    "id": "d7.gloaming.maw",
+    "zone": "deep-gloaming",
+    "biome": "gloaming",
+    "name": "The Sodden Maw",
+    "depth": 7,
+    "ambientLight": 0,
+    "description": "Down from the hollow the growth gives out at last. The canopy cannot reach here; the ferns dwindle to sickly threads and then to nothing, and the light dies with them into a breathing black. This is the foot of the green — a sodden throat of the gulf where the warm water pours away downward into a dark that has never been lit, and the smell rising out of it is no longer the smell of growing things. No line has been rigged here, no stake driven; whatever the Gloaming was the pleasant face of, it ends at this rim, and what waits below it keeps its own counsel. The hollow climbs back up toward the light.",
+    "exits": { "up": "d7.gloaming.hollow" },
+    "fixtures": [],
+    "groundItems": [],
     "spawns": []
   },
   "d7.throat": {

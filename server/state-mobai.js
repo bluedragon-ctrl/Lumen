@@ -36,6 +36,13 @@ const EMOTE_WEIGHT_SCALE = 0.25;
 const AGGRO_RATE = 1; // detection gained per action at clear sight
 const AGGRO_ENGAGE = 2; // detection threshold at which a mob commits to attack
 const AGGRO_GRACE = 3; // actions a target stays unperceived before detection decays
+// Ambush patience (see _isEngaged): an `ambush` mob takes sleeping prey outright,
+// but against an *awake* delver it lies in wait rather than committing on sight.
+// Once it has fully noticed such a delver, each action carries this small chance
+// that its patience breaks and it strikes anyway — the slow snap of a lair
+// predator (or a rooted carnivorous plant) at prey that lingers in reach. One
+// landed blow seeds combat threat, so the fight carries on normally from there.
+const AMBUSH_LINGER = 0.03; // per-action chance an ambusher snaps at a lingering awake delver
 // Mob memory (see _pruneAggro / _restoreGrudges): a `remembers` mob does
 // not forgive combat threat the way it forgets detection. When a player it has
 // traded blows with LEAVES the room, that threat is parked in `mob.grudge` rather
@@ -384,13 +391,18 @@ class MobAIMixin {
   /** A combatant is *engaged* by a mob once it has either traded blows (a live
    *  combat-threat entry, any amount → being hit provokes instantly, in any light
    *  or posture) or been noticed up to the detection threshold (`AGGRO_ENGAGE`).
-   *  An `ambush` mob holds its proactive (detection-driven) strike until the target
-   *  is a *sleeping* delver — it preys only on the helpless — but still fights back
-   *  outright once blows are traded. */
+   *  An `ambush` mob holds its proactive (detection-driven) strike for a *sleeping*
+   *  delver — it preys on the helpless — but a delver who lingers in reach while
+   *  awake risks a sudden snap (`AMBUSH_LINGER` per action once fully noticed). It
+   *  still fights back outright once blows are traded (the aggro branch above). */
   _isEngaged(mob, t, c) {
     if (mob.aggro && mob.aggro[c.id] > 0) return true;
     if (!(mob.detect && mob.detect[c.id] >= AGGRO_ENGAGE)) return false;
-    if (t.ambush) return c.kind === "player" && c.actor.posture === "sleeping";
+    if (t.ambush) {
+      if (c.kind !== "player") return false; // ambushers prey on delvers, not each other
+      if (c.actor.posture === "sleeping") return true; // helpless → taken outright
+      return Math.random() < AMBUSH_LINGER; // awake but lingering → the occasional snap
+    }
     return true;
   }
 

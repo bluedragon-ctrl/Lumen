@@ -168,14 +168,20 @@ function main() {
   // Combat triggers (see GameState.applyHitOutcome): `onHit` is a list of effect
   // specs an attacker lands on a hit (mob `attack.onHit` / item `weapon.onHit`);
   // `spikes` is a defender's melee reflect (mob-level / item `armour.spikes`).
+  // onHit adds `immobilize` over EFFECT_TYPES — a timed hold that bars the struck
+  // delver from leaving the room (a snapper's grip; see commands.move). Not a
+  // consumable effect, so it stays out of CONSUMABLE_EFFECT_TYPES.
+  const ONHIT_TYPES = [...EFFECT_TYPES, "immobilize"];
   const checkOnHit = (arr, where) => {
     if (arr == null) return;
     if (!Array.isArray(arr)) { errs.push(`${where}: onHit must be an array of effect specs`); return; }
     for (const spec of arr) {
       if (!spec || typeof spec !== "object") { errs.push(`${where}: onHit entry must be an object { type, ... }`); continue; }
-      if (!EFFECT_TYPES.includes(spec.type)) errs.push(`${where}: onHit unknown effect type "${spec.type}" (known: ${EFFECT_TYPES.join(", ")})`);
+      if (!ONHIT_TYPES.includes(spec.type)) errs.push(`${where}: onHit unknown effect type "${spec.type}" (known: ${ONHIT_TYPES.join(", ")})`);
       if (spec.type === "damage-over-time" && (typeof spec.damage !== "string" || !DICE_RE.test(spec.damage)))
         errs.push(`${where}: onHit damage-over-time needs valid dice (got "${spec.damage}")`);
+      if (spec.type === "immobilize" && (typeof spec.duration !== "number" || spec.duration <= 0))
+        errs.push(`${where}: onHit immobilize needs a positive duration (ticks) — an untimed hold never releases`);
       if (spec.duration != null && (typeof spec.duration !== "number" || spec.duration <= 0))
         errs.push(`${where}: onHit duration must be a positive number (ticks)`);
       if (spec.chance != null && (typeof spec.chance !== "number" || spec.chance <= 0 || spec.chance > 1))

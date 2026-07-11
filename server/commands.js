@@ -71,6 +71,10 @@ const VERB_SET = new Set([...VERBS, "l", "x", "i", "k", "c", "?"]); // + single-
 
 function move(state, player, dir, ctx) {
   autoStand(player); // you stand before you walk (sit/sleep don't block movement)
+  // Held fast (an `immobilize` status — a snapper's grip). You can still fight,
+  // rest, and act in the room, but you can't leave until the grip breaks or lapses.
+  if ((player.states || []).some((s) => s.type === "immobilize"))
+    return err("You strain to pull away, but something has you held fast — you can't leave until the grip breaks.");
   const room = state.world.rooms[player.location];
   // A normal exit, or a hidden one this player has already discovered (an
   // undiscovered hidden exit reads exactly like no exit — it isn't leaked).
