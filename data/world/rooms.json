@@ -2901,9 +2901,34 @@
     "depth": 5,
     "ambientLight": -1,
     "description": "The crack lets you down a long, scraping squeeze through cold rock and opens, all at once, into a chamber with no floor of light at all — the dark here is the deep kind, the kind that drinks a flame and gives nothing back. Dripping water ticks somewhere unseen, and the air is dead and still. The fault you came down by climbs back up; the chamber goes on down, where the rock has split further and the draft rises from somewhere deeper still.",
-    "exits": { "up": "d0.fault" },
+    "exits": { "up": "d0.fault", "east": "d5.fault.warmvein" },
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "cave-lurker", "max": 1, "respawn": 300, "hidden": { "perception": 3 } }]
+  },
+  "d5.fault.warmvein": {
+    "id": "d5.fault.warmvein",
+    "zone": "deep-fault",
+    "name": "The Warming Vein",
+    "depth": 5,
+    "ambientLight": 1,
+    "description": "The fault narrows to a crawl east, and something changes: the dead cold of the chamber behind gives way, degree by degree, to a dry warmth that has no business this deep. The still air begins to stir and move against your face, carrying the smell of hot stone and a faint sulphur bite. Ahead, past a last elbow of rock, a low restless glow washes the walls a dull orange — the first light down here that no one lit. The chamber lies back west; the glow is east.",
+    "exits": { "west": "d5.fault.deep", "east": "d6.fault.lavalake" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d6.fault.lavalake": {
+    "id": "d6.fault.lavalake",
+    "zone": "ember-deep",
+    "biome": "ember",
+    "name": "The Cinder Pool",
+    "depth": 6,
+    "ambientLight": 3,
+    "description": "The passage opens onto a low, wide cavern half-filled by a lake of molten rock. It is small as such things go — a stone's throw across — but it seethes, its skin cracking into slow orange veins and healing over black, and it throws a wavering light that reaches every corner of the room. Heat presses on you like a hand. Cinders lift off the surface, drift, and wink out. The rock underfoot is scorched smooth and warm through the boots. The cool way out is back west; the cavern's far side runs on, deeper into the heat.",
+    "exits": { "west": "d5.fault.warmvein" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [{ "mob": "ember-mote", "max": 2, "respawn": 240 }]
   }
 }

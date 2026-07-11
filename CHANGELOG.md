@@ -33,6 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   chance? }`); it counts down and clears like any status, and a fresh hit re-applies it.
   The **ember snapper** uses it as a chance-based bite (~35%, 3 ticks) — the plant's grip
   pins you in reach while the patch closes in.
+- **The ember deep — a lava lake east of the fault's foot.** The dead-cold chamber
+  at *The Fault's Foot* (`d5.fault.deep`) now opens east through *The Warming Vein*
+  (`d5.fault.warmvein`, a transitional threshold where the deep first turns warm) into
+  *The Cinder Pool* (`d6.fault.lavalake`) — a small molten lake in the new `ember`
+  biome and `ember-deep` zone, lit by the lava itself. It is drifted by a new
+  **ember mote**: a fragile, evasive spark of living heat that emits its own light,
+  shrugs off any glare, and pelts delvers with a new **Cinderbolt** spell. The pool's
+  far side is left open for the lava area to grow.
 - **The deep rat nest — a mutated mini-dungeon off the gloaming.** A dry crack
   south of *The Gulf Throat* (`d6.gloaming.throat`) opens into an eight-room warren
   in the `mutant` biome (`deep-nest` zone): the reeking mouth, a gnawed run and
