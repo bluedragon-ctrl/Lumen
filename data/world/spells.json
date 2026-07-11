@@ -310,5 +310,14 @@
     "hostile": true,
     "target": "creature",
     "effect": { "type": "mana-drain", "drain": "1d3", "scale": { "attr": "intellect", "per": 4 } }
+  },
+  "cinderbolt": {
+    "id": "cinderbolt",
+    "name": "Cinderbolt",
+    "description": "A spat gobbet of molten light that bursts against its mark in a scatter of sparks. The ember motes hurl it without thought — it is simply what they are, flung outward. A creature's Ward turns the worst of it aside.",
+    "manaCost": 4,
+    "hostile": true,
+    "target": "creature",
+    "effect": { "type": "damage", "damageType": "magical", "damage": "1d6", "scale": { "attr": "intellect", "per": 4 } }
   }
 }

@@ -2262,5 +2262,33 @@
       { "type": "emote", "weight": 2, "messages": ["sways slowly from side to side, tracking you", "cleans a hooked forelimb with unhurried care", "folds its blades tight against the pale glow of its body", "clicks, and a drift of half-eaten midges falls from its jaws"] }
     ],
     "loot": [{ "template": "iridescent-carapace", "chance": 0.9 }]
+  },
+  "ember-mote": {
+    "id": "ember-mote",
+    "name": "an ember mote",
+    "description": "A drifting knot of living heat, no bigger than a fist — a core of white-orange fire trailing sparks that gutter and relight. It hangs over the molten lake as if it belonged to it, turning slowly to face whatever comes near.",
+    "spawnMessage": "A spark lifts off the lava, gathers itself, and becomes {name}.",
+    "maxHp": 16,
+    "speed": 12,
+    "armour": 0,
+    "ward": 1,
+    "evasion": 0.8,
+    "emitsLight": 2,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 5, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 20 },
+    "behavior": "hunt",
+    "hostile": true,
+    "faction": "wild",
+    "attack": { "damage": "1d4", "actionCost": 12 },
+    "xp": 12,
+    "shards": "1d4",
+    "actions": [
+      { "type": "cast", "weight": 6, "spell": "cinderbolt" },
+      { "type": "attack", "weight": 3 },
+      { "type": "wander", "weight": 2, "verb": "drifts off across the pool", "scope": "zone" },
+      { "type": "emote", "weight": 2, "messages": ["sheds a spray of sparks", "pulses brighter, then dims", "circles the pool's edge"] },
+      { "type": "idle", "weight": 2 }
+    ],
+    "loot": []
   }
 }

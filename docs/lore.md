@@ -306,6 +306,19 @@ toward warm water somewhere below. How far its own floor lies — and whether it
 simply opens onto the deeper dark like everywhere else — no one has followed it to learn.
 What waits at the foot of the Gloaming stays, for now, unspoken.
 
+### The heat-veins (the ember deep)
+
+The deep fault does not only go down into cold and dark. In places it splits into a
+**heat-vein** — a crack that opens onto the Abyss's own molten blood, pooled in small
+lakes that throw a restless orange light. This is the one place in the deep where light
+is *native*: not carried down and guarded against the dark, but welling up out of the
+rock itself. Drifting over that glow are **ember motes** — sparks of the living heat
+that have gathered a dim will and a hunger, drawn to warmth and spitting it back at
+anything that comes to cool their pool. They are the antithesis of the dark-taken: where
+shadows drink light and flinch from any glare, the motes *are* light and are untroubled
+by it. How far the heat-veins run, and whether the fire that feeds them has any floor,
+is not yet known.
+
 ## The threat ladder (escalation by depth)
 
 A legible progression for hanging future content on:
