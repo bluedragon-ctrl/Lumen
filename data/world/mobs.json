@@ -2263,6 +2263,39 @@
     ],
     "loot": [{ "template": "iridescent-carapace", "chance": 0.9 }]
   },
+  "ember-snapper": {
+    "id": "ember-snapper",
+    "faction": "fauna",
+    "name": "an ember snapper",
+    "keywords": ["ember-snapper", "snapper", "ember", "plant", "bloom", "maw", "frond", "trap"],
+    "description": "What the fruiting canopy comes to, given years and meat enough: an old emberfruit bloom grown fat and rooted and no longer content to wait on the light for its living. Its petals fold back off a wet red throat rimmed with a fringe of inward-curving thorns, and among them it still bears the canopy's fruit — dim-glowing globes gone overripe and heavy, sugared on whatever the plant last caught and dissolved. It cannot walk and does not try to; it sits where it seeded, warm and patient, and waits for something living to lean close to the sweetness. Then it shuts.",
+    "spawnMessage": "One of the fruit-heavy blooms among the fronds turns its thorny mouth toward you — {name}, and it was never only a flower.",
+    "maxHp": 34,
+    "speed": 14,
+    "armour": 3,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 8, "intellect": 0, "wits": 3, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 16 },
+    "behavior": "lurk",
+    "hostile": true,
+    "ambush": true,
+    "helper": true,
+    "attack": {
+      "damage": "2d4",
+      "actionCost": 14,
+      "onHit": [
+        { "type": "damage-over-time", "name": "digesting", "damage": "1d3", "duration": 6, "chance": 1 },
+        { "type": "immobilize", "name": "Held", "duration": 3, "chance": 0.35 }
+      ]
+    },
+    "xp": 22,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 4 },
+      { "type": "emote", "weight": 2, "messages": ["leans, slow as a sunflower, toward the warmth of you", "drips a bead of clear sap from a thorn-tip", "shudders once, petals flexing, and stills", "breathes out a sweetish, rotten reek"] }
+    ],
+    "loot": [{ "template": "emberfruit", "chance": 0.8 }]
   "ember-mote": {
     "id": "ember-mote",
     "name": "an ember mote",

@@ -270,3 +270,55 @@ test("target selection: both melee and cast pick the highest-threat enemy", () =
     assert.equal(ev.targetId, p2.id, `${kind} targeted the higher-threat enemy`);
   }
 });
+
+// --- Ambush engagement (rooted/lurking predators) ---------------------------
+
+// AGGRO_ENGAGE is 2 (state-mobai.js): a detect meter must reach it before an
+// ambusher will consider a target at all. `_isEngaged` is a pure predicate, so we
+// exercise it directly with Math.random pinned for deterministic linger rolls.
+function withRandom(v, fn) {
+  const real = Math.random;
+  Math.random = () => v;
+  try { return fn(); } finally { Math.random = real; }
+}
+
+test("ambush: sleeping prey is taken outright; an awake lingerer is snapped at only by chance", () => {
+  const state = setup();
+  const t = { ambush: true };
+  const noticed = (over = {}) => ({ detect: { P: 2 }, ...over }); // fully noticed the player
+  const sleeper = { id: "P", kind: "player", actor: { posture: "sleeping" } };
+  const awake = { id: "P", kind: "player", actor: { posture: "standing" } };
+
+  // Sleeping delver → engaged outright, no roll (pin random high to prove it).
+  assert.equal(withRandom(0.99, () => state._isEngaged(noticed(), t, sleeper)), true, "sleeper taken");
+  // Awake lingerer, roll below the linger chance → the snap.
+  assert.equal(withRandom(0.0, () => state._isEngaged(noticed(), t, awake)), true, "awake lingerer snapped");
+  // Awake lingerer, roll above the chance → it keeps waiting.
+  assert.equal(withRandom(0.5, () => state._isEngaged(noticed(), t, awake)), false, "awake lingerer left alone");
+  // Not yet fully noticed → never engaged, even a sleeper.
+  assert.equal(withRandom(0.0, () => state._isEngaged(noticed({ detect: { P: 1 } }), t, sleeper)), false, "must notice first");
+  // Once blows are traded (aggro > 0) it commits regardless of posture or roll.
+  assert.equal(withRandom(0.99, () => state._isEngaged(noticed({ aggro: { P: 1 } }), t, awake)), true, "combat carries on");
+});
+
+// --- Immobilize (a snapper's grip) ------------------------------------------
+
+test("immobilize: an onHit hold lands a timed state that expires and frees the player", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  p.hp = 100;
+  // Land the hold exactly as an attacker's onHit immobilize does (shared trigger path).
+  const applied = [];
+  state._applyTriggerEffect(applied, { type: "immobilize", name: "Held", duration: 3 }, pdesc(p), null, null);
+  const held = (p.states || []).find((s) => s.type === "immobilize");
+  assert.ok(held, "a Held state is applied");
+  assert.equal(held.remaining, 3, "carries its duration");
+  assert.ok(applied.some((e) => e.type === "effect-applied" && e.effectType === "immobilize"),
+    "apply is narrated with the effect type so the renderer can word the grip");
+  // Count it down: it lapses on the 3rd tick and announces its type so the release reads right.
+  const ticks = [];
+  for (let i = 0; i < 3; i++) state._tickEffects(ticks);
+  assert.ok(!(p.states || []).some((s) => s.type === "immobilize"), "the hold has lapsed");
+  assert.ok(ticks.some((e) => e.type === "effect-expired" && e.effectType === "immobilize"),
+    "expiry narrated with the effect type");
+});

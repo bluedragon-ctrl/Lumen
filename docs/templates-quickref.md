@@ -118,7 +118,9 @@ common fields + `stackable`.
 Action types: `attack | cast | emote | wander | idle | flee | summon | react`.
 `emote` needs a non-empty `messages[]`. `onDamage` (defender-side trigger array)
 mirrors item armour `onDamage` — see data-model "Combat triggers" for the full
-shape.
+shape. `attack.onHit` effect types: `damage-over-time | emit-light | restore |
+immobilize` — the last is a timed **hold** (`{ type: "immobilize", name, duration,
+chance? }`) that bars the struck delver from leaving the room until it lapses.
 
 ### NPC reactions — the `react` action
 

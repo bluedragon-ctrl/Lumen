@@ -6,6 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Depth 7 — the lower Gloaming, where the garden turns predator.** A rigged line
+  down *The Gulf Throat* (`d6.gloaming.throat`) drops into an eight-room descent in
+  the `gloaming` biome (`deep-gloaming` zone): the lower landing, a green choke and
+  its heart-snare gone to carnivorous growth, a bright fruiting bower, the scalded
+  steps, a choked hollow where the ways converge, a weeping gloom-silk weave, and
+  the sodden maw — the foot of the green, the marked way down to the next deep (still
+  unrigged, opened in a later pass). Reuses the gloaming roster (grub, glow-midge,
+  vent-scorpion, steam-mantis) as the deeper tier's fauna.
+- **The ember snapper — a carnivorous plant (new mob).** The mature form of the
+  gloaming's fruit-bearing canopy plants: a rooted, light-loving ambush bloom that hides
+  among the honest ferns, takes a sleeping prospector outright, and digests what it
+  catches (`onHit` DoT). It still bears the canopy's fruit and drops **emberfruit** on
+  death. It never gives chase — the danger is lingering in its room, not passing through.
+  Snappers are **`helper`s**: strike one (or harm the grubs basking in their bed) and the
+  whole rooted patch shuts on you at once, so a choked room is a genuine deadly trap.
+  (The emberfruit plant family is now stocked across the gloaming's floors — forageable
+  `ember-fronds` in depth 6's Droning Hollow and in depth 7's Fruiting Bower, Lower
+  Landing, and Choked Hollow, plus emberfruit worked into the depth 6/7 landing
+  descriptions — so the snapper's lineage reads top-to-bottom (young fruiting fronds
+  above, their carnivorous mature form below) and there's forage supply ready for the
+  emberfruit recipes coming in a later pass.)
+- **New status effect — `immobilize` (held fast).** A timed hold that bars the affected
+  player from leaving the room (`commands.move` refuses) while they can still fight, rest,
+  and act. Authored as an `onHit` effect spec (`{ type: "immobilize", name, duration,
+  chance? }`); it counts down and clears like any status, and a fresh hit re-applies it.
+  The **ember snapper** uses it as a chance-based bite (~35%, 3 ticks) — the plant's grip
+  pins you in reach while the patch closes in.
 - **The ember deep — a lava lake east of the fault's foot.** The dead-cold chamber
   at *The Fault's Foot* (`d5.fault.deep`) now opens east through *The Warming Vein*
   (`d5.fault.warmvein`, a transitional threshold where the deep first turns warm) into
@@ -45,6 +72,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regeneration draught, and crystals behind a `search` (perception 4–5).
 
 ### Changed
+- **Ambush predators lose patience.** An `ambush` mob still takes a *sleeping* delver
+  outright, but once it has fully noticed one who is **awake and lingering** in its
+  room, each action now carries a small chance (`AMBUSH_LINGER`, 3%) that it strikes
+  anyway — the slow snap of a rooted plant or lair predator at prey that overstays.
+  Passing straight through stays safe; standing still no longer does. Applies to all
+  ambushers (cave-lurker, crypt-lurker, snapper).
 - **Gnaw is demoted to the Warren-Warden.** The depth-1 rat boss was billed as *the
   Brood-Mother*, but the real mother now dwells deep in the rat nest; Gnaw is
   reframed as a lone warden guarding the surface warren (her den renamed, stats

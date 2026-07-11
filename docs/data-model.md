@@ -306,13 +306,23 @@ Two symmetric, data-driven primitives, resolved in one place
 **`onHit`** — a list of effect specs applied to the defender on a *landed* hit.
 Lives on a mob's `attack.onHit` and, identically, on an item's `weapon.onHit` (so
 player weapons reuse it). Each entry is an `applyEffect` spec (`emit-light` /
-`restore` / `damage-over-time`) plus an optional `chance` (default 1). When the
-attacker is a **player**, the engine stamps `sourceId` so a poison kill credits
-them (like a bleed); a **mob's** venom credits no one. Re-applying each hit stacks
-independent instances. DoT ticks bypass armour (it's poison, not a blow).
+`restore` / `damage-over-time` / `immobilize`) plus an optional `chance` (default
+1). When the attacker is a **player**, the engine stamps `sourceId` so a poison
+kill credits them (like a bleed); a **mob's** venom credits no one. Re-applying each
+hit stacks independent instances. DoT ticks bypass armour (it's poison, not a blow).
+
+`immobilize` is a timed **hold** (`{ type: "immobilize", name, duration, chance? }`,
+`duration` in ticks, required): while any `immobilize` state is live the struck
+delver **cannot leave the room** (`commands.move` refuses) — they can still fight,
+rest, and act, but the way out is barred until the grip lapses or they die. It
+counts down and clears like any timed state; a fresh hit re-applies it, so a
+persistent attacker (the ember snapper) can keep a delver pinned in the fight.
 
 ```json
-"onHit": [{ "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 }]
+"onHit": [
+  { "type": "damage-over-time", "name": "venom", "damage": "1d2", "duration": 5, "chance": 1 },
+  { "type": "immobilize", "name": "Held", "duration": 3, "chance": 0.35 }
+]
 ```
 
 **`onDamage`** — a list of effect specs that fire when the bearer is struck. Lives

@@ -280,6 +280,15 @@ the room or disconnecting — so a stashed item you don't pick up is forgotten a
 be searched out again, and a lurking mob stays unseen *and inert* until a delver who
 has revealed it provokes it.
 
+An **`ambush`** mob is the exception to that inertness: it silently tracks the
+unaware, takes a **sleeping** delver outright, and — once it has fully noticed one
+who is awake but **lingering** in reach — carries a small per-action chance
+(`AMBUSH_LINGER`) that its patience breaks and it strikes anyway. Either way the
+blow from concealment is its own reveal (a `mob-ambush` appearance line), and it
+fires no "spotted you" tell. It never chases unless it also carries `pursues`, so
+a rooted ambusher (a carnivorous plant) or a leashed lair predator can always be
+backed away from — the danger is standing still in its room, not passing through.
+
 A find is **shared with everyone present**: the searcher points it out, so every
 co-located delver gets the same reveal — permanent discoveries onto their
 `player.discovered`, ephemeral item/mob reveals into their `revealedItems` /
