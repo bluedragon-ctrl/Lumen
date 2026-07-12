@@ -246,11 +246,11 @@
   "fenn-lost-hermit": {
     "id": "fenn-lost-hermit",
     "name": "The Name That Never Signed Up",
-    "description": "One of the oldest names in Fenn's register — a prospector who signed down before the Rush and never signed back up. Too long gone to be a quiet-claim, but it nags him; and word says a lamplit garden still keeps far down in the Gloaming.",
+    "description": "An early name in Fenn's register — an old prospector who came down a few years back, before the main Rush, and never signed back up. Fenn heard plenty of him in his day; too long gone now to be a quiet-claim, but the name nags him — and word says a lamplit garden still keeps far down in the Gloaming.",
     "start": {
       "trigger": "talk",
       "npc": "rim-recorder",
-      "offerText": "Fenn turns back to the register's first pages, gone soft with handling and older than his own years at the counter, and lays a finger on a name signed down and never signed up again. \"Halloran. One of the first ever to go below — before the Rush, before my time at this counter, before half your crowd knew there was a hole in the world — and he never came back to sign up. Too long gone to be any quiet-claim of mine; by rights I'd have closed the like of him seasons ago.\" He does not close it. \"But a prospector through here last season spoke of a lamp still burning far down in the Gloaming, and a garden, and an old man who talks to his stonebugs. I'll not strike a living man off my own book on hearsay. You're headed down that way — find him, past the fruiting hollows they say, and bring me some sign he's still drawing breath.\""
+      "offerText": "Fenn thumbs back through the register to an early page and lays a finger on a name signed down and never signed up again. \"Halloran. Came down a few years back — early, before the big Rush, before the crowds — an old hand even then, and I heard plenty of him in those days: went below to dig and never came up. By rights I'd have marked him lost seasons ago, same as the rest.\" He does not. \"But a prospector through here last season spoke of a lamp still burning far down in the Gloaming, and a garden, and an old man who talks to his stonebugs. I'll not strike a living man off my own book on hearsay. You're headed down that way — find him, past the fruiting hollows they say, and bring me some sign he's still drawing breath.\""
     },
     "steps": [
       { "collect": "hallorans-tag", "count": 1, "text": "Find Old Halloran in the deep Gloaming (past the Fruiting Bower) and get from him some sign he still lives" },
