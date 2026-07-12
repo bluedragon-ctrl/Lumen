@@ -242,5 +242,23 @@
       "xp": 80,
       "shards": 50
     }
+  },
+  "fenn-lost-hermit": {
+    "id": "fenn-lost-hermit",
+    "name": "The Name That Never Signed Up",
+    "description": "An old name in Fenn's register signed down into the deep long ago and never signed back up — too old now to be a quiet-claim, but it nags him. Word says a lamplit garden still keeps far down in the Gloaming.",
+    "start": {
+      "trigger": "talk",
+      "npc": "rim-recorder",
+      "offerText": "Fenn turns back through the register to a page gone soft with handling, older than his own years at the counter, and lays a finger on a name signed down and never signed up again. \"Halloran. Went below before I ever held this ledger — forty years, near enough — and never came back to sign up. Too long gone to be any quiet-claim of mine; by rights I closed the like of him a lifetime ago.\" He does not close it. \"But a delver through here last season spoke of a lamp still burning far down in the Gloaming, and a garden, and an old man who talks to his stonebugs. I'll not strike a living man off my own book on hearsay. You're headed down that way — find him, past the fruiting hollows they say, and bring me some sign he's still drawing breath.\""
+    },
+    "steps": [
+      { "collect": "hallorans-tag", "count": 1, "text": "Find Old Halloran in the deep Gloaming (past the Fruiting Bower) and get from him some sign he still lives" },
+      { "deliver": "hallorans-tag", "count": 1, "npc": "rim-recorder", "text": "Carry Halloran's tag up to Fenn's counter" }
+    ],
+    "rewards": {
+      "xp": 55,
+      "shards": 30
+    }
   }
 }

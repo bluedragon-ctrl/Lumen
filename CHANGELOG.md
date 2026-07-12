@@ -14,11 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   *Halloran's Hearth* (his living-nook, with a cooking fire and a warm seep-basin), a study
   walled with the field-notes tracing the emberfruit→snapper maturation, and *The Stonebug
   Pens* of farmed stonebugs kept for meat and shell (with an elder-bug for breeding stock).
-  Halloran is a non-hostile **trader** (buys the gloaming's harvest; sells emberfruit,
-  bug-meat, steam-fern, and light) with rich emotes/reactions, and a quest-giver-in-waiting.
+  Halloran is a non-hostile **trader** — buys the gloaming's harvest and sells the goods of
+  his own croft: **lamp-oil** he renders from his stonebug herd, emberfruit, bug-meat, and
+  steam-fern — with rich emotes/reactions, and a quest-giver-in-waiting.
   All four rooms are **safe**: no hostile spawns, and lit brightly enough (`ambientLight 5`)
   to stay above the Tide's predator threshold even through the deep dark — Halloran, a Rim
   lamp-tender, throws the hearth lamp up as the dark comes in.
+- **Quest — "The Name That Never Signed Up" (Fenn).** The living echo of *Quiet Too Long*:
+  Fenn the reeve finds an old name in his register — Halloran, signed down forty years ago
+  and never signed back up — and, hearing a lamp still burns in the deep Gloaming, sends you
+  to find the old man and bring back proof he lives. Halloran presses his own decades-old
+  register-tag on you (*"tell the reeve I'm not lost — just done climbing"*); carry it up to
+  Fenn's counter. Talk-started on `rim-recorder`; rewards xp + shards.
 - **Depth 7 — the lower Gloaming, where the garden turns predator.** A rigged line
   down *The Gulf Throat* (`d6.gloaming.throat`) drops into an eight-room descent in
   the `gloaming` biome (`deep-gloaming` zone): the lower landing, a green choke and

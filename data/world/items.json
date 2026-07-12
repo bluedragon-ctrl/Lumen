@@ -375,6 +375,17 @@
     "stackable": false,
     "keywords": ["tag"]
   },
+  "hallorans-tag": {
+    "id": "hallorans-tag",
+    "name": "Old Halloran's tag",
+    "keywords": ["tag", "halloran"],
+    "description": "A thumb-length tag of stamped lead on a cord worn soft with the years — the reeve's issue to every registered delver, a descent-number on one face gone decades out of date and HALLORAN on the other. Every other tag Fenn gets back is prised off a corpse; this one its owner took down off a nail and pressed into your hand himself, hale and unbothered, with word for the counter: he is not lost, only done climbing. The register will want to hear it.",
+    "type": "material",
+    "filterGroup": "other",
+    "weight": 0,
+    "value": 0,
+    "stackable": false
+  },
   "quiet-claim-key": {
     "id": "quiet-claim-key",
     "name": "the condemned adit's key",

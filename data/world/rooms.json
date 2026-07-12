@@ -1966,7 +1966,7 @@
     "description": "The path opens into a dry, high nook in the rock that some prospector has made a home of and lived in a long, long time. A cooking fire burns low in a ring of blackened stones, a catch-basin of clean warm seep-water stands beside it, and a pallet of dried fern lies pushed against the far wall under a roof of fitted stone that no canopy can gutter out. Bundles of drying specimens hang from every jut and cranny — pressed fronds, strings of shell, jarred oddities — and it is warm, and lamplit, and safe in a way nowhere else this deep is. The garden lies back north; a low opening east leads to a reek of chemicals and lamp-oil, and west a plank door lets onto the animal-warmth and shuffle of the pens.",
     "exits": { "north": "d7.croft.garden", "east": "d7.croft.study", "west": "d7.croft.pens" },
     "fixtures": ["camp-lamp", "camp-firepit", "camp-seep"],
-    "groundItems": [],
+    "groundItems": [{ "template": "hallorans-tag", "respawn": 600 }],
     "spawns": [{ "mob": "halloran", "max": 1, "respawn": 120 }]
   },
   "d7.croft.study": {
