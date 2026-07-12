@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Halloran's croft — a safe hermit's steading in the lower Gloaming.** Off the
+  Fruiting Bower (`d7.gloaming.bower`), a four-room pocket (`hallorans-croft` zone) where
+  **Old Halloran** — an old prospector who came down early, a few years back before the
+  main Rush, and stayed to learn the one living place in the deep — keeps a lamp-lit steading: *The Kept Garden* of forageable
+  plants (emberfruit, steam-fern, mushroom, palecap) with the wild snapper-blooms cut out,
+  *Halloran's Hearth* (his living-nook, with a cooking fire and a warm seep-basin), a study
+  walled with the field-notes tracing the emberfruit→snapper maturation, and *The Stonebug
+  Pens* of farmed stonebugs kept for meat and shell (with an elder-bug for breeding stock).
+  Halloran is a non-hostile **trader** — buys the gloaming's harvest and sells the goods of
+  his own croft: **lamp-oil** he renders from his stonebug herd, emberfruit, bug-meat, and
+  steam-fern — with rich emotes/reactions, and a quest-giver-in-waiting.
+  All four rooms are **safe**: no hostile spawns, and lit brightly enough (`ambientLight 5`)
+  to stay above the Tide's predator threshold even through the deep dark — Halloran, a Rim
+  lamp-tender, throws the hearth lamp up as the dark comes in.
+- **Quest — "The Name That Never Signed Up" (Fenn).** The living echo of *Quiet Too Long*:
+  Fenn the reeve, who heard plenty of the old prospector Halloran in his day — an early
+  hand who came down before the main Rush and never signed back up — hears a lamp still
+  burns in the deep Gloaming and sends you
+  to find the old man and bring back proof he lives. Halloran presses his own early
+  register-tag on you (*"tell the reeve I'm not lost — just done climbing"*); carry it up to
+  Fenn's counter. Talk-started on `rim-recorder`; rewards xp + shards.
 - **Depth 7 — the lower Gloaming, where the garden turns predator.** A rigged line
   down *The Gulf Throat* (`d6.gloaming.throat`) drops into an eight-room descent in
   the `gloaming` biome (`deep-gloaming` zone): the lower landing, a green choke and

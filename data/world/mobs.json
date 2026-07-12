@@ -2296,6 +2296,7 @@
       { "type": "emote", "weight": 2, "messages": ["leans, slow as a sunflower, toward the warmth of you", "drips a bead of clear sap from a thorn-tip", "shudders once, petals flexing, and stills", "breathes out a sweetish, rotten reek"] }
     ],
     "loot": [{ "template": "emberfruit", "chance": 0.8 }]
+  },
   "ember-mote": {
     "id": "ember-mote",
     "name": "an ember mote",
@@ -2323,5 +2324,46 @@
       { "type": "idle", "weight": 2 }
     ],
     "loot": []
+  },
+  "halloran": {
+    "id": "halloran",
+    "faction": "rim",
+    "name": "Old Halloran",
+    "keywords": ["halloran", "hermit", "old", "prospector", "man", "naturalist", "gardener"],
+    "description": "A gaunt old prospector gone half to root down here, brown and knotted as the stalks he tends, with a white beard stained emberfruit-gold at the corners and old eyes gone pale and rheumy in the underlight. He came down early — before the main Rush, when only a handful chanced the hole — to dig, and found a garden instead, and stayed to learn it: his pockets rattle with seed-pods and dried specimens, a bundle of field-notes hangs at his hip on a thong, and he keeps up a low, constant mutter, more to his stonebugs and his fronds than to the rare prospector who wanders in this deep.",
+    "maxHp": 22,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 4, "vitality": 6, "intellect": 6, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 1, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d4", "actionCost": 14 },
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 1, "messages": ["pinches a dead frond off at the stem and tucks it into a pouch", "murmurs something to the nearest stonebug and pats its plated back", "holds an emberfruit up to the light, turning it, and frowns at what he sees", "licks a pencil-stub and adds a line to the notes hung at his hip", "presses a thumb to the soil of a bed and tastes it, considering", "sorts a handful of seed-pods by some order only he knows", "talks the fronds down low and easy, the way a man gentles a nervous animal"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["goes round the croft turning the lamp-wheels up, muttering that the green can't be trusted to hold", "cocks his head at the roof as the canopy-glow starts to gutter, and reaches for the nearest lamp", "hushes the pens as the light thins, and the stonebugs pull their plates tight", "sets his back to the lit hearth and watches the dark come on with the patience of long habit"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "equipped": "torch" }, "messages": [
+          { "target": "waves your torch back from the beds: \"Gently with that flame, friend — the timber's dry as bone and the fruit sulks in fire-light.\"", "room": "waves {name}'s torch back from the dry beds." }
+        ] },
+        { "if": { "slotEmpty": "light" }, "messages": [
+          { "target": "clicks his tongue: \"No light on you, this deep? That's how the green gets a man. Stand still too long down here and something with teeth mistakes you for fruit.\"", "room": "frowns at {name}'s missing light and shakes his head." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "steers you toward the fire: \"Sit, sit — you're bleeding on my beds. Warm water and a roof that's yours a while; there's worse ways to spend an hour.\"", "room": "fusses {name} toward the warmth of the hearth." }
+        ] },
+        { "messages": [
+          { "target": "leans close, confiding: \"You'll have seen the blooms in the choke — the fat pale ones that don't quite sit like fruit? Same plant as my fronds here, only old, and fed. Give a sweet thing years and meat enough and it learns to bite. Mind which ones you reach for out there.\"", "room": "tells {name} something low and earnest about the blooms in the choke." },
+          { "target": "offers a wedge of emberfruit: \"Go on. Grew it myself — tame stock, this. It's the wild ones down the slope you want to worry over.\"", "room": "presses a wedge of emberfruit on {name}." },
+          { "target": "says, not much minding whether you answer: \"Came down to dig, I did — early, before the big Rush, before your crowds ever came. Found this instead, and never saw a reason to climb back up to the noise you lot brought with you.\"", "room": "muses aloud to {name} about coming down before the big Rush." },
+          { "target": "takes a worn lead tag down off a nail and presses it into your palm: \"You're climbing back up sometime — I'm not. Carry this to Fenn at the reeve's counter, would you? Tell the old scratch-quill Halloran's not lost. Just done with the noise.\"", "room": "presses an old lead tag into {name}'s palm with a message for the reeve." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "lamp-oil" }, { "template": "emberfruit" }, { "template": "bug-meat" }, { "template": "steam-fern" }]
+    }
   }
 }
