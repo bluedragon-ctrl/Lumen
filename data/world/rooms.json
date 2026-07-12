@@ -1864,8 +1864,8 @@
     "name": "The Fruiting Bower",
     "depth": 7,
     "ambientLight": 3,
-    "description": "West, the stalks open into a bright bloom of a chamber where the canopy has come down low enough to touch — a bower of hanging fronds heavy with emberfruit, dim-glowing globes of orange-gold dripping their warm light into the air. It is the loveliest thing in the deep, and it hums: clouds of glow-midges turn in the fruit-light, drunk on the sugar, and the whole pocket glows like a lantern someone left burning under the world. Here the fruiting plants are young and honest, still only fronds and fruit; what they come to, given years and meat, waits in the choke behind you. Old mushroom-trunks stand thick enough to cut, and the ferns grow lush and unbitten. There is no way on from here — only back east into the choke. A good place to gather, if the midges will let you keep your hands free.",
-    "exits": { "east": "d7.gloaming.thicket" },
+    "description": "West, the stalks open into a bright bloom of a chamber where the canopy has come down low enough to touch — a bower of hanging fronds heavy with emberfruit, dim-glowing globes of orange-gold dripping their warm light into the air. It is the loveliest thing in the deep, and it hums: clouds of glow-midges turn in the fruit-light, drunk on the sugar, and the whole pocket glows like a lantern someone left burning under the world. Here the fruiting plants are young and honest, still only fronds and fruit; what they come to, given years and meat, waits in the choke behind you. Old mushroom-trunks stand thick enough to cut, and the ferns grow lush and unbitten. A good place to gather, if the midges will let you keep your hands free — and not the dead-end it looks: south, half-hidden behind the hanging fronds, a worked gap in the growth has been kept deliberately clear by patient hands, and through it drifts a thread of woodsmoke and the smell of turned soil. The choke lies back east.",
+    "exits": { "east": "d7.gloaming.thicket", "south": "d7.croft.garden" },
     "fixtures": ["false-sky", "ember-fronds", "giant-mushroom-stand", "steam-fern-bed"],
     "groundItems": [],
     "spawns": [
@@ -1942,6 +1942,61 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": []
+  },
+  "d7.croft.garden": {
+    "id": "d7.croft.garden",
+    "zone": "hallorans-croft",
+    "biome": "gloaming",
+    "name": "The Kept Garden",
+    "depth": 7,
+    "ambientLight": 5,
+    "description": "South of the bower the wild growth stops as if it had struck a wall, and something astonishing takes its place: order. Someone has cut the choke back to bare rock and made a garden of the cleared ground — emberfruit fronds trained up on driven stakes in straight lit rows, beds of steam-fern kept weeded and even, a stand of mushroom-trunks pruned to grow true, a bed of pale caps under a hung lamp. Every fat, too-fleshy bloom that might have turned to teeth has been found and cut out; what grows here grows tame, and the air is sweet with fruit and turned soil instead of sap and rot. A worn path runs on south toward woodsmoke and the low sound of a man talking to himself. The bower and its wild fronds lie back north.",
+    "exits": { "north": "d7.gloaming.bower", "south": "d7.croft.hearth" },
+    "fixtures": ["camp-lamp", "ember-fronds", "steam-fern-bed", "giant-mushroom-stand", "pale-cluster"],
+    "groundItems": [],
+    "spawns": [{ "mob": "grub", "max": 1, "respawn": 180 }]
+  },
+  "d7.croft.hearth": {
+    "id": "d7.croft.hearth",
+    "zone": "hallorans-croft",
+    "biome": "gloaming",
+    "name": "Halloran's Hearth",
+    "depth": 7,
+    "ambientLight": 5,
+    "description": "The path opens into a dry, high nook in the rock that some prospector has made a home of and lived in a long, long time. A cooking fire burns low in a ring of blackened stones, a catch-basin of clean warm seep-water stands beside it, and a pallet of dried fern lies pushed against the far wall under a roof of fitted stone that no canopy can gutter out. Bundles of drying specimens hang from every jut and cranny — pressed fronds, strings of shell, jarred oddities — and it is warm, and lamplit, and safe in a way nowhere else this deep is. The garden lies back north; a low opening east leads to a reek of chemicals and lamp-oil, and west a plank door lets onto the animal-warmth and shuffle of the pens.",
+    "exits": { "north": "d7.croft.garden", "east": "d7.croft.study", "west": "d7.croft.pens" },
+    "fixtures": ["camp-lamp", "camp-firepit", "camp-seep"],
+    "groundItems": [],
+    "spawns": [{ "mob": "halloran", "max": 1, "respawn": 120 }]
+  },
+  "d7.croft.study": {
+    "id": "d7.croft.study",
+    "zone": "hallorans-croft",
+    "biome": "gloaming",
+    "name": "Halloran's Study",
+    "depth": 7,
+    "ambientLight": 5,
+    "description": "East of the hearth a smaller cell has been given over wholly to the old man's work. A makeshift bench crowds one wall — chipped glass, a clay burner, a mortar worn pale — and every other surface is shelved and stacked with the fruits of decades of looking: a snapper-bloom coiled pale and dead in cloudy fluid, trays of pinned glass-winged insects, a whole wall papered with careful sketches that follow one honest fruiting frond, panel by patient panel, into the thorned and hungry thing it becomes. Nobody down here made this but a man with nothing to do but understand where he'd washed up. The hearth lies back west.",
+    "exits": { "west": "d7.croft.hearth" },
+    "fixtures": ["camp-lamp", "camp-bench"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d7.croft.pens": {
+    "id": "d7.croft.pens",
+    "zone": "hallorans-croft",
+    "biome": "gloaming",
+    "name": "The Stonebug Pens",
+    "depth": 7,
+    "ambientLight": 5,
+    "description": "West of the hearth, low pens partitioned off with fitted stone hold a small, patient herd of stonebugs, grazing at a bank of glowing moss the old man crops and feeds them by the handful. They are stock, not wild things — grown slow and fat and unafraid in the warm lamplight, kept for the meat and the shell they give, and an old elder-bug sits among them at the head of its kind, plates gone mineral-dark with age, keeping its slow watch over the brood. It smells of moss and chitin and animal warmth, and the shuffle and grind of the herd never quite stops. The hearth lies back east.",
+    "exits": { "east": "d7.croft.hearth" },
+    "fixtures": ["camp-lamp", "glowing-moss-bank"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "stonebug", "max": 2, "respawn": 240 },
+      { "mob": "elder-stonebug", "max": 1, "respawn": 480 }
+    ]
   },
   "d7.throat": {
     "id": "d7.throat",
