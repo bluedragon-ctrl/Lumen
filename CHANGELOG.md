@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Halloran's croft — a safe hermit's steading in the lower Gloaming.** Off the
   Fruiting Bower (`d7.gloaming.bower`), a four-room pocket (`hallorans-croft` zone) where
-  **Old Halloran** — a prospector who came down forty years ago and stayed to learn the
-  one living place in the deep — keeps a lamp-lit steading: *The Kept Garden* of forageable
+  **Old Halloran** — one of the first prospectors ever to go down, before the Rush, who
+  stayed to learn the one living place in the deep — keeps a lamp-lit steading: *The Kept Garden* of forageable
   plants (emberfruit, steam-fern, mushroom, palecap) with the wild snapper-blooms cut out,
   *Halloran's Hearth* (his living-nook, with a cooking fire and a warm seep-basin), a study
   walled with the field-notes tracing the emberfruit→snapper maturation, and *The Stonebug
@@ -21,8 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to stay above the Tide's predator threshold even through the deep dark — Halloran, a Rim
   lamp-tender, throws the hearth lamp up as the dark comes in.
 - **Quest — "The Name That Never Signed Up" (Fenn).** The living echo of *Quiet Too Long*:
-  Fenn the reeve finds an old name in his register — Halloran, signed down forty years ago
-  and never signed back up — and, hearing a lamp still burns in the deep Gloaming, sends you
+  Fenn the reeve finds one of the oldest names in his register — Halloran, signed down
+  before the Rush and never signed back up — and, hearing a lamp still burns in the deep
+  Gloaming, sends you
   to find the old man and bring back proof he lives. Halloran presses his own decades-old
   register-tag on you (*"tell the reeve I'm not lost — just done climbing"*); carry it up to
   Fenn's counter. Talk-started on `rim-recorder`; rewards xp + shards.

@@ -2330,7 +2330,7 @@
     "faction": "rim",
     "name": "Old Halloran",
     "keywords": ["halloran", "hermit", "old", "prospector", "man", "naturalist", "gardener"],
-    "description": "A gaunt old prospector gone half to root down here, brown and knotted as the stalks he tends, with a white beard stained emberfruit-gold at the corners and eyes gone milky-pale from a lifetime out of the sun. He came down to dig and found a garden instead, and stayed to learn it: his pockets rattle with seed-pods and dried specimens, a bundle of field-notes hangs at his hip on a thong, and he keeps up a low, constant mutter, more to his stonebugs and his fronds than to any delver who wanders in.",
+    "description": "A gaunt old prospector gone half to root down here, brown and knotted as the stalks he tends, with a white beard stained emberfruit-gold at the corners and eyes gone milky-pale from long years out of the sun. He was one of the first ever to come down — before the Rush, before glimmer was worth the name — to dig, and found a garden instead, and stayed to learn it: his pockets rattle with seed-pods and dried specimens, a bundle of field-notes hangs at his hip on a thong, and he keeps up a low, constant mutter, more to his stonebugs and his fronds than to the rare prospector who wanders in this deep.",
     "maxHp": 22,
     "speed": 12,
     "armour": 0,
@@ -2357,7 +2357,7 @@
         { "messages": [
           { "target": "leans close, confiding: \"You'll have seen the blooms in the choke — the fat pale ones that don't quite sit like fruit? Same plant as my fronds here, only old, and fed. Give a sweet thing years and meat enough and it learns to bite. Mind which ones you reach for out there.\"", "room": "tells {name} something low and earnest about the blooms in the choke." },
           { "target": "offers a wedge of emberfruit: \"Go on. Grew it myself — tame stock, this. It's the wild ones down the slope you want to worry over.\"", "room": "presses a wedge of emberfruit on {name}." },
-          { "target": "says, not much minding whether you answer: \"Came down to dig, I did. Forty years gone. Found this instead, and never saw a reason to climb back up to the noise.\"", "room": "muses aloud to {name} about the forty years he's been down here." },
+          { "target": "says, not much minding whether you answer: \"Came down to dig, I did — before there was ever a Rush on, before your crowds. Found this instead, and never saw a reason to climb back up to the noise you lot brought with you.\"", "room": "muses aloud to {name} about coming down before the Rush ever started." },
           { "target": "takes a worn lead tag down off a nail and presses it into your palm: \"You're climbing back up sometime — I'm not. Carry this to Fenn at the reeve's counter, would you? Tell the old scratch-quill Halloran's not lost. Just done with the noise.\"", "room": "presses an old lead tag into {name}'s palm with a message for the reeve." }
         ] }
       ] }
