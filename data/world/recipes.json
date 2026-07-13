@@ -603,5 +603,29 @@
     ],
     "shards": 8,
     "output": { "template": "glimmerwood-glaive", "qty": 1 }
+  },
+  "bind-warp-fang-dirk": {
+    "id": "bind-warp-fang-dirk",
+    "name": "Warp-Fang Dirk",
+    "station": "smithing",
+    "inputs": [
+      { "template": "warp-fang", "qty": 1 },
+      { "template": "gloom-silk", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "warp-fang-dirk", "qty": 1 }
+  },
+  "bind-warp-fang-charm": {
+    "id": "bind-warp-fang-charm",
+    "name": "Warp-Fang Charm",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "warp-fang", "qty": 1 },
+      { "template": "gloom-silk", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "warp-fang-charm", "qty": 1 }
   }
 }

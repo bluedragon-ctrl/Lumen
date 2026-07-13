@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Warp-fang gear — the warp-fang dirk & charm + the Book of the Brood.** What the
+  Brood-Mother's fang becomes: a rare **warp-fang dirk** (a fast, high-crit, wits-scaled
+  finesse knife that drinks a little life on every hit — the finesse role the deep-timber
+  weapons lack) and a rare **warp-fang charm** (a neck amulet giving +12 max HP and +2 ward,
+  the brood's own tireless vigour). Both are worked from the `warp-fang` the Brood-Mother
+  drops, taught by the **Book of the Brood** that Halloran sells — closing the loop on his
+  brood-source quest (kill her, keep the fang, learn to work it). The fang's flavour is
+  reworked: its craft is now the old naturalist's bone-lore, not reserved Umbral glimmer-craft.
 - **Deep-timber weapons — three rare polearms + the Book of Glimmerwood.** Hafted in
   the giant-mushroom's glimmer-veined `fungal-hardwood` and armed with abyss materials
   (no iron): the **glimmerwood spear** (crystal-pointed reach weapon, 1d10, might-scaled),

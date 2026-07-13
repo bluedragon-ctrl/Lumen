@@ -1205,6 +1205,18 @@
     "teaches": { "recipes": ["craft-glimmerwood-spear", "craft-glimmerwood-staff", "craft-glimmerwood-glaive"] },
     "rarity": "rare"
   },
+  "book-of-the-brood": {
+    "id": "book-of-the-brood",
+    "name": "the Book of the Brood",
+    "keywords": ["book", "brood", "warp-fang", "fang", "notes", "field-notes", "halloran"],
+    "description": "The last and strangest of Halloran's field-notes, and the one he does not offer lightly — a thin sheaf given over wholly to the thing he'll send a delver to kill, and to what he learned taking its like apart. Pages of close anatomy in that cramped, careful hand: how the warp swells the bone and fuses the glimmer into it past parting, where a fang will take an edge and where it will only shatter, how to cut and drill and hang a shard so it holds. \"Waste nothing the deep gives you,\" reads the first line. Study it to fix the working of the warp-fang in memory; the binding gives up its pages as you take in the last.",
+    "type": "book",
+    "weight": 1,
+    "value": 100,
+    "stackable": true,
+    "teaches": { "recipes": ["bind-warp-fang-dirk", "bind-warp-fang-charm"] },
+    "rarity": "rare"
+  },
   "chitin-plate": {
     "id": "chitin-plate",
     "name": "a chitin plate",
@@ -1365,7 +1377,7 @@
     "id": "warp-fang",
     "name": "a great warp-fang",
     "keywords": ["fang", "tooth", "warp-fang", "warp"],
-    "description": "A single curved incisor prised from the Brood-Mother's jaw — as long as a forearm and heavier than bone has any right to be, its enamel gone translucent and veined through with cold blue-white glimmer that the deep worked into her over long ages. It hums faintly against the palm. The Umbrals' glimmer-craft could bind a fang like this into an edge or a haft that holds the light, if a delver knew the trick of it — but that knowing is not yet theirs to have.",
+    "description": "A single curved incisor prised from the Brood-Mother's jaw — as long as a forearm and heavier than bone has any right to be, its enamel gone translucent and veined through with cold blue-white glimmer that the deep worked into her over long ages. It hums faintly against the palm. It is dense bone and cold glimmer fused past parting, and a hand that truly knows how the deep's creatures are made could work a fang like this into an edge that holds the light, or a charm to hang at the throat — and few down here know the brood better than the old naturalist who tends his garden below the choke.",
     "type": "material",
     "weight": 2,
     "value": 100,
@@ -1892,6 +1904,31 @@
     "value": 180,
     "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
     "armour": { "attrMod": { "might": 1 } }
+  },
+  "warp-fang-dirk": {
+    "id": "warp-fang-dirk",
+    "rarity": "rare",
+    "name": "a warp-fang dirk",
+    "keywords": ["dirk", "knife", "dagger", "warp-fang", "fang", "warp"],
+    "description": "The Brood-Mother's own forearm-long incisor, ground down to a single wicked edge and socketed into a bound-gut grip — a knife of dense bone and cold glimmer that never quite warms in the hand. It is light and wickedly quick, and the warp that swelled the mother still haunts the tooth: where it opens a wound it draws a little of the warmth back up the blade to the hand that holds it, never quite sated. It rewards a cunning hand over a strong one.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 140,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 10, "scale": { "attr": "wits", "per": 5 }, "crit": 0.1, "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }] },
+    "armour": { "attrMod": { "wits": 1 } }
+  },
+  "warp-fang-charm": {
+    "id": "warp-fang-charm",
+    "rarity": "rare",
+    "name": "a warp-fang charm",
+    "keywords": ["charm", "amulet", "warp-fang", "fang", "brood", "warp"],
+    "description": "A shard of the Brood-Mother's fang, cut and drilled and hung at the throat on a cord of gloom-silk, still veined with the cold blue-white glimmer the deep worked into her over long ages. It carries a little of the old horror's rampant, tireless vigour — worn against the breastbone it lends the wearer some of that stubborn hold on life, and the cold glimmer in it turns a little hostile magic aside. Halloran cut it himself, and would not quite say what he learned taking the mother apart.",
+    "type": "armour",
+    "slot": "neck",
+    "weight": 0,
+    "value": 130,
+    "armour": { "maxHp": 12, "ward": 2 }
   },
   "brood-caul": {
     "id": "brood-caul",
