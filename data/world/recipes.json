@@ -517,5 +517,115 @@
     ],
     "shards": 8,
     "output": { "template": "hungering-dagger", "qty": 1 }
+  },
+  "ember-cordial": {
+    "id": "ember-cordial",
+    "name": "Ember-Cordial",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "emberfruit", "qty": 3 },
+      { "template": "steam-fern", "qty": 2 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "ember-cordial", "qty": 1 }
+  },
+  "emberwarm-tonic": {
+    "id": "emberwarm-tonic",
+    "name": "Emberwarm Tonic",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "emberfruit", "qty": 2 },
+      { "template": "steam-fern", "qty": 1 },
+      { "template": "weeping-chasm-moss", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "emberwarm-tonic", "qty": 1 }
+  },
+  "ember-stew": {
+    "id": "ember-stew",
+    "name": "Ember Stew",
+    "station": "cooking",
+    "inputs": [
+      { "template": "bug-meat", "qty": 1 },
+      { "template": "emberfruit", "qty": 2 },
+      { "template": "palecap-mushroom", "qty": 1 },
+      { "template": "steam-fern", "qty": 1 }
+    ],
+    "shards": 2,
+    "output": { "template": "ember-stew", "qty": 1 }
+  },
+  "emberfruit-conserve": {
+    "id": "emberfruit-conserve",
+    "name": "Emberfruit Conserve",
+    "station": "cooking",
+    "inputs": [
+      { "template": "emberfruit", "qty": 3 },
+      { "template": "bug-tallow", "qty": 1 }
+    ],
+    "shards": 1,
+    "output": { "template": "emberfruit-conserve", "qty": 2 }
+  },
+  "craft-glimmerwood-spear": {
+    "id": "craft-glimmerwood-spear",
+    "name": "Glimmerwood Spear",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "glimmerwood-spear", "qty": 1 }
+  },
+  "craft-glimmerwood-staff": {
+    "id": "craft-glimmerwood-staff",
+    "name": "Glimmerwood Staff",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 2 }
+    ],
+    "shards": 8,
+    "output": { "template": "glimmerwood-staff", "qty": 1 }
+  },
+  "craft-glimmerwood-glaive": {
+    "id": "craft-glimmerwood-glaive",
+    "name": "Glimmerwood Glaive",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "dense-chitin-plate", "qty": 2 },
+      { "template": "chitin-spike", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "glimmerwood-glaive", "qty": 1 }
+  },
+  "bind-warp-fang-dirk": {
+    "id": "bind-warp-fang-dirk",
+    "name": "Warp-Fang Dirk",
+    "station": "smithing",
+    "inputs": [
+      { "template": "warp-fang", "qty": 1 },
+      { "template": "gloom-silk", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "warp-fang-dirk", "qty": 1 }
+  },
+  "bind-warp-fang-charm": {
+    "id": "bind-warp-fang-charm",
+    "name": "Warp-Fang Charm",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "warp-fang", "qty": 1 },
+      { "template": "gloom-silk", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "warp-fang-charm", "qty": 1 }
   }
 }

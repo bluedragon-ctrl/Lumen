@@ -734,6 +734,36 @@
       "effect": { "type": "restore", "mana": 12 }
     }
   },
+  "ember-cordial": {
+    "id": "ember-cordial",
+    "rarity": "rare",
+    "name": "a flask of ember-cordial",
+    "keywords": ["cordial", "ember-cordial", "emberfruit", "flask", "ember"],
+    "description": "A warm, cloudy cordial pressed from Halloran's tame emberfruit and cut with steam-fern sap, glowing a deep banked-coal gold in the flask. It does not close a wound at a stroke — drunk down, it settles warm beneath the skin, and the emberfruit's slow light keeps a body mending breath by breath, long after a witchglow draught would have guttered out.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 55,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the cordial down. It sits warm and glowing in your gut, and a deep, banked heat begins to knit you slowly back together.",
+      "effect": { "type": "heal-over-time", "name": "Emberwarmth", "magnitude": 4, "interval": 3, "duration": 30, "good": true }
+    }
+  },
+  "emberwarm-tonic": {
+    "id": "emberwarm-tonic",
+    "rarity": "rare",
+    "name": "a flask of emberwarm tonic",
+    "keywords": ["tonic", "emberwarm", "emberwarm-tonic", "emberfruit", "flask"],
+    "description": "A clear, sweet tisane of steam-fern steeped with pressed emberfruit and a thread of chasm-moss, kept just short of a simmer until it holds a faint gold warmth of its own. Steam-fern to steady the racing heart, emberfruit's lingering glow to feed it — drunk down, it settles the nerves and floods the well of the will back to the brim.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the tonic down. It is sweet and warm and steadying, and the well of your will brims full and clear again.",
+      "effect": { "type": "restore", "mana": 18, "hp": 4 }
+    }
+  },
   "acid-bomb": {
     "id": "acid-bomb",
     "rarity": "uncommon",
@@ -1151,6 +1181,42 @@
     "stackable": true,
     "teaches": { "recipes": ["hearty-broth", "deep-stew"] }
   },
+  "book-of-emberfruit": {
+    "id": "book-of-emberfruit",
+    "name": "the Book of Emberfruit",
+    "keywords": ["book", "emberfruit", "notes", "field-notes", "halloran"],
+    "description": "A fat, soil-stained sheaf of Halloran's own field-notes, bound in mushroom-leather and thick with a few years' patient looking: how the tame emberfruit takes to the pot and the flask — cordial and tonic, stew and keeping-jar — every preparation drawn and annotated in a cramped, careful hand. Study it to fix the old naturalist's craft in memory; the worn binding gives up its pages as you take in the last of them.",
+    "type": "book",
+    "weight": 1,
+    "value": 70,
+    "stackable": true,
+    "teaches": { "recipes": ["ember-cordial", "emberwarm-tonic", "ember-stew", "emberfruit-conserve"] },
+    "rarity": "rare"
+  },
+  "book-of-glimmerwood": {
+    "id": "book-of-glimmerwood",
+    "name": "the Book of Glimmerwood",
+    "keywords": ["book", "glimmerwood", "notes", "field-notes", "halloran", "arming"],
+    "description": "A second, thicker sheaf of Halloran's field-notes, bound in mushroom-leather and given over wholly to the deep's one timber — how the giant-mushroom stalk seasons hard and true, and what a patient hand can make of it when the dark comes calling. Pages of drawn patterns: the crystal-headed spear, the glimmer-crowned staff, the chitin-bladed glaive, each hafted in the pale wood and annotated in a cramped, careful hand. \"A garden this deep,\" reads one margin, \"a man learns to defend.\" Study it to fix the old naturalist's arming-craft in memory; the binding gives up its pages as you take in the last of them.",
+    "type": "book",
+    "weight": 1,
+    "value": 90,
+    "stackable": true,
+    "teaches": { "recipes": ["craft-glimmerwood-spear", "craft-glimmerwood-staff", "craft-glimmerwood-glaive"] },
+    "rarity": "rare"
+  },
+  "book-of-the-brood": {
+    "id": "book-of-the-brood",
+    "name": "the Book of the Brood",
+    "keywords": ["book", "brood", "warp-fang", "fang", "notes", "field-notes", "halloran"],
+    "description": "The last and strangest of Halloran's field-notes, and the one he does not offer lightly — a thin sheaf given over wholly to the thing he'll send a delver to kill, and to what he learned taking its like apart. Pages of close anatomy in that cramped, careful hand: how the warp swells the bone and fuses the glimmer into it past parting, where a fang will take an edge and where it will only shatter, how to cut and drill and hang a shard so it holds. \"Waste nothing the deep gives you,\" reads the first line. Study it to fix the working of the warp-fang in memory; the binding gives up its pages as you take in the last.",
+    "type": "book",
+    "weight": 1,
+    "value": 100,
+    "stackable": true,
+    "teaches": { "recipes": ["bind-warp-fang-dirk", "bind-warp-fang-charm"] },
+    "rarity": "rare"
+  },
   "chitin-plate": {
     "id": "chitin-plate",
     "name": "a chitin plate",
@@ -1311,7 +1377,7 @@
     "id": "warp-fang",
     "name": "a great warp-fang",
     "keywords": ["fang", "tooth", "warp-fang", "warp"],
-    "description": "A single curved incisor prised from the Brood-Mother's jaw — as long as a forearm and heavier than bone has any right to be, its enamel gone translucent and veined through with cold blue-white glimmer that the deep worked into her over long ages. It hums faintly against the palm. The Umbrals' glimmer-craft could bind a fang like this into an edge or a haft that holds the light, if a delver knew the trick of it — but that knowing is not yet theirs to have.",
+    "description": "A single curved incisor prised from the Brood-Mother's jaw — as long as a forearm and heavier than bone has any right to be, its enamel gone translucent and veined through with cold blue-white glimmer that the deep worked into her over long ages. It hums faintly against the palm. It is dense bone and cold glimmer fused past parting, and a hand that truly knows how the deep's creatures are made could work a fang like this into an edge that holds the light, or a charm to hang at the throat — and few down here know the brood better than the old naturalist who tends his garden below the choke.",
     "type": "material",
     "weight": 2,
     "value": 100,
@@ -1340,6 +1406,36 @@
     "stackable": true,
     "consumable": { "flavour": "You eat the deep stew slowly, savouring it. Rich and warming, it fills you to the back teeth and a settled strength flows back into your limbs and your mind alike.", "effect": { "type": "restore", "hp": 12, "mana": 6 } },
     "rarity": "uncommon"
+  },
+  "ember-stew": {
+    "id": "ember-stew",
+    "rarity": "uncommon",
+    "name": "a bowl of ember stew",
+    "keywords": ["stew", "ember", "ember-stew", "bowl"],
+    "description": "A rich, dark stew of stonebug meat and palecap browned in the old man's pot and simmered slow with halved emberfruit until the whole bowl glows faintly gold and the fruit's sweetness has cooked down into the meat, steam-fern folded in at the last to settle it. It is the nearest thing to a proper hot supper anywhere this deep — it eats heavy and warm, and sends a body back down into the dark whole again.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 22,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the ember stew slowly, savouring every warm, glowing mouthful. It fills you to the back teeth, and a deep, settled strength floods back into your limbs and mind alike.",
+      "effect": { "type": "restore", "hp": 18, "mana": 6 }
+    }
+  },
+  "emberfruit-conserve": {
+    "id": "emberfruit-conserve",
+    "rarity": "uncommon",
+    "name": "a jar of emberfruit conserve",
+    "keywords": ["conserve", "jam", "preserve", "emberfruit", "jar"],
+    "description": "Halloran's tame emberfruit cooked down thick with rendered bug-tallow and potted in a stoppered clay jar, sweet and dense and faintly aglow, keeping for weeks where fresh fruit would spoil in days. A spoonful is a whole meal off a ledge with no fire to hand — the prospector's answer to a long haul in the deep, warm going down and warm sitting after.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 16,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat a spoonful of the conserve. Dense and sweet and faintly glowing, it warms you through and takes the ache of the long climb out of your limbs.",
+      "effect": { "type": "restore", "hp": 10, "mana": 6 }
+    }
   },
   "beer": {
     "id": "beer",
@@ -1769,6 +1865,70 @@
     "value": 110,
     "weapon": { "damage": { "physical": "1d8" }, "actionCost": 11, "crit": 0.1, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
     "rarity": "rare"
+  },
+  "glimmerwood-spear": {
+    "id": "glimmerwood-spear",
+    "rarity": "rare",
+    "name": "a glimmerwood spear",
+    "keywords": ["spear", "glimmerwood", "hardwood", "polearm", "haft"],
+    "description": "A long, true shaft of fungal hardwood, pale and dense and cool along the grain, capped with a whole glimmer crystal knapped down to a wicked leaf-point and lashed fast with gloom-silk cord. The crystal head holds a cold blue-white light of its own and takes a bite no honest wood should — light in the hand for its reach, and quick to the thrust, it keeps a threat at a spear's length and answers with the deep's own glimmer where it lands.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 3,
+    "value": 150,
+    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 }, "crit": 0.05 },
+    "armour": { "attrMod": { "might": 1 } }
+  },
+  "glimmerwood-staff": {
+    "id": "glimmerwood-staff",
+    "rarity": "rare",
+    "name": "a glimmerwood staff",
+    "keywords": ["staff", "glimmerwood", "rod", "focus", "hardwood", "mage"],
+    "description": "A slender rod of fungal hardwood grown straight and true, worn smooth at the grip and crowned with a raw glimmer crystal socketed into the split head and bound in copper wire. The wood's own faint veining answers the crystal's cold light, so the whole length glows a dim blue-white — no cudgel, but a caster's focus: held while casting it steadies the will and deepens the well a mind draws from, and the glimmer feeds a little of itself back with every blow it lands.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 160,
+    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 4 }, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
+    "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
+  },
+  "glimmerwood-glaive": {
+    "id": "glimmerwood-glaive",
+    "rarity": "rare",
+    "name": "a glimmerwood glaive",
+    "keywords": ["glaive", "glimmerwood", "polearm", "hardwood", "blade", "haft"],
+    "description": "A long two-fisted shaft of fungal hardwood carrying a great curved blade of fused dense chitin — the dark, mineral-heavy plate of an old elder-bug, chipped to a keen edge and inlaid along the spine with a thread of raw glimmer that glows cold in the dark. It is heavy and slow off the mark and asks a strong back and both hands — but a delver who commits to the swing brings the whole reaching arc of it down in a single cleaving stroke, and the dense edge lays a wound open wide enough to keep bleeding long after.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 4,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
+    "armour": { "attrMod": { "might": 1 } }
+  },
+  "warp-fang-dirk": {
+    "id": "warp-fang-dirk",
+    "rarity": "rare",
+    "name": "a warp-fang dirk",
+    "keywords": ["dirk", "knife", "dagger", "warp-fang", "fang", "warp"],
+    "description": "The Brood-Mother's own forearm-long incisor, ground down to a single wicked edge and socketed into a bound-gut grip — a knife of dense bone and cold glimmer that never quite warms in the hand. It is light and wickedly quick, and the warp that swelled the mother still haunts the tooth: where it opens a wound it draws a little of the warmth back up the blade to the hand that holds it, never quite sated. It rewards a cunning hand over a strong one.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 140,
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 10, "scale": { "attr": "wits", "per": 5 }, "crit": 0.1, "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }] },
+    "armour": { "attrMod": { "wits": 1 } }
+  },
+  "warp-fang-charm": {
+    "id": "warp-fang-charm",
+    "rarity": "rare",
+    "name": "a warp-fang charm",
+    "keywords": ["charm", "amulet", "warp-fang", "fang", "brood", "warp"],
+    "description": "A shard of the Brood-Mother's fang, cut and drilled and hung at the throat on a cord of gloom-silk, still veined with the cold blue-white glimmer the deep worked into her over long ages. It carries a little of the old horror's rampant, tireless vigour — worn against the breastbone it lends the wearer some of that stubborn hold on life, and the cold glimmer in it turns a little hostile magic aside. Halloran cut it himself, and would not quite say what he learned taking the mother apart.",
+    "type": "armour",
+    "slot": "neck",
+    "weight": 0,
+    "value": 130,
+    "armour": { "maxHp": 12, "ward": 2 }
   },
   "brood-caul": {
     "id": "brood-caul",
