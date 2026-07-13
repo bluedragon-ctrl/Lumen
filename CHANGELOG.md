@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Halloran's Emberfruit line — four premium consumables + the Book of Emberfruit.**
+  The old naturalist's own craft, built on his tame garden produce and craftable in
+  his croft (the hearth's cooking fire and the study's alchemist's bench): **ember-cordial**
+  (a rare healing draught — a stronger, longer heal-over-time than the regeneration draught),
+  the **emberwarm tonic** (a rare mana restorative that tops the mana tonic), **ember stew**
+  (the deep's best hot meal, above deep stew), and **emberfruit conserve** (a keeping-jar
+  ration, potted in bug-tallow, for the long haul). All four recipes are taught by the
+  **Book of Emberfruit**, which Halloran sells at his croft — finally giving emberfruit a
+  crafting purpose beyond eating it raw. Ingredients are all local: emberfruit, steam-fern
+  and palecap from his beds, bug-meat and bug-tallow from his stonebug pens, and a thread
+  of chasm-moss from the Weeping Weave nearby.
 - **Quest — "The Source of the Rot" (Halloran).** The lower Gloaming's answer to
   Maeve's shallow *Thin the Warrens*: Old Halloran, watching the deep nest at the
   throat (`d6.nest.mouth`) spill its vermin down into his green faster than he can

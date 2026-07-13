@@ -734,6 +734,36 @@
       "effect": { "type": "restore", "mana": 12 }
     }
   },
+  "ember-cordial": {
+    "id": "ember-cordial",
+    "rarity": "rare",
+    "name": "a flask of ember-cordial",
+    "keywords": ["cordial", "ember-cordial", "emberfruit", "flask", "ember"],
+    "description": "A warm, cloudy cordial pressed from Halloran's tame emberfruit and cut with steam-fern sap, glowing a deep banked-coal gold in the flask. It does not close a wound at a stroke — drunk down, it settles warm beneath the skin, and the emberfruit's slow light keeps a body mending breath by breath, long after a witchglow draught would have guttered out.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 55,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the cordial down. It sits warm and glowing in your gut, and a deep, banked heat begins to knit you slowly back together.",
+      "effect": { "type": "heal-over-time", "name": "Emberwarmth", "magnitude": 4, "interval": 3, "duration": 30, "good": true }
+    }
+  },
+  "emberwarm-tonic": {
+    "id": "emberwarm-tonic",
+    "rarity": "rare",
+    "name": "a flask of emberwarm tonic",
+    "keywords": ["tonic", "emberwarm", "emberwarm-tonic", "emberfruit", "flask"],
+    "description": "A clear, sweet tisane of steam-fern steeped with pressed emberfruit and a thread of chasm-moss, kept just short of a simmer until it holds a faint gold warmth of its own. Steam-fern to steady the racing heart, emberfruit's lingering glow to feed it — drunk down, it settles the nerves and floods the well of the will back to the brim.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the tonic down. It is sweet and warm and steadying, and the well of your will brims full and clear again.",
+      "effect": { "type": "restore", "mana": 18, "hp": 4 }
+    }
+  },
   "acid-bomb": {
     "id": "acid-bomb",
     "rarity": "uncommon",
@@ -1151,6 +1181,18 @@
     "stackable": true,
     "teaches": { "recipes": ["hearty-broth", "deep-stew"] }
   },
+  "book-of-emberfruit": {
+    "id": "book-of-emberfruit",
+    "name": "the Book of Emberfruit",
+    "keywords": ["book", "emberfruit", "notes", "field-notes", "halloran"],
+    "description": "A fat, soil-stained sheaf of Halloran's own field-notes, bound in mushroom-leather and thick with a few years' patient looking: how the tame emberfruit takes to the pot and the flask — cordial and tonic, stew and keeping-jar — every preparation drawn and annotated in a cramped, careful hand. Study it to fix the old naturalist's craft in memory; the worn binding gives up its pages as you take in the last of them.",
+    "type": "book",
+    "weight": 1,
+    "value": 70,
+    "stackable": true,
+    "teaches": { "recipes": ["ember-cordial", "emberwarm-tonic", "ember-stew", "emberfruit-conserve"] },
+    "rarity": "rare"
+  },
   "chitin-plate": {
     "id": "chitin-plate",
     "name": "a chitin plate",
@@ -1340,6 +1382,36 @@
     "stackable": true,
     "consumable": { "flavour": "You eat the deep stew slowly, savouring it. Rich and warming, it fills you to the back teeth and a settled strength flows back into your limbs and your mind alike.", "effect": { "type": "restore", "hp": 12, "mana": 6 } },
     "rarity": "uncommon"
+  },
+  "ember-stew": {
+    "id": "ember-stew",
+    "rarity": "uncommon",
+    "name": "a bowl of ember stew",
+    "keywords": ["stew", "ember", "ember-stew", "bowl"],
+    "description": "A rich, dark stew of stonebug meat and palecap browned in the old man's pot and simmered slow with halved emberfruit until the whole bowl glows faintly gold and the fruit's sweetness has cooked down into the meat, steam-fern folded in at the last to settle it. It is the nearest thing to a proper hot supper anywhere this deep — it eats heavy and warm, and sends a body back down into the dark whole again.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 22,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat the ember stew slowly, savouring every warm, glowing mouthful. It fills you to the back teeth, and a deep, settled strength floods back into your limbs and mind alike.",
+      "effect": { "type": "restore", "hp": 18, "mana": 6 }
+    }
+  },
+  "emberfruit-conserve": {
+    "id": "emberfruit-conserve",
+    "rarity": "uncommon",
+    "name": "a jar of emberfruit conserve",
+    "keywords": ["conserve", "jam", "preserve", "emberfruit", "jar"],
+    "description": "Halloran's tame emberfruit cooked down thick with rendered bug-tallow and potted in a stoppered clay jar, sweet and dense and faintly aglow, keeping for weeks where fresh fruit would spoil in days. A spoonful is a whole meal off a ledge with no fire to hand — the prospector's answer to a long haul in the deep, warm going down and warm sitting after.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 16,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You eat a spoonful of the conserve. Dense and sweet and faintly glowing, it warms you through and takes the ache of the long climb out of your limbs.",
+      "effect": { "type": "restore", "hp": 10, "mana": 6 }
+    }
   },
   "beer": {
     "id": "beer",
