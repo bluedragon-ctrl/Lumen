@@ -223,7 +223,10 @@ class EffectsMixin {
       if (got.hp || got.mana) events.push({ type: "vitals", playerId: player.id });
       else silent = true; // already at full hp/mana — nothing to heal, so don't claim it
     } else if (a.damage) {
-      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause: "darkness" })) died = true;
+      // `cause` tags the hurt/death flavour (see events.js HURT_SRC); defaults to the
+      // original darkness-drain wording so pre-existing rooms are unchanged.
+      const cause = a.damage.cause || "darkness";
+      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause })) died = true;
       if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
     }
     return { fired: true, doused, died, silent };

@@ -2030,11 +2030,120 @@
     "name": "The Redward Fissure",
     "depth": 8,
     "ambientLight": 2,
-    "description": "The gallery ends where the heat wins outright. Here the wet gives up entirely and the rock itself begins to glow — a dull sullen red banked deep in the stone, the first honest fire in a world of borrowed and stolen light — and a fissure splits the floor and falls away steeply downward, breathing up a scorching wind and a low, distant roar, and a light too red and too restless to be anything but the Abyss's own molten blood pooled somewhere below. This is the floor of the Gloaming, and past it the green has no more business: what rises through this crack is the heat that warmed the whole hothouse from underneath, welling up out of the deeper dark. No line has been rigged down the fissure yet, and no one who has looked into that red glow has been in a hurry to be the first. The gallery climbs back north.",
-    "exits": { "north": "d8.scald.gallery" },
+    "description": "The gallery ends where the heat wins outright. Here the wet gives up entirely and the rock itself begins to glow — a dull sullen red banked deep in the stone, the first honest fire in a world of borrowed and stolen light — and a fissure splits the floor and falls away steeply downward, breathing up a scorching wind and a low, distant roar, and a light too red and too restless to be anything but the Abyss's own molten blood pooled somewhere below. This is the floor of the Gloaming, and past it the green has no more business: what rises through this crack is the heat that warmed the whole hothouse from underneath, welling up out of the deeper dark. A line has been rigged down the fissure at last, bolted to the cooling rock at the lip and swaying out over the drop in the updraught, and it goes down into the red. The gallery climbs back north.",
+    "exits": { "north": "d8.scald.gallery", "down": "d9.ember.landing" },
+    "exitMessages": {
+      "down": "You take the rigged line and go down into the fissure, and the heat comes up to meet you — the scorching updraught tearing at your clothes, the red glow swelling from a banked ember to an open glare, the roar climbing until it is the whole world — and the line pays out and pays out and finally ends on a shelf of scorched black rock in a light that needs no lamp: the floor of the deep at last, where the Abyss bleeds fire."
+    },
     "fixtures": ["salt-crust"],
     "groundItems": [],
     "spawns": []
+  },
+  "d9.ember.landing": {
+    "id": "d9.ember.landing",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Cindershelf",
+    "depth": 9,
+    "ambientLight": 2,
+    "description": "The rigged line ends on a broad shelf of scorched black rock, and for the first time in all the deep there is no dark to guard against: the whole floor is lit from below and beyond by a restless orange glow that wells up out of the stone instead of being carried down and hoarded against the Tide. The heat sits on everything like a laid hand. Cinders lift off unseen fires and drift glowing across the shelf before they wink out; the rock ticks and groans as it cools and swells; every breath is dry and tastes of hot iron. The rigged line sways back up into the fissure overhead. The shelf runs on south toward a thread of moving light, and east it breaks down into a scatter of hot basins where something lies basking.",
+    "exits": { "up": "d8.scald.fissure", "south": "d9.ember.firethread", "east": "d9.ember.pools" },
+    "exitMessages": {
+      "up": "You catch the rigged line and haul yourself back up into the fissure, the heat falling away hand over hand, the roar dropping to a mutter and then to nothing, until the wet grey stone of the gallery-mouth opens overhead and you climb out onto the floor of the Gloaming."
+    },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cinder-newt", "max": 1, "respawn": 200 }
+    ]
+  },
+  "d9.ember.firethread": {
+    "id": "d9.ember.firethread",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Firethread",
+    "depth": 9,
+    "ambientLight": 3,
+    "description": "South of the shelf a stream of molten rock crosses the floor — no wider than a man is tall, but moving, a slow bright ribbon of orange threading a black channel it has cut for itself, skinning over grey and cracking open bright and skinning over again. The heat off it is a wall you lean into to pass. A margin of cooled crust runs alongside where the footing holds, littered with the glassy spatter the thread throws when it gulps, and the air above the flow shivers and swims so that the far wall seems to breathe. The shelf lies back north; eastward, past the head of the thread, a hollow booms and hisses on some slow clock of its own.",
+    "exits": { "north": "d9.ember.landing", "east": "d9.ember.geyser" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "ember-salamander", "max": 1, "respawn": 260 }
+    ]
+  },
+  "d9.ember.geyser": {
+    "id": "d9.ember.geyser",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Clockwork Geyser",
+    "depth": 9,
+    "ambientLight": 3,
+    "description": "The thread feeds a deep throat in the floor, and the throat keeps time. For long minutes it only mutters and steams, a black gullet welling slow with molten rock; then it draws a breath the whole room feels, and spits — a roaring column of fire-lit steam and glowing spatter flung to the roof, so bright and so sudden it prints itself on the eye — and falls back, and mutters, and begins again on the same patient count. Prospectors who have watched it swear it keeps the Abyss's own hours, quickening when the Tide runs high. The scalded rock all around is crusted white and gold with the salts the geyser leaves as it breathes. The molten thread runs back west; a low crawl north lifts toward warm basking-stone.",
+    "exits": { "west": "d9.ember.firethread", "north": "d9.ember.pools" },
+    "fixtures": ["salt-crust"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "vent-scorpion", "max": 1, "respawn": 240 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 20,
+        "action": { "damage": { "hp": "5d6", "cause": "heat" } },
+        "message": "The geyser draws the breath you feel in your chest and spits — a roaring column of fire-lit steam and molten spatter erupts over the whole hollow, and there is nowhere on the scalded floor to stand out of it.",
+        "roomMessage": "The geyser erupts, flinging a roaring column of steam and glowing spatter to the roof." }
+    ]
+  },
+  "d9.ember.pools": {
+    "id": "d9.ember.pools",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Basking Pools",
+    "depth": 9,
+    "ambientLight": 3,
+    "description": "Here the floor dips into a scatter of shallow basins, and each one holds its own small pool of molten stone — pockets of live orange caught in the black, steaming and healing over and cracking bright again — so the whole hollow is a hearth-field of low lights. Between them the stone is hot enough to bask on and dry enough to hold, and the animals of the deep floor know it: fat newts sprawl belly-down on the warm shelves soaking up a heat that never fails and never dims, and heavier things lie coiled at the pools' edges with their coals showing through the joints of their hide. It is almost peaceful, in the way the garden above was almost peaceful — a warm lit place in the dark that wants you to stay a while. The shelf lies back west, the geyser booms to the south, and a nest of hot cracks opens east.",
+    "exits": { "west": "d9.ember.landing", "south": "d9.ember.geyser", "east": "d9.ember.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "cinder-newt", "max": 2, "respawn": 180 },
+      { "mob": "ember-salamander", "max": 1, "respawn": 280 }
+    ]
+  },
+  "d9.ember.warren": {
+    "id": "d9.ember.warren",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Cinder Warren",
+    "depth": 9,
+    "ambientLight": 2,
+    "description": "East of the pools the floor breaks into a maze of hot cracks and low hollows, a warren of scorched stone webbed with thin bright seams where the fire runs close beneath. This is where the salamanders of the deep floor den: the cracks are worn smooth by their coming and going, littered with shed skins gone to grey ash and the picked, heat-cracked bones of whatever last wandered in warm-blooded, and more than one shadow in the glow is a heavy body waiting out the hottest hour with its eyes half-lidded. They do not fear the light — they are made of it — and they do not care to be crowded in their own dens. The pools lie back west; the warren drops away south, and the glow that way is no longer banked in the stone but open, and enormous.",
+    "exits": { "west": "d9.ember.pools", "south": "d9.ember.lake" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "ember-salamander", "max": 2, "respawn": 220 },
+      { "mob": "cinder-newt", "max": 1, "respawn": 200 }
+    ]
+  },
+  "d9.ember.lake": {
+    "id": "d9.ember.lake",
+    "zone": "the-ember-deep",
+    "biome": "ember",
+    "name": "The Molten Heart",
+    "depth": 9,
+    "ambientLight": 4,
+    "description": "The warren opens, and the deep ends here, at the thing that has been warming the whole world stacked above it. A lake of molten rock fills the vault wall to wall — no small pool but a slow sea of it, its black skin drifting and cracking into rivers of orange and mending as you watch, throwing up a light so steady and so red that no lamp has ever been needed on all this floor and never will be. The heat is a physical weight against the chest; the air roars softly off the surface; and out over the middle of it drift the ember-motes, sparks of the living fire gathered into slow, turning, watchful knots that belong to the lake and resent anything that comes to cool it. This is the floor of the deep — the heat-vein's own heart, the fire the Abyss bleeds up to feed its green — and there is no down from here, only the lake, and the light, and the long climb back. The warren lies back north.",
+    "exits": { "north": "d9.ember.warren" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "ember-mote", "max": 3, "respawn": 300 },
+      { "mob": "ember-salamander", "max": 1, "respawn": 300 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 2,
+        "action": { "damage": { "hp": "1d3", "cause": "heat" } } }
+    ]
   },
   "d7.croft.garden": {
     "id": "d7.croft.garden",

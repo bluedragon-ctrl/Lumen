@@ -155,6 +155,8 @@ function main() {
           else if (a.damage) {
             for (const k of ["hp", "mana"]) if (a.damage[k] !== undefined && !(typeof a.damage[k] === "string" && DICE_RE.test(a.damage[k])))
               errs.push(`${where}: damage.${k} must be dice notation (e.g. "1d2")`);
+            if (a.damage.cause !== undefined && (typeof a.damage.cause !== "string" || !a.damage.cause))
+              errs.push(`${where}: damage.cause must be a non-empty string`);
           }
         });
       }

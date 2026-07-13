@@ -1468,6 +1468,15 @@
     "value": 9,
     "stackable": true
   },
+  "firescale": {
+    "id": "firescale",
+    "name": "a firescale",
+    "description": "A single scute prised from the hide of an ember salamander — coal-black, thick as a coin, and still warm to the touch hours after the creature is dead. It sheds heat slow and takes fire not at all; smiths and alchemists both covet the trick, though nobody yet works enough of them to say what it makes.",
+    "type": "material",
+    "weight": 0,
+    "value": 14,
+    "stackable": true
+  },
   "scroll-summon-wisp": {
     "id": "scroll-summon-wisp",
     "name": "a Scroll of Summon Wisp",
