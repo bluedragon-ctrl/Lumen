@@ -1950,9 +1950,9 @@
     "type": "weapon",
     "slot": "hand",
     "weight": 2,
-    "value": 150,
+    "value": 200,
     "weapon": {
-      "damage": { "physical": "1d6" },
+      "damage": { "physical": "2d4" },
       "actionCost": 12,
       "scale": { "attr": "wits", "per": 5 },
       "crit": 0.05,
@@ -1968,8 +1968,8 @@
     "type": "armour",
     "slot": "head",
     "weight": 1,
-    "value": 140,
-    "armour": { "armour": 1, "attrMod": { "might": 1 }, "spikes": { "damage": "1d3", "chance": 0.5 } }
+    "value": 185,
+    "armour": { "armour": 1, "attrMod": { "might": 1, "vitality": 1 }, "spikes": { "damage": "1d3", "chance": 0.5 } }
   },
   "petal-cloak": {
     "id": "petal-cloak",
@@ -1980,8 +1980,8 @@
     "type": "armour",
     "slot": "cloak",
     "weight": 1,
-    "value": 150,
-    "armour": { "armour": 1, "ward": 1, "maxHp": 8, "attrMod": { "vitality": 1 } }
+    "value": 195,
+    "armour": { "armour": 1, "ward": 2, "maxHp": 8, "attrMod": { "vitality": 1 } }
   },
   "glimmerspine-spear": {
     "id": "glimmerspine-spear",
