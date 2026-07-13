@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - **The Gorgon's drop — vine whip, crown of thorns, petal cloak (+ a new `slow` debuff).**
-  Three rare rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
+  Three epic rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
   the **vine whip** (a hand weapon that lands a *slow* on its target — the first use of a
   new combat mechanic), the **crown of thorns** (a head piece that turns the wearer's own
   thorns outward, pricking melee attackers — the first player `spikes` gear), and the

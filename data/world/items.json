@@ -1943,7 +1943,7 @@
   },
   "vine-whip": {
     "id": "vine-whip",
-    "rarity": "rare",
+    "rarity": "epic",
     "name": "a vine whip",
     "keywords": ["vine", "whip", "lash", "gorgon", "snapper", "thorn"],
     "description": "A single living vine cut from the Gorgon's crown and cured with the fight still in it — a wrist-thick, snake-supple length of woody cord that has not stopped moving, coiling slow around the grip as though it still remembered being part of something larger. Its whole length is set with inward-curving thorns and tipped with the small fanged head it hunted by, and where it lands it does what the bloom did: the thorns catch and the coils draw tight, dragging at a foe until its every movement comes slow and laboured. It rewards a cunning hand — set the lash, and let the drag do the work.",
@@ -1961,7 +1961,7 @@
   },
   "crown-of-thorns": {
     "id": "crown-of-thorns",
-    "rarity": "rare",
+    "rarity": "epic",
     "name": "a crown of thorns",
     "keywords": ["crown", "thorns", "thorn", "circlet", "wreath", "gorgon"],
     "description": "The woody thorn-crown that ringed the Gorgon's central maw, cut whole and worn as a circlet — a wreath of dark, inward-curving thorns still faintly warm and weeping a bead of clear sap, lit here and there by a shrivelled ember-fruit gone hard as amber. It sits heavy on the brow and it bites the wearer a little, and it bites anything that comes to grips far worse: the thorns turn outward against a closing foe, so that to strike the one who wears it is to be pricked bloody for the trouble. There is a mean, patient strength in wearing your enemy's teeth.",
@@ -1973,7 +1973,7 @@
   },
   "petal-cloak": {
     "id": "petal-cloak",
-    "rarity": "rare",
+    "rarity": "epic",
     "name": "a petal cloak",
     "keywords": ["petal", "cloak", "mantle", "bloom", "gorgon"],
     "description": "A single great petal of the Gorgon's bloom, broad as a shield and supple as heavy silk, cured with its warmth and its cold blue glimmer-sheen still caught in the grain and slung from the shoulders like a mantle. It is thick, living stuff that a blade parts grudgingly, and it holds the bloom's slow furnace-warmth against the deep's chill — worn close, it seems to knit small hurts a little faster, the way the plant sealed its own cuts and grew on regardless. Lovely, and faintly obscene, and warm as nothing else this deep.",
