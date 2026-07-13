@@ -634,13 +634,17 @@ class GameState {
     this._dyingTick(events); // fallen delvers count down to waking at the rim (death pacing)
 
     for (const p of this.players.values()) {
-      const sp = effectiveSpeed(this.world, p); // heavy gear (speedPenalty) slows action-energy gain
+      // heavy gear (speedPenalty) and any active `slow` debuff both drag the rate a
+      // delver banks action-energy; floored at 1 so movement never fully stalls.
+      const sp = Math.max(1, effectiveSpeed(this.world, p) - this.slowAmount(p));
       p.energy = Math.min(p.energy + sp, sp * ENERGY_BANK_ACTIONS);
       this._recoverTick(p, events);
     }
     for (const rt of Object.values(this.rooms)) {
       for (const m of rt.mobs) {
-        const speed = this.world.mobs[m.template].speed || DEFAULT_MOB_SPEED;
+        const base = this.world.mobs[m.template].speed || DEFAULT_MOB_SPEED;
+        // A slowed mob (a vine-whip's lash) accrues energy — and so acts — slower.
+        const speed = Math.max(1, base - this.slowAmount(m));
         m.energy = Math.min((m.energy || 0) + speed, speed * ENERGY_BANK_ACTIONS);
       }
     }

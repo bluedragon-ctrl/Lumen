@@ -151,6 +151,7 @@ function createDispatcher({
     "effect-expired": (ev) => withPlayer(ev.playerId, (player) => {
       const msg = ev.effectType === "emit-light" ? "The light beneath your skin fades."
         : ev.effectType === "immobilize" ? "The grip on you slackens — you can move again."
+        : ev.effectType === "slow" ? "The drag lifts from your limbs — you move freely again."
         : `Your ${ev.name} fades.`;
       sendToPlayer(ev.playerId, { type: "log", text: msg });
       refreshViews(player);
@@ -162,6 +163,8 @@ function createDispatcher({
       // A trigger (e.g. a venomous bite) just landed a status effect on a player.
       const text = ev.effectType === "immobilize"
         ? "Thorned coils clamp around you — you're held fast and can't leave!"
+        : ev.effectType === "slow"
+        ? "Coils lash tight around your limbs — every movement drags."
         : `The ${ev.name} takes hold.`;
       sendToPlayer(ev.playerId, { type: "log", text });
       markPlayerView(ev.playerId);
@@ -193,14 +196,20 @@ function createDispatcher({
       }
     }),
 
-    "mob-effect-applied": (ev) =>
-      // A player's on-hit effect (e.g. a venom-coated weapon) took hold on a mob.
-      broadcastRoom(ev.roomId, ev, (n) => `The ${ev.name} takes hold of ${n}.`),
+    "mob-effect-applied": (ev) => {
+      // A player's on-hit effect (e.g. a venom-coated weapon, a slowing lash) took hold on a mob.
+      const line = ev.effectType === "slow"
+        ? (n) => `Coils lash tight around ${n} — its movements drag and slow.`
+        : (n) => `The ${ev.name} takes hold of ${n}.`;
+      broadcastRoom(ev.roomId, ev, line);
+    },
 
     "mob-effect-expired": (ev) => {
-      // A status effect (venom/bleed/glow) wore off a mob — mirror of player effect-expired.
+      // A status effect (venom/bleed/glow/slow) wore off a mob — mirror of player effect-expired.
       const line = ev.effectType === "emit-light"
         ? (n) => `The glow fades from ${n}.`
+        : ev.effectType === "slow"
+        ? (n) => `${cap(n)} shakes off the drag and quickens again.`
         : (MOB_EFFECT_EXPIRED_FLAVOUR[ev.name] || ((n) => `The ${ev.name} fades from ${n}.`));
       broadcastRoom(ev.roomId, ev, line);
     },

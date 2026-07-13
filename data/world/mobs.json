@@ -2331,7 +2331,11 @@
       { "type": "idle", "weight": 1 },
       { "type": "emote", "weight": 2, "messages": ["turns a dozen fanged heads slowly toward the warmth of you", "drips clear sap from a hundred thorns, and the whole crown sways", "settles its roots deeper into the glimmer-seam and drinks", "breathes out a wave of sweetish, carrion-rank heat"] }
     ],
-    "loot": []
+    "loot": [
+      { "template": "vine-whip", "chance": 0.2 },
+      { "template": "crown-of-thorns", "chance": 0.2 },
+      { "template": "petal-cloak", "chance": 0.2 }
+    ]
   },
   "gorgon-tendril": {
     "id": "gorgon-tendril",

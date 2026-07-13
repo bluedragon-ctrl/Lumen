@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Gorgon's drop — vine whip, crown of thorns, petal cloak (+ a new `slow` debuff).**
+  Three rare rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
+  the **vine whip** (a hand weapon that lands a *slow* on its target — the first use of a
+  new combat mechanic), the **crown of thorns** (a head piece that turns the wearer's own
+  thorns outward, pricking melee attackers — the first player `spikes` gear), and the
+  **petal cloak** (a warm, living cloak that wards, toughens, and mends). The new `slow`
+  status shaves points off how fast a struck creature banks action-energy, so a slowed
+  foe simply acts less often (floored so it hobbles, never freezes); available as a weapon
+  `onHit` effect and read by the tick driver.
 - **The Scald — the boiling foot of the Gloaming (depth 8), and its boss, The Gorgon.**
   A six-room floor descending from **The Sodden Maw** (a line is now rigged down its
   rim): the green growth drowns and dies, the hot water turns to **boiling races and
