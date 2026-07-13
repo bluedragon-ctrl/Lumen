@@ -2345,6 +2345,9 @@
       { "type": "emote", "weight": 1, "messages": ["pinches a dead frond off at the stem and tucks it into a pouch", "murmurs something to the nearest stonebug and pats its plated back", "holds an emberfruit up to the light, turning it, and frowns at what he sees", "licks a pencil-stub and adds a line to the notes hung at his hip", "presses a thumb to the soil of a bed and tastes it, considering", "sorts a handful of seed-pods by some order only he knows", "talks the fronds down low and easy, the way a man gentles a nervous animal"] },
       { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["goes round the croft turning the lamp-wheels up, muttering that the green can't be trusted to hold", "cocks his head at the roof as the canopy-glow starts to gutter, and reaches for the nearest lamp", "hushes the pens as the light thins, and the stonebugs pull their plates tight", "sets his back to the lit hearth and watches the dark come on with the patience of long habit"] },
       { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "delivery": true }, "messages": [
+          { "target": "eyes the great fang jutting from your pack and goes very still: \"That's it, then — that's her tooth, no mistaking the glimmer worked into it. Bring it here, let me see... aye. The runs'll go quiet a while, and my beds with them. Keep it, friend; I only needed to know it was done.\"", "room": "stares at the great fang in {name}'s pack and slowly straightens from the beds." }
+        ] },
         { "if": { "equipped": "torch" }, "messages": [
           { "target": "waves your torch back from the beds: \"Gently with that flame, friend — the timber's dry as bone and the fruit sulks in fire-light.\"", "room": "waves {name}'s torch back from the dry beds." }
         ] },

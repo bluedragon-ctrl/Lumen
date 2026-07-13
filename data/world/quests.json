@@ -260,5 +260,25 @@
       "xp": 55,
       "shards": 30
     }
+  },
+  "halloran-brood-source": {
+    "id": "halloran-brood-source",
+    "name": "The Source of the Rot",
+    "description": "The nest at the throat spills its vermin down into Halloran's green faster than he can cut them back. He wants the source — the Brood-Mother in the deepest hollow of the nest — put down, and a fang brought back as proof the runs will go quiet.",
+    "start": {
+      "trigger": "talk",
+      "npc": "halloran",
+      "offerText": "Halloran straightens from a bed, wiping soil on his knees, and looks at you a long moment before he speaks. \"You came down past the choke — you'll have seen the runs. The gnaw-marks, the droppings, that little grey tide that never quite stops. That's not my garden's own trouble; that's the nest, up at the throat, spilling its get down into my green faster than the blooms can eat them. I've cut and I've cut, but you don't save a bed by pulling weeds — you go for the root. Something old and swollen mothers the whole reeking lot from the deepest hollow of that nest, and every litter she drops climbs up past me. Thin her grown get on your way in — the warped ones, bold enough they don't scatter — then put down the bloated thing at the heart of it. And bring me a fang off her jaw, so I know it's truly done. I'll not keep the thing; it's yours, and worth more to a climber than to an old man rooted here. I only need to see it.\""
+    },
+    "steps": [
+      { "kill": "warp-rat", "count": 4, "text": "Cull the nest's warped get on the way into the deep warren" },
+      { "kill": "brood-mother", "count": 1, "text": "Put down the Brood-Mother in the deepest hollow of the nest" },
+      { "deliver": "warp-fang", "count": 1, "npc": "halloran", "text": "Carry a warp-fang back to Halloran as proof the source is dead" }
+    ],
+    "rewards": {
+      "xp": 80,
+      "shards": 45,
+      "items": [{ "template": "warp-fang" }]
+    }
   }
 }
