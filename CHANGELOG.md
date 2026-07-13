@@ -17,8 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (no way down from here). Two new heat-adapted fauna den here — the near-tame
   **cinder-newt** and the territorial, cinder-spitting **ember salamander** (drops a
   new `firescale` material) — alongside the returning vent-scorpion and the lake's own
-  **ember-motes**. No boss: this is a fauna-and-hazard floor. *(A scald/heat room-effect
-  for the geyser and lake is deferred to a later pass.)*
+  **ember-motes**. No boss: this is a fauna-and-hazard floor. **The Clockwork Geyser** now
+  erupts on a ~20-second clock for a heavy `5d6` burst, and lingering at the edge of **The
+  Molten Heart** sears for a small `1d3` every couple of ticks — both via the room-effects
+  system, tagged with a new `heat` damage `cause` ("the searing heat") so the hurt reads
+  as fire rather than the dark. Room-effect `damage` now takes an optional `cause` (defaults
+  to `darkness`, leaving existing rooms unchanged).
 - **The Gorgon's drop — vine whip, crown of thorns, petal cloak (+ a new `slow` debuff).**
   Three epic rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
   the **vine whip** (a hand weapon that lands a *slow* on its target — the first use of a

@@ -62,7 +62,7 @@ Exactly one key per `action`:
 |-----------|-------------------------------|--------|
 | `douse`   | `true`                        | Extinguish **every lit light source the player carries** (equipped `light` slot + inventory): set `lit = false`, then recompute room light. A non-refuellable husk is left as-is (not consumed — unlike burning out). |
 | `restore` | `{ hp?: int, mana?: int }`    | Flat restore, clamped to maxima. Reuses `applyRestore(actor, { hp, mana })`. |
-| `damage`  | `{ hp?: dice, mana?: dice }`  | Dice-notation damage (like `lightBane.damage`). `hp` routes through `_hurtPlayer` (can kill → respawn); `mana` through a new `_drainMana` (clamps at 0). |
+| `damage`  | `{ hp?: dice, mana?: dice, cause?: string }` | Dice-notation damage (like `lightBane.damage`). `hp` routes through `_hurtPlayer` (can kill → respawn); `mana` through a new `_drainMana` (clamps at 0). Optional `cause` tags the hurt/death flavour via `events.js` `HURT_SRC` (e.g. `"heat"` → "the searing heat"); defaults to `"darkness"` — the original drain wording — so existing rooms are unchanged. |
 
 Dice strings follow the existing notation (`"1d2"`, `"2d4+1"`, …). `restore`
 amounts are flat ints (matching consumable `restore`).

@@ -2085,6 +2085,12 @@
     "groundItems": [],
     "spawns": [
       { "mob": "vent-scorpion", "max": 1, "respawn": 240 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 20,
+        "action": { "damage": { "hp": "5d6", "cause": "heat" } },
+        "message": "The geyser draws the breath you feel in your chest and spits — a roaring column of fire-lit steam and molten spatter erupts over the whole hollow, and there is nowhere on the scalded floor to stand out of it.",
+        "roomMessage": "The geyser erupts, flinging a roaring column of steam and glowing spatter to the roof." }
     ]
   },
   "d9.ember.pools": {
@@ -2133,6 +2139,10 @@
     "spawns": [
       { "mob": "ember-mote", "max": 3, "respawn": 300 },
       { "mob": "ember-salamander", "max": 1, "respawn": 300 }
+    ],
+    "effects": [
+      { "trigger": "tick", "interval": 2,
+        "action": { "damage": { "hp": "1d3", "cause": "heat" } } }
     ]
   },
   "d7.croft.garden": {

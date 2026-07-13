@@ -23,6 +23,7 @@ const HURT_SRC = {
   venom: "venom",
   bleed: "your wounds",
   darkness: "the creeping dark",
+  heat: "the searing heat",
 };
 const MOB_HURT_FLAVOUR = {
   light: (n, d) => `${cap(n)} recoils, seared by the light. (-${d})`,

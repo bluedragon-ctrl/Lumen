@@ -109,6 +109,14 @@ test("applyRoomEffect: damage hurts hp (player-hurt) and drains mana", () => {
   assert.ok(events.some((e) => e.type === "player-hurt" && e.cause === "darkness"));
 });
 
+test("applyRoomEffect: damage.cause tags the player-hurt event (defaulting to darkness)", () => {
+  const { state, player } = gsWithPlayer();
+  player.hp = 20;
+  const events = [];
+  state.applyRoomEffect(player, "test.bright", { trigger: "tick", action: { damage: { hp: "2", cause: "heat" } } }, events);
+  assert.ok(events.some((e) => e.type === "player-hurt" && e.cause === "heat"));
+});
+
 test("applyRoomEffect: a killing hp blow returns died and skips mana drain", () => {
   const { state, player } = gsWithPlayer("test.dark");
   player.hp = 1; player.mana = 10;
