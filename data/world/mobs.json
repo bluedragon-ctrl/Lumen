@@ -2297,6 +2297,73 @@
     ],
     "loot": [{ "template": "emberfruit", "chance": 0.8 }]
   },
+  "gorgon": {
+    "id": "gorgon",
+    "faction": "fauna",
+    "name": "The Gorgon",
+    "keywords": ["gorgon", "snapper", "bloom", "plant", "vine", "vines", "snake", "snakes", "mother", "boss"],
+    "description": "The oldest bloom in the Gloaming, and the last thing the fruiting canopy ever comes to. Where the ember-snappers are single greedy mouths, this is a whole rooted body — a knot of woody trunk the girth of a man, sunk into a rich seam of raw glimmer and grown huge on the cold light and the heat together. From it rises a crown of vines thick as a wrist and longer than a room, and they do not hang: they lift and sway and quest through the warm air on their own account, each tipped with a fanged, fruit-lit head that turns to follow the warmth of you, so the whole plant reads as a nest of pale snakes weaving off a single dreaming stem. It cannot leave the seam it feeds on. It does not have to — it simply reaches, and where its reach falls short it lets a length of itself go, to come and find you on its own.",
+    "spawnMessage": "The great stem in the glimmer-light shudders, and its whole crown of vines rears up off the stone at once — a dozen fanged heads swinging round toward you, {name}, and every snake of it is hungry.",
+    "maxHp": 145,
+    "speed": 12,
+    "armour": 5,
+    "ward": 1,
+    "attributes": { "might": 13, "vitality": 17, "intellect": 2, "wits": 5, "perception": 11 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 16 },
+    "behavior": "lurk",
+    "hostile": true,
+    "ambush": true,
+    "helper": true,
+    "attack": {
+      "damage": "2d6",
+      "bonus": 1,
+      "actionCost": 13,
+      "onHit": [
+        { "type": "immobilize", "name": "Coiled", "duration": 3, "chance": 0.5 },
+        { "type": "damage-over-time", "name": "constricting", "damage": "1d4", "duration": 5, "chance": 0.6 }
+      ]
+    },
+    "xp": 90,
+    "shards": "5d6",
+    "actions": [
+      { "type": "summon", "weight": 4, "mob": "gorgon-tendril", "count": 2, "max": 8, "verb": "heaves, and its coiled vines peel up off the stone one after another — snake-headed and questing, each cutting itself loose to come hunting on its own" },
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 1 },
+      { "type": "emote", "weight": 2, "messages": ["turns a dozen fanged heads slowly toward the warmth of you", "drips clear sap from a hundred thorns, and the whole crown sways", "settles its roots deeper into the glimmer-seam and drinks", "breathes out a wave of sweetish, carrion-rank heat"] }
+    ],
+    "loot": []
+  },
+  "gorgon-tendril": {
+    "id": "gorgon-tendril",
+    "faction": "fauna",
+    "name": "a lashing tendril",
+    "keywords": ["tendril", "vine", "lash", "snake", "head", "gorgon"],
+    "description": "A length of the great bloom's crown cut loose to hunt — a wrist-thick vine as long as a man, moving upright and head-first like a snake that has forgotten it was ever a plant. Its tip is a small fanged mouth ringed with inward-curving thorns and still lit by one overripe fruit, and it drags the wet, trailing stump of its own severed root behind it as it comes. It cannot last long parted from the stem. It does not seem to care.",
+    "spawnMessage": "A vine drops off the crown, rights itself head-high, and comes weaving for you — {name}.",
+    "maxHp": 13,
+    "speed": 16,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 6, "vitality": 4, "intellect": 0, "wits": 4, "perception": 7 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 16 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [
+        { "type": "damage-over-time", "name": "digesting", "damage": "1d3", "duration": 4, "chance": 0.5 }
+      ]
+    },
+    "xp": 6,
+    "shards": "1d3",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["rears back, fanged head weaving", "snaps at the air between you", "drags its severed root a length closer with a wet sound"] }
+    ],
+    "loot": []
+  },
   "ember-mote": {
     "id": "ember-mote",
     "name": "an ember mote",

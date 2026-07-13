@@ -1937,9 +1937,102 @@
     "name": "The Sodden Maw",
     "depth": 7,
     "ambientLight": 0,
-    "description": "Down from the hollow the growth gives out at last. The canopy cannot reach here; the ferns dwindle to sickly threads and then to nothing, and the light dies with them into a breathing black. This is the foot of the green — a sodden throat of the gulf where the warm water pours away downward into a dark that has never been lit, and the smell rising out of it is no longer the smell of growing things. No line has been rigged here, no stake driven; whatever the Gloaming was the pleasant face of, it ends at this rim, and what waits below it keeps its own counsel. The hollow climbs back up toward the light.",
-    "exits": { "up": "d7.gloaming.hollow" },
-    "fixtures": [],
+    "description": "Down from the hollow the growth gives out at last. The canopy cannot reach here; the ferns dwindle to sickly threads and then to nothing, and the light dies with them into a breathing black. This is the foot of the green — a sodden throat of the gulf where the warm water pours away downward into a dark that has never been lit, and the smell rising out of it is no longer the smell of growing things. A line has been rigged at the rim since, and a stake driven; someone went down into the reek and the heat, whatever the Gloaming was the pleasant face of, and left the rigging behind them. The hollow climbs back up toward the light; the line pays out down into the boiling dark below.",
+    "exits": { "up": "d7.gloaming.hollow", "down": "d8.scald.stair" },
+    "exitMessages": {
+      "down": "You take the rigged line and lower yourself over the rim into the reek. The warm water sheets down the rock beside you and the last of the green dies out overhead; the air turns thick and scalding, the stone underhand goes slick and then hot, and the steady drip becomes a hiss becomes a low boiling roar — until your boots find a drowned stair in the steam and you step off the line into the seething foot of the Gloaming, a full stage below the green."
+    },
+    "fixtures": ["prospectors-rigging"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d8.scald.stair": {
+    "id": "d8.scald.stair",
+    "zone": "the-scald",
+    "biome": "gloaming",
+    "tags": ["water"],
+    "name": "The Drowned Stair",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "The line sets you down on a worked stair — someone cut these steps, long ago, and the deep has been unmaking them ever since. Warm water sheets down them in a thin scalding film and steam stands in the air thick enough to drink, so that the little light there is comes from nowhere and shows nothing past arm's reach. The false sky is gone; the green is gone; the lush growth of the hollows above has dwindled here to a grey slime of heat-loving weed that films every wet surface and squelches underfoot. It is the Gloaming with its beautiful mask pulled off — the same warmth, the same wet, but blind and close and scalding, a hothouse with the lamps put out. The line climbs back up toward the far green light; the stair runs down south into a roar of moving water, and east a slick ledge leads off toward a reek of dead timber.",
+    "exits": { "up": "d7.gloaming.maw", "south": "d8.scald.race", "east": "d8.scald.gallery" },
+    "fixtures": ["prospectors-rigging", "steaming-pool", "salt-crust"],
+    "groundItems": [],
+    "spawns": [{ "mob": "vent-scorpion", "max": 1, "respawn": 240 }]
+  },
+  "d8.scald.race": {
+    "id": "d8.scald.race",
+    "zone": "the-scald",
+    "biome": "gloaming",
+    "tags": ["water"],
+    "name": "The Boiling Race",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "South the stair drops beside a slot in the rock where all the warm water of the Gloaming above gathers at last and goes mad — a race of near-boiling water roaring down a throat of scoured stone, throwing up a scald of steam that blisters bare skin at the wrong distance and hides the far wall outright. The weed cannot hold in the current; only a crust of grey mineral salt cakes the dry ledges, and a careless foot on the slick between them means the race, and the race means cooking. The flat pale scorpions of the hot pools run this rim too, out for the basking and the wounded both. The stair climbs back north; the ledge runs east along the water into a wider steaming dark.",
+    "exits": { "north": "d8.scald.stair", "east": "d8.scald.basin" },
+    "fixtures": ["steaming-pool", "salt-crust"],
+    "groundItems": [],
+    "spawns": [{ "mob": "vent-scorpion", "max": 2, "respawn": 200 }]
+  },
+  "d8.scald.basin": {
+    "id": "d8.scald.basin",
+    "zone": "the-scald",
+    "biome": "gloaming",
+    "tags": ["water"],
+    "name": "The Simmering Basin",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "The race spills out into a wide floor of terraced pools where the water slows and simmers rather than boils — a hundred steaming basins stepped down the rock, breathing white steam up into a dark so thick with it that the pools show only as a faint scald-glow through the murk. It is the hot, blind heart of this floor. Blistered ferns and grey weed ring the cooler edges; something long-legged and patient shifts once in the steam and goes still, waiting for the warmth of you to come blundering close in the blindness. The race lies back west; south, past the last of the pools, a warmer light leaks up through the steam — steady, and blue, and colder than any fire.",
+    "exits": { "west": "d8.scald.race", "south": "d8.scald.vein" },
+    "fixtures": ["steaming-pool", "salt-crust", "steam-fern-bed"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "vent-scorpion", "max": 2, "respawn": 220 },
+      { "mob": "steam-mantis", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d8.scald.gallery": {
+    "id": "d8.scald.gallery",
+    "zone": "the-scald",
+    "biome": "gloaming",
+    "name": "The Blistered Gallery",
+    "depth": 8,
+    "ambientLight": 1,
+    "description": "East off the stair the floor lifts into a long dry gallery the steam does not reach, and it is a graveyard of the green above. Whole mushroom-trunks that came down toward the warmth stand here dead and blistered, their timber split and salt-caked, and the fat ferns that followed them have cooked to brown paper on the stone. Nothing grows; everything grew, once, and reached too far down and died of it. But the old carnivorous blooms found the dead wood good rooting, and more than one blistered stump among the trunks is not a stump at all, only patient, and still bearing its one overripe fruit down here where nothing else is sweet. The stair lies back west; the gallery runs on south, and the air ahead shivers with a dry, rising heat.",
+    "exits": { "west": "d8.scald.stair", "south": "d8.scald.fissure" },
+    "fixtures": ["salt-crust", "giant-mushroom-stand"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "ember-snapper", "max": 2, "respawn": 240, "hidden": { "perception": 3 } },
+      { "mob": "grub", "max": 1, "respawn": 180 }
+    ]
+  },
+  "d8.scald.vein": {
+    "id": "d8.scald.vein",
+    "zone": "the-scald",
+    "biome": "gloaming",
+    "name": "The Glutton's Seam",
+    "depth": 8,
+    "ambientLight": 3,
+    "description": "South of the basin the steam thins and the dark opens into the one lit place on this drowned floor, and it is lovely, and it is the worst place here. A rich seam of raw glimmer threads the whole back wall — a fortune in cold blue-white light caught in the stone, the richest lode a prospector could dream of finding this deep — and the warmth of the pools and the light of the seam together have made this a garden again where nothing else down here can grow. Ferns stand lush and unblistered; overripe emberfruit hangs heavy and glowing in the blue light; and rooted into the very seam, drinking the light and the heat both, grown huge and old and patient on this double bounty, something waits at the heart of the green that all the lesser blooms above are only the children of. The basin lies back north. There is no other way out, and the seam is not going anywhere, and neither is what grows on it.",
+    "exits": { "north": "d8.scald.basin" },
+    "fixtures": ["glimmer-vein", "ember-fronds", "steam-fern-bed"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "gorgon", "max": 1, "respawn": 1200 },
+      { "mob": "ember-snapper", "max": 1, "respawn": 300, "hidden": { "perception": 4 } }
+    ]
+  },
+  "d8.scald.fissure": {
+    "id": "d8.scald.fissure",
+    "zone": "the-scald",
+    "biome": "ember",
+    "name": "The Redward Fissure",
+    "depth": 8,
+    "ambientLight": 2,
+    "description": "The gallery ends where the heat wins outright. Here the wet gives up entirely and the rock itself begins to glow — a dull sullen red banked deep in the stone, the first honest fire in a world of borrowed and stolen light — and a fissure splits the floor and falls away steeply downward, breathing up a scorching wind and a low, distant roar, and a light too red and too restless to be anything but the Abyss's own molten blood pooled somewhere below. This is the floor of the Gloaming, and past it the green has no more business: what rises through this crack is the heat that warmed the whole hothouse from underneath, welling up out of the deeper dark. No line has been rigged down the fissure yet, and no one who has looked into that red glow has been in a hurry to be the first. The gallery climbs back north.",
+    "exits": { "north": "d8.scald.gallery" },
+    "fixtures": ["salt-crust"],
     "groundItems": [],
     "spawns": []
   },
