@@ -2396,6 +2396,58 @@
     ],
     "loot": []
   },
+  "cinder-newt": {
+    "id": "cinder-newt",
+    "faction": "fauna",
+    "name": "a cinder-newt",
+    "keywords": ["newt", "cinder", "cinder-newt", "salamander", "basker"],
+    "description": "The basking newt of the false garden, followed down to where the warmth is honest and grown to suit it: a fat, soft-bodied thing the length of a forearm, its hide gone coal-dark and banded with dull ember-orange along the spine, so that at rest on the hot stone it is only another cooling cinder. It lies belly-down on the scalding shelves soaking a heat that never gutters and never fails, crops the pale crusts that grow at the pools' edges, and pays a prospector no mind at all unless trodden on. It cannot be driven into the dark; there is none here to drive it into.",
+    "spawnMessage": "{Name} shifts on the hot stone, its banded hide catching the glow, and settles again to bask.",
+    "maxHp": 12,
+    "speed": 9,
+    "armour": 1,
+    "ward": 0,
+    "attributes": { "might": 3, "vitality": 5, "intellect": 0, "wits": 3, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 12 },
+    "behavior": "wander",
+    "hostile": false,
+    "xp": 4,
+    "actions": [
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 4, "messages": ["spreads its toes flat against the scalding stone", "crops a mouthful of pale crust from a pool's edge", "blinks slow in the ember-light", "swells and settles as the heat rolls over it"] },
+      { "type": "wander", "weight": 2, "verb": "hauls itself off to a warmer stone", "scope": "zone" }
+    ],
+    "loot": [{ "template": "salamander-tail", "chance": 0.5 }]
+  },
+  "ember-salamander": {
+    "id": "ember-salamander",
+    "faction": "fauna",
+    "name": "an ember salamander",
+    "keywords": ["salamander", "ember", "ember-salamander", "fire", "coals"],
+    "description": "Everything the pale salamander of the upper damp is not: a heavy, deliberate animal built for the fire it dens in, its hide a coal-black armour of overlapping scutes that crack open bright orange along the joints when it moves, so it seems to carry its own banked embers under the skin. It suns itself by the molten pools with its eyes half-lidded and asks nothing of anything — but it will not be crowded, and it does not run. Lean into its patch of heat and it gapes a mouth lit like a furnace-door and coughs a spray of live cinders, then comes on low and unhurried, certain of its ground.",
+    "spawnMessage": "A shadow by the pool-edge that you took for a cooling stone lifts its head, and the joints of it crack open glowing — {name}, and it has decided you are too close.",
+    "maxHp": 26,
+    "speed": 12,
+    "armour": 2,
+    "ward": 1,
+    "attributes": { "might": 6, "vitality": 7, "intellect": 0, "wits": 5, "perception": 6 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 16 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 12,
+      "onHit": [{ "type": "damage-over-time", "name": "seared", "damage": "1d3", "duration": 4, "chance": 0.6 }]
+    },
+    "xp": 14,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["gapes a furnace-bright mouth and hisses out a curl of smoke", "cracks its scutes open glowing as it shifts", "coughs a spatter of live cinders across the stone", "drags its heavy tail slow across the scorched rock"] }
+    ],
+    "loot": [{ "template": "firescale", "chance": 0.6 }, { "template": "salamander-tail", "chance": 0.3 }]
+  },
   "halloran": {
     "id": "halloran",
     "faction": "rim",

@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Ember Deep — the floor of the deep (depth 9), below The Scald.** A line is
+  now rigged down the **Redward Fissure**, and it drops onto the last floor: a
+  six-room molten reach where light is finally *native*, welling orange out of the
+  rock instead of carried down against the Tide. From **The Cindershelf** the floor
+  runs through **The Firethread** (a molten stream), **The Clockwork Geyser** (an
+  eruption that keeps the Abyss's hours), **The Basking Pools**, and **The Cinder
+  Warren** to **The Molten Heart** — a wall-to-wall lava lake, the heat-source that
+  has warmed the whole Gloaming from underneath, and the terminal foot of the descent
+  (no way down from here). Two new heat-adapted fauna den here — the near-tame
+  **cinder-newt** and the territorial, cinder-spitting **ember salamander** (drops a
+  new `firescale` material) — alongside the returning vent-scorpion and the lake's own
+  **ember-motes**. No boss: this is a fauna-and-hazard floor. *(A scald/heat room-effect
+  for the geyser and lake is deferred to a later pass.)*
 - **The Gorgon's drop — vine whip, crown of thorns, petal cloak (+ a new `slow` debuff).**
   Three epic rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
   the **vine whip** (a hand weapon that lands a *slow* on its target — the first use of a
