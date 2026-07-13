@@ -2366,7 +2366,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "book-of-emberfruit" }, { "template": "lamp-oil" }, { "template": "emberfruit" }, { "template": "bug-meat" }, { "template": "steam-fern" }]
+      "sells": [{ "template": "book-of-emberfruit" }, { "template": "book-of-glimmerwood" }, { "template": "lamp-oil" }, { "template": "emberfruit" }, { "template": "bug-meat" }, { "template": "steam-fern" }]
     }
   }
 }

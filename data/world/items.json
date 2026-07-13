@@ -1193,6 +1193,18 @@
     "teaches": { "recipes": ["ember-cordial", "emberwarm-tonic", "ember-stew", "emberfruit-conserve"] },
     "rarity": "rare"
   },
+  "book-of-glimmerwood": {
+    "id": "book-of-glimmerwood",
+    "name": "the Book of Glimmerwood",
+    "keywords": ["book", "glimmerwood", "notes", "field-notes", "halloran", "arming"],
+    "description": "A second, thicker sheaf of Halloran's field-notes, bound in mushroom-leather and given over wholly to the deep's one timber — how the giant-mushroom stalk seasons hard and true, and what a patient hand can make of it when the dark comes calling. Pages of drawn patterns: the crystal-headed spear, the glimmer-crowned staff, the chitin-bladed glaive, each hafted in the pale wood and annotated in a cramped, careful hand. \"A garden this deep,\" reads one margin, \"a man learns to defend.\" Study it to fix the old naturalist's arming-craft in memory; the binding gives up its pages as you take in the last of them.",
+    "type": "book",
+    "weight": 1,
+    "value": 90,
+    "stackable": true,
+    "teaches": { "recipes": ["craft-glimmerwood-spear", "craft-glimmerwood-staff", "craft-glimmerwood-glaive"] },
+    "rarity": "rare"
+  },
   "chitin-plate": {
     "id": "chitin-plate",
     "name": "a chitin plate",
@@ -1841,6 +1853,45 @@
     "value": 110,
     "weapon": { "damage": { "physical": "1d8" }, "actionCost": 11, "crit": 0.1, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
     "rarity": "rare"
+  },
+  "glimmerwood-spear": {
+    "id": "glimmerwood-spear",
+    "rarity": "rare",
+    "name": "a glimmerwood spear",
+    "keywords": ["spear", "glimmerwood", "hardwood", "polearm", "haft"],
+    "description": "A long, true shaft of fungal hardwood, pale and dense and cool along the grain, capped with a whole glimmer crystal knapped down to a wicked leaf-point and lashed fast with gloom-silk cord. The crystal head holds a cold blue-white light of its own and takes a bite no honest wood should — light in the hand for its reach, and quick to the thrust, it keeps a threat at a spear's length and answers with the deep's own glimmer where it lands.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 3,
+    "value": 150,
+    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 }, "crit": 0.05 },
+    "armour": { "attrMod": { "might": 1 } }
+  },
+  "glimmerwood-staff": {
+    "id": "glimmerwood-staff",
+    "rarity": "rare",
+    "name": "a glimmerwood staff",
+    "keywords": ["staff", "glimmerwood", "rod", "focus", "hardwood", "mage"],
+    "description": "A slender rod of fungal hardwood grown straight and true, worn smooth at the grip and crowned with a raw glimmer crystal socketed into the split head and bound in copper wire. The wood's own faint veining answers the crystal's cold light, so the whole length glows a dim blue-white — no cudgel, but a caster's focus: held while casting it steadies the will and deepens the well a mind draws from, and the glimmer feeds a little of itself back with every blow it lands.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 160,
+    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 4 }, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
+    "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
+  },
+  "glimmerwood-glaive": {
+    "id": "glimmerwood-glaive",
+    "rarity": "rare",
+    "name": "a glimmerwood glaive",
+    "keywords": ["glaive", "glimmerwood", "polearm", "hardwood", "blade", "haft"],
+    "description": "A long two-fisted shaft of fungal hardwood carrying a great curved blade of fused stonebug chitin, its edge chipped keen and inlaid along the spine with a thread of raw glimmer that glows cold in the dark. It is heavy and slow off the mark and asks a strong back and both hands — but a delver who commits to the swing brings the whole reaching arc of it down in a single cleaving stroke, and the chitin edge lays a wound open wide enough to keep bleeding long after.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 4,
+    "value": 180,
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
+    "armour": { "attrMod": { "might": 1 } }
   },
   "brood-caul": {
     "id": "brood-caul",

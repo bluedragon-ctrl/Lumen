@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Deep-timber weapons — three rare polearms + the Book of Glimmerwood.** Hafted in
+  the giant-mushroom's glimmer-veined `fungal-hardwood` and armed with abyss materials
+  (no iron): the **glimmerwood spear** (crystal-pointed reach weapon, 1d10, might-scaled),
+  the **glimmerwood staff** (a caster's focus — magical 1d6, intellect-scaled, +2 intellect
+  / +6 max mana, feeds mana back on hit), and the **glimmerwood glaive** (a two-handed
+  chitin-bladed polearm, 1d12, might-scaled, opens a bleeding gash). All three are taught
+  by the **Book of Glimmerwood**, which Halloran sells at his croft, and forged at any
+  smithy — a strong, ore-free crafting path off a renewable harvested timber, and the
+  first use for `fungal-hardwood`.
 - **Halloran's Emberfruit line — four premium consumables + the Book of Emberfruit.**
   The old naturalist's own craft, built on his tame garden produce and craftable in
   his croft (the hearth's cooking fire and the study's alchemist's bench): **ember-cordial**

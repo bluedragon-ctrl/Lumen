@@ -566,5 +566,42 @@
     ],
     "shards": 1,
     "output": { "template": "emberfruit-conserve", "qty": 2 }
+  },
+  "craft-glimmerwood-spear": {
+    "id": "craft-glimmerwood-spear",
+    "name": "Glimmerwood Spear",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "glimmerwood-spear", "qty": 1 }
+  },
+  "craft-glimmerwood-staff": {
+    "id": "craft-glimmerwood-staff",
+    "name": "Glimmerwood Staff",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 2 }
+    ],
+    "shards": 8,
+    "output": { "template": "glimmerwood-staff", "qty": 1 }
+  },
+  "craft-glimmerwood-glaive": {
+    "id": "craft-glimmerwood-glaive",
+    "name": "Glimmerwood Glaive",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "chitin-plate", "qty": 3 },
+      { "template": "chitin-spike", "qty": 2 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 8,
+    "output": { "template": "glimmerwood-glaive", "qty": 1 }
   }
 }
