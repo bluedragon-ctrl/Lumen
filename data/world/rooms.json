@@ -1976,9 +1976,12 @@
     "name": "Halloran's Study",
     "depth": 7,
     "ambientLight": 5,
-    "description": "East of the hearth a smaller cell has been given over wholly to the old man's work. A makeshift bench crowds one wall — chipped glass, a clay burner, a mortar worn pale — and every other surface is shelved and stacked with the fruits of a few years' hard looking: a snapper-bloom coiled pale and dead in cloudy fluid, trays of pinned glass-winged insects, a whole wall papered with careful sketches that follow one honest fruiting frond, panel by patient panel, into the thorned and hungry thing it becomes. Nobody down here made this but a man with nothing to do but understand where he'd washed up. The hearth lies back west.",
+    "description": "East of the hearth a smaller cell has been given over wholly to the old man's work. A makeshift bench crowds one wall — chipped glass, a clay burner, a mortar worn pale — and every other surface is shelved and stacked with the fruits of a few years' hard looking: a snapper-bloom coiled pale and dead in cloudy fluid, trays of pinned glass-winged insects, a whole wall papered with careful sketches that follow one honest fruiting frond, panel by patient panel, into the thorned and hungry thing it becomes. Nobody down here made this but a man with nothing to do but understand where he'd washed up. A bolted hatch is set into the floor, warm to the touch and breathing heat through its seams. The hearth lies back west.",
     "exits": { "west": "d7.croft.hearth" },
-    "fixtures": ["camp-lamp", "camp-bench"],
+    "exitMessages": {
+      "down": "You lower yourself through the hatch onto cold iron rungs and begin to climb down. The shaft goes on, and on — past seams of dead coral and old water, past dark that no lamp of the croft ever reached — and the air thickens and warms with every rung, until at last the rungs end and you step off onto scorched rock in a red, waiting glow, four long depths beneath the garden."
+    },
+    "fixtures": ["camp-lamp", "camp-bench", "study-hatch"],
     "groundItems": [],
     "spawns": []
   },
@@ -2985,5 +2988,21 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": [{ "mob": "ember-mote", "max": 2, "respawn": 240 }]
+  },
+  "d11.underhearth.pool": {
+    "id": "d11.underhearth.pool",
+    "zone": "underhearth",
+    "biome": "ember",
+    "name": "The Underhearth",
+    "depth": 11,
+    "ambientLight": 3,
+    "description": "The shaft's iron rungs end on a warm shelf of scorched rock, and the dark opens into a low vault half-filled by a small lake of molten stone. It is no larger than the croft's own garden, but it seethes — its black skin cracking into slow orange veins and healing over — and throws a steady, wavering red light that needs no lamp. Heat sits on the room like a lid. Whatever the old man above makes of this place, he has left it be: nothing hunts here, nothing stirs but the cinders that lift off the lake and wink out. The rungs climb back up toward the croft. Beyond the lake the vault runs on into unlit dark, where no path has yet been cut.",
+    "exits": { "up": "d7.croft.study" },
+    "exitMessages": {
+      "up": "You find the iron rungs again and start the long haul back up, the heat falling away behind you rung by rung, the air cooling and dampening, until the pale lamplight of the study finally opens overhead and you climb out onto the croft floor, four depths above the glow."
+    },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
   }
 }

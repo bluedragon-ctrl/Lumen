@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A hatch in Halloran's study, and the Underhearth far below.** A bolted floor
+  hatch in the old naturalist's study (`open hatch` / `use hatch`) draws back to
+  drop a long iron-runged shaft into the heat. Climb down four depths and it opens
+  onto **The Underhearth** (depth 11) — a small, self-lit lava lake in the ember
+  biome, still and non-hostile, with the rungs climbing back up to the croft. A
+  quiet threshold room: its far side runs on into unlit dark where no path has yet
+  been cut, waiting for a later content pass.
 - **Warp-fang gear — the warp-fang dirk & charm + the Book of the Brood.** What the
   Brood-Mother's fang becomes: a rare **warp-fang dirk** (a fast, high-crit, wits-scaled
   finesse knife that drinks a little life on every hit — the finesse role the deep-timber
