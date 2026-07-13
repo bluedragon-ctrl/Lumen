@@ -85,12 +85,23 @@ function main() {
     // Optional per-exit departure flavour (move() shows it to the mover instead of
     // "You go <dir>."). Object of dir -> non-empty string; each dir must be a real exit.
     if (r.exitMessages != null) {
+      // A dir is a real exit if it's a plain exit, a hidden exit, or the direction
+      // of a door fixture in the room (all three are walked by move(), which shows
+      // the exitMessage regardless of how the destination resolved).
+      const doorDirs = new Set(
+        (r.fixtures || [])
+          .map((f) => (typeof f === "string" ? f : f.template))
+          .map((fid) => fixtures[fid])
+          .filter((ft) => ft && ft.door)
+          .map((ft) => ft.door.dir)
+      );
+      const hasExitDir = (dir) => (r.exits && r.exits[dir]) || (r.hiddenExits && r.hiddenExits[dir]) || doorDirs.has(dir);
       if (typeof r.exitMessages !== "object" || Array.isArray(r.exitMessages))
         errs.push(`room ${id}: exitMessages must be an object of dir -> message`);
       else for (const [dir, msg] of Object.entries(r.exitMessages)) {
         if (typeof msg !== "string" || !msg.trim())
           errs.push(`room ${id}: exitMessage ${dir} must be a non-empty string`);
-        if (!(r.exits && r.exits[dir]))
+        if (!hasExitDir(dir))
           errs.push(`room ${id}: exitMessage ${dir} has no matching exit`);
       }
     }
