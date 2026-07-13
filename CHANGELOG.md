@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Quest — "The Source of the Rot" (Halloran).** The lower Gloaming's answer to
+  Maeve's shallow *Thin the Warrens*: Old Halloran, watching the deep nest at the
+  throat (`d6.nest.mouth`) spill its vermin down into his green faster than he can
+  cut them back, sends you to the root of it — cull the warped get, put down the
+  **Brood-Mother** in the deepest hollow of the nest, and bring back a warp-fang as
+  proof. He returns the fang (it's worth more to a climber than to him). Talk-started
+  on `halloran`; rewards xp + shards + the fang, with an ambient `delivery` reaction
+  so he calls for it across the croft. *(A produce reward from his own garden is
+  planned for a later content pass.)*
 - **Halloran's croft — a safe hermit's steading in the lower Gloaming.** Off the
   Fruiting Bower (`d7.gloaming.bower`), a four-room pocket (`hallorans-croft` zone) where
   **Old Halloran** — an old prospector who came down early, a few years back before the
