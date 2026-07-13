@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Gorgon's drop — vine whip, crown of thorns, petal cloak (+ a new `slow` debuff).**
+  Three epic rewards, each a 20% drop from The Gorgon (a reason to go back and fight it):
+  the **vine whip** (a hand weapon that lands a *slow* on its target — the first use of a
+  new combat mechanic), the **crown of thorns** (a head piece that turns the wearer's own
+  thorns outward, pricking melee attackers — the first player `spikes` gear), and the
+  **petal cloak** (a warm, living cloak that wards, toughens, and mends). The new `slow`
+  status shaves points off how fast a struck creature banks action-energy, so a slowed
+  foe simply acts less often (floored so it hobbles, never freezes); available as a weapon
+  `onHit` effect and read by the tick driver.
+- **The Scald — the boiling foot of the Gloaming (depth 8), and its boss, The Gorgon.**
+  A six-room floor descending from **The Sodden Maw** (a line is now rigged down its
+  rim): the green growth drowns and dies, the hot water turns to **boiling races and
+  simmering pools**, and the heat climbs toward the fire below — a drowned stair, a
+  boiling race, a steaming basin, a blistered timber-gallery, a rich glimmer seam, and
+  the **Redward Fissure**, where the rock glows red and a crack falls away toward the
+  molten deep (the descent to depth 9 is described but not yet cut — a later pass).
+  In **The Glutton's Seam**, rooted into a rich `glimmer-vein`, waits **The Gorgon** —
+  the mutated apex snapper the whole carnivorous canopy matures toward, a rooted bloom
+  whose snake-headed vines quest through the air and which cuts lengths of itself loose
+  as up-to-eight **lashing tendrils** to hunt what its reach can't hold. Ambient threat
+  reuses the Gloaming's fauna; **the boss's drop is deferred to a later pass.**
 - **A hatch in Halloran's study, and the Underhearth far below.** A bolted floor
   hatch in the old naturalist's study (`open hatch` / `use hatch`) draws back to
   drop a long iron-runged shaft into the heat. Climb down four depths and it opens

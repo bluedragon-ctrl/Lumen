@@ -74,6 +74,21 @@ class EffectsMixin {
   }
 
   /**
+   * Total active `slow` speed reduction on an actor (players or mobs). A `slow`
+   * status (a vine-whip's snaring lash) shaves points off the rate the actor banks
+   * action-energy each tick — so a slowed creature simply acts less often — read by
+   * the tick driver's energy accrual (see advance()). Summed across live instances;
+   * the caller floors the result so a slow can hobble but never fully freeze (that's
+   * what `immobilize`/`sleep` are for).
+   */
+  slowAmount(actor) {
+    if (!actor.states) return 0;
+    let n = 0;
+    for (const s of actor.states) if (s.type === "slow") n += s.magnitude || 0;
+    return n;
+  }
+
+  /**
    * Tick active status effects on every actor (players and mobs): first apply any
    * `damage-over-time` (bleed/poison) through the shared damage sinks, then count
    * down timed effects and announce expiries. A DoT that kills its host stops that

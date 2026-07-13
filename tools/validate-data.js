@@ -180,9 +180,11 @@ function main() {
   // specs an attacker lands on a hit (mob `attack.onHit` / item `weapon.onHit`);
   // `spikes` is a defender's melee reflect (mob-level / item `armour.spikes`).
   // onHit adds `immobilize` over EFFECT_TYPES — a timed hold that bars the struck
-  // delver from leaving the room (a snapper's grip; see commands.move). Not a
-  // consumable effect, so it stays out of CONSUMABLE_EFFECT_TYPES.
-  const ONHIT_TYPES = [...EFFECT_TYPES, "immobilize"];
+  // delver from leaving the room (a snapper's grip; see commands.move) — and `slow`,
+  // a timed speed debuff that shaves points off how fast the struck actor banks
+  // action-energy (a vine-whip's lash; see state.advance / slowAmount). Neither is a
+  // consumable effect, so they stay out of CONSUMABLE_EFFECT_TYPES.
+  const ONHIT_TYPES = [...EFFECT_TYPES, "immobilize", "slow"];
   const checkOnHit = (arr, where) => {
     if (arr == null) return;
     if (!Array.isArray(arr)) { errs.push(`${where}: onHit must be an array of effect specs`); return; }
@@ -193,6 +195,12 @@ function main() {
         errs.push(`${where}: onHit damage-over-time needs valid dice (got "${spec.damage}")`);
       if (spec.type === "immobilize" && (typeof spec.duration !== "number" || spec.duration <= 0))
         errs.push(`${where}: onHit immobilize needs a positive duration (ticks) — an untimed hold never releases`);
+      if (spec.type === "slow") {
+        if (typeof spec.magnitude !== "number" || spec.magnitude <= 0)
+          errs.push(`${where}: onHit slow needs a positive magnitude (the speed points shaved off the target)`);
+        if (typeof spec.duration !== "number" || spec.duration <= 0)
+          errs.push(`${where}: onHit slow needs a positive duration (ticks) — an untimed slow never lifts`);
+      }
       if (spec.duration != null && (typeof spec.duration !== "number" || spec.duration <= 0))
         errs.push(`${where}: onHit duration must be a positive number (ticks)`);
       if (spec.chance != null && (typeof spec.chance !== "number" || spec.chance <= 0 || spec.chance > 1))
