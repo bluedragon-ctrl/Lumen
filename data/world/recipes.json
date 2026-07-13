@@ -597,7 +597,7 @@
     "station": "smithing",
     "inputs": [
       { "template": "fungal-hardwood", "qty": 2 },
-      { "template": "chitin-plate", "qty": 3 },
+      { "template": "dense-chitin-plate", "qty": 2 },
       { "template": "chitin-spike", "qty": 2 },
       { "template": "glimmer-dust", "qty": 1 }
     ],
