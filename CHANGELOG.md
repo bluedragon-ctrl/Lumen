@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Horizontal direction consistency (variable passage lengths).** The validator now
+  checks the compass shape of the world the same way it checks floors — with
+  **directions as authored truth and distances free**: a `west` passage may be long or
+  short, but a loop of exits must be able to close at *some* choice of lengths. Loops
+  that net a direction no matter how they stretch (a room that would sit both east and
+  west of another) are rejected. Exactly two such spots exist today, both documented as
+  `GRID_CUTS` entries pending a content decision (stale-checked like `FLOOR_CUTS`): the
+  Sunken Warren's flooded one-way squeeze from Broodsump to the Drowned Cache, and the
+  sanctuary rim-path that places the Grub Hollow east of the Glow Garden yet directly
+  south of the Kept Cistern.
 - **Map-shape lints: exit reciprocity, zone contiguity, shadowed hidden exits.** The
   validator now also enforces that a return exit, where one exists, runs in the exact
   opposite direction (one-ways stay legal — "down one way, west back" doesn't); that

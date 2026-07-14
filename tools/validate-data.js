@@ -2,8 +2,9 @@
 /**
  * Validates Lumen static world data: JSON validity, cross-references,
  * reachability of all rooms from the starting location, vertical consistency
- * (every room solves to a single derived floor), exit reciprocity, and zone
- * contiguity.
+ * (every room solves to a single derived floor), horizontal direction
+ * consistency (compass loops must be able to close at some passage lengths),
+ * exit reciprocity, and zone contiguity.
  *
  * Usage:  node tools/validate-data.js
  *         node tools/validate-data.js --floors   # also print the solved-elevation report
@@ -39,6 +40,24 @@ const FLOOR_CUTS = [
 // entries cannot outlive their reason.
 const PENDING_ZONE_LINKS = [
   // (empty) every zone is currently one connected piece.
+];
+
+// Known-open horizontal geometry: edges excluded from the grid solve pending a
+// content decision, stale-checked like FLOOR_CUTS. The grid solve treats
+// compass directions as authored truth and distances as free — a cut is only
+// needed where a loop's directions cannot reconcile at ANY lengths.
+const GRID_CUTS = [
+  // The flooded squeeze behind the Pale Mother's nest (one-way boss escape,
+  // Sunken Warren): it runs `west` from Broodsump yet surfaces at the Drowned
+  // Cache, which the rest of the warren pins far east. Open decision: give the
+  // passage a non-cardinal direction (needs engine support for `in`/`out`), or
+  // accept it as a declared winding tunnel.
+  { a: "d8.broodsump", b: "d8.cache" },
+  // The sanctuary rim-path: the Grub Hollow is authored east of the Glow
+  // Garden AND directly south of the Kept Cistern, which no cardinal layout
+  // can satisfy (the cistern sits west of the shrine, the garden east). Open
+  // decision: drop or re-author one of the hollow's two links.
+  { a: "d9.sanctuary.hollow", b: "d9.sanctuary.cistern" },
 ];
 
 function main() {
@@ -1044,6 +1063,78 @@ function main() {
   for (const p of PENDING_ZONE_LINKS)
     if (!zoneRooms.has(p.zone)) errs.push(`PENDING_ZONE_LINKS references unknown zone ${p.zone}`);
 
+  // ── Horizontal direction consistency ──────────────────────────────────
+  // Compass directions are authored truth; distances are not (a "west"
+  // passage may be long or short, so lengths stay free variables). Per axis,
+  // a perpendicular exit pins two rooms to the same coordinate and a parallel
+  // exit orders them strictly; a loop whose directions cannot reconcile at
+  // ANY choice of lengths (it nets eastward no matter what) is a direction
+  // lie. Vertical and unrecognised directions impose no horizontal constraint.
+  const allEdges = [];
+  for (const id of Object.keys(rooms))
+    for (const [dir, to] of edgeList(id)) if (rooms[to]) allEdges.push([id, dir, to]);
+  const gridErrors = (cuts) => {
+    const cset = new Set(cuts.flatMap(({ a, b }) => [a + " " + b, b + " " + a]));
+    const out = [];
+    for (const [axis, posDir, negDir, eqA, eqB] of [
+      ["x", "east", "west", "north", "south"],
+      ["y", "north", "south", "east", "west"],
+    ]) {
+      // union-find: perpendicular edges pin rooms to the same axis coordinate
+      const parent = {};
+      const find = (n) => (parent[n] === n ? n : (parent[n] = find(parent[n])));
+      for (const id of Object.keys(rooms)) parent[id] = id;
+      for (const [a, dir, b] of allEdges)
+        if ((dir === eqA || dir === eqB) && !cset.has(a + " " + b)) {
+          const ra = find(a), rb = find(b);
+          if (ra !== rb) parent[ra] = rb;
+        }
+      // parallel edges strictly order the pinned classes; a directed cycle can
+      // never flatten, whatever lengths the passages take
+      const adj = new Map();
+      for (const [a, dir, b] of allEdges) {
+        if (cset.has(a + " " + b)) continue;
+        let from, to2;
+        if (dir === posDir) { from = find(a); to2 = find(b); }
+        else if (dir === negDir) { from = find(b); to2 = find(a); }
+        else continue;
+        if (from === to2) {
+          out.push(`grid: ${a} -${dir}-> ${b} needs a strict ${axis} offset, but a perpendicular path pins the two rooms ${axis}-equal`);
+          continue;
+        }
+        if (!adj.has(from)) adj.set(from, []);
+        adj.get(from).push({ to: to2, via: `${a} -${dir}-> ${b}` });
+      }
+      const state = new Map();
+      const stack = [];
+      const dfs = (u) => {
+        state.set(u, 1);
+        for (const e of adj.get(u) || []) {
+          const st = state.get(e.to) || 0;
+          if (st === 0) { stack.push(e); dfs(e.to); stack.pop(); }
+          else if (st === 1) {
+            const start = stack.findIndex((se) => se.to === e.to);
+            const loop = stack.slice(start < 0 ? 0 : start).concat([e]).map((x) => x.via);
+            out.push(`grid: loop cannot flatten on the ${axis} axis at any passage lengths: ${loop.join("  +  ")}`);
+          }
+        }
+        state.set(u, 2);
+      };
+      for (const u of adj.keys()) if (!state.get(u)) dfs(u);
+    }
+    return out;
+  };
+  errs.push(...gridErrors(GRID_CUTS));
+  for (const cut of GRID_CUTS) {
+    if (!rooms[cut.a] || !rooms[cut.b]) { errs.push(`grid: GRID_CUTS references missing room ${!rooms[cut.a] ? cut.a : cut.b}`); continue; }
+    if (!allEdges.some(([a, , b]) => (a === cut.a && b === cut.b) || (a === cut.b && b === cut.a))) {
+      errs.push(`grid: GRID_CUTS ${cut.a} <-> ${cut.b} matches no edge — remove it`);
+      continue;
+    }
+    if (!gridErrors(GRID_CUTS.filter((c) => c !== cut)).length)
+      errs.push(`grid: GRID_CUTS ${cut.a} <-> ${cut.b} is satisfied by the solve — the cut is stale, remove it`);
+  }
+
   if (errs.length) {
     console.error("VALIDATION FAILED:\n" + errs.map((e) => "  - " + e).join("\n"));
     process.exit(1);
@@ -1096,4 +1187,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { FLOOR_CUTS };
+module.exports = { FLOOR_CUTS, GRID_CUTS };
