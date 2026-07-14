@@ -2195,7 +2195,7 @@
     "stackable": true,
     "consumable": {
       "flavour": "You knock back a long pull of the amber spirit. It sears going down, then blooms into a reckless, roaring warmth — you feel strong, unbreakable, and abruptly certain of things you have no business being certain about.",
-      "effect": { "type": "attr-buff", "name": "Bravado", "attrMod": { "might": 3, "wits": -2, "perception": -2 }, "maxHp": 10, "duration": 60, "refresh": true, "good": true }
+      "effect": { "type": "attr-buff", "name": "Bravado", "attrMod": { "might": 3, "wits": -2, "perception": -2 }, "maxHp": 10, "duration": 180, "refresh": true, "good": true }
     }
   },
   "warded-signet-ring": {
