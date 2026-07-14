@@ -53,11 +53,6 @@ const GRID_CUTS = [
   // passage a non-cardinal direction (needs engine support for `in`/`out`), or
   // accept it as a declared winding tunnel.
   { a: "d8.broodsump", b: "d8.cache" },
-  // The sanctuary rim-path: the Grub Hollow is authored east of the Glow
-  // Garden AND directly south of the Kept Cistern, which no cardinal layout
-  // can satisfy (the cistern sits west of the shrine, the garden east). Open
-  // decision: drop or re-author one of the hollow's two links.
-  { a: "d9.sanctuary.hollow", b: "d9.sanctuary.cistern" },
 ];
 
 function main() {
