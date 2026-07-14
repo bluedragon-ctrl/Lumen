@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Map-shape lints: exit reciprocity, zone contiguity, shadowed hidden exits.** The
+  validator now also enforces that a return exit, where one exists, runs in the exact
+  opposite direction (one-ways stay legal — "down one way, west back" doesn't); that
+  every `zone` is one connected piece, so zone-scoped wanderers can't be stranded on an
+  island (a zone deliberately split while its connecting content is upcoming is declared
+  in `PENDING_ZONE_LINKS`, with a stale check so entries can't outlive their reason); and
+  that a hidden exit never shares a direction with a visible exit in the same room
+  (`move()` resolves the visible one first, so the hidden way would be unwalkable). All
+  three pass on the current world with zero exceptions.
 - **True floors, derived from the map itself (`exitSpans` + a validator floor solve).**
   `depth` is now formally the **progression band** — the rung of the descent — and no
   longer pretends to be elevation. The validator solves every room's true **floor** from

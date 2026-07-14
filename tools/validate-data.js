@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Validates Lumen static world data: JSON validity, cross-references,
- * reachability of all rooms from the starting location, and vertical
- * consistency (every room solves to a single derived floor).
+ * reachability of all rooms from the starting location, vertical consistency
+ * (every room solves to a single derived floor), exit reciprocity, and zone
+ * contiguity.
  *
  * Usage:  node tools/validate-data.js
  *         node tools/validate-data.js --floors   # also print the solved-elevation report
@@ -30,6 +31,14 @@ const FLOOR_CUTS = [
   // geometry closes with no exceptions. Add an entry (`{ a, b }` severs the
   // a<->b edges) only while a genuine content decision is pending, with a
   // comment saying what that decision is.
+];
+
+// Zones deliberately split while the content that will connect them is still
+// upcoming (the world is built top-down). A listed zone may solve as multiple
+// islands; the stale check errors once the zone becomes contiguous, so
+// entries cannot outlive their reason.
+const PENDING_ZONE_LINKS = [
+  // (empty) every zone is currently one connected piece.
 ];
 
 function main() {
@@ -95,6 +104,10 @@ function main() {
       if (!h || !has(rooms, h.to)) errs.push(`room ${id}: hiddenExit ${dir} -> missing room ${h && h.to}`);
       if (typeof h.perception !== "number" || h.perception <= 0)
         errs.push(`room ${id}: hiddenExit ${dir} perception must be a positive number`);
+      // move() resolves visible exits first, so a visible exit on the same
+      // direction shadows the hidden one — it could never be walked.
+      if ((r.exits || {})[dir])
+        errs.push(`room ${id}: hiddenExit ${dir} is shadowed by the visible exit ${dir} — it would be unwalkable even once discovered`);
     }
     // A dir is a real exit if it's a plain exit, a hidden exit, or the direction
     // of a door fixture in the room (all three are walked by move(), which shows
@@ -988,6 +1001,48 @@ function main() {
     if (satisfied(a, b, ab) && satisfied(b, a, ba))
       errs.push(`floor solve: FLOOR_CUTS ${a} <-> ${b} is satisfied by the solve — the cut is stale, remove it`);
   }
+
+  // ── Exit reciprocity ──────────────────────────────────────────────────
+  // A one-way passage is legal (no return edge at all), but where a return
+  // edge exists it must run in the exact opposite direction — a pair like
+  // "down one way, west back" lies about the shape of the world. Checked
+  // across all three edge kinds.
+  const OPP = { north: "south", south: "north", east: "west", west: "east", up: "down", down: "up" };
+  for (const id of Object.keys(rooms))
+    for (const [dir, to] of edgeList(id)) {
+      if (!rooms[to] || !OPP[dir]) continue;
+      const back = edgeList(to).filter(([, t]) => t === id);
+      if (back.length && !back.some(([d]) => d === OPP[dir]))
+        errs.push(`room ${id}: exit ${dir} -> ${to} returns via ${back.map(([d]) => d).join("/")} — a return exit must be the opposite direction (${OPP[dir]}), or absent (one-way)`);
+    }
+
+  // ── Zone contiguity ───────────────────────────────────────────────────
+  // `zone` bounds wander (scope: "zone"), so a zone split into islands
+  // strands zone-scoped mobs. Every zone must be one connected piece unless
+  // declared in PENDING_ZONE_LINKS (built top-down, connection upcoming).
+  const zoneRooms = new Map();
+  for (const [id, r] of Object.entries(rooms))
+    if (r.zone) {
+      if (!zoneRooms.has(r.zone)) zoneRooms.set(r.zone, []);
+      zoneRooms.get(r.zone).push(id);
+    }
+  const pendingZones = new Set(PENDING_ZONE_LINKS.map((p) => p.zone));
+  for (const [zone, ids] of zoneRooms) {
+    const zseen = new Set([ids[0]]);
+    const zq = [ids[0]];
+    while (zq.length) {
+      const c = zq.shift();
+      for (const [, to] of edgeList(c))
+        if (rooms[to] && rooms[to].zone === zone && !zseen.has(to)) { zseen.add(to); zq.push(to); }
+    }
+    const stranded = ids.filter((i) => !zseen.has(i));
+    if (stranded.length && !pendingZones.has(zone))
+      errs.push(`zone ${zone}: not contiguous — unreachable from ${ids[0]} within the zone: ${stranded.join(", ")} (declare in PENDING_ZONE_LINKS while the connecting content is upcoming)`);
+    if (!stranded.length && pendingZones.has(zone))
+      errs.push(`zone ${zone}: PENDING_ZONE_LINKS entry is stale — the zone is contiguous now, remove it`);
+  }
+  for (const p of PENDING_ZONE_LINKS)
+    if (!zoneRooms.has(p.zone)) errs.push(`PENDING_ZONE_LINKS references unknown zone ${p.zone}`);
 
   if (errs.length) {
     console.error("VALIDATION FAILED:\n" + errs.map((e) => "  - " + e).join("\n"));
