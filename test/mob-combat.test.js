@@ -25,6 +25,10 @@ function makeCombatWorld() {
       biter: { id: "biter", name: "a biter", description: "", maxHp: 5, xp: 1, faction: "wild", perception: band, attack: { damage: "1", type: "physical", actionCost: 12 } },
       // Caster (no melee). Tanky so a reflect can't matter; casts don't reflect anyway.
       caster: { id: "caster", name: "a caster", description: "", maxHp: 50, xp: 1, faction: "wild", attributes: { intellect: 5 }, perception: band },
+      // A rim guard: `helper` (joins allies' fights) and armed with an attack action
+      // so it can act on that commitment. Hits for 5 → fells the maxHp-5 biter in one
+      // blow. `rim` allies the player, so it defends a delver under attack.
+      guard: { id: "guard", name: "a guard", description: "", maxHp: 20, xp: 1, faction: "rim", helper: true, hostile: false, perception: band, attack: { damage: "5", type: "physical", actionCost: 12 }, actions: [{ type: "attack", weight: 6 }] },
     },
     spells: {
       bolt: { id: "bolt", name: "Shadow Bolt", hostile: true, effect: { type: "damage", damage: "5" } },
@@ -116,6 +120,35 @@ test("melee: mob-vs-mob neither rouses nor auto-starts a player", () => {
   assert.ok(events.some((e) => e.type === "attack" && e.targetKind === "mob"), "a mob-vs-mob attack happened");
   assert.ok(!has(events, "player-woke"));
   assert.ok(!has(events, "combat-auto-start"));
+});
+
+// --- Faction assist (allies defend their own) -------------------------------
+
+test("assist: a rim helper commits to the fight when a wild mob attacks an allied player", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const attacker = addMob(state, "biter"); // wild
+  const guard = addMob(state, "guard");    // rim, helper — allies the player
+  attacker.aggro = { [p.id]: 5 };          // the biter has engaged the player
+  const events = [];
+  state._assistPass(guard, state.world.mobs.guard, [mdesc(attacker)], state.rooms.arena.light, "arena", events);
+  assert.ok(guard.aggro && guard.aggro[attacker.id] > 0, "the guard commits threat to the player's attacker");
+  assert.ok(has(events, "mob-assist"), "a mob-assist event announces the guard stepping in");
+});
+
+test("assist: the committed helper then swings at the attacker via its attack action", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  const attacker = addMob(state, "biter"); // wild, maxHp 5 → the guard's 5 fells it
+  const guard = addMob(state, "guard");
+  attacker.aggro = { [p.id]: 5 };
+  const events = [];
+  // The assist pass commits the guard, then a full action turn resolves into a
+  // real swing — proving an armed helper can act on that commitment (the bug the
+  // rim watch once had was an attack block with no attack action to roll).
+  state._assistPass(guard, state.world.mobs.guard, [mdesc(attacker)], state.rooms.arena.light, "arena", events);
+  state._mobAct(guard, state.world.mobs.guard, "arena", events);
+  assert.ok(!state.rooms.arena.mobs.includes(attacker), "the guard struck down the player's attacker");
 });
 
 // --- Cast -------------------------------------------------------------------

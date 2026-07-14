@@ -410,6 +410,14 @@ function main() {
     if (m.attack && (typeof m.attack.damage !== "string" || !DICE_RE.test(m.attack.damage)))
       errs.push(`mob ${id}: attack.damage "${m.attack.damage}" is not valid dice notation`);
     if (m.attack) checkOnHit(m.attack.onHit, `mob ${id} attack`); // bite poisons, etc.
+    // An attack block is only usable if an `attack` action can be rolled. A mob
+    // with an `actions` array must therefore list an `{ type: "attack" }` action;
+    // otherwise it can never swing even when engaged (the auto-attack fallback
+    // only fires for mobs with no actions array). Catches an armed-but-toothless
+    // guard/helper — the bug class that once left the rim watch unable to fight.
+    if (m.attack && Array.isArray(m.actions) && m.actions.length &&
+        !m.actions.some((a) => a.type === "attack"))
+      errs.push(`mob ${id}: has an attack block but no "attack" action, so it can never swing — add { "type": "attack" } to its actions`);
     checkSpikes(m.spikes, `mob ${id}`); // contact reflect sugar (thornbug)
     checkOnDamage(m.onDamage, `mob ${id}`); // general when-struck triggers
     if (m.shards != null && (typeof m.shards !== "string" || !DICE_RE.test(m.shards)))

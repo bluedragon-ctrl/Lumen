@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The Rim turns out for a delver under attack.** Every village and camp NPC — not
+  just Hale the watchman — now steps into a fight the instant an enemy strikes a
+  prospector in their room, putting the engine's existing faction-assist to work for
+  the whole Rim. **Captain Sella** wades in as a genuine threat (sturdier, `1d8` at a
+  quick cadence); the traders, clerks, mender, and old Halloran pile on as light
+  backup (`1d4`) — a crowd that deters more than any one of them wins. They never
+  start trouble (`hostile: false`), only defend a delver or answer one who strikes
+  *them*, and a guard holds its post rather than chasing a foe that flees the room.
 - **Horizontal direction consistency (variable passage lengths).** The validator now
   checks the compass shape of the world the same way it checks floors — with
   **directions as authored truth and distances free**: a `west` passage may be long or
@@ -225,6 +233,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regeneration draught, and crystals behind a `search` (perception 4–5).
 
 ### Changed
+- **The Tide indicator moved to the status bar.** The phase/intensity meter sat on the
+  player panel's shards line, easy to miss; it now rides the always-visible vitals strip
+  right after HP and Mana, so a prospector reads the gathering dark at a glance. Same
+  phase colours and fill behaviour, restyled to match the vitals bars.
 - **Ambush predators lose patience.** An `ambush` mob still takes a *sleeping* delver
   outright, but once it has fully noticed one who is **awake and lingering** in its
   room, each action now carries a small chance (`AMBUSH_LINGER`, 3%) that it strikes
@@ -241,6 +253,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   override with their own hue.
 
 ### Fixed
+- **The rim watch can now actually swing.** Hale the watchman (and Old Halloran) carried
+  an `attack` block but no `attack` *action* in their behaviour table — and because the
+  auto-attack fallback only covers mobs with no actions list, they gathered threat and
+  then just stood there. Both now list the action and fight as intended. The data
+  validator gained a rule rejecting any mob that has an attack block but no way to roll
+  it, so an armed-but-toothless guard can't ship again.
 - **The Inspect window's biome tint no longer tears when light changes.** The biome
   glow (`[class*="biome-"]::before`, `z-index: -1`) only paints above the pane's opaque
   background when `#inspect` forms a stacking context — and the only light band that
