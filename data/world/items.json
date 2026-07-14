@@ -2170,5 +2170,44 @@
       "flavour": "You drink the cold blue physic down. It bites clean and astringent, and the well of your will brims full and clear again.",
       "effect": { "type": "restore", "mana": 18 }
     }
+  },
+  "fine-lantern": {
+    "id": "fine-lantern",
+    "rarity": "uncommon",
+    "name": "a fine lantern",
+    "keywords": ["lantern", "lamp", "fine", "light"],
+    "description": "A trim surface lantern of lacquered tin and clear glass, a polished reflector cupped behind the flame to throw the light forward in a clean, bright cone. It is honest wider-world work — brighter than any brass lantern the Rim can offer and thriftier with its oil, the wick trimmed fine and the draught baffled so a single flask burns half again as long. No glimmer, no ward; only a lamp made properly, by people who make lamps for a living. Dear, for a lamp — but Silas will remind you the dark charges more.",
+    "type": "light",
+    "slot": "light",
+    "weight": 2,
+    "value": 70,
+    "light": { "output": 4, "fuelMax": 800, "burnPerTick": 0.75, "fuelItem": "lamp-oil", "refuelPerUnit": 400 }
+  },
+  "gilt-spirits": {
+    "id": "gilt-spirits",
+    "rarity": "uncommon",
+    "name": "a gilt flask of spirits",
+    "keywords": ["spirits", "flask", "bottle", "liquor", "drink", "gilt", "firewater", "brandy"],
+    "description": "A tall cut-glass flask with a gilt collar and stopper, the kind that graces a wider-world merchant's table, three-quarters full of a dark amber spirit that catches the light like a banked coal. It is honest distilled liquor — no herb-craft, no glimmer, only proof enough to put fire in the belly and iron in a shaking hand. A long pull makes a prospector bolder and harder to put down, and considerably worse at noticing why that's a bad idea. Silas pours a measure for buyers and charges them for the bottle.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 35,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You knock back a long pull of the amber spirit. It sears going down, then blooms into a reckless, roaring warmth — you feel strong, unbreakable, and abruptly certain of things you have no business being certain about.",
+      "effect": { "type": "attr-buff", "name": "Bravado", "attrMod": { "might": 3, "wits": -2, "perception": -2 }, "maxHp": 10, "duration": 60, "refresh": true, "good": true }
+    }
+  },
+  "warded-signet-ring": {
+    "id": "warded-signet-ring",
+    "rarity": "rare",
+    "name": "a warded signet ring",
+    "keywords": ["ring", "signet", "warded", "protection", "guild", "band"],
+    "description": "A heavy gold signet ring, its face cut not with a crest but with a tight knot of warding-marks in the clean, geometric hand of a wider-world mage-guild — proofmarked on the inner band where a surface assayer struck it. This is guild-work, the honest enchantment of the kingdoms above: no glimmer, no deep-folk craft, only a patient ward laid on gold by a licensed hand. Worn, it turns a measure of hostile magic aside and keeps the wearer that half-step quicker to slip a blow. Rings like this rarely come down the road — they are bought up long before they reach the dark. Silas will not say who he took this one from, only what he wants for it.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 200,
+    "armour": { "armour": 0, "ward": 4, "speedPenalty": 0, "attrMod": { "wits": 2 } }
   }
 }

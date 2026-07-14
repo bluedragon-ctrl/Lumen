@@ -379,6 +379,10 @@ function main() {
             if (typeof v !== "number") errs.push(`item ${id}: effect.attrMod.${k} must be a number`);
           }
           if (eff.duration == null) errs.push(`item ${id}: attr-buff effect must set a duration (ticks)`);
+          // Optional fortify: a flat, timed max-HP bonus the buff also grants
+          // (real durability a Vitality attrMod can't give — see state.deriveStats).
+          if (eff.maxHp != null && (typeof eff.maxHp !== "number" || eff.maxHp < 0))
+            errs.push(`item ${id}: attr-buff effect.maxHp must be a non-negative number`);
         }
         // A thrown bomb may burst (instant `damage`), leave a lingering `dot`
         // (corroding/poison cloud), or both — but it must do at least one.

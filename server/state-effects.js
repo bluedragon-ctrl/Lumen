@@ -45,6 +45,7 @@ class EffectsMixin {
       ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
       attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
+      maxHp: spec.maxHp || 0, // flat, timed max-HP bonus (a "fortify" buff — see _stateHpBonus / _refreshMaxHp)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
       pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
@@ -52,6 +53,10 @@ class EffectsMixin {
       remaining: spec.duration != null ? spec.duration : null, // null = permanent
       good: spec.good !== false,
     });
+    // A fortify buff lifts the pool the moment it lands: re-derive maxHp and
+    // grant the added capacity as current HP (like a level-up). Player-only —
+    // mobs carry a static template maxHp. Expiry clamps it back in _tickEffects.
+    if (spec.maxHp && this.players.get(actor.id) === actor) this._refreshMaxHp(actor);
   }
 
   /**
@@ -108,7 +113,8 @@ class EffectsMixin {
         const healed = this._heal(p, s.magnitude);
         if (healed) events.push({ type: "regen-tick", playerId: p.id, amount: healed, name: s.name });
       }
-      this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
+      const expired = this._expireStates(p, events, (s) => ({ type: "effect-expired", playerId: p.id, effectType: s.type, name: s.name }));
+      if (expired.some((s) => s.maxHp)) this._refreshMaxHp(p); // a lapsed fortify drops maxHp; clamp current HP down
     }
     for (const [roomId, rt] of Object.entries(this.rooms)) {
       for (const m of [...rt.mobs]) {
@@ -235,7 +241,7 @@ class EffectsMixin {
   /** Count down an actor's timed states, dropping (and announcing via `mkEvent`)
    *  any that reach zero. Permanent states (remaining == null) persist. */
   _expireStates(actor, events, mkEvent) {
-    if (!actor.states) return;
+    if (!actor.states) return [];
     const expired = [];
     actor.states = actor.states.filter((s) => {
       if (s.remaining == null) return true;
@@ -244,6 +250,7 @@ class EffectsMixin {
       return true;
     });
     for (const s of expired) events.push(mkEvent(s));
+    return expired;
   }
 }
 

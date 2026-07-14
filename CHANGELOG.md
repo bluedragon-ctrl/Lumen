@@ -30,6 +30,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   apothecary **healing** and **mana potions** (the game's first *instant* HP restore,
   gated behind Silas's rare visits and steep asking price). All deliberately
   non-glimmer, non-Umbral — rare down here only because they're ordinary up top.
+- **More of Silas's stock — a finer lamp, a stiff drink, and his first bit of magic.**
+  A **fine lantern** (brighter *and* thriftier than brass — output 4, a flask lasts half
+  again as long — but no glimmer/ward; it fills the gap between the brass lantern and the
+  glimmersteel lamp); a **gilt flask of spirits** (a "Bravado" buff: might up, but wits
+  and perception down and a fortify buffer of temp HP — reckless strength that dulls the
+  judgement keeping you alive); and, crossing into his first **wider-world magic item**, a
+  rare **warded signet ring** (a licensed surface mage-guild enchantment — ward + Wits, so
+  ward and evasion both — explicitly *not* glimmer or deep-folk craft). Silas now carries
+  the occasional rare foreign charm alongside his honest steel.
+- **Fortify: buffs can now grant temporary max HP.** A status effect may carry a flat,
+  timed `maxHp` (authored on an `attr-buff`), folded into `deriveStats` like gear `maxHp` —
+  applying it grants the added capacity as current HP (like a level-up) and expiry clamps
+  it back down. This gives potions/drinks real *toughness*, which a Vitality `attrMod`
+  never could (HP pools derive from **base** attributes, so a Vitality buff is inert).
+  Player-only for now; the gilt spirits are the first to use it.
 - **The Rim turns out for a delver under attack.** Every village and camp NPC — not
   just Hale the watchman — now steps into a fight the instant an enemy strikes a
   prospector in their room, putting the engine's existing faction-assist to work for

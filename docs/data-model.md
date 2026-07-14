@@ -700,6 +700,8 @@ An **effect spec** is the descriptor authored on the source (e.g. a consumable's
 | `name`      | string  | Display label for the state chip. |
 | `magnitude` | number  | Effect strength (e.g. light output). |
 | `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |
+| `attrMod`   | object? | For `attr-buff`: flat attribute bonuses (`{ might: 3, wits: -2 }`), folded into `effectiveAttributes` while live — flows through to-hit, melee, Ward, and evasion. |
+| `maxHp`     | number? | For `attr-buff`: a **fortify** bonus — a flat, timed lift to the actor's max HP. Unlike a Vitality `attrMod` (pools derive from *base* attributes, so a Vitality buff is inert), this actually raises the pool: `deriveStats` folds it in, applying it grants the added capacity as current HP (like a level-up), and expiry clamps HP back down. Player-only. |
 
 Applying an effect pushes a live instance `{ type, name, magnitude, remaining, good }`
 onto the actor; instances **stack** (each counts and each ticks down on its own).

@@ -183,7 +183,11 @@ function itemSpecLines(tmpl, w, viewer) {
   const eff = tmpl.consumable && tmpl.consumable.effect;
   if (eff && typeof eff === "object") {
     if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
-    else if (eff.type === "attr-buff" && eff.attrMod) lines.push(`drink: ${Object.entries(eff.attrMod).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`).join(", ")} for ${fmtDuration(eff.duration)}`);
+    else if (eff.type === "attr-buff" && (eff.attrMod || eff.maxHp)) {
+      const mods = Object.entries(eff.attrMod || {}).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`);
+      if (eff.maxHp) mods.push(`max HP +${eff.maxHp}`);
+      lines.push(`drink: ${mods.join(", ")} for ${fmtDuration(eff.duration)}`);
+    }
     else if (eff.type === "damage-room") lines.push(`throw: ${eff.damage}${eff.damageType ? ` ${eff.damageType}` : ""} damage to every foe in the room (single use)`);
     else lines.push(`drink: ${eff.type}`);
   }

@@ -56,9 +56,12 @@ Type-specific blocks (include exactly the one matching `type`):
             "maxHp": 5,                                    // optional bonus max HP while worn (≥0)
             "attrMod": { "wits": -1 },                     // optional stat trade-off
             "spikes": { "damage": "1d3", "chance": 1 } }   // optional melee reflect (chance in (0,1])
-// consumable: effect.type ∈ emit-light|restore|damage-over-time
+// consumable: effect.type ∈ emit-light|restore|damage-over-time|heal-over-time|attr-buff|summon|damage-room
 "consumable": { "flavour": "optional one-off cast message.",
                 "effect": { "type": "restore", "hp": 5, "mana": 5 } }
+// attr-buff: timed stat swing; optional `maxHp` fortify (a real, timed HP-pool
+//   lift — Vitality attrMod is inert, pools use BASE attributes). Needs duration.
+//   "effect": { "type": "attr-buff", "name": "Bravado", "attrMod": { "might": 3, "wits": -2 }, "maxHp": 10, "duration": 60, "refresh": true, "good": true }
 // scroll: teaches scroll.spell (spell must exist)
 "scroll": { "spell": "spark" }
 // recipe item: names a recipe id that must exist
