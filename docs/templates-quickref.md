@@ -315,3 +315,31 @@ characters:
   "knownSpells": []                        // spell ids must exist
 }
 ```
+
+---
+
+## Scheduler — `data/world/schedule.json`
+
+Timed world events (independent of the Tide). Array of entries; each fires on its
+cadence and runs an action type (handlers in `server/schedule-actions.js`). Full
+reference in [data-model.md](data-model.md).
+
+```jsonc
+[
+  {
+    "id": "visiting-trader",             // unique
+    "everyTicks": 1200,                  // fire-to-fire cadence (≈ seconds at TICK_MS 1000)
+    "firstTicks": 1200,                  // optional; ticks to the FIRST fire (default everyTicks)
+    "action": {
+      "type": "visit",                   // only type today
+      "mob": "visiting-trader",          // must exist; a `shop` template = a trader
+      "room": "d0.roadgate",             // must exist
+      "stayTicks": 300                   // present duration; MUST be < everyTicks
+    }
+  }
+]
+```
+
+`visit` places a mob (arrival `spawnMessage`, departure `despawnVerb` — on the
+mob), then removes it after `stayTicks`. No spawner `origin`: never repops, never
+counts against a room cap.

@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A visiting trader, and the Scheduler behind them.** A new **Scheduler**
+  (`data/world/schedule.json`, engine `server/state-scheduler.js`) runs data-driven
+  timed world events on their own cadences, independent of the Tide — each entry
+  delegates to an **action-type handler** (`server/schedule-actions.js`), so new
+  timed behaviours are added by writing a handler, not new plumbing. The first
+  action type is **`visit`**: an NPC arrives in a room, trades or lingers a while,
+  then leaves (reusing the existing `mob-spawn` / `mob-flee` events; no spawner
+  `origin`, so it never repops or counts against a room cap). The first entry is a
+  **road-worn trader** who slips in through a wicket by the **Landward Gate**
+  (`d0.roadgate`) — arriving every 20 min, trading 5 min, then gone. For this
+  proof-of-concept they stock only lamp-oil as a sample ware; real stock is a later
+  content pass. The gate's room text gains a wicket door so the arrival is
+  canon-consistent (the padlocked main gate stays rusted shut).
 - **The Rim turns out for a delver under attack.** Every village and camp NPC — not
   just Hale the watchman — now steps into a fight the instant an enemy strikes a
   prospector in their room, putting the engine's existing faction-assist to work for

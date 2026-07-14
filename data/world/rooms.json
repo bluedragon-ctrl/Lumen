@@ -216,7 +216,7 @@
     "biome": "rim",
     "tags": ["patrol"],
     "name": "The Landward Gate",
-    "description": "The street gives out at the settlement's landward wall, where a heavy iron gate stands chained and padlocked across the old road — the way the Rush first came down, and the only way overland back out to the wider world. It hasn't been swung open in a long while: the chain is orange with rust, and the lane beyond lies dark and untravelled. For now there is nowhere to go but back west, into the lamplight.",
+    "description": "The street gives out at the settlement's landward wall, where a heavy iron gate stands chained and padlocked across the old road — the way the Rush first came down, and the only way overland back out to the wider world. It hasn't been swung open in a long while: the chain is orange with rust, and the lane beyond lies dark and untravelled — save for a low wicket door in the wall beside it, worked open now and then for the rare pedlar who still walks the old road in. For now there is nowhere to go but back west, into the lamplight.",
     "depth": 0,
     "ambientLight": 2,
     "exits": { "west": "d0.street" },

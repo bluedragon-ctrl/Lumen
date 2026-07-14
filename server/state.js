@@ -54,6 +54,7 @@ class GameState {
       : this.tide.phases[0] || "calm";
     this.tideOverride = null;
     this._initRooms();
+    this._initSchedule(); // timed events (visiting trader, …) — see state-scheduler.js
   }
 
   _initRooms() {
@@ -689,6 +690,7 @@ class GameState {
     this.resolveMobAI(events);
     this._recoverMobsTick(events); // wounded, disengaged mobs knit their wounds (post-AI: aggro is freshly pruned)
     this._respawnTick(events);
+    this._scheduleTick(events); // timed events: visiting NPCs arrive/leave, etc.
     this._harvestTick(events);
     this._summonTick(events);
     this._mineTick(events);
@@ -1018,5 +1020,6 @@ mixin(GameState, require("./state-mobai")); // mob AI, threat/grudge, pursuit, m
 mixin(GameState, require("./state-tide")); // the Tide world clock: phases, lamps, tide spawns/sweeps
 mixin(GameState, require("./state-spells")); // cast resolution, detonateRoom, summon lifecycle
 mixin(GameState, require("./state-effects")); // status effects, restores, OOC mob regen, room effects
+mixin(GameState, require("./state-scheduler")); // timed events: the Scheduler (visiting trader, …)
 
 module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE, roomEffectFires };

@@ -467,6 +467,32 @@
       "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
     }
   },
+  "visiting-trader": {
+    "id": "visiting-trader",
+    "faction": "rim",
+    "name": "a road-worn trader",
+    "description": "A gaunt traveller in a dust-caked oilskin coat, a laden pack and a roped strongbox riding their shoulders. One of the few who still slips in through the wicket by the landward gate, walking the old road when the light allows to lay out their wares — here a while to trade, then gone again before the dark comes in.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "helper": true,
+    "attack": { "damage": "1d4", "actionCost": 14 },
+    "spawnMessage": "The wicket by the landward gate creaks, and {name} slips in off the old road, a laden pack across their shoulders.",
+    "despawnVerb": "shoulders their pack and slips back out through the wicket, gone into the dark road",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 2, "messages": ["unlaces the pack and lays a few wares out on a cloth", "glances back at the wicket, judging the light", "counts the hours left before the dark on scarred fingers", "re-ropes the strongbox and tests the knot"] }
+    ],
+    "shop": {
+      "sells": [{ "template": "lamp-oil" }]
+    }
+  },
   "rim-smith": {
     "id": "rim-smith",
     "faction": "rim",

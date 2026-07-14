@@ -23,6 +23,7 @@ function loadWorld() {
     spells: readJson("world/spells.json"),
     quests: readJson("world/quests.json"),
     tide: readJson("world/tide.json"), // the world clock's config (see world-clock.js)
+    schedule: readJson("world/schedule.json"), // timed events (see state-scheduler.js)
     playerTemplate: readJson("templates/player.json"),
   };
   // Static content must not be mutated at runtime; freeze the top level.

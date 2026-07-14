@@ -15,6 +15,7 @@ const fs = require("fs");
 const path = require("path");
 const { FACTIONS } = require("../server/config");
 const { PHASES } = require("../server/world-clock");
+const { SCHEDULE_ACTION_TYPES } = require("../server/schedule-actions");
 
 const ROOT = path.resolve(__dirname, "..");
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
@@ -62,6 +63,7 @@ function main() {
   const spells = read("data/world/spells.json");
   const quests = read("data/world/quests.json");
   const tide = read("data/world/tide.json");
+  const schedule = read("data/world/schedule.json");
   const player = read("data/templates/player.json");
 
   const errs = [];
@@ -935,6 +937,39 @@ function main() {
         chkChance(e.chance, `emotes.${p}.chance`);
         if (e.requireDark != null && typeof e.requireDark !== "boolean") errs.push(`tide: emotes.${p}.requireDark must be a boolean`);
       }
+    }
+  }
+
+  // The Scheduler (data/world/schedule.json): timed events. Each entry needs a
+  // unique id, a positive fire cadence, and a known action type (the whitelist is
+  // imported from schedule-actions.js, so it stays in lockstep with the engine).
+  // Per-type params are checked below — `visit` is the only type today.
+  {
+    if (schedule != null && !Array.isArray(schedule)) {
+      errs.push("schedule: must be an array of scheduled entries");
+    } else {
+      const seenIds = new Set();
+      (schedule || []).forEach((e, i) => {
+        if (!e || typeof e !== "object") return errs.push(`schedule[${i}] must be an object`);
+        const where = e.id ? `schedule "${e.id}"` : `schedule[${i}]`;
+        if (typeof e.id !== "string" || !e.id) errs.push(`${where}: id must be a non-empty string`);
+        else if (seenIds.has(e.id)) errs.push(`${where}: duplicate id`);
+        else seenIds.add(e.id);
+        if (typeof e.everyTicks !== "number" || e.everyTicks <= 0) errs.push(`${where}: everyTicks must be a positive number`);
+        if (e.firstTicks != null && (typeof e.firstTicks !== "number" || e.firstTicks < 0)) errs.push(`${where}: firstTicks must be a non-negative number`);
+        const a = e.action;
+        if (!a || typeof a !== "object") { errs.push(`${where}: action must be an object`); return; }
+        if (!SCHEDULE_ACTION_TYPES.includes(a.type)) {
+          errs.push(`${where}: action.type "${a.type}" is not one of ${SCHEDULE_ACTION_TYPES.join(", ")}`);
+          return;
+        }
+        if (a.type === "visit") {
+          if (!has(mobs, a.mob)) errs.push(`${where}: action.mob references missing mob ${a.mob}`);
+          if (!has(rooms, a.room)) errs.push(`${where}: action.room references missing room ${a.room}`);
+          if (typeof a.stayTicks !== "number" || a.stayTicks <= 0) errs.push(`${where}: action.stayTicks must be a positive number`);
+          else if (typeof e.everyTicks === "number" && a.stayTicks >= e.everyTicks) errs.push(`${where}: action.stayTicks must be less than everyTicks`);
+        }
+      });
     }
   }
 
