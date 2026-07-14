@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **True floors, derived from the map itself (`exitSpans` + a validator floor solve).**
+  `depth` is now formally the **progression band** — the rung of the descent — and no
+  longer pretends to be elevation. The validator solves every room's true **floor** from
+  the exit graph (an `up`/`down` exit moves one floor, every other direction stays level)
+  and fails when two routes to a room disagree, so new areas can no longer ship vertical
+  loops that don't close. A new optional room field **`exitSpans`** (`{ "down": 5 }`)
+  declares a multi-floor chute or shaft — a progression shortcut — and the two top-down
+  stubs now carry theirs: the **Riven Yard fault** falls 5 floors (the Fault's Foot lands
+  on floor −5, its band's trunk) and the **Underhearth hatch** falls 7 (floor −11, the
+  deepest point in the world), so the content that later connects those areas laterally
+  is checked against their intended elevation. `node tools/validate-data.js --floors`
+  prints the solved elevation report (per-band trunk, per-floor band mix, outliers); the
+  **3D map** now drives its vertical axis with solved floors instead of the old
+  band-plus-heuristic and its tooltip shows `band · floor`. Two known-open geometry
+  contradictions (the falselight-vs-lake descent count around the Gloaming approach, and
+  the d3 drowned crack whose return flue is authored `west`) are documented as
+  `FLOOR_CUTS` in the validator pending a design decision.
 - **The Ember Deep — the floor of the deep (depth 9), below The Scald.** A line is
   now rigged down the **Redward Fissure**, and it drops onto the last floor: a
   six-room molten reach where light is finally *native*, welling orange out of the
