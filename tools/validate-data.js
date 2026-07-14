@@ -26,15 +26,11 @@ const DICE_RE = /^\d+d\d+([+-]\d+)?$|^\d+$/;
 // of the graph, so entries cannot outlive their reason. Exported so map-3d
 // draws with the same cuts the validator solves with.
 const FLOOR_CUTS = [
-  // The routes below the lake disagree by 3 floors with the routes through
-  // falselight and the d3 drowned crack: which count is canonical is an open
-  // design decision. Until it lands, the deep super-region (camp, the chasm
-  // bridge, necropolis, sanctuary, midden, fields) anchors through
-  // d5.gullet -> d6.camp, and these two contradicting edges are severed.
-  { a: "d5.windway", b: "d5.gatemouth" },
-  // Also internally skewed: you drop `down` through the crack but the flue
-  // back is `west` — it can't become `up` (d7.chasm already has an up exit),
-  // so the pair is one floor out of true until that spot is re-authored.
+  // The drowned crack under the d3 plunge-pool drops 4 floors onto d7.chasm
+  // (-3 -> -7), but its edges can't declare that yet: the return flue is
+  // authored `west` (horizontal = level), and it can't simply become `up`
+  // because d7.chasm already has an up exit to the gallery. Open decision:
+  // allow a signed climb on a horizontal exit, or re-author the flue.
   { a: "d3.cave", b: "d7.chasm" },
 ];
 

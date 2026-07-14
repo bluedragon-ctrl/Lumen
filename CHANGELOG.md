@@ -12,17 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the exit graph (an `up`/`down` exit moves one floor, every other direction stays level)
   and fails when two routes to a room disagree, so new areas can no longer ship vertical
   loops that don't close. A new optional room field **`exitSpans`** (`{ "down": 5 }`)
-  declares a multi-floor chute or shaft — a progression shortcut — and the two top-down
-  stubs now carry theirs: the **Riven Yard fault** falls 5 floors (the Fault's Foot lands
-  on floor −5, its band's trunk) and the **Underhearth hatch** falls 7 (floor −11, the
-  deepest point in the world), so the content that later connects those areas laterally
-  is checked against their intended elevation. `node tools/validate-data.js --floors`
-  prints the solved elevation report (per-band trunk, per-floor band mix, outliers); the
-  **3D map** now drives its vertical axis with solved floors instead of the old
-  band-plus-heuristic and its tooltip shows `band · floor`. Two known-open geometry
-  contradictions (the falselight-vs-lake descent count around the Gloaming approach, and
-  the d3 drowned crack whose return flue is authored `west`) are documented as
-  `FLOOR_CUTS` in the validator pending a design decision.
+  declares a multi-floor chute or shaft — a progression shortcut — and the three
+  intentional drops now carry theirs: the **rat-nest chute** falls 4 floors (landing the
+  deep nest, and with it Falselight — the Gloaming's top floor — at its designed depth-5
+  elevation), the **Riven Yard fault** falls 5, and the **Underhearth hatch** falls 4
+  (floor −11, the deepest point in the world), so the content that later connects those
+  areas laterally is checked against their intended elevation. With the spans declared,
+  the solve comes out a **perfect ladder — every band's trunk floor equals its depth,
+  d0 through d11**. `node tools/validate-data.js --floors` prints the solved elevation
+  report (per-band trunk, per-floor band mix, outliers); the **3D map** now drives its
+  vertical axis with solved floors instead of the old band-plus-heuristic and its
+  tooltip shows `band · floor`. One known-open geometry contradiction remains (the d3
+  drowned crack drops 4 floors but its return flue is authored `west`), documented as a
+  `FLOOR_CUTS` entry in the validator pending a design decision.
 - **The Ember Deep — the floor of the deep (depth 9), below The Scald.** A line is
   now rigged down the **Redward Fissure**, and it drops onto the last floor: a
   six-room molten reach where light is finally *native*, welling orange out of the

@@ -748,6 +748,7 @@
     "ambientLight": 0,
     "description": "The warden's floor gives out here into a wide, gnawed sink in the rock — a raw shaft dropping sheer and lightless into a warmth that reeks of musk and old blood, rising from somewhere very far down. The rim is greasy with the passage of countless small bodies climbing up out of the dark. This is where they come from, and it is no place for the living: the litter of those who found that out is scattered about the lip — a snapped ladder, a cracked helm, a prospector's boot with the foot still in it, none of it dragged back up. The shaft is a smooth, steepening chute; whatever goes down it does not climb back. The warden's den lies back up; the drop falls away down.",
     "exits": { "up": "d1.den", "down": "d6.nest.chimney" },
+    "exitSpans": { "down": 4 },
     "exitMessages": {
       "down": "You lower yourself over the lip — and the rock tilts, and takes you. The chute steepens and there is no stopping it: a long, roaring, helpless slide through a gnawed throat of stone, blind in the dark, the reek rushing up thicker and warmer the deeper you drop, until the floor finally kicks out from under you and pitches you sprawling into the heart of the nest, far below. There is no climbing back up that."
     },
@@ -2181,7 +2182,7 @@
     "ambientLight": 5,
     "description": "East of the hearth a smaller cell has been given over wholly to the old man's work. A makeshift bench crowds one wall — chipped glass, a clay burner, a mortar worn pale — and every other surface is shelved and stacked with the fruits of a few years' hard looking: a snapper-bloom coiled pale and dead in cloudy fluid, trays of pinned glass-winged insects, a whole wall papered with careful sketches that follow one honest fruiting frond, panel by patient panel, into the thorned and hungry thing it becomes. Nobody down here made this but a man with nothing to do but understand where he'd washed up. A bolted hatch is set into the floor, warm to the touch and breathing heat through its seams. The hearth lies back west.",
     "exits": { "west": "d7.croft.hearth" },
-    "exitSpans": { "down": 7 },
+    "exitSpans": { "down": 4 },
     "exitMessages": {
       "down": "You lower yourself through the hatch onto cold iron rungs and begin to climb down. The shaft goes on, and on — past seams of dead coral and old water, past dark that no lamp of the croft ever reached — and the air thickens and warms with every rung, until at last the rungs end and you step off onto scorched rock in a red, waiting glow, four long depths beneath the garden."
     },
@@ -3203,7 +3204,7 @@
     "ambientLight": 3,
     "description": "The shaft's iron rungs end on a warm shelf of scorched rock, and the dark opens into a low vault half-filled by a small lake of molten stone. It is no larger than the croft's own garden, but it seethes — its black skin cracking into slow orange veins and healing over — and throws a steady, wavering red light that needs no lamp. Heat sits on the room like a lid. Whatever the old man above makes of this place, he has left it be: nothing hunts here, nothing stirs but the cinders that lift off the lake and wink out. The rungs climb back up toward the croft. Beyond the lake the vault runs on into unlit dark, where no path has yet been cut.",
     "exits": { "up": "d7.croft.study" },
-    "exitSpans": { "up": 7 },
+    "exitSpans": { "up": 4 },
     "exitMessages": {
       "up": "You find the iron rungs again and start the long haul back up, the heat falling away behind you rung by rung, the air cooling and dampening, until the pale lamplight of the study finally opens overhead and you climb out onto the croft floor, four depths above the glow."
     },
