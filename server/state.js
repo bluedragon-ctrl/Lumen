@@ -54,6 +54,7 @@ class GameState {
       : this.tide.phases[0] || "calm";
     this.tideOverride = null;
     this._initRooms();
+    this._initSchedule(); // timed events (visiting trader, …) — see state-scheduler.js
   }
 
   _initRooms() {
@@ -293,6 +294,17 @@ class GameState {
     return bonus;
   }
 
+  /** Bonus max HP from active *fortify* buffs — a timed `maxHp` carried on a
+   *  status (e.g. a stiff drink that toughens as it emboldens). Unlike a
+   *  Vitality attr-buff this actually lifts the pool, because pools derive from
+   *  BASE attributes; folded into `deriveStats`, granted on apply and clamped on
+   *  expiry (see applyEffect / _refreshMaxHp). Player-only. */
+  _stateHpBonus(player) {
+    let bonus = 0;
+    for (const s of player.states || []) if (s.maxHp) bonus += s.maxHp;
+    return bonus;
+  }
+
   /** Bonus max Mana from equipped gear (`armour.maxMana`) — e.g. an Umbral
    *  glimmer-ring that deepens a caster's well. Summed across every equipped
    *  slot and folded into `deriveStats`, refreshed whenever gear changes. */
@@ -332,13 +344,25 @@ class GameState {
    */
   deriveStats(player) {
     const a = player.attributes || {};
-    player.maxHp = HP_BASE + ((player.level || 1) - 1) * HP_PER_LEVEL + (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player);
+    player.maxHp = HP_BASE + ((player.level || 1) - 1) * HP_PER_LEVEL + (a.vitality || 0) * HP_PER_VITALITY + this._equipHpBonus(player) + this._stateHpBonus(player);
     player.maxMana = (a.intellect || 0) * MANA_PER_INTELLECT + this._equipManaBonus(player);
     player.manaRegen = this.manaRegenFor(player);
     const band = this.world.playerTemplate.perception || { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
     const sight = Math.floor(((a.perception || 0) - ATTR_BASELINE) / SIGHT_PER_PERCEPTION);
     const dimBelow = Math.max(band.blindBelow, band.dimBelow - sight);
     player.perception = { blindBelow: band.blindBelow, dimBelow, harmedAbove: band.harmedAbove };
+  }
+
+  /** Turn a fortify buff's max-HP change into a health change. On a rise (the
+   *  buff applies) grant the new capacity as current HP, like a level-up; on a
+   *  fall (the buff lapses) clamp current HP back down. deriveStats itself never
+   *  touches hp — this is the one caller that does, for the fortify path.
+   *  Player-only; mobs read a static template maxHp. */
+  _refreshMaxHp(player) {
+    const prev = player.maxHp;
+    this.deriveStats(player);
+    if (player.maxHp > prev) player.hp += player.maxHp - prev;
+    else if (player.hp > player.maxHp) player.hp = player.maxHp;
   }
 
   /** Credit `amount` lifetime XP to a player and resolve any level-ups it
@@ -689,6 +713,7 @@ class GameState {
     this.resolveMobAI(events);
     this._recoverMobsTick(events); // wounded, disengaged mobs knit their wounds (post-AI: aggro is freshly pruned)
     this._respawnTick(events);
+    this._scheduleTick(events); // timed events: visiting NPCs arrive/leave, etc.
     this._harvestTick(events);
     this._summonTick(events);
     this._mineTick(events);
@@ -1018,5 +1043,6 @@ mixin(GameState, require("./state-mobai")); // mob AI, threat/grudge, pursuit, m
 mixin(GameState, require("./state-tide")); // the Tide world clock: phases, lamps, tide spawns/sweeps
 mixin(GameState, require("./state-spells")); // cast resolution, detonateRoom, summon lifecycle
 mixin(GameState, require("./state-effects")); // status effects, restores, OOC mob regen, room effects
+mixin(GameState, require("./state-scheduler")); // timed events: the Scheduler (visiting trader, …)
 
 module.exports = { GameState, makeItemInstance, addToFloor, makeMobInstance, actorEmitLight, playerDefence, effectiveSpeed, buyValueOf, sellValueOf, SELL_RATE, itemVisibleTo, fixtureVisibleTo, mobVisibleTo, effectivePerception, canPerceive, isDiscovered, discoveryKey, xpForLevel, effectiveAttributes, spellScaleBonus, durationScaleBonus, MELEE_SCALE, roomEffectFires };

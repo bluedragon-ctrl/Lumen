@@ -1,0 +1,12 @@
+[
+  {
+    "id": "visiting-trader",
+    "everyTicks": 1200,
+    "action": {
+      "type": "visit",
+      "mob": "visiting-trader",
+      "room": "d0.roadgate",
+      "stayTicks": 300
+    }
+  }
+]

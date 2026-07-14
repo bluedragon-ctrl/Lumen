@@ -638,8 +638,46 @@ resolved config off `state.tide`.
 
 > **Where flavour lives.** A *creature's* own arrival/exit wording is authored on the
 > mob (`spawnMessage` / `despawnVerb` in `mobs.json`), reused by every spawn path
-> (respawn, creep, roster) — not in `tide.json`. `tide.json` holds only what belongs
-> to the world clock itself.
+> (respawn, creep, roster, **the Scheduler**) — not in `tide.json`. `tide.json` holds
+> only what belongs to the world clock itself.
+
+---
+
+## The Scheduler (static) — `data/world/schedule.json`
+
+Timed world events, independent of the Tide. An **array** of entries; each fires on
+its own cadence and delegates the effect to an **action-type handler** (registered
+in `server/schedule-actions.js`). The engine (`server/state-scheduler.js`) owns only
+the timers — new timed behaviours are added by writing a handler, so entries stay
+pure data. Purely in-memory (resets on restart, like repop and the Tide).
+
+```json
+[
+  { "id": "visiting-trader", "everyTicks": 1200,
+    "action": { "type": "visit", "mob": "visiting-trader", "room": "d0.roadgate", "stayTicks": 300 } }
+]
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `id` | string | Unique entry id. |
+| `everyTicks` | int | Fire-to-fire cadence (ticks ≈ seconds at `TICK_MS` 1000). |
+| `firstTicks` | int? | Ticks until the **first** fire (default `everyTicks`) — phases a fresh world so it isn't populated the instant it boots. |
+| `action` | Action | What happens on each fire (`{ type, … }`). |
+
+A handler's `fire` may return a **duration** (ticks) to become a *duration action* —
+the engine calls its `end` that many ticks later; anything else is a one-shot. A
+fire is skipped while an entry is still active, so a short cadence never stacks
+overlapping runs.
+
+**Action types** (only `visit` today):
+
+| `type` | Params | Effect |
+|---|---|---|
+| `visit` | `{ mob, room, stayTicks }` | An NPC arrives in `room`, then leaves after `stayTicks`. An ordinary instance with **no** spawner `origin` (never repops, never counts against a cap) — a `shop` template makes it a trader through the usual trade path. Arrival/departure reuse `mob-spawn` (`spawnMessage`) and `mob-flee` (`despawnVerb`). `stayTicks` must be `< everyTicks`. |
+
+The **visiting trader** at the Landward Gate (`d0.roadgate`) is the first entry:
+arrives every 20 min, trades 5 min, then gone.
 
 ---
 
@@ -662,6 +700,8 @@ An **effect spec** is the descriptor authored on the source (e.g. a consumable's
 | `name`      | string  | Display label for the state chip. |
 | `magnitude` | number  | Effect strength (e.g. light output). |
 | `duration`  | integer | Lifetime in **ticks** (1s each); omit for a permanent effect. |
+| `attrMod`   | object? | For `attr-buff`: flat attribute bonuses (`{ might: 3, wits: -2 }`), folded into `effectiveAttributes` while live — flows through to-hit, melee, Ward, and evasion. |
+| `maxHp`     | number? | For `attr-buff`: a **fortify** bonus — a flat, timed lift to the actor's max HP. Unlike a Vitality `attrMod` (pools derive from *base* attributes, so a Vitality buff is inert), this actually raises the pool: `deriveStats` folds it in, applying it grants the added capacity as current HP (like a level-up), and expiry clamps HP back down. Player-only. |
 
 Applying an effect pushes a live instance `{ type, name, magnitude, remaining, good }`
 onto the actor; instances **stack** (each counts and each ticks down on its own).

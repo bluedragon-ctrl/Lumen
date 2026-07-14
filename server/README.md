@@ -191,7 +191,30 @@ spawner below its `max` counts down `respawn` ticks and then puts one mob back i
 its home room (a `mob-spawn` event). The cap counts a spawner's mobs wherever they
 have since wandered, so roaming never multiplies the population. Omit `respawn`
 for a static one-time spawn. Cadence stays on the single tick — cheap integer
-countdowns, no separate timer (an event-scheduler is deferred until scale needs it).
+countdowns, no separate timer. Timed events that aren't tied to a home-room cap
+(an NPC that visits and leaves) live on the **Scheduler** instead (see below).
+
+### The Scheduler (timed events)
+
+Separate from repop and the Tide, the **Scheduler** (`state-scheduler.js`, config
+`data/world/schedule.json`) runs data-driven timed events. Each entry fires on its
+own `everyTicks` cadence and delegates the effect to an **action-type handler**
+(`schedule-actions.js`); the engine owns only the timers, so new timed behaviours
+are added by writing a handler, not by touching the loop. An entry:
+`{ id, everyTicks, firstTicks?, action: { type, … } }` — `firstTicks` phases the
+first fire (default `everyTicks`). A handler's `fire` may return a duration in
+ticks to become a **duration action** (the engine calls its `end` that many ticks
+later); anything else is a one-shot. A fire is skipped while an entry is still
+active, so a short cadence can't stack overlapping runs. Purely in-memory — resets
+on restart, like repop and the Tide.
+
+The first action type is **`visit`** (`{ mob, room, stayTicks }`): a mob arrives in
+a room, then leaves after `stayTicks`. It's an ordinary instance carrying no
+spawner `origin` (never repops, never counts against a cap), so a `shop` template
+makes it a trader through the usual trade path, and arrival/departure reuse the
+`mob-spawn` (`spawnMessage`) and `mob-flee` (`despawnVerb`) events. The **visiting
+trader** at the Landward Gate is the first — arriving every 20 min, trading 5 min,
+then gone.
 
 Each tick a mob takes **one weighted action** from its `actions` table
 (`attack` / `emote` / `wander` / `idle`) among those currently available — so mobs

@@ -6,6 +6,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A visiting trader, and the Scheduler behind them.** A new **Scheduler**
+  (`data/world/schedule.json`, engine `server/state-scheduler.js`) runs data-driven
+  timed world events on their own cadences, independent of the Tide — each entry
+  delegates to an **action-type handler** (`server/schedule-actions.js`), so new
+  timed behaviours are added by writing a handler, not new plumbing. The first
+  action type is **`visit`**: an NPC arrives in a room, trades or lingers a while,
+  then leaves (reusing the existing `mob-spawn` / `mob-flee` events; no spawner
+  `origin`, so it never repops or counts against a room cap). The first entry is
+  **Silas the outland-factor** — a greedy outsider merchant profiteering on the
+  Rush, who slips in through a wicket by the **Landward Gate** (`d0.roadgate`) to
+  sell the diggers scarce wider-world goods dear, then leaves — arriving every 20
+  min, trading 5 min, then gone. The gate's room text gains a wicket door so the arrival is
+  canon-consistent (the padlocked main gate stays rusted shut).
+- **Silas's stock — honest surface gear, priced like sin.** The visiting trader now
+  deals in mundane wider-world goods the Abyss can't make, each marked up steeply:
+  a **half-plate harness** and a **great helm** (the first armour to reach a mundane
+  `armour: 3` — and the first gear anywhere to carry a real `speedPenalty`, so honest
+  plate is protection bought with speed and wariness), a **longsword** and a **halberd**
+  (a fine one-hander and a heavy reach polearm, both above the Rim's crude arms), an
+  **embroidered mantle** (the mundane mirror of the Umbral ward-cloaks — surface wool
+  that turns a *glancing blade* where deep-silk turns magic), and corked surface
+  apothecary **healing** and **mana potions** (the game's first *instant* HP restore,
+  gated behind Silas's rare visits and steep asking price). All deliberately
+  non-glimmer, non-Umbral — rare down here only because they're ordinary up top.
+- **More of Silas's stock — a finer lamp, a stiff drink, and his first bit of magic.**
+  A **fine lantern** (brighter *and* thriftier than brass — output 4, a flask lasts half
+  again as long — but no glimmer/ward; it fills the gap between the brass lantern and the
+  glimmersteel lamp); a **gilt flask of spirits** (a "Bravado" buff: might up, but wits
+  and perception down and a fortify buffer of temp HP — reckless strength that dulls the
+  judgement keeping you alive); and, crossing into his first **wider-world magic item**, a
+  rare **warded signet ring** (a licensed surface mage-guild enchantment — ward + Wits, so
+  ward and evasion both — explicitly *not* glimmer or deep-folk craft). Silas now carries
+  the occasional rare foreign charm alongside his honest steel.
+- **Fortify: buffs can now grant temporary max HP.** A status effect may carry a flat,
+  timed `maxHp` (authored on an `attr-buff`), folded into `deriveStats` like gear `maxHp` —
+  applying it grants the added capacity as current HP (like a level-up) and expiry clamps
+  it back down. This gives potions/drinks real *toughness*, which a Vitality `attrMod`
+  never could (HP pools derive from **base** attributes, so a Vitality buff is inert).
+  Player-only for now; the gilt spirits are the first to use it.
 - **The Rim turns out for a delver under attack.** Every village and camp NPC — not
   just Hale the watchman — now steps into a fight the instant an enemy strikes a
   prospector in their room, putting the engine's existing faction-assist to work for

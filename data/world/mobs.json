@@ -467,6 +467,41 @@
       "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
     }
   },
+  "visiting-trader": {
+    "id": "visiting-trader",
+    "faction": "rim",
+    "name": "Silas the outland-factor",
+    "description": "A lean, sharp-eyed man in a travel-stained coat of better cut than anything the Rim can sell, rings on three fingers and a ledger never far from them. He came down the old road chasing the Rush — not to dig, but to sell the diggers what the wider world still has and the Abyss does not, at whatever the desperate will pay. Every kindness of his has a price written faint beneath it.",
+    "maxHp": 20,
+    "speed": 12,
+    "armour": 0,
+    "ward": 0,
+    "attributes": { "might": 5, "vitality": 5, "intellect": 6, "wits": 6, "perception": 6 },
+    "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },
+    "behavior": "passive",
+    "hostile": false,
+    "helper": true,
+    "attack": { "damage": "1d4", "actionCost": 14 },
+    "spawnMessage": "The wicket by the landward gate creaks, and {name} slips in off the old road, coat brushed clean and ledger already open.",
+    "despawnVerb": "counts the day's take, shoulders his pack, and slips back out through the wicket into the dark road",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 10 },
+      { "type": "emote", "weight": 3, "messages": ["polishes a ring on his sleeve and eyes the room's purses", "murmurs a price under his breath, then adds a little more", "tuts at the Rim's rough goods and lets his own catch the light", "licks a thumb and turns a page of his ledger"] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "eyes your wounds, then a coat pocket: \"You look poorly. I'd sell you a remedy — dear, mind. Rare things are dear.\"", "room": "eyes {name}'s wounds and pats a coat pocket." }
+        ] },
+        { "messages": [
+          { "target": "spreads his ringed hands: \"Everything down here's cheap and breaking. Everything I carry came a long way and doesn't. You do the sums.\"", "room": "spreads his hands at {name}, all reason and rings." },
+          { "target": "gives you a merchant's smile: \"Buy while I'm here — I don't come often, and I never come cheap.\"", "room": "gives {name} a merchant's smile with no warmth behind it." }
+        ] }
+      ] }
+    ],
+    "shop": {
+      "sells": [{ "template": "lamp-oil", "price": 10 }, { "template": "half-plate-harness", "price": 190 }, { "template": "great-helm", "price": 100 }, { "template": "longsword", "price": 95 }, { "template": "halberd", "price": 135 }, { "template": "embroidered-mantle", "price": 90 }, { "template": "healing-potion", "price": 75 }, { "template": "mana-potion", "price": 65 }, { "template": "fine-lantern", "price": 110 }, { "template": "gilt-spirits", "price": 55 }, { "template": "warded-signet-ring", "price": 320 }]
+    }
+  },
   "rim-smith": {
     "id": "rim-smith",
     "faction": "rim",
