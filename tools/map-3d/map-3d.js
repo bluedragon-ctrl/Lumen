@@ -2,7 +2,8 @@
 /**
  * Lumen 3D map — a local, browser-based, READ-ONLY view of the whole world as a
  * rotatable / zoomable 3D model. Rooms are nodes (labelled with name + id),
- * exits are edges; depth is the vertical axis. Dependency-free (a tiny vanilla
+ * exits are edges; the solved floor (derived from up/down exits, exitSpans
+ * aware) is the vertical axis. Dependency-free (a tiny vanilla
  * canvas 3D engine), so it also runs as a standalone HTML file offline.
  *
  *   node tools/map-3d/map-3d.js            # serves http://localhost:3945
@@ -20,6 +21,9 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..", ".."); // tools/map-3d/ -> repo root
+// Shared with the validator so the map draws with the same floor solve it
+// enforces (edges under a known-open geometry decision are severed there too).
+const { FLOOR_CUTS } = require("../validate-data.js");
 const ROOMS_PATH = path.join(ROOT, "data", "world", "rooms.json");
 const FIXTURES_PATH = path.join(ROOT, "data", "world", "fixtures.json");
 const PAGE_PATH = path.join(__dirname, "map-3d.html");
@@ -63,7 +67,8 @@ function buildStandalone() {
   // Escape "<" so no room prose containing "</script>" can break out of the tag
   // (< is valid JSON and parses back to "<").
   const json = JSON.stringify(rooms).replace(/</g, "\\u003c");
-  const inject = `<script>window.LUMEN_WORLD = ${json};</script>\n`;
+  const cuts = JSON.stringify(FLOOR_CUTS).replace(/</g, "\\u003c");
+  const inject = `<script>window.LUMEN_WORLD = ${json}; window.LUMEN_FLOOR_CUTS = ${cuts};</script>\n`;
   // Insert just before the first <script> so the data exists before the engine runs.
   const out = page.replace(/<script>/, inject + "<script>");
   fs.writeFileSync(OUT_PATH, out, "utf8");
@@ -80,7 +85,7 @@ const server = http.createServer((req, res) => {
     if (req.method === "GET" && req.url === "/api/world") {
       // Always re-read from disk so the map reflects current data on each reload.
       const rooms = withDoorExits(readJSON(ROOMS_PATH));
-      return void sendJSON(res, 200, { ok: true, rooms });
+      return void sendJSON(res, 200, { ok: true, rooms, floorCuts: FLOOR_CUTS });
     }
     res.writeHead(404).end("Not found");
   } catch (e) {

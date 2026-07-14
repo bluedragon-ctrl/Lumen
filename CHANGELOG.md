@@ -6,6 +6,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Map-shape lints: exit reciprocity, zone contiguity, shadowed hidden exits.** The
+  validator now also enforces that a return exit, where one exists, runs in the exact
+  opposite direction (one-ways stay legal — "down one way, west back" doesn't); that
+  every `zone` is one connected piece, so zone-scoped wanderers can't be stranded on an
+  island (a zone deliberately split while its connecting content is upcoming is declared
+  in `PENDING_ZONE_LINKS`, with a stale check so entries can't outlive their reason); and
+  that a hidden exit never shares a direction with a visible exit in the same room
+  (`move()` resolves the visible one first, so the hidden way would be unwalkable). All
+  three pass on the current world with zero exceptions.
+- **True floors, derived from the map itself (`exitSpans` + a validator floor solve).**
+  `depth` is now formally the **progression band** — the rung of the descent — and no
+  longer pretends to be elevation. The validator solves every room's true **floor** from
+  the exit graph (an `up`/`down` exit moves one floor, every other direction stays level)
+  and fails when two routes to a room disagree, so new areas can no longer ship vertical
+  loops that don't close. A new optional room field **`exitSpans`** (`{ "down": 5 }`)
+  declares a multi-floor chute or shaft — a progression shortcut — and the intentional
+  drops now carry theirs: the **rat-nest chute** falls 4 floors (landing the deep nest,
+  and with it Falselight — the Gloaming's top floor — at its designed depth-5
+  elevation), the **Riven Yard fault** falls 5, the **Underhearth hatch** falls 4
+  (floor −11, the deepest point in the world), the **drowned crack** under the d3
+  plunge-pool falls 4 onto the Black Chimney, and the Gullet's **switchback stair**
+  descends 2 to the Forward Camp — so the content that later connects those areas
+  laterally is checked against their intended elevation. The chimney's connections were
+  re-directioned to make its geometry honest: the Long Gallery now runs **south** into
+  it (the gallery's own prose already slopes that way) and the prospectors' rigged
+  climbing-flue is now a true hidden **up** back to the Plunge Cave. With the spans
+  declared, the solve comes out a **perfect ladder — every band's trunk floor equals
+  its depth, d0 through d11 — with no exceptions**: the validator's `FLOOR_CUTS` list
+  is empty. Every spanned exit also carries **departure prose** (`exitMessages`) so the
+  mover feels the extra distance — the fault's scraping chimneys, the drowned crack's
+  battering flume, the Gullet's long switchback stair — and the validator now requires
+  prose on any exit that spans floors. `node tools/validate-data.js --floors` prints
+  the solved elevation report (per-band trunk, per-floor band mix, outliers); the
+  **3D map** now drives its vertical axis with solved floors instead of the old
+  band-plus-heuristic and its tooltip shows `band · floor`.
 - **The Ember Deep — the floor of the deep (depth 9), below The Scald.** A line is
   now rigged down the **Redward Fissure**, and it drops onto the last floor: a
   six-room molten reach where light is finally *native*, welling orange out of the

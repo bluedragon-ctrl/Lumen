@@ -100,9 +100,10 @@
 "use strict";
 /* ───────────────────────────── Lumen 3D map ─────────────────────────────
  * Dependency-free: a tiny canvas-2D 3D engine (orbit camera + perspective
- * projection). Rooms are laid out by walking exit directions per depth-layer,
- * with depth driving the vertical axis. No external libraries, so this page
- * runs offline / as a standalone file. Data comes either from a baked-in
+ * projection). Rooms are laid out by walking exit directions, with the
+ * solved floor (derived from up/down exits — see buildLayout) driving the
+ * vertical axis and `depth` driving colour. No external libraries, so this
+ * page runs offline / as a standalone file. Data comes either from a baked-in
  * window.LUMEN_WORLD (standalone build) or from /api/world (live server).
  * ------------------------------------------------------------------------ */
 
@@ -133,12 +134,17 @@ let EDGES = [];     // [{a, b, hidden}]
 let depthMin = 0, depthMax = 0;
 
 // ───────────────────────────── data load ─────────────────────────────────
+let FLOOR_CUTS = [];  // known-open geometry edges, shared from validate-data.js
 async function loadWorld() {
-  if (window.LUMEN_WORLD) return window.LUMEN_WORLD;           // baked standalone
+  if (window.LUMEN_WORLD) {                                    // baked standalone
+    FLOOR_CUTS = window.LUMEN_FLOOR_CUTS || [];
+    return window.LUMEN_WORLD;
+  }
   const res = await fetch("/api/world", { cache: "no-store" });
   if (!res.ok) throw new Error("HTTP " + res.status);
   const data = await res.json();
   if (!data.ok) throw new Error(data.error || "server error");
+  FLOOR_CUTS = data.floorCuts || [];
   return data.rooms;
 }
 
@@ -148,11 +154,13 @@ function showError(msg) {
 }
 
 // ─────────────────────── layout: rooms → 3D positions ────────────────────
-// Vertical (Y): the authored `depth` is the primary band (deeper depth → lower,
-// always), and up/down exits *within* a depth add a smaller sub-offset bounded
-// below one band — so a room you descend into (e.g. the inn cellar, a "down"
-// within depth 0) sits below the other depth-0 rooms yet still above depth 1,
-// the way it reads when you walk it, without ever letting depths cross.
+// Vertical (Y): the solved floor. `depth` is the progression band, not
+// elevation — true elevation is derived from the exit graph: an up/down exit
+// moves one floor unless the source room's `exitSpans` declares a longer
+// shaft (a multi-floor chute/shortcut), and every other direction stays
+// level. This mirrors the floor solve in tools/validate-data.js (which also
+// enforces that the solve closes); here, where two routes would disagree,
+// the first route walked wins so the map still draws.
 // Horizontal (X/Z): a compass walk seeds positions, then a force-directed pass
 // (nodes repel, edges pull) spreads crowded rooms apart for legibility.
 function buildLayout(rooms) {
@@ -207,39 +215,26 @@ function buildLayout(rooms) {
     shelf++;
   }
 
-  // ── vertical sub-offset: walk up/down exits *within* a depth ──
-  // micro[id] is a relative rank along intra-depth vertical chains (down = +1).
-  const micro = {};
-  for (const id of ids) {
-    if (micro[id] != null) continue;
-    micro[id] = 0;
-    const q = [id];
-    while (q.length) {
-      const cur = q.shift();
-      const cd = rooms[cur].depth | 0;
-      for (const { dir, to } of exitsOf(rooms[cur])) {
-        if (!rooms[to] || micro[to] != null || (rooms[to].depth | 0) !== cd) continue;
-        if (dir !== "up" && dir !== "down") continue;
-        micro[to] = micro[cur] + (dir === "down" ? 1 : -1);
-        q.push(to);
-      }
+  // ── vertical: solve floors from up/down exits (exitSpans-aware) ──
+  const cutSet = new Set(FLOOR_CUTS.flatMap(({ a, b }) => [a + " " + b, b + " " + a]));
+  const floorOf = {};
+  floorOf[root] = 0;
+  const fQueue = [root];
+  while (fQueue.length) {
+    const cur = fQueue.shift();
+    for (const { dir, to } of exitsOf(rooms[cur])) {
+      if (!rooms[to] || floorOf[to] != null || cutSet.has(cur + " " + to)) continue;
+      const span = (rooms[cur].exitSpans || {})[dir] || 1;
+      floorOf[to] = floorOf[cur] + (dir === "down" ? -span : dir === "up" ? span : 0);
+      fQueue.push(to);
     }
   }
-  // Per-depth: normalise micro to start at 0 and scale so the deepest sub-room in
-  // a depth never reaches the next depth's band.
-  const dLo = {}, dHi = {};
+  let floorMin = Infinity, floorMax = -Infinity;
   for (const id of ids) {
-    const d = rooms[id].depth | 0, m = micro[id];
-    dLo[d] = Math.min(d in dLo ? dLo[d] : Infinity, m);
-    dHi[d] = Math.max(d in dHi ? dHi[d] : -Infinity, m);
-  }
-  const SUB_BASE = 120;              // base px per intra-depth down-step
-  function subOffset(id) {
-    const d = rooms[id].depth | 0;
-    const range = dHi[d] - dLo[d];
-    if (range <= 0) return 0;
-    const scale = Math.min(SUB_BASE, (LAYER * 0.75) / range);
-    return (micro[id] - dLo[d]) * scale;
+    // Shelved rooms (unreachable from root) fall back to their band as a floor.
+    if (floorOf[id] == null) floorOf[id] = -(rooms[id].depth | 0);
+    if (floorOf[id] < floorMin) floorMin = floorOf[id];
+    if (floorOf[id] > floorMax) floorMax = floorOf[id];
   }
 
   // Materialise nodes. A tiny deterministic jitter (golden-angle) breaks exact
@@ -250,9 +245,9 @@ function buildLayout(rooms) {
     const room = rooms[id], p = placed[id], d = room.depth | 0;
     const a = i * 2.39996323;
     NODES.push(NODE_BY_ID[id] = {
-      id, name: room.name || id, depth: d, zone: room.zone || "",
+      id, name: room.name || id, depth: d, floor: floorOf[id], zone: room.zone || "",
       x: p.gx * CELL + Math.cos(a) * 12,
-      y: -((d - depthMin) * LAYER + subOffset(id)),
+      y: -((floorMax - floorOf[id]) * LAYER),
       z: p.gz * CELL + Math.sin(a) * 12,
       exits: exitsOf(room),
     });
@@ -296,7 +291,8 @@ function buildLayout(rooms) {
   Object.assign(DEFAULT_CAM, JSON.parse(JSON.stringify(cam)));
 
   document.getElementById("subtitle").textContent =
-    NODES.length + " rooms · depths " + depthMin + "–" + depthMax;
+    NODES.length + " rooms · bands d" + depthMin + "–d" + depthMax +
+    " · floors " + floorMax + "…" + floorMin;
   document.getElementById("legMin").textContent = "d" + depthMin;
   document.getElementById("legMax").textContent = "d" + depthMax;
   buildLegend();
@@ -550,7 +546,7 @@ function updateHover(mx, my) {
     tip.innerHTML =
       `<div class="t-name">${esc(best.name)}</div>` +
       `<div class="t-id">${esc(best.id)}</div>` +
-      `<div class="t-meta">depth ${best.depth}${best.zone ? " · " + esc(best.zone) : ""}</div>` +
+      `<div class="t-meta">band d${best.depth} · floor ${best.floor}${best.zone ? " · " + esc(best.zone) : ""}</div>` +
       `<div class="t-exits">exits: ${esc(exShown)}</div>`;
     tip.style.display = "block";
     tip.style.left = Math.min(mx + 14, innerWidth - 290) + "px";
