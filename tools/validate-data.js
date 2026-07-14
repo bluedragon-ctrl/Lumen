@@ -26,12 +26,10 @@ const DICE_RE = /^\d+d\d+([+-]\d+)?$|^\d+$/;
 // of the graph, so entries cannot outlive their reason. Exported so map-3d
 // draws with the same cuts the validator solves with.
 const FLOOR_CUTS = [
-  // The drowned crack under the d3 plunge-pool drops 4 floors onto d7.chasm
-  // (-3 -> -7), but its edges can't declare that yet: the return flue is
-  // authored `west` (horizontal = level), and it can't simply become `up`
-  // because d7.chasm already has an up exit to the gallery. Open decision:
-  // allow a signed climb on a horizontal exit, or re-author the flue.
-  { a: "d3.cave", b: "d7.chasm" },
+  // (empty) Every known contradiction is resolved — the world's vertical
+  // geometry closes with no exceptions. Add an entry (`{ a, b }` severs the
+  // a<->b edges) only while a genuine content decision is pending, with a
+  // comment saying what that decision is.
 ];
 
 function main() {

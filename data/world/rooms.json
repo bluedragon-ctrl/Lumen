@@ -1128,6 +1128,7 @@
     "description": "The falls have gnawed a deep pocket back into the rock here, and the river's overspill gathers in a broad, cold plunge-pool that fills most of the floor. For all the water the falls feed it the pool never rises to overflow — somewhere beneath the surface it has worn its own way out, and a slow, cold draw tugs at anything that drifts too near the deep end. The roar of the cataract comes muffled through the stone, and the dark is total but for what light a delver brings. This is no quiet fishing-hole: pale crayfish own the water, eyeless and armoured, claws raised at anything that nears their pool — they swarm the fish the falls wash down, and will turn those same claws on a careless hand. The way out is back south, through the spray.",
     "exits": { "south": "d3.falls" },
     "hiddenExits": { "down": { "to": "d7.chasm", "perception": 8, "name": "a drowned crack beneath the plunge-pool" } },
+    "exitSpans": { "down": 4 },
     "fixtures": ["still-pool"],
     "groundItems": [],
     "spawns": [{ "mob": "pale-crayfish", "max": 2, "respawn": 120 }],
@@ -1520,6 +1521,7 @@
     "ambientLight": 0,
     "description": "The line drops you into a narrow throat of wet rock, and the lake's outflow comes down it with you — a black race of water roaring in the dark to your one side, close enough to soak you with its cold. The moss-glow of the lake dies within a few steps and does not return; here there is only what light a delver carries, and the noise of the water filling the stone. The stair the prospectors cut is a rough switchback of stakes and notched ledges, slick underfoot, doubling back on itself as it follows the current down. There is no glow, no growing thing, nothing to feed on a light this deep — only the descent, longer than it looks, working steadily down. Partway down the switchback a side-mouth opens east, and the rock there breathes back at you — faintly, unmistakably warm, the only warmth in the whole cold throat. The line climbs back up toward the lake; below, the throat opens out and the roar begins to fall behind.",
     "exits": { "up": "d4.lake.farshore", "down": "d6.camp", "east": "d5.windway" },
+    "exitSpans": { "down": 2 },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -1824,6 +1826,7 @@
     "ambientLight": 0,
     "description": "The throat opens onto a wide, dry ledge set back from the water, and the roar drops to a steady hush below. Prospectors held this place once — the last flat, dry ground before the dark goes bad — and the bones of their camp are still here: a ring of fire-blackened stones, a plank bench knocked together across two crates, a brass lamp standing dark on a flat rock, bedrolls rotted to felt against the wall. They meant to push deeper from here and stage their finds on the climb out. The chalk tallies by the bench break off mid-season, and no one struck the camp or carried it home; it was simply left. It is a good place to strike a light, cook a catch, and gather yourself — for the camp ends where the prospectors' nerve did. A low passage runs on south into a colder dark, unstaked and unmarked, where no line has yet been made fast. The stair climbs back up toward the lake.",
     "exits": { "up": "d5.gullet", "south": "d7.throat" },
+    "exitSpans": { "up": 2 },
     "fixtures": ["camp-lamp", "camp-firepit", "camp-bench", "camp-seep"],
     "groundItems": [
       { "template": "lamp-oil", "qty": 1, "respawn": 600 }
@@ -2287,7 +2290,7 @@
     "depth": 7,
     "ambientLight": 0,
     "description": "The second great cavern of the warren, longer than it is wide — a black gallery that runs on south past the reach of any light a delver carries, the floor sloping gently down the whole way as though the stone itself is leaning toward the deep. A seam of rust-red iron ore shows in one wall, worth the working for a delver with the arm to spare. The crawlers are thinner here than in the hall but not gone; they flow along the walls and the long centre in loose, restless streams, all of them moving the same way, downslope, as though something below were calling the whole tide of them down. A side gallery opens west, and from it comes a dry, massed rasping louder than anywhere else in the warren. At the gallery's low end the floor gives out entirely into a black shaft dropping down; the hall lies back north.",
-    "exits": { "north": "d7.hall", "west": "d7.brood", "down": "d7.chasm" },
+    "exits": { "north": "d7.hall", "west": "d7.brood", "south": "d7.chasm" },
     "fixtures": ["iron-vein"],
     "groundItems": [],
     "spawns": [
@@ -2319,8 +2322,9 @@
     "depth": 7,
     "ambientLight": 0,
     "description": "The shaft drops you down a rough chimney of wet, fluted rock into a narrow well of dark, and here the warren shows its true depth at last. This is no cave the prospectors cut or the crawlers wore — it is a natural flue worn by water long gone, and it does not end at the ledge you land on. Below your feet the chimney plunges on, down and down past the reach of any light you can throw, a cold breath rising out of it that is older and emptier than the warren above; no rope has ever been made fast here, no stake driven, and a dropped stone falls a long, long time before any sound comes back. That way lies deeper than anyone has gone. Where the old water polished the flue smooth, a pale vein of silver ore runs through the rock within arm's reach of the ledge. For now there is only the ledge: a low passage breaks off it, leading on into a dead and lightless hush, and the chimney climbs back up toward the gallery. One stretch of the western wall is split by a flowstone-choked fissure, and a faint draught breathes out of it — warmer and wetter than the warren's dead air, carrying the far ghost of running water, as though the crack climbed toward the living river somewhere high above.",
-    "exits": { "up": "d7.gallery", "south": "d7.hush" },
-    "hiddenExits": { "west": { "to": "d3.cave", "perception": 4, "name": "the prospectors' rigged climbing-flue" } },
+    "exits": { "north": "d7.gallery", "south": "d7.hush" },
+    "hiddenExits": { "up": { "to": "d3.cave", "perception": 4, "name": "the prospectors' rigged climbing-flue" } },
+    "exitSpans": { "up": 4 },
     "fixtures": ["silver-vein", { "template": "prospectors-rigging", "hidden": { "perception": 4 } }],
     "groundItems": [],
     "spawns": [{ "mob": "gloom-crawler", "max": 2, "respawn": 90 }]
