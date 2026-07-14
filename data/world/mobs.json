@@ -499,7 +499,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "lamp-oil", "price": 10 }]
+      "sells": [{ "template": "lamp-oil", "price": 10 }, { "template": "half-plate-harness", "price": 190 }, { "template": "great-helm", "price": 100 }, { "template": "longsword", "price": 95 }, { "template": "halberd", "price": 135 }, { "template": "embroidered-mantle", "price": 90 }, { "template": "healing-potion", "price": 75 }, { "template": "mana-potion", "price": 65 }]
     }
   },
   "rim-smith": {

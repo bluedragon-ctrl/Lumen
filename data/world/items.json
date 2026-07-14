@@ -2080,5 +2080,95 @@
     "weight": 0,
     "value": 5,
     "stackable": true
+  },
+  "half-plate-harness": {
+    "id": "half-plate-harness",
+    "rarity": "uncommon",
+    "name": "a half-plate harness",
+    "keywords": ["half-plate", "halfplate", "plate", "harness", "armour", "armor", "cuirass"],
+    "description": "Honest surface plate — a hammered breast-and-back with tassets and shoulder-guards, the steel bright and unpitted in a way nothing forged in the dark ever stays. It turns a blade as well as the deep's finest and better than any beaten iron cuirass — but it was made for a road above, not a crawlway below, and every plate of it drags: the weight rides hard and the closed shell walls a body off from the wariness that keeps one alive down here. Silas swears it saved a better man than you once. Silas swears a great many things.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 10,
+    "value": 120,
+    "armour": { "armour": 3, "ward": 0, "speedPenalty": 2, "attrMod": { "wits": -1 } }
+  },
+  "great-helm": {
+    "id": "great-helm",
+    "rarity": "uncommon",
+    "name": "a great helm",
+    "keywords": ["great-helm", "greathelm", "helm", "helmet", "war-helm"],
+    "description": "A full surface war-helm, flat-topped and blank-faced, with only a breathing-band of holes and a narrow eye-slit to let the world in. It shrugs off a blow no iron cap could — but sealed inside it a prospector goes half-blind and half-deaf, the dark narrowed to a slot and every sound gone to a muffled roar. Fine work from a wider-world armourer, and Silas prices it as though the head inside were worth saving.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 4,
+    "value": 65,
+    "armour": { "armour": 3, "ward": 0, "speedPenalty": 1, "attrMod": { "wits": -1, "perception": -1 } }
+  },
+  "longsword": {
+    "id": "longsword",
+    "rarity": "uncommon",
+    "name": "a longsword",
+    "keywords": ["longsword", "long-sword", "sword", "blade"],
+    "description": "A proper surface longsword, a hand-and-a-half of bright straight steel with a cross-guard and a wire-wound grip — the honest arm of a road-warden or a hired blade up top, worlds away from the crude picks and knapped deep-stone the Rim makes do with. It bites deeper than any short-sword and keeps its edge, and its plain good balance rewards a strong arm. Nothing clever, nothing cursed; only steel that was made right, which down here is rare enough.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 3,
+    "value": 60,
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 13, "scale": { "attr": "might", "per": 3 } }
+  },
+  "halberd": {
+    "id": "halberd",
+    "rarity": "uncommon",
+    "name": "a halberd",
+    "keywords": ["halberd", "polearm", "pole-arm", "poleaxe"],
+    "description": "A long surface polearm — an axe-blade, a back-spike and a thrusting point all socketed on a banded haft taller than the man who swings it. It is slow to bring round in a close crawlway and asks a strong back, but a prospector who sets their weight behind it brings a terrible weight of steel down on a single point, cleaving where a sword would only cut. A soldier's weapon by the make of it; how it came to be for sale at the mouth of the Abyss, Silas will not say.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 5,
+    "value": 85,
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } }
+  },
+  "embroidered-mantle": {
+    "id": "embroidered-mantle",
+    "rarity": "uncommon",
+    "name": "an embroidered mantle",
+    "keywords": ["mantle", "cloak", "embroidered", "wool"],
+    "description": "A heavy travelling mantle of fine wool, the hem and collar worked with a hand's-breadth of silver-thread embroidery gone a little road-worn — the kind of thing a merchant of the wider world wears to be taken for a man of means. Doubled and lined against the cold, it settles thick across the shoulders and turns a glancing blow the deep-made silks would let through, and its warmth keeps a body hale where the chasm-chill would wear one down. No wards worked in it, no glimmer — only good cloth, which Silas assures you is worth every shard.",
+    "type": "armour",
+    "slot": "cloak",
+    "weight": 2,
+    "value": 55,
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0, "maxHp": 2 }
+  },
+  "healing-potion": {
+    "id": "healing-potion",
+    "rarity": "uncommon",
+    "name": "a healing potion",
+    "keywords": ["potion", "healing", "heal", "physic"],
+    "description": "A corked glass phial of clear red physic, brewed by some apothecary of the wider world and carried down the long road unspilt. Where the Rim's healers coax a slow mending out of witchglow and moss, this works all at once: drunk down, it closes torn flesh in a single hot rush, the wound knitting faster than the eye can follow. Surface alchemy, potent and dear — Silas keeps only a few, and names a price for each as though it were his own blood in the glass.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 45,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You pull the cork and drink the red physic down. Heat floods the wound and your torn flesh draws closed in a single searing rush.",
+      "effect": { "type": "restore", "hp": 18 }
+    }
+  },
+  "mana-potion": {
+    "id": "mana-potion",
+    "rarity": "uncommon",
+    "name": "a mana potion",
+    "keywords": ["potion", "mana", "physic"],
+    "description": "A corked phial of cold blue physic from a wider-world apothecary, still faintly astringent with whatever herb-craft settled it. Drunk down, it clears the noise behind the eyes and floods the well of the will back to the brim — deeper and quicker than the moss-tonics the Rim steeps, and priced to match. Silas will tell you it is distilled from mountain springwater by cloistered adepts. Silas will tell you anything that adds a shard to the price.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 40,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink the cold blue physic down. It bites clean and astringent, and the well of your will brims full and clear again.",
+      "effect": { "type": "restore", "mana": 18 }
+    }
   }
 }
