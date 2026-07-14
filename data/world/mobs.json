@@ -582,7 +582,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "bug-meat" }, { "template": "grub" }, { "template": "minor-light-potion" }, { "template": "luminescent-gland" }]
+      "sells": [{ "template": "bug-meat" }, { "template": "bug-tallow" }, { "template": "grub" }, { "template": "minor-light-potion" }, { "template": "luminescent-gland" }]
     }
   },
   "rim-mage": {

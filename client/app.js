@@ -469,10 +469,11 @@ $("jump-pill").addEventListener("click", () => {
   cmdEl.focus();
 });
 
-// The Tide indicator in the status strip, beside HP/Mana — a phase label + a bar
-// that fills with the dark (0 in Calm, full at the Tide). Driven by lightweight `tide`
-// frames, separate from the player view so it can creep forward on its own without
-// rebuilding the panel. Hidden entirely when the world clock is off.
+// The Tide indicator at the far end of the status strip, past Speed — a phase label
+// + a small disc that fills radially with the dark (0 in Calm, full at the Tide).
+// Driven by lightweight `tide` frames, separate from the player view so it can creep
+// forward on its own without rebuilding the panel. Hidden entirely when the world
+// clock is off.
 function renderTide(t) {
   const el = $("tide-meter");
   if (!el) return;
@@ -481,7 +482,7 @@ function renderTide(t) {
   el.className = "stat tide-meter tide-" + t.phase;
   const pct = Math.round((t.intensity || 0) * 100);
   $("tide-label").textContent = t.phase;
-  $("tide-fill").style.width = pct + "%";
+  el.style.setProperty("--tide-pct", pct);
   el.title = `The Tide — ${t.phase} (${pct}% dark)`;
 }
 

@@ -272,6 +272,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regeneration draught, and crystals behind a `search` (perception 4–5).
 
 ### Changed
+- **Wick now stocks bug-tallow.** The stonebug pens render the stuff, so Wick the
+  rim-farmer sells it (3 shards) alongside her bug-meat and grubs — a reliable buy for
+  cooks and lamp-fillers who'd rather not grind stonebugs for every lump. Especially
+  welcome now that Roasted Grubs call for a tallow.
+- **Roasted Grubs are worth cooking now.** The recipe was 3 grubs → a handful healing
+  4 HP — barely better than gnawing the three grubs raw (1 HP each). It now takes
+  **6 grubs + 1 bug-tallow** and the handful restores **8 HP** (value 3 → 8), so frying
+  them in fat is a real gain over raw and folds six grubs into one stackable snack.
+  Still poor man's fare, kept just under the Bug-Meat Skewer's tier.
+- **Reeve's tags now fetch a shard as scrap.** Both quest tags — *a delver's tag* and
+  *Old Halloran's tag* — respawn on their ground, so a prospector can pick up spares
+  after the register turn-in, and with `value: 0` they were unsellable dead weight.
+  Each now carries a small scrap value (sells for 1 shard, the lead being worth a
+  pittance), so duplicates can be offloaded to any trader instead of cluttering the pack.
+- **The Tide indicator restyled and moved past Speed.** Sitting between Mana and Speed
+  as a wide fill bar, it read like a third HP/energy vital. It now rides the far end of
+  the status strip, after Speed, and the bar is replaced by a small circular disc that
+  fills radially with the dark like a rising moon — ambient world state at a glance,
+  clearly not a personal vital. Same phase colours (calm/stirring/tide/receding) and
+  gliding transition.
 - **The Tide indicator moved to the status bar.** The phase/intensity meter sat on the
   player panel's shards line, easy to miss; it now rides the always-visible vitals strip
   right after HP and Mana, so a prospector reads the gathering dark at a glance. Same
@@ -292,6 +312,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   override with their own hue.
 
 ### Fixed
+- **Inventory-tab overrides now reach the client.** Items authored with a `filterGroup`
+  (the tab override — e.g. the quest tags filed under *Other*, or oil and edibles under
+  *Use*) were sorted only by their raw `type`, because `itemView` never serialised the
+  field. `filterGroup` is now included in the inventory payload, so *a delver's tag* and
+  its kin land under **Other** instead of **Mats**, and refuel/edible materials under
+  **Use** as authored.
 - **The rim watch can now actually swing.** Hale the watchman (and Old Halloran) carried
   an `attack` block but no `attack` *action* in their behaviour table — and because the
   auto-attack fallback only covers mobs with no actions list, they gathered threat and

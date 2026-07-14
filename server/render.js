@@ -16,6 +16,7 @@ function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
   const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null, rarity: t.rarity || "common" };
+  if (t.filterGroup) v.filterGroup = t.filterGroup; // honour the authored inventory-tab override client-side
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
     v.lit = !!inst.lit;
