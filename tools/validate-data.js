@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * Validates Lumen static world data: JSON validity, cross-references, and
- * reachability of all rooms from the starting location.
+ * Validates Lumen static world data: JSON validity, cross-references,
+ * reachability of all rooms from the starting location, and vertical
+ * consistency (every room solves to a single derived floor).
  *
  * Usage:  node tools/validate-data.js
+ *         node tools/validate-data.js --floors   # also print the solved-elevation report
  * Exits non-zero on any error (suitable for a pre-merge check).
  */
 "use strict";
@@ -17,6 +19,24 @@ const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 // Dice notation: "<count>d<sides>" with optional "+/-<flat>", or a plain integer.
 const DICE_RE = /^\d+d\d+([+-]\d+)?$|^\d+$/;
+
+// Known-open map geometry: edges excluded from the floor solve pending a
+// content decision. A cut severs the a<->b edges in both directions; the
+// stale-cut check in main() errors once a cut's edge is satisfied by the rest
+// of the graph, so entries cannot outlive their reason. Exported so map-3d
+// draws with the same cuts the validator solves with.
+const FLOOR_CUTS = [
+  // The routes below the lake disagree by 3 floors with the routes through
+  // falselight and the d3 drowned crack: which count is canonical is an open
+  // design decision. Until it lands, the deep super-region (camp, the chasm
+  // bridge, necropolis, sanctuary, midden, fields) anchors through
+  // d5.gullet -> d6.camp, and these two contradicting edges are severed.
+  { a: "d5.windway", b: "d5.gatemouth" },
+  // Also internally skewed: you drop `down` through the crack but the flue
+  // back is `west` — it can't become `up` (d7.chasm already has an up exit),
+  // so the pair is one floor out of true until that spot is re-authored.
+  { a: "d3.cave", b: "d7.chasm" },
+];
 
 function main() {
   const rooms = read("data/world/rooms.json");
@@ -82,20 +102,20 @@ function main() {
       if (typeof h.perception !== "number" || h.perception <= 0)
         errs.push(`room ${id}: hiddenExit ${dir} perception must be a positive number`);
     }
+    // A dir is a real exit if it's a plain exit, a hidden exit, or the direction
+    // of a door fixture in the room (all three are walked by move(), which shows
+    // the exitMessage regardless of how the destination resolved).
+    const doorDirs = new Set(
+      (r.fixtures || [])
+        .map((f) => (typeof f === "string" ? f : f.template))
+        .map((fid) => fixtures[fid])
+        .filter((ft) => ft && ft.door)
+        .map((ft) => ft.door.dir)
+    );
+    const hasExitDir = (dir) => (r.exits && r.exits[dir]) || (r.hiddenExits && r.hiddenExits[dir]) || doorDirs.has(dir);
     // Optional per-exit departure flavour (move() shows it to the mover instead of
     // "You go <dir>."). Object of dir -> non-empty string; each dir must be a real exit.
     if (r.exitMessages != null) {
-      // A dir is a real exit if it's a plain exit, a hidden exit, or the direction
-      // of a door fixture in the room (all three are walked by move(), which shows
-      // the exitMessage regardless of how the destination resolved).
-      const doorDirs = new Set(
-        (r.fixtures || [])
-          .map((f) => (typeof f === "string" ? f : f.template))
-          .map((fid) => fixtures[fid])
-          .filter((ft) => ft && ft.door)
-          .map((ft) => ft.door.dir)
-      );
-      const hasExitDir = (dir) => (r.exits && r.exits[dir]) || (r.hiddenExits && r.hiddenExits[dir]) || doorDirs.has(dir);
       if (typeof r.exitMessages !== "object" || Array.isArray(r.exitMessages))
         errs.push(`room ${id}: exitMessages must be an object of dir -> message`);
       else for (const [dir, msg] of Object.entries(r.exitMessages)) {
@@ -103,6 +123,24 @@ function main() {
           errs.push(`room ${id}: exitMessage ${dir} must be a non-empty string`);
         if (!hasExitDir(dir))
           errs.push(`room ${id}: exitMessage ${dir} has no matching exit`);
+      }
+    }
+    // Optional multi-floor spans: `exitSpans: { "down": 4 }` declares that the
+    // vertical exit in that direction moves that many floors in one step — a
+    // chute or long shaft acting as a progression shortcut. Cartographic
+    // metadata only: the floor solve below and the map tools read it, the game
+    // engine never does. The paired return exit, if any, must imply the same
+    // span — the floor solve flags a mismatch as a loop that doesn't close.
+    if (r.exitSpans != null) {
+      if (typeof r.exitSpans !== "object" || Array.isArray(r.exitSpans))
+        errs.push(`room ${id}: exitSpans must be an object of dir -> floor count`);
+      else for (const [dir, n] of Object.entries(r.exitSpans)) {
+        if (dir !== "up" && dir !== "down")
+          errs.push(`room ${id}: exitSpans.${dir} — only up/down exits can span floors`);
+        else if (!hasExitDir(dir))
+          errs.push(`room ${id}: exitSpans.${dir} has no matching exit`);
+        if (!Number.isInteger(n) || n < 2)
+          errs.push(`room ${id}: exitSpans.${dir} must be an integer >= 2 (1 is the implicit default)`);
       }
     }
     for (const f of r.fixtures || []) {
@@ -899,10 +937,101 @@ function main() {
   for (const id of Object.keys(rooms))
     if (!seen.has(id)) errs.push(`room ${id}: NOT reachable from start (${player.startLocation})`);
 
+  // ── Vertical consistency: derived floors ─────────────────────────────────
+  // `depth` is the progression band (the rung of the descent), NOT elevation.
+  // True elevation — the "floor" — is derived from the exit graph: an up/down
+  // exit moves one floor unless the source room's `exitSpans` declares a longer
+  // shaft; every other direction stays level. The solve must close: two routes
+  // to the same room must agree on its floor, otherwise the world's geometry
+  // contradicts itself and no floor-accurate map of it can be drawn.
+  // (map-3d solves with the same rules and the shared FLOOR_CUTS above.)
+  const edgeList = (rid) => {
+    const r = rooms[rid], out = [];
+    for (const [dir, to] of Object.entries(r.exits || {})) out.push([dir, to]);
+    for (const [dir, h] of Object.entries(r.hiddenExits || {})) if (h && h.to) out.push([dir, h.to]);
+    for (const f of r.fixtures || []) {
+      const ft = fixtures[typeof f === "string" ? f : f.template];
+      if (ft && ft.door && ft.door.to) out.push([ft.door.dir, ft.door.to]);
+    }
+    return out;
+  };
+  const cutSet = new Set(FLOOR_CUTS.flatMap(({ a, b }) => [a + " " + b, b + " " + a]));
+  const floorStep = (rid, dir) => {
+    const span = (rooms[rid].exitSpans || {})[dir] || 1;
+    return dir === "down" ? -span : dir === "up" ? span : 0;
+  };
+  const floors = new Map([[player.startLocation, 0]]);
+  const fq = [player.startLocation];
+  while (fq.length) {
+    const c = fq.shift();
+    if (!rooms[c]) continue;
+    for (const [dir, to] of edgeList(c)) {
+      if (!rooms[to] || cutSet.has(c + " " + to)) continue;
+      const f = floors.get(c) + floorStep(c, dir);
+      if (floors.has(to)) {
+        if (floors.get(to) !== f)
+          errs.push(`floor solve: ${c} -${dir}-> ${to} implies floor ${f}, but another route already solved ${to} to floor ${floors.get(to)} (vertical loop does not close)`);
+      } else {
+        floors.set(to, f);
+        fq.push(to);
+      }
+    }
+  }
+  for (const id of Object.keys(rooms))
+    if (seen.has(id) && !floors.has(id))
+      errs.push(`floor solve: ${id} is only reachable through a FLOOR_CUTS edge — cannot assign a floor`);
+  for (const { a, b } of FLOOR_CUTS) {
+    if (!rooms[a] || !rooms[b]) { errs.push(`floor solve: FLOOR_CUTS references missing room ${!rooms[a] ? a : b}`); continue; }
+    const ab = edgeList(a).find(([, to]) => to === b);
+    const ba = edgeList(b).find(([, to]) => to === a);
+    if (!ab && !ba) { errs.push(`floor solve: FLOOR_CUTS ${a} <-> ${b} matches no edge — remove it`); continue; }
+    const satisfied = (from, to, e) =>
+      !e || (floors.has(from) && floors.has(to) && floors.get(to) === floors.get(from) + floorStep(from, e[0]));
+    if (satisfied(a, b, ab) && satisfied(b, a, ba))
+      errs.push(`floor solve: FLOOR_CUTS ${a} <-> ${b} is satisfied by the solve — the cut is stale, remove it`);
+  }
+
   if (errs.length) {
     console.error("VALIDATION FAILED:\n" + errs.map((e) => "  - " + e).join("\n"));
     process.exit(1);
   }
+
+  // Optional elevation report (--floors): the solved floor of every band, for
+  // retuning bands, choosing exitSpans values, and spotting mis-banded rooms.
+  if (process.argv.includes("--floors")) {
+    const byBand = new Map(), byFloor = new Map();
+    for (const [id, f] of floors) {
+      const d = rooms[id].depth;
+      if (!byBand.has(d)) byBand.set(d, []);
+      byBand.get(d).push(f);
+      if (!byFloor.has(f)) byFloor.set(f, new Map());
+      byFloor.get(f).set(d, (byFloor.get(f).get(d) || 0) + 1);
+    }
+    const median = (xs) => xs.slice().sort((p, q) => p - q)[xs.length >> 1];
+    const trunk = new Map([...byBand].map(([d, fs2]) => [d, median(fs2)]));
+    console.log(`FLOOR REPORT — floor 0 = ${player.startLocation}; up positive, down negative`);
+    console.log("  band | rooms | floors     | trunk (median)");
+    for (const d of [...byBand.keys()].sort((p, q) => p - q)) {
+      const fs2 = byBand.get(d);
+      console.log(
+        `  d${String(d).padEnd(3)} | ${String(fs2.length).padStart(5)} | ` +
+        `${String(Math.min(...fs2)).padStart(3)} .. ${String(Math.max(...fs2)).padEnd(3)} | ${trunk.get(d)}`
+      );
+    }
+    console.log("  floor | rooms | bands present");
+    for (const f of [...byFloor.keys()].sort((p, q) => q - p)) {
+      const bands = [...byFloor.get(f)].sort((p, q) => p[0] - q[0]).map(([d, c]) => `d${d}(${c})`).join(" ");
+      const total = [...byFloor.get(f).values()].reduce((s, c) => s + c, 0);
+      console.log(`  ${String(f).padStart(5)} | ${String(total).padStart(5)} | ${bands}`);
+    }
+    const outliers = [...floors].filter(([id, f]) => Math.abs(f - trunk.get(rooms[id].depth)) >= 2);
+    if (outliers.length) {
+      console.log("  rooms >= 2 floors from their band's trunk (re-band or span candidates):");
+      for (const [id, f] of outliers.sort((p, q) => p[1] - q[1]))
+        console.log(`    ${id}  floor ${f}  (band trunk ${trunk.get(rooms[id].depth)})`);
+    }
+  }
+
   console.log(
     `OK: ${Object.keys(rooms).length} rooms, ${Object.keys(items).length} items, ` +
       `${Object.keys(mobs).length} mobs, ${Object.keys(fixtures).length} fixtures, ` +
@@ -912,4 +1041,6 @@ function main() {
   );
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { FLOOR_CUTS };
