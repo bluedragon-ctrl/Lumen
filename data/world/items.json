@@ -371,7 +371,7 @@
     "type": "material",
     "filterGroup": "other",
     "weight": 0,
-    "value": 0,
+    "value": 5,
     "stackable": false,
     "keywords": ["tag"]
   },
@@ -383,7 +383,7 @@
     "type": "material",
     "filterGroup": "other",
     "weight": 0,
-    "value": 0,
+    "value": 5,
     "stackable": false
   },
   "quiet-claim-key": {
@@ -1316,14 +1316,14 @@
   "roasted-grubs": {
     "id": "roasted-grubs",
     "name": "a handful of roasted grubs",
-    "description": "Fat grubs roasted on the hearthstones until they crisp and split. They pop between the teeth — poor man's fare, but hot and honest, and they sit far better cooked than raw.",
+    "description": "A double handful of fat grubs fried crisp in bug-tallow on the hearthstones until they split and sizzle. They pop between the teeth, rich with rendered fat — poor man's fare, but hot and honest, and worth far more in the belly than the same grubs gnawed raw.",
     "type": "consumable",
     "weight": 0,
-    "value": 3,
+    "value": 8,
     "stackable": true,
     "consumable": {
-      "flavour": "You crunch through the roasted grubs. Greasy and warm, they take the worst of the edge off your hunger.",
-      "effect": { "type": "restore", "hp": 4 }
+      "flavour": "You crunch through the roasted grubs, greasy and hot. The rendered tallow sits heavy and warming, and the gnawing hunger loosens its grip.",
+      "effect": { "type": "restore", "hp": 8 }
     }
   },
   "fried-mushrooms": {

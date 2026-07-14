@@ -196,7 +196,8 @@
     "name": "Roasted Grubs",
     "station": "cooking",
     "inputs": [
-      { "template": "grub", "qty": 3 }
+      { "template": "grub", "qty": 6 },
+      { "template": "bug-tallow", "qty": 1 }
     ],
     "output": { "template": "roasted-grubs", "qty": 1 }
   },
