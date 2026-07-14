@@ -2434,8 +2434,9 @@
     "name": "The Plunge Foot",
     "depth": 8,
     "ambientLight": 0,
-    "description": "East the floor tilts down and the roar resolves into what makes it: a hard, cold column of water falling out of a crack in the high dark and hammering into a churning black pool, throwing up a freezing spray that fills the whole chamber. The cold of it drowns your flame the moment you step in, a hiss of steam and then nothing, and the dark closes whole. This is the foot of some great fall — the overspill of the drowned country far above come down at last to the bottom of the world. The water deafens. A wet ledge climbs north along the cataract; a low passage runs back west, and another east.",
-    "exits": { "west": "d8.cistern", "north": "d8.ledge", "east": "d8.cache" },
+    "description": "East the floor tilts down and the roar resolves into what makes it: a hard, cold column of water falling out of a crack in the high dark and hammering into a churning black pool, throwing up a freezing spray that fills the whole chamber. The cold of it drowns your flame the moment you step in, a hiss of steam and then nothing, and the dark closes whole. This is the foot of some great fall — the overspill of the drowned country far above come down at last to the bottom of the world. The water deafens. A wet ledge climbs north along the cataract; a low passage runs back west.",
+    "exits": { "west": "d8.cistern", "north": "d8.ledge" },
+    "hiddenExits": { "east": { "to": "d8.camp", "perception": 8, "name": "a dry seam behind the cataract's spray" } },
     "fixtures": [],
     "groundItems": [],
     "spawns": [],
@@ -2691,9 +2692,8 @@
     "name": "The Drowned Cache",
     "depth": 8,
     "ambientLight": 0,
-    "description": "East of the plunge the spray thins and the passage ends in a dry pocket lifted just above the water-line — and someone reached it before you. A prospector's cache sits tucked into a worked niche: an oiled roll gone black with damp, a strongbox forced and emptied long since, and the scatter of what the finders did not think worth carrying back up through all that dark. What they came all this way for is still here, barely touched — a rich vein of raw glimmer threading the back of the niche, cold mineral light caught in the rock. They got this far down and turned around. Whether they made it back up, the cache does not say. The plunge roars west, the only way back — though the back of the niche does not quite ring solid.",
-    "exits": { "west": "d8.plungefoot" },
-    "hiddenExits": { "east": { "to": "d8.camp", "perception": 8, "name": "a hairline crack behind the cache, squeezing east into the dark" } },
+    "description": "The squeeze opens into a small, half-drowned pocket behind the nest, the water black and knee-deep over a floor the Umbrals once worked smooth. Someone reached it long before the brood came: a prospector's cache sits tucked into a worked niche above the water-line — an oiled roll gone black with damp, a strongbox forced and emptied long since. What they came all this way for is still here, barely touched — a rich vein of raw glimmer threading the back of the niche, cold mineral light caught in the rock. They got this far down and turned around; the warren has kept the place for its own since. The only way out is back east, through the flooded squeeze.",
+    "exits": { "east": "d8.broodsump" },
     "fixtures": ["glimmer-vein"],
     "groundItems": [
       { "template": "crystal", "qty": 1, "respawn": 900 }
@@ -2769,8 +2769,8 @@
     "name": "The Prospectors' Last Camp",
     "depth": 8,
     "ambientLight": 0,
-    "description": "Behind the cache the niche narrows to a crack you would never have squeezed through if you had not seen it — and beyond it the rock opens into a dry, still pocket the prospectors kept for their own. Whoever emptied the cache outside holed up here — as far down as their claim ever ran, the last dry ground before the dark below: a cold fire-ring set under a natural flue that draws the smoke away, a catch-basin walled in clay to take the clean seep threading down one wall, a battered oil-lamp left standing on a flat stone. It is untouched, exactly as they left it — bedrolls folded, a pot upturned by the ash — as though they meant to come back. They did not. But the makings are all sound, and the dark does not find its way in here. Strike the lamp, light the fire, drink, and gather yourself before going on. The only way out is back west, through the crack to the cache.",
-    "exits": { "west": "d8.cache" },
+    "description": "Behind the cataract the spray hides a seam you would never have squeezed through if you had not seen it — and beyond it the rock opens into a dry, still pocket the prospectors kept for their own. The prospectors who worked this claim holed up here — as far down as their claim ever ran, the last dry ground before the dark below: a cold fire-ring set under a natural flue that draws the smoke away, a catch-basin walled in clay to take the clean seep threading down one wall, a battered oil-lamp left standing on a flat stone. It is untouched, exactly as they left it — bedrolls folded, a pot upturned by the ash — as though they meant to come back. They did not. But the makings are all sound, and the dark does not find its way in here. Strike the lamp, light the fire, drink, and gather yourself before going on. The only way out is back west, through the seam behind the spray.",
+    "exits": { "west": "d8.plungefoot" },
     "fixtures": ["camp-firepit", "camp-seep", "camp-lamp"],
     "groundItems": [
       { "template": "lamp-oil", "qty": 2, "respawn": 1800 },
@@ -2842,8 +2842,8 @@
     "name": "The Glow Garden",
     "depth": 9,
     "ambientLight": 1,
-    "description": "East of the shrine the chamber widens into a tended garden of light — bed upon bed of pale mushrooms breathing their weak, steady glow, and a great fan of witchglow spread cold and green across the far wall, all of it crowding the warded light the way fungus crowds any glow in the deep. It has the look of something once kept and now only left to grow: old planting-rows gone soft at the edges, the deep-folk's work carried on by nothing but the dark's own slow gardening. Armoured grey stonebugs trundle the beds on patient mandibles, and squat thornbugs bristle between the fattest caps, none of them troubled by you — there is forage enough here, and the light keeps the hunters out. The shrine lies west; the beds carry on east into a lower hollow.",
-    "exits": { "west": "d9.sanctuary.shrine", "east": "d9.sanctuary.hollow" },
+    "description": "East of the shrine the chamber widens into a tended garden of light — bed upon bed of pale mushrooms breathing their weak, steady glow, and a great fan of witchglow spread cold and green across the far wall, all of it crowding the warded light the way fungus crowds any glow in the deep. It has the look of something once kept and now only left to grow: old planting-rows gone soft at the edges, the deep-folk's work carried on by nothing but the dark's own slow gardening. Armoured grey stonebugs trundle the beds on patient mandibles, and squat thornbugs bristle between the fattest caps, none of them troubled by you — there is forage enough here, and the light keeps the hunters out. The shrine lies back west.",
+    "exits": { "west": "d9.sanctuary.shrine" },
     "fixtures": ["pale-cluster", "witchglow-cluster"],
     "groundItems": [],
     "spawns": [
@@ -2859,8 +2859,8 @@
     "name": "The Grub Hollow",
     "depth": 9,
     "ambientLight": 1,
-    "description": "The garden beds slope down into a damp, low hollow where the glow runs thin and the fungus grows soft and rotten-sweet. Pale grubs chew slow trails through the rot, and grey scour-slugs haul themselves over the stone leaving clean tracks behind, grazing whatever the beds let fall — the quiet cleaners at the bottom of the lit food web, doing here in the warded calm what they do everywhere there is light to feed under. A stonebug or two grinds among them, unhurried. There is nothing here that means you harm. The garden climbs back west, still water lies north, and a darker seam opens south where the warded light at last gives out.",
-    "exits": { "west": "d9.sanctuary.garden", "north": "d9.sanctuary.cistern", "south": "d9.sanctuary.run" },
+    "description": "The cistern's rim slopes down into a damp, low hollow where the glow runs thin and the fungus grows soft and rotten-sweet. Pale grubs chew slow trails through the rot, and grey scour-slugs haul themselves over the stone leaving clean tracks behind, grazing whatever the sanctuary sheds, carried down with the water — the quiet cleaners at the bottom of the lit food web, doing here in the warded calm what they do everywhere there is light to feed under. A stonebug or two grinds among them, unhurried. There is nothing here that means you harm. Still water lies back north up the slope, and a darker seam opens south where the warded light at last gives out.",
+    "exits": { "north": "d9.sanctuary.cistern", "south": "d9.sanctuary.run" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -2878,7 +2878,7 @@
     "depth": 9,
     "ambientLight": 1,
     "description": "West of the shrine a still pool lies in a basin of worked stone, kept apart and kept clean — not the drowned black of the warren above but clear, cold water, walled round with the patient Umbral cutting and lit blue-white by a glimmer-lamp set in the rock above it. This is the deep-folk's own water, held separate from the great fall below; pale blind cave-fish drift the surface in slow, blind circles, and moss and lit fungus crowd the damp rim where a stonebug grazes the banks. Nothing has fouled it. The shrine lies east, the rim slopes south down toward the grub hollow, and at the pool's far end worked steps drop away toward a colder roar — the great fall, somewhere below.",
-    "exits": { "east": "d9.sanctuary.shrine", "south": "d9.sanctuary.hollow", "down": "d9.sanctuary.basin" },
+    "exits": { "east": "d9.sanctuary.shrine", "south": "d9.sanctuary.hollow", "down": "d10.sanctuary.basin" },
     "fixtures": ["pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -2886,12 +2886,12 @@
       { "mob": "stonebug", "max": 1, "respawn": 200 }
     ]
   },
-  "d9.sanctuary.basin": {
-    "id": "d9.sanctuary.basin",
+  "d10.sanctuary.basin": {
+    "id": "d10.sanctuary.basin",
     "zone": "umbral-sanctuary",
     "tags": ["water"],
     "name": "The Plunge Basin",
-    "depth": 9,
+    "depth": 10,
     "ambientLight": 0,
     "description": "The stair from the kept cistern descends past the edge of the warded light into a wide, dark cavern loud with falling water — and as your eyes give up, the dark is not quite whole, for high overhead a hard, cold column of water comes down out of the black and hammers into a churning pool, and the spray of it carries a faint blue-white glow. This is the foot of the great fall: the same black water you watched break apart far above you from the chasm ledge, the Far Bank's lake come all the way down the throat of the world to land here at the bottom. Curtains of weeping chasm-moss hang from the wet rock above the pool, trailing their hair-fine tendrils into the spray and glowing cold in the dark, and where the water has scoured the rock face a thin seam of raw glimmer threads the broken stone. The shrine's light does not reach here, and the things that shun it have crept to the water's edge — pale blind salamanders basking in the damp, an eyeless tremor-mole reading the stone for footfall. The worn stair climbs back up toward the kept water and its glow.",
     "exits": { "up": "d9.sanctuary.cistern" },
