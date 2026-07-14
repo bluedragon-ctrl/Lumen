@@ -469,8 +469,8 @@ $("jump-pill").addEventListener("click", () => {
   cmdEl.focus();
 });
 
-// The Tide HUD indicator on the shards line — a small phase label + a bar that
-// fills with the dark (0 in Calm, full at the Tide). Driven by lightweight `tide`
+// The Tide indicator in the status strip, beside HP/Mana — a phase label + a bar
+// that fills with the dark (0 in Calm, full at the Tide). Driven by lightweight `tide`
 // frames, separate from the player view so it can creep forward on its own without
 // rebuilding the panel. Hidden entirely when the world clock is off.
 function renderTide(t) {
@@ -478,7 +478,7 @@ function renderTide(t) {
   if (!el) return;
   if (!t || !t.enabled) { el.hidden = true; return; }
   el.hidden = false;
-  el.className = "tide-meter tide-" + t.phase;
+  el.className = "stat tide-meter tide-" + t.phase;
   const pct = Math.round((t.intensity || 0) * 100);
   $("tide-label").textContent = t.phase;
   $("tide-fill").style.width = pct + "%";
