@@ -47,12 +47,10 @@ const PENDING_ZONE_LINKS = [
 // compass directions as authored truth and distances as free — a cut is only
 // needed where a loop's directions cannot reconcile at ANY lengths.
 const GRID_CUTS = [
-  // The flooded squeeze behind the Pale Mother's nest (one-way boss escape,
-  // Sunken Warren): it runs `west` from Broodsump yet surfaces at the Drowned
-  // Cache, which the rest of the warren pins far east. Open decision: give the
-  // passage a non-cardinal direction (needs engine support for `in`/`out`), or
-  // accept it as a declared winding tunnel.
-  { a: "d8.broodsump", b: "d8.cache" },
+  // (empty) Every compass loop in the world can close — no direction lies.
+  // Add an entry (`{ a, b }` severs the a<->b edges from the grid solve) only
+  // while a genuine content decision is pending, with a comment saying what
+  // that decision is.
 ];
 
 function main() {

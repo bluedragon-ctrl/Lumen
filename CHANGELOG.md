@@ -11,13 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **directions as authored truth and distances free**: a `west` passage may be long or
   short, but a loop of exits must be able to close at *some* choice of lengths. Loops
   that net a direction no matter how they stretch (a room that would sit both east and
-  west of another) are rejected. The sanctuary's contradiction is resolved per design:
-  the **Grub Hollow** now hangs off the Kept Cistern's rim alone (the Glow Garden's
-  east passage is gone — its beds end at a wall, and the hollow grazes what the
-  sanctuary sheds), and the **Plunge Basin** is re-banded to **depth 10**, matching the
-  floor it already solved to. One documented `GRID_CUTS` entry remains (stale-checked
-  like `FLOOR_CUTS`): the Sunken Warren's flooded one-way squeeze from Broodsump to the
-  Drowned Cache, pending the cache/camp re-layout decision.
+  west of another) are rejected. Both contradictions found are resolved per design, so
+  the `GRID_CUTS` exception list ships **empty**: in the sanctuary, the **Grub Hollow**
+  now hangs off the Kept Cistern's rim alone (the Glow Garden's east passage is gone)
+  and the **Plunge Basin** is re-banded to **depth 10**, matching the floor it already
+  solved to; in the Sunken Warren, the **Drowned Cache** is now the Broodsump's own
+  search-secret (the flooded squeeze west behind the nest — Perception 7 — opens into a
+  half-drowned pocket, description rewritten), and the **Prospectors' Last Camp**
+  re-homes behind the Plunge Foot's cataract ("a dry seam behind the cataract's spray",
+  Perception 8), keeping the safe haven at the warren's crossroads instead of behind
+  the boss.
 - **Map-shape lints: exit reciprocity, zone contiguity, shadowed hidden exits.** The
   validator now also enforces that a return exit, where one exists, runs in the exact
   opposite direction (one-ways stay legal — "down one way, west back" doesn't); that
