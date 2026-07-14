@@ -135,6 +135,10 @@ function main() {
           errs.push(`room ${id}: exitSpans.${dir} has no matching exit`);
         if (!Number.isInteger(n) || n < 2)
           errs.push(`room ${id}: exitSpans.${dir} must be an integer >= 2 (1 is the implicit default)`);
+        // A multi-floor passage must *feel* long: require departure prose so the
+        // mover understands they travelled further than one room's worth.
+        if (!(r.exitMessages || {})[dir])
+          errs.push(`room ${id}: exitSpans.${dir} spans ${n} floors but has no exitMessages.${dir} — a multi-floor passage needs departure prose`);
       }
     }
     for (const f of r.fixtures || []) {

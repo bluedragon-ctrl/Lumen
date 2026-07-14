@@ -25,10 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   climbing-flue is now a true hidden **up** back to the Plunge Cave. With the spans
   declared, the solve comes out a **perfect ladder — every band's trunk floor equals
   its depth, d0 through d11 — with no exceptions**: the validator's `FLOOR_CUTS` list
-  is empty. `node tools/validate-data.js --floors` prints the solved elevation report
-  (per-band trunk, per-floor band mix, outliers); the **3D map** now drives its
-  vertical axis with solved floors instead of the old band-plus-heuristic and its
-  tooltip shows `band · floor`.
+  is empty. Every spanned exit also carries **departure prose** (`exitMessages`) so the
+  mover feels the extra distance — the fault's scraping chimneys, the drowned crack's
+  battering flume, the Gullet's long switchback stair — and the validator now requires
+  prose on any exit that spans floors. `node tools/validate-data.js --floors` prints
+  the solved elevation report (per-band trunk, per-floor band mix, outliers); the
+  **3D map** now drives its vertical axis with solved floors instead of the old
+  band-plus-heuristic and its tooltip shows `band · floor`.
 - **The Ember Deep — the floor of the deep (depth 9), below The Scald.** A line is
   now rigged down the **Redward Fissure**, and it drops onto the last floor: a
   six-room molten reach where light is finally *native*, welling orange out of the
