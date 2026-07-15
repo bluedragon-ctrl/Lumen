@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Iridescent-shell craft — a light, finesse-leaning armour line to counter the
+  chitin tanks.** Old Halloran now sells a **book of the iridescent shell**, teaching
+  four recipes worked from the **iridescent carapace** shed by the Scald's steam-mantis
+  and venom-scorpion, each lashed or sewn with **gloom-silk**. Where the chitin line
+  buys raw armour with weight and a dulled ear for the dark (`wits −1` to `−3`), this
+  line stays near-weightless, keeps a delver quick, and *sharpens* the eye
+  (`perception +1`): an **iridescent cuirass** and **cowl** (light `armour 1` with a
+  touch of `ward`), an **iridescent flense** (a fast `wits`-scaling razor that leaves a
+  bleed, the finesse answer to the might-heavy chitin maul), and — the line's prize —
+  a rare **iridescent scale-cloak**, carapace scales stitched onto gloom-silk for
+  `armour 1` / `ward 3`, the physical-leaning counterpart to the pure-ward gloom-silk
+  cloak. (Names and flavour provisional, pending sign-off.)
 - **Mob status tags — a delver can now read why a creature isn't attacking.** The
   room list surfaces a light- and behaviour-driven tag after a *visible* mob's name,
   extending the existing posture tag (`asleep`/`sitting`). A dark-adapted creature

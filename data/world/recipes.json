@@ -355,6 +355,50 @@
     "shards": 8,
     "output": { "template": "spiked-chitin-armor", "qty": 1 }
   },
+  "forge-iridescent-cuirass": {
+    "id": "forge-iridescent-cuirass",
+    "name": "Iridescent Cuirass",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iridescent-carapace", "qty": 4 },
+      { "template": "gloom-silk", "qty": 2 }
+    ],
+    "shards": 8,
+    "output": { "template": "iridescent-cuirass", "qty": 1 }
+  },
+  "forge-iridescent-cowl": {
+    "id": "forge-iridescent-cowl",
+    "name": "Iridescent Cowl",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iridescent-carapace", "qty": 2 },
+      { "template": "gloom-silk", "qty": 1 }
+    ],
+    "shards": 5,
+    "output": { "template": "iridescent-cowl", "qty": 1 }
+  },
+  "forge-iridescent-flense": {
+    "id": "forge-iridescent-flense",
+    "name": "Iridescent Flense",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iridescent-carapace", "qty": 2 },
+      { "template": "gloom-silk", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "iridescent-flense", "qty": 1 }
+  },
+  "weave-iridescent-scale-cloak": {
+    "id": "weave-iridescent-scale-cloak",
+    "name": "Iridescent Scale-Cloak",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "iridescent-carapace", "qty": 6 },
+      { "template": "gloom-silk", "qty": 5 }
+    ],
+    "shards": 12,
+    "output": { "template": "iridescent-scale-cloak", "qty": 1 }
+  },
   "smelt-silver": {
     "id": "smelt-silver",
     "name": "Silver Bar",
