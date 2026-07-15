@@ -1632,6 +1632,71 @@
     "stackable": true,
     "recipe": "forge-kingshell-cuirass"
   },
+  "iridescent-cuirass": {
+    "id": "iridescent-cuirass",
+    "rarity": "uncommon",
+    "name": "an iridescent cuirass",
+    "keywords": ["cuirass", "iridescent", "carapace", "shell", "sheen"],
+    "description": "Forearm-length plates of iridescent carapace lashed close over a light backing with gloom-silk cord, each curved shell throwing its own shifting sheen of green and violet. It weighs almost nothing against a slab of stacked chitin, and it sheds a blow sideways along the curve rather than stopping it dead — worn light and quick, it leaves a delver their speed and their ear for the dark where heavy plate takes both.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 2,
+    "value": 55,
+    "armour": { "armour": 1, "ward": 1, "speedPenalty": 0, "maxHp": 2 }
+  },
+  "iridescent-cowl": {
+    "id": "iridescent-cowl",
+    "rarity": "uncommon",
+    "name": "an iridescent cowl",
+    "keywords": ["cowl", "visor", "iridescent", "carapace", "shell", "sheen"],
+    "description": "A single curved plate of iridescent carapace worked into a light visor and strapped over a soft lining, the oil-slick sheen playing across it as it turns. Where a chitin helm boxes the ears and dulls a delver to the dark, this sits feather-light and catches even the false light, so the eye reads the gloom a shade the sharper for the shimmer.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 1,
+    "value": 30,
+    "armour": { "armour": 1, "ward": 0, "attrMod": { "perception": 1 } }
+  },
+  "iridescent-flense": {
+    "id": "iridescent-flense",
+    "rarity": "uncommon",
+    "name": "an iridescent flense",
+    "keywords": ["flense", "blade", "knife", "iridescent", "carapace", "razor"],
+    "description": "A single plate of iridescent carapace ground down to a translucent razor and bound to a wrapped grip with gloom-silk — light as a leaf and wickedly quick, its edge a shifting line of green-violet sheen. It has no heft to bring down like a smith's steel; it rewards a keen eye and a fast hand, laying open a foe in shallow, weeping strokes faster than a heavier arm could ever land.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 1,
+    "value": 34,
+    "weapon": {
+      "damage": { "physical": "1d6" },
+      "actionCost": 10,
+      "scale": { "attr": "wits", "per": 5 },
+      "onHit": [{ "type": "damage-over-time", "name": "bleed", "damage": "1d2", "duration": 3, "chance": 0.5 }]
+    }
+  },
+  "iridescent-scale-cloak": {
+    "id": "iridescent-scale-cloak",
+    "rarity": "rare",
+    "name": "an iridescent scale-cloak",
+    "keywords": ["cloak", "mantle", "scale", "scaled", "iridescent", "carapace", "gloom-silk", "sheen"],
+    "description": "A long mantle of gloom-silk sewn all over with overlapping scales of iridescent carapace, each no bigger than a thumbnail and each catching the underlight in its own oil-slick green and violet, so the whole cloak ripples like water when it moves. Supple as the cold cloth beneath, it turns a blade the silk alone would let through, and the deep-made weave still lies thick against hostile magic — the scattered shimmer keeping a wearer's eye keen on the dark besides.",
+    "type": "armour",
+    "slot": "cloak",
+    "weight": 1,
+    "value": 140,
+    "armour": { "armour": 1, "ward": 3, "attrMod": { "perception": 1 } }
+  },
+  "book-of-the-iridescent-shell": {
+    "id": "book-of-the-iridescent-shell",
+    "rarity": "rare",
+    "name": "a book of the iridescent shell",
+    "keywords": ["book", "iridescent", "shell", "carapace", "halloran", "treatise"],
+    "description": "A soil-stained sheaf in Old Halloran's cramped hand, bound in mushroom-leather and thick with a naturalist's patient looking — how the great deep-bugs' shed carapace can be lashed and ground and sewn the deep's own way into gear no ore ever gave: a light cuirass and visor, a razor flensing-blade, and a scale-cloak of shell stitched onto gloom-silk. Study it to fix the whole light-shell craft in memory; the worn binding gives up its pages as you take in the last.",
+    "type": "book",
+    "weight": 1,
+    "value": 300,
+    "stackable": true,
+    "teaches": { "recipes": ["forge-iridescent-cuirass", "forge-iridescent-cowl", "forge-iridescent-flense", "weave-iridescent-scale-cloak"] }
+  },
   "book-of-basic-smithing": {
     "id": "book-of-basic-smithing",
     "name": "a book of basic smithing",
