@@ -8,6 +8,7 @@
 const quests = require("./quests");
 const { buildExamineView } = require("./render");
 const { canSee } = require("./light");
+const { mobVisibleTo } = require("./perception");
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 // Can this player make out the mob — room bright enough for them, or it's self-lit?
@@ -75,7 +76,21 @@ function createDispatcher({
   // room view dirty. A null/undefined line for an observer sends nothing to them.
   function broadcastRoom(roomId, ev, lineFor, { type = "log", refreshRoom = false } = {}) {
     const frames = new Map(); // text -> serialized frame; light-gating yields only a few distinct lines
+    // A hidden mob's ambient narration (emote, targeted reaction, …) must not leak
+    // to a delver who hasn't found it — a stray emote would give the ambush away.
+    // Reveal is per-player and ephemeral (search, or an ambush strike; see
+    // GameState.revealedMobs), so gate per observer: those who've revealed it still
+    // read the line, the unaware get nothing. Non-hidden mobs are unaffected. If the
+    // actor has already left the room (e.g. a slink-out event), the lookup misses and
+    // we fall back to the plain light-gated broadcast.
+    const rt = state.rooms[roomId];
+    const actor = ev.mobId != null && rt ? rt.mobs.find((x) => x.id === ev.mobId) : null;
+    const gateHidden = !!(actor && actor.hidden);
     for (const o of state.playersIn(roomId)) {
+      if (gateHidden && !mobVisibleTo(state, o, actor)) {
+        if (refreshRoom) markRoomView(o.id);
+        continue;
+      }
       const text = lineFor(mobNameFor(o, ev), o);
       if (text != null) {
         let data = frames.get(text);

@@ -12,6 +12,32 @@ const { actorEmitLight, playerDefence, effectiveSpeed, sellValueOf, buyValueOf, 
 // default and shows nothing.
 const POSTURE_LABEL = { sitting: "sitting", sleeping: "asleep" };
 
+// The social tag shown after a *mob's* name in the room list — extends the bare
+// posture label with light- and behaviour-driven states, so a delver understands
+// WHY a visible creature isn't attacking (the alternative reads as a bug). Only
+// ever applied to a mob the viewer can already see; it never reveals a hidden one
+// (those are filtered out upstream). Highest-priority inert reason wins:
+//   asleep      — inert until struck (posture)
+//   dazzled     — dark-adapted, blinded by light past `blindAbove`: can't perceive
+//                 anyone, so it never engages (the centipede-in-glare confusion)
+//   reeling     — harmed by light past `harmedAbove` but still able to fight (glare)
+//   lying in wait — an `ambush` mob tracking the room, holding its strike (see
+//                 _isEngaged): it hasn't traded blows yet, so shows no aggro
+//   sitting     — alert-at-rest (posture)
+// NOTE: the surfaced wording ("dazzled", "reeling", "lying in
+// wait") is placeholder pending maintainer sign-off — mechanics only for now.
+function mobStatusTag(t, m, light) {
+  if (m.posture === "sleeping") return "asleep";
+  const per = t.perception;
+  if (per && per.blindAbove != null && light > per.blindAbove) return "dazzled";
+  if (isHarmedByLight(per, light)) return "reeling";
+  // Lying in wait: an ambusher that has not yet committed to anyone (no live
+  // combat threat). Once it snaps and trades blows, `aggro` fills and the tag
+  // drops — it's plainly fighting from there.
+  if (t.ambush && !(m.aggro && Object.values(m.aggro).some((v) => v > 0))) return "lying in wait";
+  return POSTURE_LABEL[m.posture] || undefined;
+}
+
 function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
@@ -93,7 +119,7 @@ function buildRoomView(state, p) {
       const sells = t.shop && t.shop.sells ? t.shop.sells.map((o) => w.items[o.template].name) : undefined;
       // A mob the viewer summoned/owns reads as friendly (blue), never as an enemy.
       const owned = m.faction === "player" && m.ownerId === p.id;
-      mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, owned, luminous, posture: POSTURE_LABEL[m.posture] || undefined, sells });
+      mobs.push({ id: m.id, name: t.name, hostile: !!t.hostile, owned, luminous, posture: mobStatusTag(t, m, light), sells });
     }
   }
   const items = see
@@ -392,4 +418,4 @@ function buildExamineView(state, p, q) {
   return null;
 }
 
-module.exports = { buildPlayerView, buildRoomView, buildExamineView, itemView };
+module.exports = { buildPlayerView, buildRoomView, buildExamineView, itemView, mobStatusTag };
