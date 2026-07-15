@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Mob status tags — a delver can now read why a creature isn't attacking.** The
+  room list surfaces a light- and behaviour-driven tag after a *visible* mob's name,
+  extending the existing posture tag (`asleep`/`sitting`). A dark-adapted creature
+  blinded by light past its `blindAbove` cap reads **`(dazzled)`** — the fix for the
+  centipede-in-glare confusion, where a mob that literally can't perceive anyone just
+  stood there looking broken; one harmed by light but still able to fight reads
+  **`(reeling)`**; and an `ambush` mob holding its strike reads
+  **`(lying in wait)`** until it trades blows. The tag is only ever shown for a mob the
+  viewer can already see — it never reveals a hidden one. (Surfaced wording is
+  provisional, pending sign-off.)
 - **A visiting trader, and the Scheduler behind them.** A new **Scheduler**
   (`data/world/schedule.json`, engine `server/state-scheduler.js`) runs data-driven
   timed world events on their own cadences, independent of the Tide — each entry
@@ -312,6 +322,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   override with their own hue.
 
 ### Fixed
+- **A hidden mob no longer gives itself away with an emote.** A lurking ambusher
+  (e.g. the crypt-lurker) could pick its ambient `emote` action while still concealed,
+  and the line was broadcast to everyone in the room — telling a delver who hadn't
+  found it that *something* was there. Room broadcasts now gate a hidden mob's ambient
+  narration (emotes, targeted reactions, and the like) per observer: a delver who has
+  revealed it (via `search`, or by being struck from hiding) still reads the line, but
+  the unaware get nothing. Non-hidden mobs are unaffected, and the ambush-strike
+  reveal still lands as before.
 - **Inventory-tab overrides now reach the client.** Items authored with a `filterGroup`
   (the tab override — e.g. the quest tags filed under *Other*, or oil and edibles under
   *Use*) were sorted only by their raw `type`, because `itemView` never serialised the
