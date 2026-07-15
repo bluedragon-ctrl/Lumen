@@ -1556,6 +1556,211 @@
     ],
     "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "chitin-spike", "chance": 0.5 }]
   },
+  "umbral-paqo": {
+    "id": "umbral-paqo",
+    "faction": "umbral",
+    "name": "the paqo",
+    "keywords": ["paqo", "priest", "umbral", "shrine", "keeper"],
+    "description": "Older than the others, and stiller — an Umbral who has kept the village cradle so long the blue-white light seems to rise as much from under the grey skin as from the glimmer in the basin. Robed in undyed gloom-silk worn soft with years, the paqo tends the little temple's ward the way a surface priest tends a flame: trimming it, bowing to it, letting it neither flare nor fail. The wide, lightless eyes turn on a prospector without warmth and without fear — only the long patience of a keeper who has watched the deep take villages before, and means this one to be the one it does not.",
+    "maxHp": 40,
+    "speed": 12,
+    "armour": 2,
+    "ward": 3,
+    "attributes": { "might": 4, "vitality": 6, "intellect": 7, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 3, "messages": ["trims the cradle's glow a shade lower with a slow, practised hand", "bows once to the light and is still", "traces a knotted glyph over the basin, the light beneath the grey skin pulsing with it", "murmurs something slow and rounded to the cradle, too low to catch"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["lays both hands to the cradle as the dark presses in, and the glow does not waver", "stands square before the light while the deep breathes cold against the ward", "says, low and sure: \"Here it does not come in. Here it has never come in.\""] },
+      { "type": "react", "weight": 3, "cooldown": 120, "reactions": [
+        { "if": { "phase": ["stirring", "tide"] }, "messages": [
+          { "target": "watches you without alarm as the Tide gathers: \"Your kin run for their lamps, yaku-runa. Ours were lit before you were born. Stand, and it will pass.\"", "room": "watches {name} with calm, lightless eyes as the Tide gathers." }
+        ] },
+        { "if": { "hpBelow": 0.4 }, "messages": [
+          { "target": "marks your wounds and inclines its head toward the font: \"The deep asks its price in blood. Drink, and pay it less.\"", "room": "inclines its head, marking {name}'s wounds." }
+        ] },
+        { "messages": [
+          { "target": "regards you a long moment: \"You came down through our fields and our dead's high road, and the ward let you. That is not nothing, yaku-runa. Sit. There is a thing the village may yet ask of you.\"", "room": "regards {name} a long, unhurried moment." },
+          { "target": "says, slow and careful: \"The bright-folk take the glimmer for their trade. We keep it for our light. One day those two will not both fit in the deep — but not today.\"", "room": "says something slow and rounded to {name} in the Umbral tongue." }
+        ] }
+      ] }
+    ],
+    "shards": "2d6"
+  },
+  "umbral-awaq": {
+    "id": "umbral-awaq",
+    "faction": "umbral",
+    "name": "the awaq",
+    "keywords": ["awaq", "weaver", "umbral", "silk", "gloom-silk"],
+    "description": "A weaver at the loom, long grey fingers moving through the gut-line strings faster than the eye follows and never once looking down at them. Bolts of finished gloom-silk hang folded at the awaq's shoulder, breathing their faint dark shimmer; the eyes stay half-shut against even the cradle's soft glow, the better to feel the thread. This is the craft the deep-folk are known for above all, and the awaq works it the way water works stone — without hurry, and without stopping.",
+    "maxHp": 36,
+    "speed": 12,
+    "armour": 1,
+    "ward": 2,
+    "attributes": { "might": 4, "vitality": 5, "intellect": 6, "wits": 7, "perception": 6 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 10 },
+      { "type": "emote", "weight": 3, "messages": ["throws the shuttle through the warp without looking, and catches it again", "runs a length of finished gloom-silk between two fingers, testing the shimmer", "cards a handful of pale chasm-moss fibre into thread", "holds a half-woven bolt up to the cradle's glow, then folds it away"] },
+      { "type": "emote", "weight": 2, "phase": ["stirring", "tide"], "messages": ["weaves on, unhurried, as the dark presses at the light", "does not look up as the Tide gathers — the thread does not care for the hour"] },
+      { "type": "react", "weight": 2, "cooldown": 120, "reactions": [
+        { "messages": [
+          { "target": "glances at your gear with a weaver's eye: \"Surface cloth. Loud, and it will not last the deep. Mine would — when there is a bolt to spare, yaku-runa.\"", "room": "glances over {name}'s gear with a weaver's eye." },
+          { "target": "says, without slowing the shuttle: \"The moss gives its silk slow. So do I.\"", "room": "says something to {name} without slowing the loom." }
+        ] }
+      ] }
+    ],
+    "shards": "1d6"
+  },
+  "umbral-qhatuq": {
+    "id": "umbral-qhatuq",
+    "faction": "umbral",
+    "name": "the qhatuq",
+    "keywords": ["qhatuq", "trader", "umbral", "market", "stall"],
+    "description": "A trader of the village, keeping a stall of tended crop and worked goods under the market's cold lamps — kin, plainly, to the qhatuq the prospectors meet by the river far above, and cut from the same patient cloth. Long fingers sort river-shells and folded silk into neat rows; the wide eyes weigh a prospector the way they weigh everything, for what it is worth and what it will cost. The manner is not unfriendly. It is only that of someone who has all the time in the deep, and knows you do not.",
+    "maxHp": 40,
+    "speed": 12,
+    "armour": 2,
+    "ward": 2,
+    "attributes": { "might": 5, "vitality": 6, "intellect": 6, "wits": 6, "perception": 6 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 12 },
+      { "type": "emote", "weight": 3, "messages": ["sorts a handful of pale river-shells into even rows", "turns a market-lamp down a notch, easing the glare", "weighs a folded bolt of silk in one hand, unhurried", "sets out a tray of tended crop and steps back to judge it"] },
+      { "type": "emote", "weight": 2, "phase": ["stirring", "tide"], "messages": ["draws the stall's cloth over the goods as the dark gathers, in no hurry at all", "turns the market-lamps low as the Tide comes on, and waits it out"] },
+      { "type": "react", "weight": 2, "cooldown": 120, "reactions": [
+        { "messages": [
+          { "target": "inclines its head to you, slow: \"Trade, when I have it laid out, yaku-runa. Come back when the stall is full.\"", "room": "inclines its head to {name}, slow and unhurried." },
+          { "target": "says, weighing you: \"The river brought your kin down to us. It brings shards, too. Both are welcome. Both cost time.\"", "room": "weighs {name} with wide, lightless eyes." }
+        ] }
+      ] }
+    ],
+    "shards": "2d6"
+  },
+  "umbral-layqa": {
+    "id": "umbral-layqa",
+    "faction": "umbral",
+    "name": "the layqa",
+    "keywords": ["layqa", "alchemist", "magician", "glimmer", "umbral", "worker"],
+    "description": "The village's glimmer-worker, bent over a still of glass coils and stone retorts with a cradle of raw glimmer breathing cold beneath it. Where the others keep the deep out, the layqa reaches into it — boiling glimmer down, binding it into brews and worked charms, the hungry glimmer-craft the deep-folk have always practised and the surface never learned to do safely. A faint dark shimmer clings to the long fingers that no washing takes off. The eyes, when they lift to you, hold the sharp, sideways curiosity the other Umbrals lack.",
+    "maxHp": 38,
+    "speed": 12,
+    "armour": 1,
+    "ward": 3,
+    "attributes": { "might": 4, "vitality": 5, "intellect": 8, "wits": 6, "perception": 6 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d6", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 10 },
+      { "type": "emote", "weight": 3, "messages": ["feeds a pinch of ground chitin into a retort and watches the glimmer take it", "swirls a stoppered jar of cold blue light and holds it up to read", "scores a glyph into a charm-blank with quick, sure strokes", "wipes glimmer-shimmer from its fingers onto a rag that already glows faintly"] },
+      { "type": "emote", "weight": 2, "phase": ["stirring", "tide"], "messages": ["works on through the Tide, the still's little cradle steady against the dark", "cocks its head at the deepening black as though listening for something in it"] },
+      { "type": "react", "weight": 2, "cooldown": 120, "reactions": [
+        { "messages": [
+          { "target": "looks up from the still with sharp, sideways interest: \"You carry the surface's magic — will alone, spent and gone. Ours eats the glimmer itself. Hungrier. Heavier. I could show you, yaku-runa, when the work is racked.\"", "room": "looks up from the still at {name} with sharp, sideways interest." },
+          { "target": "says, half to itself: \"The deep gives and the deep takes. The trick is in the binding.\"", "room": "says something half to itself as {name} passes." }
+        ] }
+      ] }
+    ],
+    "shards": "2d6"
+  },
+  "umbral-stonewright": {
+    "id": "umbral-stonewright",
+    "faction": "umbral",
+    "name": "the stonewright",
+    "keywords": ["stonewright", "smith", "lapidary", "jeweller", "armourer", "umbral"],
+    "description": "Broad for an Umbral and heavy in the shoulder, the village's stonewright works the lapidary bench and the glimmer-hearth both — cutting river-shell and glimmer into charms one hour, binding chitin and worked stone into blade and plate the next. The same sure hand that carves the walls' reliefs sets a jewel or grinds an edge; to the deep-folk it is all one craft, the shaping of hard things. Grey dust of shell and stone greys the arms to the elbow, and the eyes measure a prospector's gear before they meet the prospector's face.",
+    "maxHp": 46,
+    "speed": 12,
+    "armour": 3,
+    "ward": 1,
+    "attributes": { "might": 7, "vitality": 7, "intellect": 5, "wits": 6, "perception": 6 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "attack": { "damage": "1d8", "actionCost": 14 },
+    "actions": [
+      { "type": "attack", "weight": 4 },
+      { "type": "idle", "weight": 10 },
+      { "type": "emote", "weight": 3, "messages": ["sets a graver to a shell-blank and takes off a curl of pale nacre", "turns a half-ground blade to the light and sights down its edge", "taps a glimmer-chip into a ring-setting with a small worked hammer", "brushes stone-dust from the bench and lays out the next piece"] },
+      { "type": "emote", "weight": 2, "phase": ["stirring", "tide"], "messages": ["works the hearth on through the Tide, the glimmer-coals steady and blue", "sets down the graver as the dark gathers, and watches the lane a while"] },
+      { "type": "react", "weight": 2, "cooldown": 120, "reactions": [
+        { "messages": [
+          { "target": "measures your gear with a hard eye: \"Surface iron. Heavy, and it fears the damp. I cut better from shell and stone, yaku-runa — when there is work to sell.\"", "room": "measures {name}'s gear with a hard, appraising eye." },
+          { "target": "grunts, not unkindly: \"Charm or blade, it is the same craft. Shaping what does not want to be shaped.\"", "room": "grunts something to {name}, not unkindly." }
+        ] }
+      ] }
+    ],
+    "shards": "2d6"
+  },
+  "umbral-sentry": {
+    "id": "umbral-sentry",
+    "faction": "umbral",
+    "name": "an umbral sentry",
+    "keywords": ["sentry", "qhawaq", "watcher", "guard", "umbral"],
+    "description": "A qhawaq — a watcher — walking the village round in unhurried circuits, from the warded gate to the plaza and back. Taller and harder than the crafters, wrapped in layered gloom-silk over worked-stone plate, it carries a glimmer-headed spear whose cold blue light goes ahead of it into every shadow. It does not challenge a prospector who keeps to the lit lanes; it only watches, and lets itself be seen watching. Whatever comes up out of the deep against the village finds the qhawaq between it and the homes.",
+    "maxHp": 54,
+    "speed": 13,
+    "armour": 3,
+    "ward": 2,
+    "attributes": { "might": 7, "vitality": 8, "intellect": 3, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 8 },
+    "emitsLight": 1,
+    "behavior": "wander",
+    "hostile": false,
+    "helper": true,
+    "remembers": true,
+    "xp": 24,
+    "attack": { "damage": "1d8", "actionCost": 12 },
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 5 },
+      { "type": "wander", "weight": 3, "verb": "walks its round off down the lit lane", "scope": "zone" },
+      { "type": "emote", "weight": 2, "messages": ["grounds the butt of its glimmer-spear and stands watch", "turns the spear's cold light into a shadowed corner, then moves on", "marks you pass with steady, lightless eyes and says nothing"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["sets itself toward the deep as the dark gathers, spear-light bared", "lowers the glimmer-spear and watches the black lane below, very still", "rasps a low word to the other watcher across the plaza as the Tide comes on"] }
+    ],
+    "shards": "2d6"
+  },
+  "umbral-villager": {
+    "id": "umbral-villager",
+    "faction": "umbral",
+    "name": "an umbral villager",
+    "keywords": ["villager", "umbral", "deep-folk", "folk"],
+    "description": "One of the village's own, about the ordinary business of a life lived wholly below the sun — carrying water, mending silk, herding a slow stonebug back to its pen. Grey-skinned and soft-eyed, with the faint blue glow of the deep moving under the skin, the villager gives a prospector a wide, incurious berth: not afraid, not welcoming, only used to the surface-folk passing through and gone. The rounded Umbral tongue passes low between them where they gather, and falls quiet when a stranger comes near.",
+    "maxHp": 24,
+    "speed": 12,
+    "attributes": { "might": 3, "vitality": 4, "intellect": 5, "wits": 5, "perception": 5 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 6 },
+    "emitsLight": 1,
+    "behavior": "wander",
+    "hostile": false,
+    "actions": [
+      { "type": "idle", "weight": 10 },
+      { "type": "wander", "weight": 3, "verb": "wanders off about its business", "scope": "zone" },
+      { "type": "emote", "weight": 3, "messages": ["carries a stoppered jar of clean water past, eyes down", "mends a tear in a length of gloom-silk with quick grey fingers", "coaxes a slow stonebug along by tapping its shell", "trades a few low, rounded words with another of the folk, then falls quiet as you near"] },
+      { "type": "emote", "weight": 2, "phase": ["stirring", "tide"], "messages": ["draws indoors as the dark gathers, unhurried, used to the hour", "gathers a child of the folk close under the lamp-niche as the Tide comes on"] }
+    ],
+    "shards": "1d4"
+  },
   "pale-king": {
     "id": "pale-king",
     "name": "the Pale King",
