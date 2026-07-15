@@ -127,9 +127,15 @@ A subterranean humanoid race native to the Abyss — there long before the Rush.
 - **Settlements:** Umbral **villages** lie deeper in the Abyss. The first Umbral a
   prospector meets on the descent is **Mallki the qhatuq** (trader), who keeps a
   lamp-lit hollow and a tended fungus garden beside the underground river of the
-  third floor. Far below, past the warded sanctuary and its kept fields, the deepest
-  known village was **lost to the dark** (see *The Hollowing*) — a place the surviving
-  Umbrals ward themselves away from and do not speak of.
+  third floor. Far below, past the warded sanctuary and through its kept fields,
+  lies the first **living village** the descent reaches — **Illa Llaqta** ("the lit
+  town"), a whole worked-stone community of crafters, keepers, and watchers held
+  lamp-lit against the dark below (depth 10). It is the Umbrals shown at home: quiet
+  masters of stone, silk, and glimmer-craft, tending their own cradle-ward and
+  cropping the fields above. Deeper still — far down in the Abyss, **not** beneath
+  these fields — the deepest known village was **lost to the dark** (see *The
+  Hollowing*), a place the surviving Umbrals ward themselves away from and do not
+  speak of.
 - **Language:** the Umbral tongue draws on **Quechua** roots for its flavour —
   soft, rounded, sparse. A few words surface in their speech and place-names
   (*qhatuq* — trader; *paqcha* — waterfall; *yaku-runa* — "water-folk", their name
@@ -182,21 +188,22 @@ at the Hollowing as the dark's own slow work; it must never **explain** it.
 
 #### The lost village
 
-Deepest of the worked places — below the warded gate beneath the Umbral fields — lies an
-**Umbral village the dark took whole**: streets of close-set stone, lamp-niches long
-cold, reliefs cut by hands that are now shadows on their own walls. Nothing slaughtered
-it; the Hollowing thinned it out, household by household, until none were left to leave.
-It is **abandoned** by the living and **inhabited** by its own dead — husks still
-shuffling through their chores, faded things half-gone at the edges, and mindless shadows
-pooled in the dark corners: the whole slow arc of the Hollowing under one roof. The
-surface Umbrals know of it and **will not speak of it**; the sanctuary and its wards above
-stand, in part, against what the village became — and it is the reason a warded gate stands
-shut. The largest worked-stone complex in the deep, kept by no one, kept *out* by the
-living.
+Deepest of the worked places — **far down in the Abyss (around depth 17), not beneath the
+Umbral fields** — lies an **Umbral village the dark took whole**: streets of close-set
+stone, lamp-niches long cold, reliefs cut by hands that are now shadows on their own walls.
+Nothing slaughtered it; the Hollowing thinned it out, household by household, until none
+were left to leave. It is **abandoned** by the living and **inhabited** by its own dead —
+husks still shuffling through their chores, faded things half-gone at the edges, and
+mindless shadows pooled in the dark corners: the whole slow arc of the Hollowing under one
+roof. The surface Umbrals know of it and **will not speak of it**; the sanctuary and its
+wards, and the living village's own cradle-ward, stand in part against what this deeper
+place became. The largest worked-stone complex in the deep, kept by no one, kept *out* by
+the living.
 
-*(Place-name provisional, pending sign-off — an Umbral/Quechua name in the vein of the
-existing* qhatuq / paqcha / yaku-runa, *e.g.* **Tuta Llaqta** *— "night-town." See the
-language note under The Umbrals.)*
+*(Not to be confused with the* living *village of **Illa Llaqta** at depth 10 — see*
+Settlements *under The Umbrals. Place-name provisional, pending sign-off — an
+Umbral/Quechua name in the vein of the existing* qhatuq / paqcha / yaku-runa, *e.g.*
+**Tuta Llaqta** *— "night-town." See the language note under The Umbrals.)*
 
 ## The Deep & its ecosystem
 

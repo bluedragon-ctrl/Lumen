@@ -190,6 +190,51 @@
     "type": "switch",
     "switch": { "emitsLight": 4, "on": true }
   },
+  "village-cradle": {
+    "id": "village-cradle",
+    "name": "the community cradle",
+    "keywords": ["cradle", "glimmer", "shrine", "altar", "light", "ward"],
+    "description": "A knot of raw glimmer smaller than the great cradle in the sanctuary above, cupped in a worked-stone basin at the heart of the little temple and breathing a steady blue-white glow that fills the room and pains no eye. This is the village's own kept light — a ward set and tended by the community's own hands, never once let go dark, holding the deep back from the close-set homes around it. Where the sanctuary's cradle guards the long road down, this one guards the hearth.",
+    "type": "scenery",
+    "emitsLight": 2
+  },
+  "village-reliefs": {
+    "id": "village-reliefs",
+    "name": "the carved reliefs",
+    "keywords": ["relief", "reliefs", "carving", "carvings", "wall", "glyph", "glyphs", "stone"],
+    "description": "The plaza walls are carved end to end in the old, sure hand — the deep-folk's stonemasonry, generations of it: tended rows of crop, the slow drift of lightbugs, small figures bowed at a cradle of light, and everywhere the rounded, knotted glyphs of the Umbral tongue. It is a whole village's memory cut into the living rock, and the newest work is no less careful than the oldest.",
+    "type": "scenery"
+  },
+  "weaver-looms": {
+    "id": "weaver-looms",
+    "name": "the weaver's looms",
+    "keywords": ["loom", "looms", "silk", "gloom-silk", "cloth", "thread", "weave"],
+    "description": "Tall looms of worked bone and gut-line stand along the wall, strung with lengths of gloom-silk at every stage of the craft — raw chasm-moss fibre carded pale, half-woven bolts breathing a faint dark shimmer, finished cloth folded and stacked. The air smells of wet silk and cold stone. This is where the deep-folk's famous weave is made, thread by patient thread.",
+    "type": "scenery"
+  },
+  "lapidary-bench": {
+    "id": "lapidary-bench",
+    "name": "the lapidary's bench",
+    "keywords": ["bench", "lapidary", "jewel", "jewellery", "shell", "graver", "tools", "blade"],
+    "description": "A low worked-stone bench crowded with the jeweller's and armourer's craft: cut river-shell and polished glimmer set in careful rows, chisels and gravers laid out by size, and half-finished pieces — a ringed charm, a scored blade-blank — waiting on the next patient hour. A fine dust of shell and stone lies over everything.",
+    "type": "scenery"
+  },
+  "glimmer-still": {
+    "id": "glimmer-still",
+    "name": "the glimmer-still",
+    "keywords": ["still", "coils", "retort", "jars", "reagent", "glimmer", "bench", "alchemy"],
+    "description": "A clutter of the glimmer-worker's art: glass coils and stone retorts, stoppered jars of ground chitin and dried glow-moss, and beneath it all a shallow cradle of raw glimmer breathing cold light, where the deep is boiled down and bound into things a hand can carry. The reek of reagent hangs close and sharp.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
+  "dwelling-niches": {
+    "id": "dwelling-niches",
+    "name": "the lamp-niches",
+    "keywords": ["niche", "niches", "home", "homes", "dwelling", "hanging", "hangings", "lamp"],
+    "description": "The homes open off the lane in close-set stone, each with a niche cut beside its door where a small knot of glimmer burns low and blue — kept always lit, never let go dark, the way the deep-folk have warded their hearths since long before the Rush. Woven hangings, stacked crockery, the ordinary clutter of lives lived wholly out of the sun.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
   "glimmer-ward": {
     "id": "glimmer-ward",
     "name": "a warding of glimmer-stakes",

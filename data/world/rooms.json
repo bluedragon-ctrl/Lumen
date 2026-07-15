@@ -3054,8 +3054,8 @@
     "name": "The Lightfield Commons",
     "depth": 10,
     "ambientLight": 1,
-    "description": "The fields open out into a broad lit common, and for the first time on the long way down the deep looks less like a wound in the world than a place lived in. Tended rows of luminous fungus run the floor in even crops, breathing a soft blue-green light; lightbugs drift thick overhead in a slow, shifting constellation, and the glow of them moves wherever they wander. Armoured grey stonebugs graze the rows on patient mandibles and bristling thornbugs trundle between the fattest caps, none of them troubled by you — there is forage enough, and no hunter has ever been let down this far. This is the Umbrals' own ground, kept and cropped and quiet. The stair climbs back north; moss terraces lie west, a worked water-channel runs east, and south the rows run on toward the close-set roofs and lamplit cuts of a village — but the way there drops through a low warded gate that stands shut for now, and does not yet open to you.",
-    "exits": { "north": "d10.fields.stair", "west": "d10.fields.terraces", "east": "d10.fields.channel" },
+    "description": "The fields open out into a broad lit common, and for the first time on the long way down the deep looks less like a wound in the world than a place lived in. Tended rows of luminous fungus run the floor in even crops, breathing a soft blue-green light; lightbugs drift thick overhead in a slow, shifting constellation, and the glow of them moves wherever they wander. Armoured grey stonebugs graze the rows on patient mandibles and bristling thornbugs trundle between the fattest caps, none of them troubled by you — there is forage enough, and no hunter has ever been let down this far. This is the Umbrals' own ground, kept and cropped and quiet. The stair climbs back north; moss terraces lie west, a worked water-channel runs east, and south the rows run on through a low warded gate — the deep-folk's own, standing open to the living — and down toward the close-set roofs and lamplit cuts of the village kept beyond it.",
+    "exits": { "north": "d10.fields.stair", "west": "d10.fields.terraces", "east": "d10.fields.channel", "south": "d10.village.gate" },
     "fixtures": ["umbral-garden-beds", "witchglow-cluster"],
     "groundItems": [],
     "spawns": [
@@ -3112,6 +3112,129 @@
     "spawns": [
       { "mob": "blind-cave-fish", "max": 4, "respawn": 120 },
       { "mob": "lightbug", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d10.village.gate": {
+    "id": "d10.village.gate",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Warded Gate",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The tended rows give way to worked stone, and the common's south way drops through the low gate the commons only promised — no longer shut, and never barred to the living. This is the village's own ward: lines scored deep into the stone and pinned with stakes of raw glimmer that breathe a steady blue-white light, a bound edge set not against you but against whatever climbs the dark from below. Lightbugs pour up the stair at your back and stream on through the gate in a slow river of drifting light, as if the village breathes them. Beyond, worked lanes run down between close-set roofs under cold lamps that never go out. The common lies back north; the village opens south into a lit plaza.",
+    "exits": { "north": "d10.fields.commons", "south": "d10.village.plaza" },
+    "fixtures": ["umbral-coldlamp", "glimmer-ward"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 4, "respawn": 120 },
+      { "mob": "umbral-sentry", "max": 2, "respawn": 400 }
+    ]
+  },
+  "d10.village.plaza": {
+    "id": "d10.village.plaza",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Plaza",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The lanes open into a broad plaza cut square from the living rock — the heart of the village, and the first place this deep that was made simply to be lived in. Cold glimmer-lamps stand on worked posts around the square, throwing their soft blue-white light over walls carved end to end with the old sure hand: rows of tended crop, drifting lightbugs, small figures bowed at a cradle of light. Lightbugs gather thick over the open ground, and the deep-folk cross it about their own quiet business, giving a prospector a wide and incurious berth. A great fan of witchglow spreads green up one wall. Ways run off in every quarter: the warded gate lies north, a shrine glows south, craft-lanes open east, and the market lies west.",
+    "exits": { "north": "d10.village.gate", "south": "d10.village.shrine", "east": "d10.village.weaver", "west": "d10.village.market" },
+    "fixtures": ["umbral-coldlamp", "village-reliefs", "witchglow-cluster"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "lightbug", "max": 3, "respawn": 120 },
+      { "mob": "umbral-villager", "max": 2, "respawn": 300 }
+    ]
+  },
+  "d10.village.shrine": {
+    "id": "d10.village.shrine",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Community Shrine",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "South of the plaza a low vaulted temple holds the village's own kept light: a knot of raw glimmer smaller than the great cradle in the sanctuary far above, cupped in a worked-stone basin and breathing a steady blue-white glow that fills the room and pains no eye. This is the ward the village sets by its own hands — not the sanctuary's guard over the long road down, but the closer one, the hearth-light held against the dark below. The walls are carved with the deep-folk bowed at the glow, and a shallow font catches a clean thread of water beneath the relief. The paqo keeps this place, and does not let it fail. The plaza lies back north.",
+    "exits": { "north": "d10.village.plaza" },
+    "fixtures": ["umbral-coldlamp", "village-cradle", "shrine-font"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-paqo", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d10.village.weaver": {
+    "id": "d10.village.weaver",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Weaver's Hall",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "East of the plaza the craft-lane opens into a long hall hung with cloth: tall looms of worked bone and gut-line stand along the wall, strung with gloom-silk at every stage of the weave, and finished bolts breathe their faint dark shimmer from the racks. A cold glimmer-lamp lights the work without glaring on it, kept soft for eyes that were never meant for the sun. The air smells of wet silk and stone. Here the awaq makes the weave the deep-folk are known for, thread by patient thread. The plaza lies back west; the lane runs on east to the stonewright's.",
+    "exits": { "west": "d10.village.plaza", "east": "d10.village.lapidary" },
+    "fixtures": ["umbral-coldlamp", "weaver-looms"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-awaq", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d10.village.lapidary": {
+    "id": "d10.village.lapidary",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Stonewright's",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The lane ends at a workshop where two crafts share one roof: a low lapidary bench crowded with cut river-shell and set glimmer, and beside it a glimmer-hearth breathing low blue heat over a worked-stone anvil. The stonewright cuts charm and jewel at the one and binds blade and plate at the other, and to the deep-folk it is all the same work — the shaping of hard things. A cold glimmer-lamp burns steady overhead, and grey dust of shell and stone lies fine over everything. The weaver's hall lies back west; a quiet lane of homes runs south.",
+    "exits": { "west": "d10.village.weaver", "south": "d10.village.dwellings" },
+    "fixtures": ["umbral-coldlamp", "umbral-forge", "lapidary-bench"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-stonewright", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d10.village.dwellings": {
+    "id": "d10.village.dwellings",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Dwelling Lane",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "A close lane of homes cut into the rock, roof against roof, where the village simply lives. Each door has a niche beside it holding a small knot of glimmer that burns low and blue, kept always lit — the deep-folk have warded their hearths this way since long before the Rush. Woven hangings stir in the slow air, crockery is stacked in the doorways, and the folk pass low, rounded words between them that fall quiet as a stranger nears. There is nothing here to take and nothing to trade, only lives lived wholly out of the sun. The stonewright's lies back north.",
+    "exits": { "north": "d10.village.lapidary" },
+    "fixtures": ["umbral-coldlamp", "dwelling-niches"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-villager", "max": 2, "respawn": 300 }
+    ]
+  },
+  "d10.village.market": {
+    "id": "d10.village.market",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Market",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "West of the plaza the ground opens into the village market: worked-stone stalls under a ring of cold glimmer-lamps, and beds of tended crop breathing their soft blue-green light between them, so the produce grows where it is sold. A qhatuq keeps a stall of river-shell, folded silk, and dried cap, sorting the goods into even rows with long unhurried fingers. Lightbugs drift low over the stalls. It is a quiet trade — the deep-folk buy and sell among themselves, and let the surface-folk look. The plaza lies back east; a reagent-reek leaks from the glimmer-worker's west.",
+    "exits": { "east": "d10.village.plaza", "west": "d10.village.glimmer" },
+    "fixtures": ["umbral-coldlamp", "umbral-garden-beds"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-qhatuq", "max": 1, "respawn": 600 },
+      { "mob": "lightbug", "max": 1, "respawn": 150 }
+    ]
+  },
+  "d10.village.glimmer": {
+    "id": "d10.village.glimmer",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Glimmer-Worker's",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The market's west end gives onto a close, reagent-reeking workroom where the village reaches into the deep instead of warding it out. A still of glass coils and stone retorts runs the wall, a shallow cradle of raw glimmer breathing cold light beneath it, and stoppered jars of ground chitin and dried glow-moss stand racked to the roof. Here the layqa boils glimmer down and binds it into brew and charm — the hungry glimmer-craft the deep-folk have always kept, and the surface never learned to work safely. A cold glimmer-lamp steadies the light over it all. The market lies back east.",
+    "exits": { "east": "d10.village.market" },
+    "fixtures": ["umbral-coldlamp", "glimmer-still"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-layqa", "max": 1, "respawn": 600 }
     ]
   },
   "d10.camp.picket": {

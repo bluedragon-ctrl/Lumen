@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Illa Llaqta — a living Umbral village at depth 10, the first the descent
+  reaches.** South of the Lightfield Commons, through a warded gate that now
+  *opens* to the living, an eight-room worked-stone community: **The Warded Gate**
+  (glimmer-staked, lightbugs streaming through, walked by two travelling
+  **sentries** — *qhawaq*), a carved-relief **Plaza** at its heart, a **Community
+  Shrine** with its own lesser cradle-ward kept by the **paqo** (priest), the
+  **awaq**'s gloom-silk **Weaver's Hall**, the **stonewright**'s combined lapidary
+  &amp; armoury, a **Market** with the village **qhatuq**, the **layqa**'s
+  reagent-reeking **Glimmer-Worker's**, and a **Dwelling Lane** of lamp-niched homes
+  where ambient villagers live. Every NPC room is lit by an always-on **cold
+  glimmer-lamp**, so the whole village stays bright and safe through the Tide — the
+  Umbral counterpart to the humans' oil-lit Lastlight camp across the lake. The
+  Umbrals are shown at home for the first time: quiet masters of stone, silk, and
+  glimmer-craft, open but reserved to the *yaku-runa* passing through. Merchandise,
+  recipes, and the paqo's quest are deferred to follow-up passes. (Names and flavour
+  provisional, pending sign-off.)
+- **Lore fix:** the *lost* Umbral village (Tuta Llaqta) is corrected from "beneath
+  the fields' warded gate" to far deeper in the Abyss (~depth 17) — the gate south
+  of the commons opens onto the *living* village, not the dead one.
 - **Iridescent-shell craft — a light, finesse-leaning armour line to counter the
   chitin tanks.** Old Halloran now sells a **book of the iridescent shell**, teaching
   four recipes worked from the **iridescent carapace** shed by the Scald's steam-mantis
