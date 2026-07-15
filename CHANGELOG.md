@@ -282,6 +282,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regeneration draught, and crystals behind a `search` (perception 4–5).
 
 ### Changed
+- **Verification subagent, consolidated and brought up to date.** The
+  `multiplayer-tester` agent is replaced by a single **`lumen-verify`** agent
+  ([.claude/agents/lumen-verify.md](.claude/agents/lumen-verify.md)) covering both
+  single-client checks (a rendered tag, a light-tier behaviour, a command's effect)
+  and the old multiplayer scenarios. It fixes stale guidance that had gone wrong —
+  the current in-app-browser tool names, the fact that login must use the login
+  screen (typing into `#cmd` is ignored pre-auth), `@give` (not `@item`) — and adds
+  the hard-won bits: a *unit-test-first* rule, room-light manipulation recipes for
+  light/perception tests, and the gotchas that bite (death scatters your gear and
+  warps you to the Rim, `lightBane` mobs die fast in light, `@spawn` never spawns
+  `hidden`). Dev tooling only — no game behaviour changes.
 - **Wick now stocks bug-tallow.** The stonebug pens render the stuff, so Wick the
   rim-farmer sells it (3 shards) alongside her bug-meat and grubs — a reliable buy for
   cooks and lamp-fillers who'd rather not grind stonebugs for every lump. Especially
