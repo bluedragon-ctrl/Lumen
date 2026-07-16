@@ -1863,7 +1863,7 @@
       "actionCost": 13,
       "crit": 0.12,
       "scale": { "attr": "perception", "per": 3 },
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     }
   },
   "aya-keepers-vestments": {

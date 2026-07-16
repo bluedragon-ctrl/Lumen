@@ -1841,7 +1841,7 @@
     "attack": {
       "damage": "1d6",
       "actionCost": 12,
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
     },
     "xp": 18,
     "shards": "2d4",
@@ -1873,7 +1873,7 @@
     "attack": {
       "damage": "1d6",
       "actionCost": 12,
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "gloom-rot", "damage": "1d3", "duration": 6, "chance": 1 }]
     },
     "xp": 25,
     "shards": "2d4",
@@ -1993,7 +1993,7 @@
       "damage": "1d8",
       "actionCost": 12,
       "onHit": [
-        { "type": "damage-over-time", "damageType": "magical", "name": "gloom-rot", "damage": "1d4", "duration": 6, "chance": 1 }
+        { "type": "damage-over-time", "damageType": "void", "name": "gloom-rot", "damage": "1d4", "duration": 6, "chance": 1 }
       ]
     },
     "xp": 49,
@@ -2073,7 +2073,7 @@
     "attack": {
       "damage": "1d6",
       "actionCost": 14,
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "grave-chill", "damage": "1d2", "duration": 4, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "grave-chill", "damage": "1d2", "duration": 4, "chance": 1 }]
     },
     "xp": 13,
     "shards": "1d4",
@@ -2107,7 +2107,7 @@
     "attack": {
       "damage": "1d8",
       "actionCost": 14,
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     },
     "xp": 22,
     "shards": "2d4",
@@ -2145,7 +2145,7 @@
     "attack": {
       "damage": "1d8",
       "actionCost": 12,
-      "onHit": [{ "type": "damage-over-time", "damageType": "magical", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     },
     "xp": 21,
     "shards": "2d4",

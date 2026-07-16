@@ -300,7 +300,7 @@
     "manaCost": 0,
     "hostile": true,
     "target": "creature",
-    "effect": { "type": "damage", "damageType": "magical", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
+    "effect": { "type": "damage", "damageType": "void", "damage": "2d6", "scale": { "attr": "intellect", "per": 3 } }
   },
   "leech-warmth": {
     "id": "leech-warmth",
