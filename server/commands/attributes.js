@@ -20,6 +20,7 @@ const {
   HP_PER_VITALITY, MANA_PER_INTELLECT,
   HIT_PER_PERCEPTION, CRIT_PER_PERCEPTION,
   WARD_PER_WITS, EVASION_PER_WITS,
+  physicalDotSoak, DOT_VITALITY_DIVISOR,
 } = require("../combat-math");
 const { logMsg } = require("./shared");
 
@@ -81,10 +82,12 @@ function attributesSheet(state, player) {
           desc = `none equipped right now`;
         }
         break;
-      case "vitality":
-        effect = `<#green>+${val * HP_PER_VITALITY} max HP<#reset>`;
-        desc = `${HP_PER_VITALITY} HP per point`;
+      case "vitality": {
+        const soak = physicalDotSoak(val);
+        effect = `<#green>+${val * HP_PER_VITALITY} max HP · soaks ${soak}/tick from bleeds<#reset>`;
+        desc = `${HP_PER_VITALITY} HP per point; 1 bleed-soak per ${DOT_VITALITY_DIVISOR} Vitality`;
         break;
+      }
       case "intellect":
         effect = `<#green>+${val * MANA_PER_INTELLECT} max MP<#reset>`;
         desc = `${MANA_PER_INTELLECT} MP per point; also powers spells & glimmer weapons`;
@@ -110,8 +113,8 @@ function attributesSheet(state, player) {
   // meaning rides in the `effect` column with no leading em-dash.
   lines.push("", "<#gold>Defences<#reset>", "");
   lines.push(row("armour", def.armour, "flat cut to physical damage you take"));
-  lines.push(row("spellward", def.ward, `${def.ward}% to fizzle a hostile spell · −${def.ward}% to magical weapon blows`));
-  lines.push(row("voidward", def.voidWard, "like spellward, but vs void damage only"));
+  lines.push(row("spellward", def.ward, `${def.ward}% to fizzle a hostile spell or magical DoT tick · −${def.ward}% to magical weapon blows`));
+  lines.push(row("voidward", def.voidWard, "like spellward, but vs void damage — casts, ticks & blows"));
   lines.push(row("evasion", pct(def.evasion), "chance to avoid an incoming blow"));
 
   lines.push("", "<#gray>To-hit and crit also depend on light and your weapon.<#reset>");
