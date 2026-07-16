@@ -181,6 +181,35 @@ duplicated state. On failure, point at the likely source
 `server/light.js`, `server/render.js`, `server/events.js`) — but do not fix it
 unless asked.
 
+## Testing friction / tooling gaps (ALWAYS the last step)
+
+After the scenario table, always emit a **Testing friction / tooling gaps**
+section — even if the answer is "none". This is a feedback loop for the harness
+itself: many gotchas above (no set-light command, `@spawn` never sets `hidden`,
+death scatters gear) exist only because someone hit them the hard way. Record
+anything that **blocked, slowed, or prevented** verification this run:
+
+- **Missing dev affordance** — you had to fight lightbugs because there's no
+  `@light <n>`; no way to spawn a `hidden` mob without editing room config; no
+  command to fast-forward N ticks; etc.
+- **Couldn't simulate in the client** — the behaviour is a pure calculation
+  (decay curve, probability roll, long-horizon tide drift) that a `node --test`
+  unit would exercise deterministically but the browser can't. Say so and name
+  the function.
+- **Setup cost** — repeated multi-step dances that a single admin command or
+  test fixture would collapse.
+
+For each item give: the gap, a concrete proposed fix, and the likely owner —
+**new admin command / code change → needs a PR** (per `CLAUDE.md`, every change
+lands via PR with maintainer approval), or **unsimulatable logic → a unit test**.
+
+You **do not** act on these yourself and you **do not** spawn another agent —
+you run to completion and hand back a report, so you cannot pause to ask. When
+there are real gaps, end the section with a one-line **Recommended follow-up:**
+flag naming what a separate improvement agent would do. The decision to start
+that agent belongs to whoever called you: they read the flag and ask the user
+first. If there are no gaps, write "Testing friction: none" and stop.
+
 ## Cleanup
 
 Leave the server running unless asked to stop it. Close extra tabs you opened.
