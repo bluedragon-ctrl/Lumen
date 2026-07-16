@@ -26,6 +26,7 @@ const {
   addToInventory, joinList, equipItem,
 } = require("./commands/shared");
 const { buildHelp } = require("./commands/help");
+const { attributesSheet } = require("./commands/attributes");
 const { shopList, buy, sell } = require("./commands/trade");
 const { craft, recipes } = require("./commands/craft");
 const { mine, gather, fish } = require("./commands/resource");
@@ -58,6 +59,7 @@ const VERBS = [
   "look", "examine", "exam", "search", "get", "take", "pickup", "drop",
   "inventory", "inv", "attack", "kill", "stop", "sit", "sleep", "stand",
   "wake", "wakeup", "cast", "craft", "make", "learn", "study", "spells", "train",
+  "attributes", "attr", "stats",
   "list", "shop", "wares", "buy", "sell",
   "drink", "quaff", "eat", "refuel", "fill", "use", "switch", "toggle", "flip",
   "mine", "dig", "gather", "forage", "harvest", "pick", "fish", "angle", "recipes", "say", "emote", "me", "equip", "wield", "wear",
@@ -592,6 +594,7 @@ const COMMANDS = [
   { verbs: ["learn", "study"], run: learn },
   { verbs: ["spells"], run: spellList },
   { verbs: ["train"], run: train },
+  { verbs: ["attributes", "attr", "stats"], run: (s, p) => attributesSheet(s, p) },
   { verbs: ["list", "shop", "wares"], run: shopList },
   { verbs: ["buy"], run: buy },
   { verbs: ["sell"], run: sell },

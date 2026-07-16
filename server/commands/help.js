@@ -53,6 +53,7 @@ const HELP_SECTIONS = [
   ["Other", [
     "learn | study <scroll|schematic|book> — learn a spell or recipe (consumes it)",
     "train [attribute] — spend a level-up point (no arg: show progress)",
+    "attributes | attr | stats — your character sheet: what each attribute grants and every defence explained",
     "quest | journal — your quest log (in progress / finished)",
     "alias [F1-F4] [command] — bind a function key to a command (no args: list; key only: clear)",
     "quit | logout — leave the game (progress is saved; closing the tab is just as safe)",
