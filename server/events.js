@@ -537,12 +537,17 @@ function createDispatcher({
 
     "mob-hurt": (ev) => {
       const line = MOB_HURT_FLAVOUR[ev.cause] || ((n, d) => `${cap(n)} is hurt. (-${d})`);
-      broadcastRoom(ev.roomId, ev, (n) => line(n, ev.damage));
+      // A typed hurt (a DoT tick — see _tickEffects) folds its type into the damage
+      // parenthetical: "(-2 physical)". Untyped hurts (light-bane, spikes, the room)
+      // keep their bare "(-2)"; they name their own cause in the flavour.
+      const withType = (s) => (ev.damageType ? s.replace(`(-${ev.damage})`, `(-${ev.damage} ${ev.damageType})`) : s);
+      broadcastRoom(ev.roomId, ev, (n) => withType(line(n, ev.damage)));
     },
 
     "player-hurt": (ev) => {
       const src = HURT_SRC[ev.cause] || ev.cause || "an unseen hurt";
-      sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}.` });
+      const tag = ev.damageType ? ` (${ev.damageType})` : ""; // a typed DoT tick names its type; environmental hurts don't
+      sendToPlayer(ev.playerId, { type: "log", text: `You take ${ev.damage} damage from ${src}${tag}.` });
       markPlayerView(ev.playerId);
     },
 

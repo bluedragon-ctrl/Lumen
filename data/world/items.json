@@ -1589,7 +1589,7 @@
       "damage": { "physical": "1d4" },
       "actionCost": 11,
       "scale": { "attr": "wits", "per": 6 },
-      "onHit": [{ "type": "damage-over-time", "name": "bleed", "damage": "1d2", "duration": 4, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "bleed", "damage": "1d2", "duration": 4, "chance": 1 }]
     }
   },
   "spiked-chitin-armor": {
@@ -1670,7 +1670,7 @@
       "damage": { "physical": "1d6" },
       "actionCost": 10,
       "scale": { "attr": "wits", "per": 5 },
-      "onHit": [{ "type": "damage-over-time", "name": "bleed", "damage": "1d2", "duration": 3, "chance": 0.5 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "bleed", "damage": "1d2", "duration": 3, "chance": 0.5 }]
     }
   },
   "iridescent-scale-cloak": {
@@ -1863,7 +1863,7 @@
       "actionCost": 13,
       "crit": 0.12,
       "scale": { "attr": "perception", "per": 3 },
-      "onHit": [{ "type": "damage-over-time", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
+      "onHit": [{ "type": "damage-over-time", "damageType": "void", "name": "grave-chill", "damage": "1d3", "duration": 5, "chance": 1 }]
     }
   },
   "aya-keepers-vestments": {
@@ -1976,7 +1976,7 @@
     "slot": "hand",
     "weight": 4,
     "value": 180,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
     "armour": { "attrMod": { "might": 1 } }
   },
   "warp-fang-dirk": {
@@ -2090,7 +2090,7 @@
       "actionCost": 11,
       "scale": { "attr": "wits", "per": 6 },
       "onHit": [
-        { "type": "damage-over-time", "name": "glimmer-burn", "damage": "1d3", "duration": 4, "chance": 1 }
+        { "type": "damage-over-time", "damageType": "magical", "name": "glimmer-burn", "damage": "1d3", "duration": 4, "chance": 1 }
       ]
     }
   },

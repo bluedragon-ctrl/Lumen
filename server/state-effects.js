@@ -13,6 +13,13 @@
 const { rollDice } = require("./dice");
 const { roomEffectFires } = require("./combat-math");
 
+// Default damage *type* for a room effect's `cause` (see applyRoomEffect): the dark
+// drinks life as "void", the ember rooms burn as "physical". Only causes with a
+// classified nature appear here; anything else stays untyped (untagged) unless the
+// effect names its own `damage.damageType`. Light-bane's "light" is set at its own
+// source (_environmentTick). Cosmetic today; a future resist pass reads the type.
+const ENV_DAMAGE_TYPE = { darkness: "void", heat: "physical" };
+
 // Out-of-combat recovery (see _recoverMobsTick): a wounded mob that
 // nothing is fighting or watching, in a room clear of living foes, knits its
 // wounds shut. It must hold OOC_REGEN_DELAY ticks past its last combat first (so
@@ -44,6 +51,7 @@ class EffectsMixin {
       armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
       ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      damageType: spec.damageType || null, // "physical"/"magical" for a DoT tick, so the console names it (see _tickEffects)
       attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
       maxHp: spec.maxHp || 0, // flat, timed max-HP bonus (a "fortify" buff — see _stateHpBonus / _refreshMaxHp)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
@@ -105,7 +113,7 @@ class EffectsMixin {
       let dead = false;
       for (const s of p.states) {
         if (s.type !== "damage-over-time" || !s.damage) continue;
-        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed" })) { dead = true; break; }
+        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType })) { dead = true; break; }
       }
       if (dead) continue;
       for (const s of p.states) {
@@ -123,7 +131,7 @@ class EffectsMixin {
         for (const s of m.states) {
           if (s.type !== "damage-over-time" || !s.damage) continue;
           const src = s.sourceId ? this.players.get(s.sourceId) : null;
-          if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
+          if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType, killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
         }
         if (!dead) {
           const t = this.world.mobs[m.template];
@@ -232,7 +240,12 @@ class EffectsMixin {
       // `cause` tags the hurt/death flavour (see events.js HURT_SRC); defaults to the
       // original darkness-drain wording so pre-existing rooms are unchanged.
       const cause = a.damage.cause || "darkness";
-      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause })) died = true;
+      // The damage *type* the console names (and a future resist pass will read):
+      // the dark drinks life as "void", the ember rooms burn as "physical". An
+      // effect may override per-room via `damage.damageType`; an unmapped cause
+      // stays untyped (untagged) rather than guessing.
+      const damageType = a.damage.damageType || ENV_DAMAGE_TYPE[cause] || null;
+      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause, damageType })) died = true;
       if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
     }
     return { fired: true, doused, died, silent };

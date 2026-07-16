@@ -9,14 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
   `A gloom-touched crawler hits you for 6 (physical)!`,
-  `A gloom-touched crawler blasts you with Gloom Bolt for 13 (magical)!` — so a
-  delver always knows whether **Armour** (physical) or **Ward** (magical) is
-  what stands between them and the hit, and can react to a Ward-cut blow chewing
-  through them. Covers melee (both directions and mob-vs-mob) and spell casts
-  (player and mob); the type flows from the swing/cast's `damageType` through the
-  `attack`/`mob-cast` event (and `castSpell`'s result) to the render. Damage from
-  lingering effects and the environment (bleed, venom, the searing light) already
-  names its own cause and is left as-is.
+  `A gloom-touched crawler blasts you with Gloom Bolt for 13 (void)!` — so a
+  delver always knows whether **Armour** (physical) or **Ward** (physical vs the
+  rest) is what stands between them and the hit, and can react to a Ward-cut blow
+  chewing through them. Covers melee (both directions and mob-vs-mob), spell casts
+  (player and mob), and **damage-over-time ticks** — a bleed reads `(-2 physical)`,
+  a gloom-rot `(-3 void)`, and `You take 3 damage from gloom-rot (void).` — so a
+  lingering effect's nature is legible too (groundwork for a future resist-by-stat
+  pass). Every DoT is now typed in the data (`damageType` on the
+  `damage-over-time` spec: bleed/gash/venom/acid & the like physical; glimmer-burn
+  and Witchfire magical; gloom-rot and grave-chill void). Environmental damage is
+  typed too, with its own elements: light-bane burns mobs as `light`
+  (`seared by the light. (-2 light)`), the dark drinks a delver's warmth as `void`
+  (`You take 1 damage from the creeping dark (void).`), and the ember rooms sear as
+  `physical`. The gloom/grave attacks that read as *the dark* — **Gloom Bolt**,
+  **gloom-rot**, **grave-chill** — are relabelled from `magical` to `void`; **void
+  is still resolved exactly as magical** (Ward-negated / Ward-cut) for now, the tag
+  only makes the distinction visible ahead of a separate pass that gives it teeth.
+  The type flows from the swing/cast's `damageType`, the DoT effect's, or the
+  room/light-bane source, through the `attack`/`mob-cast`/`mob-hurt`/`player-hurt`
+  events (and `castSpell`'s result) to the render — one seam (`events.dmgTag`)
+  states it everywhere. All cosmetic today; the labels are the groundwork a future
+  resist-by-stat pass (e.g. Vitality vs physical, Wits vs void) will read.
 
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent

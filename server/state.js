@@ -896,12 +896,12 @@ class GameState {
    * Returns the death event (already pushed), or null if the mob survives.
    */
   _hurtMob(mob, roomId, amount, events, opts = {}) {
-    const { cause = "hit", killer = null, threatTo = null, silent = false } = opts;
+    const { cause = "hit", killer = null, threatTo = null, silent = false, damageType = null } = opts;
     if (threatTo != null) this._addThreat(mob, threatTo, Math.max(1, amount));
     mob.hp -= amount;
     if (!silent) {
       const t = this.world.mobs[mob.template];
-      events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
+      events.push({ type: "mob-hurt", roomId, mobId: mob.id, mobName: t.name, cause, damage: amount, damageType, mobHp: Math.max(0, mob.hp), emitsLight: t.emitsLight > 0, light: this.rooms[roomId].light });
     }
     if (mob.hp > 0) return null;
     const death = this._killMobAt(mob, roomId, killer, cause);
@@ -916,9 +916,9 @@ class GameState {
    *  caller's own swing/cast event already narrates the blow). Returns the death
    *  event (already pushed), or null if the player survives. */
   _hurtPlayer(player, amount, events, opts = {}) {
-    const { cause = "hit", silent = false } = opts;
+    const { cause = "hit", silent = false, damageType = null } = opts;
     player.hp -= amount;
-    if (!silent) events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, hp: Math.max(0, player.hp), maxHp: player.maxHp });
+    if (!silent) events.push({ type: "player-hurt", playerId: player.id, cause, damage: amount, damageType, hp: Math.max(0, player.hp), maxHp: player.maxHp });
     if (player.hp <= 0) {
       const death = this._beginDeath(player, player.location, events);
       events.push(death);
@@ -937,7 +937,7 @@ class GameState {
         const lb = this.world.mobs[m.template].lightBane;
         if (!lb || rt.light <= (lb.above || 0)) continue;
         const dmg = Math.max(1, rollDice(lb.damage));
-        this._hurtMob(m, roomId, dmg, events, { cause: "light", killer: this._topThreat(m, playersHere) });
+        this._hurtMob(m, roomId, dmg, events, { cause: "light", damageType: lb.damageType || "light", killer: this._topThreat(m, playersHere) });
       }
     }
   }
