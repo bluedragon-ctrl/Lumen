@@ -12,11 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `A gloom-touched crawler blasts you with Gloom Bolt for 13 (magical)!` — so a
   delver always knows whether **Armour** (physical) or **Ward** (magical) is
   what stands between them and the hit, and can react to a Ward-cut blow chewing
-  through them. Covers melee (both directions and mob-vs-mob) and spell casts
-  (player and mob); the type flows from the swing/cast's `damageType` through the
-  `attack`/`mob-cast` event (and `castSpell`'s result) to the render. Damage from
-  lingering effects and the environment (bleed, venom, the searing light) already
-  names its own cause and is left as-is.
+  through them. Covers melee (both directions and mob-vs-mob), spell casts (player
+  and mob), and **damage-over-time ticks** — a bleed reads `(-2 physical)`, a
+  gloom-rot `(-3 magical)`, and `You take 3 damage from gloom-rot (magical).` —
+  so a lingering effect's nature is legible too (groundwork for a future
+  resist-by-stat pass). Every DoT is now typed in the data (`damageType` on the
+  `damage-over-time` spec: bleed/gash/venom/acid & the like physical; glimmer-burn,
+  gloom-rot, grave-chill, Witchfire magical). The type flows from the swing/cast's
+  `damageType`, or the DoT effect's, through the `attack`/`mob-cast`/`mob-hurt`/
+  `player-hurt` events (and `castSpell`'s result) to the render. Environmental
+  damage that isn't physical-or-magical (the searing light, room heat) keeps its
+  own cause and stays untagged.
 
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent

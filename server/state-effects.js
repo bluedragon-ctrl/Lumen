@@ -44,6 +44,7 @@ class EffectsMixin {
       armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
       ward: spec.ward || 0,
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
+      damageType: spec.damageType || null, // "physical"/"magical" for a DoT tick, so the console names it (see _tickEffects)
       attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
       maxHp: spec.maxHp || 0, // flat, timed max-HP bonus (a "fortify" buff — see _stateHpBonus / _refreshMaxHp)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
@@ -105,7 +106,7 @@ class EffectsMixin {
       let dead = false;
       for (const s of p.states) {
         if (s.type !== "damage-over-time" || !s.damage) continue;
-        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed" })) { dead = true; break; }
+        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType })) { dead = true; break; }
       }
       if (dead) continue;
       for (const s of p.states) {
@@ -123,7 +124,7 @@ class EffectsMixin {
         for (const s of m.states) {
           if (s.type !== "damage-over-time" || !s.damage) continue;
           const src = s.sourceId ? this.players.get(s.sourceId) : null;
-          if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
+          if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType, killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
         }
         if (!dead) {
           const t = this.world.mobs[m.template];
