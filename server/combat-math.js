@@ -248,6 +248,18 @@ function mitigate(base, damageType, defence) {
   return Math.max(1, Math.round(base * (1 - (defence.ward || 0) / 100)));
 }
 
+// A *physical* damage-over-time pulse is soaked flat by the defender's Vitality —
+// the lingering-wound counterpart to Armour soaking a physical *blow* (see mitigate):
+// Armour shrugs the strike, Vitality shrugs the bleed. floor(vit / 8) per pulse.
+// Player-only today (mobs don't get it, so bleed *offence* stays predictable to
+// tune); the pulse's own floor-of-1 in _tickEffects still lets a soaked bleed sting.
+// A separate seam from mitigate(): DoT physical isn't cut by Armour, and non-physical
+// DoT is handled by the ward fizzle instead (see _dotResisted), so no double-dip.
+const DOT_VITALITY_DIVISOR = 8;
+function physicalDotSoak(vitality) {
+  return Math.floor((vitality || 0) / DOT_VITALITY_DIVISOR);
+}
+
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
 function pickWeighted(options) {
   const total = options.reduce((s, o) => s + (o.weight || 1), 0);
@@ -329,6 +341,7 @@ module.exports = {
   wardNegates,
   wardPoolFor,
   mitigate,
+  physicalDotSoak,
   pickWeighted,
   roomEffectFires,
   strike,

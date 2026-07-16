@@ -45,8 +45,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   delver has any), and `inspect` lists a piece's voidward. Seeded on **Halo**, the
   Umbral glimmer-singer's weave, which now also grants **+5 voidward per Intellect**
   for its duration — the first way to attune. **Deferred to a later pass:**
-  damage-over-time and environmental void (gloom-rot, the creeping dark) still deal
-  raw damage — Voidward does not reduce them *yet*, by design.
+  environmental void (the creeping dark's own hp drain) still deals raw damage —
+  Voidward does not reduce it *yet*, by design.
+- **Ward now shrugs off lingering damage too: DoT ticks roll a per-pulse fizzle.**
+  A damage-over-time pulse of a classified non-physical type now faces the same
+  all-or-nothing Ward roll a hostile *spell cast* does (`wardNegates`): each due
+  tick rolls independently against the matching pool — a **void** pulse (gloom-rot,
+  grave-chill) against **Voidward**, any other classified pulse (Witchfire and the
+  like) against **Spellward** — and a negated pulse deals nothing that beat, silently
+  (no per-tick spam). Because the roll is 1% per point, a pulse skips at the same
+  *average* rate a direct hit is cut, so Voidward keeps one meaning across hits,
+  casts, and now ticks. **Physical and untyped DoTs are untouched** — legacy bleeds
+  keep landing exactly as before, gaining no stealth Ward save. One shared seam
+  (`_dotResisted` in the effect ticker) guards both directions, so a warded mob
+  shrugs a player's void bleed just as a Halo-warded delver shrugs the rot.
+- **Vitality now blunts lingering physical damage.** A *physical* DoT pulse (bleed,
+  gash, venom, and the like) can't fizzle, so it is instead soaked flat by the
+  player's **Vitality** — `floor(Vitality / 8)` per tick (`physicalDotSoak`), the
+  lingering-wound counterpart to Armour soaking a physical *blow*: **Armour shrugs
+  the strike, Vitality shrugs the bleed.** Zero at the baseline (Vitality 3), so it
+  rewards investment — a hardy delver (Vitality 24 → −3/tick) largely shrugs off
+  small bleeds, though the pulse's floor-of-1 means a landed bleed always stings.
+  The soak reads effective Vitality, so a fortify draught boosts it too. It is
+  **player-only** (mobs never soak a DoT by Vitality, keeping bleed *offence*
+  predictable) and applies to explicitly-typed physical pulses only — untyped DoTs
+  are unchanged. With this the deferred DoT-resist pass is complete for status
+  effects; only environmental void's own hp drain still deals raw damage, by design.
 
 ### Added
 - **`attributes` (`attr` / `stats`) — a live character sheet that explains what
