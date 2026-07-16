@@ -342,6 +342,7 @@ module.exports = {
   wardPoolFor,
   mitigate,
   physicalDotSoak,
+  DOT_VITALITY_DIVISOR,
   pickWeighted,
   roomEffectFires,
   strike,
