@@ -320,6 +320,8 @@ function main() {
     if (it.weapon) checkOnHit(it.weapon.onHit, `item ${id} weapon`); // player on-hit effects (forward-ready)
     if (it.armour) {
       checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); // player thorns / when-struck triggers (forward-ready)
+      if (it.armour.voidWard != null && (typeof it.armour.voidWard !== "number" || it.armour.voidWard < 0))
+        errs.push(`item ${id}: armour.voidWard must be a non-negative number`); // vs void only — Umbral gear
       if (it.armour.maxHp != null && (typeof it.armour.maxHp !== "number" || it.armour.maxHp < 0))
         errs.push(`item ${id}: armour.maxHp must be a non-negative number`); // bonus durability from heavy gear
       if (it.armour.maxMana != null && (typeof it.armour.maxMana !== "number" || it.armour.maxMana < 0))
@@ -461,6 +463,8 @@ function main() {
       errs.push(`mob ${id}: armour must be a number`);
     if (m.ward != null && typeof m.ward !== "number")
       errs.push(`mob ${id}: ward must be a number`);
+    if (m.voidWard != null && typeof m.voidWard !== "number")
+      errs.push(`mob ${id}: voidWard must be a number`); // vs void only — Umbral mobs
     if (m.shop) {
       // A trader's stock; prices default to each item's `value` (override optional).
       // Buying from a player is data-driven (any valued item), so no `buys` list.
@@ -761,9 +765,10 @@ function main() {
       }
     } else if (eff.type === "protect") {
       if (eff.duration != null && (typeof eff.duration !== "number" || eff.duration <= 0)) errs.push(`spell ${id}: effect.duration must be a positive number (ticks)`);
-      if (eff.armour == null && eff.ward == null) errs.push(`spell ${id}: protect effect needs at least one of armour/ward`);
+      if (eff.armour == null && eff.ward == null && eff.voidWard == null) errs.push(`spell ${id}: protect effect needs at least one of armour/ward/voidWard`);
       chkAmount(eff.armour, `spell ${id}: effect.armour`);
       chkAmount(eff.ward, `spell ${id}: effect.ward`);
+      chkAmount(eff.voidWard, `spell ${id}: effect.voidWard`); // vs void only (Umbral weaves)
     } else if (eff.type === "summon") {
       if (!eff.mob || !has(mobs, eff.mob)) errs.push(`spell ${id}: summon effect references missing mob ${eff.mob}`);
       if (eff.count != null && (typeof eff.count !== "number" || eff.count <= 0)) errs.push(`spell ${id}: summon count must be a positive number`);

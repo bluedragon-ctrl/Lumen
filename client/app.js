@@ -507,8 +507,9 @@ function renderPlayer(p) {
     states.appendChild(el);
   }
 
-  // Attributes, then derived stats: defences (Armour vs physical, Ward vs
-  // magical), evasion (dodge from Wits) and crit chance (from Perception).
+  // Attributes, then derived stats: defences (Armour vs physical, Spellward vs
+  // magical, Voidward vs void), evasion (dodge from Wits) and crit chance (from
+  // Perception). Voidward is Umbral-only, so it's shown only once a delver has any.
   const attrs = $("p-attrs");
   attrs.innerHTML = "";
   for (const [k, v] of Object.entries(p.attributes)) {
@@ -517,7 +518,10 @@ function renderPlayer(p) {
     attrs.appendChild(wrap);
   }
   const pct = (f) => `${Math.round((f || 0) * 100)}%`;
-  [["armour", p.armour || 0], ["ward", p.ward || 0], ["evasion", pct(p.evasion)], ["crit", pct(p.crit)]].forEach(([k, v], i) => {
+  const defRows = [["armour", p.armour || 0], ["spellward", p.ward || 0]];
+  if (p.voidWard) defRows.push(["voidward", p.voidWard]);
+  defRows.push(["evasion", pct(p.evasion)], ["crit", pct(p.crit)]);
+  defRows.forEach(([k, v], i) => {
     const wrap = document.createElement("div");
     wrap.className = "defence" + (i === 0 ? " first" : "");
     wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;

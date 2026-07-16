@@ -200,7 +200,7 @@ A map of `itemId → template`. Common fields plus type-specific blocks.
 | `stackable`  | bool?   | If true, instances stack as `qty` (materials). |
 | `light`      | block?  | `{ output, fuelMax, burnPerTick }` — makes it a fuelled light source. Add `fuelItem` + `refuelPerUnit` to make it **refuellable** (`refuel <item>` consumes one `fuelItem` and adds `refuelPerUnit` fuel); omit them for a disposable light (e.g. a torch). |
 | `weapon`     | block?  | `{ damage: { physical?, magical? }, actionCost, scale?, crit?, onHit? }`. Damage values are **dice notation** (see below). `crit` is an optional flat crit chance (0..1) the weapon adds on top of the wielder's Perception-derived crit (mirrors a mob's `attack.crit`); a crit doubles the damage roll. |
-| `armour`     | block?  | `{ armour, ward, speedPenalty, maxHp?, maxMana?, attrMod?, spikes?, onDamage? }`. `maxHp`/`maxMana` are bonus max HP/Mana the piece grants while worn (heavy gear → durability on top of Vitality; caster gear → a deeper mana well on top of Intellect); both are folded into derived stats and refreshed on equip/unequip, with the new capacity granted on equip and clamped on unequip. `attrMod` is a map of attribute → flat modifier applied to the wearer's **effective** attributes (read live at combat/cast time), e.g. `{ "intellect": 2 }` to lift spell power or `{ "wits": -1 }` for clumsy heavy gear. |
+| `armour`     | block?  | `{ armour, ward, voidWard?, speedPenalty, maxHp?, maxMana?, attrMod?, spikes?, onDamage? }`. `armour` soaks physical flat; `ward` (shown to players as **spellward**) cuts magical; `voidWard` cuts **void only** as a percent (Umbral gear — the *only* source of Voidward, since Wits grants none). `maxHp`/`maxMana` are bonus max HP/Mana the piece grants while worn (heavy gear → durability on top of Vitality; caster gear → a deeper mana well on top of Intellect); both are folded into derived stats and refreshed on equip/unequip, with the new capacity granted on equip and clamped on unequip. `attrMod` is a map of attribute → flat modifier applied to the wearer's **effective** attributes (read live at combat/cast time), e.g. `{ "intellect": 2 }` to lift spell power or `{ "wits": -1 }` for clumsy heavy gear. |
 | `consumable` | block?  | `{ effect }` — `drink`/`use` applies `effect`, a **status-effect primitive** (see [Status effects](#status-effects-dynamic)). |
 | `scroll`     | block?  | `{ spell }` — `learn`/`study` teaches the one spell, then consumes the item. |
 | `recipe`     | string? | A recipe id — `learn`/`study` teaches the one recipe, then consumes the item. |
@@ -248,7 +248,8 @@ A map of `mobId → template`.
 | `maxHp`      | integer | Starting/full HP. |
 | `speed`      | integer | Action-point gain per tick (normal ≈ 12). |
 | `armour`     | integer?| Innate **physical** damage reduction (default 0), like a player's Armour. |
-| `ward`       | integer?| Innate **magical** damage reduction (default 0), like a player's Ward. |
+| `ward`       | integer?| Innate **magical** damage reduction (default 0), like a player's Ward (spellward). |
+| `voidWard`   | integer?| Innate **void** damage reduction (default 0), percent-cut, like a player's Voidward. For Umbral mobs. |
 | `attributes` | block   | `{ might, vitality, intellect, wits, perception }`. |
 | `perception` | block   | `{ blindBelow, harmedAbove }`. |
 | `emitsLight` | integer?| Self-illumination output. >0 → visible even in darkness *and* adds room light. |
@@ -748,10 +749,17 @@ burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight
 - `"physical"` — the damage is a *blow*, not a weave: soaked flat by the target's
   **Armour** (floor 1), and **immune to the Ward fizzle** — a physical spell always
   lands (Ward never negates it). Iron Blast is the reference spell.
+- `"void"` — cut by the target's **Voidward** pool, *not* Ward: a hostile void
+  *cast* is fizzled by Voidward (all-or-nothing, `wardPoolFor` picks the pool), and
+  a void *weapon* blow is cut by Voidward as a **percent** (see `mitigate`).
+  Voidward is granted **only by Umbral gear and weaves** (never by Wits), so a
+  delver with none faces void unmitigated — the intended pressure as void spreads.
+  (DoT/environmental void is *not* yet routed through `mitigate`, so Voidward does
+  not reduce it — a deliberate deferral; see CHANGELOG.)
 - **anything else** (`"magical"`, `"fire"`, `"light"`, or omitted) — the existing
   behavior: a hostile spell *cast* is negated wholesale by **Ward** (`wardNegates`,
-  all-or-nothing per target), and lands at full damage if it isn't. Only `physical`
-  has a concrete non-default rule today; other strings are accepted as labels and
+  all-or-nothing per target), and lands at full damage if it isn't. `physical` and
+  `void` have concrete rules today; other strings are accepted as labels and
   behave like magical until they earn their own rule (a new branch in `mitigate`
   plus a defensive stat). For a *weapon*, `magical` is instead a Ward **percent**
   cut (see `strike`) — the per-cast fizzle is a spell-only gate.

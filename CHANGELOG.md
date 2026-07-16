@@ -31,6 +31,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   events (and `castSpell`'s result) to the render — one seam (`events.dmgTag`)
   states it everywhere. All cosmetic today; the labels are the groundwork a future
   resist-by-stat pass (e.g. Vitality vs physical, Wits vs void) will read.
+- **Void now has a defence of its own: Voidward.** A new percent-cut resist pool
+  that reduces **void** damage only — the first damage type to earn its own rule
+  since physical. Unlike Ward (renamed **Spellward** in the character panel to make
+  the pair legible), Voidward is **not** granted by Wits: it comes *only* from
+  **Umbral gear and weaves**, so a delver with none faces void unmitigated — the
+  intended pressure as void spreads deeper in the descent. Mechanically, a void
+  *weapon* blow is cut by Voidward as a percent and a void *spell cast* is fizzled
+  by Voidward instead of Ward (`mitigate` / `wardPoolFor` — the shared seams both
+  weapons and casts run through); Ward no longer touches void at all. Gear declares
+  `armour.voidWard`, mobs `voidWard`, and `protect` weaves bake a scaled `voidWard`.
+  The character panel shows **armour / spellward / voidward** (voidward only once a
+  delver has any), and `inspect` lists a piece's voidward. Seeded on **Halo**, the
+  Umbral glimmer-singer's weave, which now also grants **+5 voidward per Intellect**
+  for its duration — the first way to attune. **Deferred to a later pass:**
+  damage-over-time and environmental void (gloom-rot, the creeping dark) still deal
+  raw damage — Voidward does not reduce them *yet*, by design.
 
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent

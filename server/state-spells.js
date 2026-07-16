@@ -18,7 +18,7 @@ const { DEFAULT_FACTION } = require("./config");
 const { makeMobInstance } = require("./instances");
 const {
   effectiveAttributes, playerDefence, mobDefence,
-  spellScaleBonus, durationScaleBonus, scaledAmount, wardNegates, mitigate,
+  spellScaleBonus, durationScaleBonus, scaledAmount, wardNegates, wardPoolFor, mitigate,
 } = require("./combat-math");
 
 class SpellsMixin {
@@ -293,9 +293,10 @@ class SpellsMixin {
 
     // Ward negates a hostile spell *cast* wholesale — but only a non-physical one.
     // A physical spell (Iron Blast's hurled iron) is a blow, not a weave: Ward can't
-    // fizzle it; it always lands and is soaked by Armour below (see mitigate).
-    const ward = mobDefence(w.mobs[mob.template], mob).ward || 0;
-    if (spell.hostile && eff.damageType !== "physical" && wardNegates(ward)) {
+    // fizzle it; it always lands and is soaked by Armour below (see mitigate). A
+    // `void` cast is fizzled by the target's Voidward instead of Ward (wardPoolFor).
+    const def = mobDefence(w.mobs[mob.template], mob);
+    if (spell.hostile && eff.damageType !== "physical" && wardNegates(wardPoolFor(eff.damageType, def))) {
       this._addThreat(mob, player.id, 1); // a fizzled bolt still draws its ire
       return { resisted: true };
     }
@@ -401,7 +402,7 @@ class SpellsMixin {
       // still earns the caster's ire, but lands no damage or burn on that target.
       // A physical burst (Iron Blast's shrapnel) can't be warded off — it always
       // lands and is soaked by Armour below.
-      if (wardCheck && spec.damageType !== "physical" && wardNegates(mobDefence(t, mob).ward || 0)) {
+      if (wardCheck && spec.damageType !== "physical" && wardNegates(wardPoolFor(spec.damageType, mobDefence(t, mob)))) {
         this._addThreat(mob, player.id, 1);
         results.push({ id: mob.id, name: t.name, damage: 0, dot: false, resisted: true, killed: false, death: null });
         continue;
@@ -463,10 +464,11 @@ class SpellsMixin {
       // Bake the caster-scaled defence into the instance (base + attribute bonus).
       const armour = scaledAmount(attrs, eff.armour);
       const ward = scaledAmount(attrs, eff.ward);
+      const voidWard = scaledAmount(attrs, eff.voidWard); // Umbral weaves (Halo) turn void aside
       // Lifetime can scale with the caster (durationScale, ticks per point) on top of
       // any flat base — a keener mage holds the weave longer.
       const duration = (eff.duration || 0) + durationScaleBonus(attrs, eff.durationScale);
-      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, duration, refresh: eff.refresh, good: true });
+      this.applyEffect(target.actor, { type: "protect", name: eff.name || "protect", armour, ward, voidWard, duration, refresh: eff.refresh, good: true });
       // A radiant ward (Halo) also sheds light: a companion emit-light state, lasting
       // as long as the ward, brightens the room at once — mirrors the smouldering DoT's
       // glow (see _applyHostileSpellEffect) and the way a quaffed light potion lifts the room.
@@ -475,7 +477,7 @@ class SpellsMixin {
         this.rooms[roomId].light = this.computeRoomLight(roomId);
       }
       this._narrateEffectApplied(events, target, eff.name || eff.type);
-      return { effect: "protect", name: spell.name, armour, ward, light: eff.emitLight || 0, duration, threat: 1 }; // a pure buff: a flat sliver of threat
+      return { effect: "protect", name: spell.name, armour, ward, voidWard, light: eff.emitLight || 0, duration, threat: 1 }; // a pure buff: a flat sliver of threat
     }
 
     if (eff.type === "cleanse") {
