@@ -49,6 +49,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   raw damage — Voidward does not reduce them *yet*, by design.
 
 ### Added
+- **`attributes` (`attr` / `stats`) — a live character sheet that explains what
+  every attribute is doing for you.** Reads your attributes *effective* (base +
+  gear `attrMod` + active buffs, exactly what combat reads) and shows the real
+  number each one grants right now: Might → weapon damage, Vitality → max HP,
+  Intellect → max MP, Perception → to-hit/crit, Wits → spellward + evasion. Weapon
+  damage is weapon-aware — the "+N damage" clause hangs on whichever attribute your
+  held weapon actually scales on (a glimmer blade reads on Intellect, not Might),
+  and Might reads "none equipped right now" when your weapon ignores it. A
+  **Defences** block then spells out all four mitigation pools in plain language —
+  **Armour** (flat cut to physical), **Spellward** (chance to fizzle a hostile
+  spell + a percent cut to magical weapon blows), **Voidward** (the same vs void),
+  and **Evasion** (chance to dodge a blow). Gear/buff shifts annotate as
+  `(base 3, −1)` so heavy iron dulling Wits is legible. Purely informational; no
+  state changes.
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent
   reaches.** South of the Lightfield Commons, through a warded gate that now
   *opens* to the living, an eight-room worked-stone community: **The Warded Gate**
