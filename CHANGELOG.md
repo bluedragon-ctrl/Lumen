@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Combat lines now flag magical damage.** A landed blow that deals magical
+  damage is tagged in the console — `You hit a giant rat for 4 (magical).`,
+  `The wraith hits you for 12 (magical)!` — so a delver can tell that a
+  Ward-cut blow (not Armour-soaked) is chewing through them and react (raise
+  Ward, not Armour). Physical hits, the unspoken default, stay untagged to keep
+  ordinary fights clean; the type flows from the swing's `damageType` through
+  the `attack` event to the render. Spell casts already name themselves.
+
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent
   reaches.** South of the Lightfield Commons, through a warded gate that now
