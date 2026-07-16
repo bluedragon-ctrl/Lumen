@@ -758,9 +758,14 @@ burning target glows for as long as it smoulders (mirrors Witchfire's `emitLight
   `damageType`) is handled separately from `mitigate`: on each due tick it rolls the
   same all-or-nothing Ward fizzle a *cast* does — void → Voidward, else Spellward
   (`_dotResisted` → `wardNegates`/`wardPoolFor`) — and a negated pulse deals nothing
-  that beat, silently. Physical and *untyped* DoTs never fizzle (legacy bleeds land
-  as before). Only **environmental** void's own hp drain is still unmitigated — a
-  deliberate deferral; see CHANGELOG.
+  that beat, silently. A **physical** DoT pulse can't fizzle; instead it is soaked
+  flat by the *player* defender's **Vitality** — `floor(vitality / 8)` per tick, the
+  lingering-wound counterpart to Armour soaking a physical blow (`physicalDotSoak`,
+  floored at 1). This is **player-only** (mobs never soak a DoT by Vitality, so bleed
+  offence stays predictable) and applies to explicitly-typed physical only — *untyped*
+  DoTs are soaked by neither Vitality nor Ward (legacy bleeds land as before). Only
+  **environmental** void's own hp drain is still unmitigated — a deliberate deferral;
+  see CHANGELOG.
 - **anything else** (`"magical"`, `"fire"`, `"light"`, or omitted) — the existing
   behavior: a hostile spell *cast* is negated wholesale by **Ward** (`wardNegates`,
   all-or-nothing per target), and lands at full damage if it isn't. `physical` and

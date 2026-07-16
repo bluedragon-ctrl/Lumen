@@ -58,9 +58,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   casts, and now ticks. **Physical and untyped DoTs are untouched** — legacy bleeds
   keep landing exactly as before, gaining no stealth Ward save. One shared seam
   (`_dotResisted` in the effect ticker) guards both directions, so a warded mob
-  shrugs a player's void bleed just as a Halo-warded delver shrugs the rot. This
-  is the first half of the deferred DoT-resist pass; environmental void's own hp
-  drain still deals raw damage, by design.
+  shrugs a player's void bleed just as a Halo-warded delver shrugs the rot.
+- **Vitality now blunts lingering physical damage.** A *physical* DoT pulse (bleed,
+  gash, venom, and the like) can't fizzle, so it is instead soaked flat by the
+  player's **Vitality** — `floor(Vitality / 8)` per tick (`physicalDotSoak`), the
+  lingering-wound counterpart to Armour soaking a physical *blow*: **Armour shrugs
+  the strike, Vitality shrugs the bleed.** Zero at the baseline (Vitality 3), so it
+  rewards investment — a hardy delver (Vitality 24 → −3/tick) largely shrugs off
+  small bleeds, though the pulse's floor-of-1 means a landed bleed always stings.
+  The soak reads effective Vitality, so a fortify draught boosts it too. It is
+  **player-only** (mobs never soak a DoT by Vitality, keeping bleed *offence*
+  predictable) and applies to explicitly-typed physical pulses only — untyped DoTs
+  are unchanged. With this the deferred DoT-resist pass is complete for status
+  effects; only environmental void's own hp drain still deals raw damage, by design.
 
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent

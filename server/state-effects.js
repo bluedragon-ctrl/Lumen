@@ -11,7 +11,7 @@
 // reaches methods that live in state.js or the other mixins. Pure relocation —
 // no behaviour change.
 const { rollDice } = require("./dice");
-const { roomEffectFires, playerDefence, mobDefence, wardNegates, wardPoolFor } = require("./combat-math");
+const { roomEffectFires, playerDefence, mobDefence, wardNegates, wardPoolFor, effectiveAttributes, physicalDotSoak } = require("./combat-math");
 
 // Default damage *type* for a room effect's `cause` (see applyRoomEffect): the dark
 // drinks life as "void", the ember rooms burn as "physical". Only causes with a
@@ -126,10 +126,16 @@ class EffectsMixin {
     for (const p of this.players.values()) {
       if (!p.states || !p.states.length || p.hp <= 0) continue;
       let dead = false;
+      let vit = null; // effective Vitality, computed lazily on the first physical DoT (soak = floor(vit/8))
       for (const s of p.states) {
         if (s.type !== "damage-over-time" || !s.damage) continue;
         if (this._dotResisted(s, playerDefence(this.world, p))) continue; // Ward shrugs this pulse
-        if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType })) { dead = true; break; }
+        let amount = Math.max(1, rollDice(s.damage));
+        if (s.damageType === "physical") { // Vitality shrugs the lingering wound (player-only; see physicalDotSoak)
+          if (vit === null) vit = effectiveAttributes(this.world, p).vitality || 0;
+          amount = Math.max(1, amount - physicalDotSoak(vit));
+        }
+        if (this._hurtPlayer(p, amount, events, { cause: s.name || "bleed", damageType: s.damageType })) { dead = true; break; }
       }
       if (dead) continue;
       for (const s of p.states) {
