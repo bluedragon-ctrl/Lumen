@@ -883,7 +883,7 @@ class MobAIMixin {
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
-      spellName: spell.name, resisted, damage, effectName, doused, killed, drained, manaDrain, manaDrained,
+      spellName: spell.name, resisted, damage, damageType: eff.damageType || "magical", effectName, doused, killed, drained, manaDrain, manaDrained,
       targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
     if (damage > 0) {

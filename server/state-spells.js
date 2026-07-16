@@ -313,6 +313,7 @@ class SpellsMixin {
     const result = { resisted: false };
     if (applied.kind === "damage") {
       result.damage = applied.damage;
+      result.damageType = eff.damageType || "magical"; // for the caster-facing "(magical)" tag
       // Damage, threat and any kill resolve in the shared sink. Silent: the cast
       // command narrates the blow — and the kill, so magic.js filters the death
       // event out of its dispatch for the same reason.

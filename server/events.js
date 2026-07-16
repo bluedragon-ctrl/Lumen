@@ -11,10 +11,12 @@ const { canSee } = require("./light");
 const { mobVisibleTo } = require("./perception");
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-// A damage-type tag for combat lines. Physical is the unspoken default, so only a
-// non-physical blow is flagged (" (magical)") — that's the type a delver can't
-// otherwise tell apart from a normal hit, so it's the one worth naming.
-const dmgTag = (ev) => (ev.damageType && ev.damageType !== "physical" ? ` (${ev.damageType})` : "");
+// A damage-type tag for combat lines: every landed blow states its type
+// (" (physical)" / " (magical)"), so a delver always knows whether Armour or Ward
+// is what stands between them and the hit. Physical is soaked flat by Armour;
+// magical is cut by Ward (see combat-math mitigate). No type on the event (a
+// pre-tag save, an odd path) → no tag rather than a wrong one.
+const dmgTag = (t) => (t ? ` (${t})` : "");
 // Can this player make out the mob — room bright enough for them, or it's self-lit?
 const canSeeMob = (player, light, emitsLight) => !!emitsLight || canSee(player.perception, light);
 
@@ -238,7 +240,7 @@ function createDispatcher({
       if (ev.by === "player") {
         // The attacker targeted it, so they always know what it is.
         const verb = ev.hit
-          ? `hit ${ev.targetName} for ${ev.damage}${dmgTag(ev)}`
+          ? `hit ${ev.targetName} for ${ev.damage}${dmgTag(ev.damageType)}`
           : ev.sighted
             ? `swing at ${ev.targetName} and miss`
             : `flail at ${ev.targetName} in the dark and miss`;
@@ -263,7 +265,7 @@ function createDispatcher({
           const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
           const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
           const line = ev.hit
-            ? `${cap(an)} strikes ${tn} for ${ev.damage}${dmgTag(ev)}.${ev.crit ? " A critical hit!" : ""}`
+            ? `${cap(an)} strikes ${tn} for ${ev.damage}${dmgTag(ev.damageType)}.${ev.crit ? " A critical hit!" : ""}`
             : `${cap(an)} ${ev.sighted ? `swings at ${tn} and misses` : `lunges at ${tn} in the dark and misses`}.`;
           sendToPlayer(o.id, { type: "combat", text: line });
         }
@@ -272,7 +274,7 @@ function createDispatcher({
         const seen = target && canSeeMob(target, ev.light, ev.attackerEmitsLight);
         const who = seen ? ev.attackerName : "something";
         const youLine = ev.hit
-          ? `${cap(who)} hits you for ${ev.damage}${dmgTag(ev)}!${ev.crit ? " A critical hit!" : ""}`
+          ? `${cap(who)} hits you for ${ev.damage}${dmgTag(ev.damageType)}!${ev.crit ? " A critical hit!" : ""}`
           : seen
             ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
             : "Something lunges out of the dark and misses.";
@@ -297,7 +299,7 @@ function createDispatcher({
           let line;
           if (ev.resisted) line = `${cap(an)} hurls ${ev.spellName} at ${tn}, but its ward turns it aside.`;
           else if (ev.effectName) line = `${cap(an)} casts ${ev.spellName} on ${tn} — the ${ev.effectName} takes hold.`;
-          else line = `${cap(an)} blasts ${tn} with ${ev.spellName} for ${ev.damage}.`;
+          else line = `${cap(an)} blasts ${tn} with ${ev.spellName} for ${ev.damage}${dmgTag(ev.damageType)}.`;
           sendToPlayer(o.id, { type: "combat", text: line });
         }
         return;
@@ -312,7 +314,7 @@ function createDispatcher({
         ? `${cap(who)} settles against you and drinks — the warmth of your will drains away (-${ev.manaDrained} mana).`
         : `${cap(who)} settles against you and drinks, but finds no warmth left to take.`;
       else if (ev.effectName) youLine = `${cap(who)} casts ${ev.spellName} on you — the ${ev.effectName} takes hold.`;
-      else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}!`;
+      else youLine = `${cap(who)} blasts you with ${ev.spellName} for ${ev.damage}${dmgTag(ev.damageType)}!`;
       if (ev.drained > 0) youLine += ` Your stolen warmth closes ${seen ? "its" : "their"} wounds.`;
       sendToPlayer(ev.targetId, { type: "combat", text: youLine });
       if (target) markPlayerView(ev.targetId);

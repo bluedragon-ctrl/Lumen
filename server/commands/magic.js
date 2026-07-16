@@ -194,6 +194,9 @@ function cast(state, player, arg, ctx) {
   const events = [];
   const res = state.castSpell(player, spell, mob, events);
   const msgs = spell.messages || {};
+  // State the damage type on the caster's line too, so every damage number in the
+  // game carries its type (see events.dmgTag for the melee/mob-cast side).
+  const typeTag = res.damageType ? ` (${res.damageType})` : "";
 
   let roomText, selfText;
   const tail = []; // quest messages, appended after the views
@@ -214,10 +217,10 @@ function cast(state, player, arg, ctx) {
     const lootTxt = d.loot && d.loot.length ? ` It leaves behind ${d.loot.join(", ")}.` : "";
     tail.push(...questKill(state, player, d));
     roomText = `${player.name}'s ${verb} blasts ${mt.name} apart, and it dies.${lootTxt}`;
-    selfText = `Your ${verb} blasts ${mt.name} apart for ${res.damage}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`;
+    selfText = `Your ${verb} blasts ${mt.name} apart for ${res.damage}${typeTag}! You slay ${mt.name}.${d.xp ? ` (+${d.xp} xp)` : ""}${lootTxt}`;
   } else {
     // A landed, non-lethal hit — the one beat a spell may reflavour via `messages`.
-    const vars = { caster: player.name, target: mt.name, spell: spell.name, verb, damage: res.damage };
+    const vars = { caster: player.name, target: mt.name, spell: spell.name, verb, damage: `${res.damage}${typeTag}` };
     roomText = fillTemplate(msgs.room || "{caster} hurls a crackling {verb} at {target}.", vars);
     selfText = fillTemplate(msgs.self || "You hurl {spell} at {target} for {damage} damage.", vars);
   }
@@ -278,8 +281,10 @@ function castBurst(state, player, spell, ctx) {
 
   stickToSurvivor(state, player, results);
 
+  // Every target of one burst shares the spell's damage type; state it once per name.
+  const typeTag = ` (${(spell.effect && spell.effect.damageType) || "magical"})`;
   let outcome = "";
-  if (hurt.length) outcome += ` It ${msgs.hitVerb || flav.hitVerb} ${hurt.map((r) => `${r.name} for ${r.damage}`).join(", ")}.`;
+  if (hurt.length) outcome += ` It ${msgs.hitVerb || flav.hitVerb} ${hurt.map((r) => `${r.name} for ${r.damage}${typeTag}`).join(", ")}.`;
   if (burning.length) outcome += ` ${burning.map((r) => r.name).join(", ")} ${burning.length === 1 ? "catches" : "catch"} alight, left to burn.`;
   if (killed.length) outcome += ` It ${msgs.killVerb || flav.killVerb} ${killed.map((r) => r.name).join(", ")}!${xp ? ` (+${xp} xp)` : ""}`;
   if (resisted.length) outcome += ` ${resisted.map((r) => r.name).join(", ")} ${resisted.length === 1 ? "shrugs" : "shrug"} the burst off, warded.`;
