@@ -5,6 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Combat lines now state the damage type on every hit.** Each landed blow is
+  tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
+  `A gloom-touched crawler hits you for 6 (physical)!`,
+  `A gloom-touched crawler blasts you with Gloom Bolt for 13 (magical)!` — so a
+  delver always knows whether **Armour** (physical) or **Ward** (magical) is
+  what stands between them and the hit, and can react to a Ward-cut blow chewing
+  through them. Covers melee (both directions and mob-vs-mob) and spell casts
+  (player and mob); the type flows from the swing/cast's `damageType` through the
+  `attack`/`mob-cast` event (and `castSpell`'s result) to the render. Damage from
+  lingering effects and the environment (bleed, venom, the searing light) already
+  names its own cause and is left as-is.
+
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent
   reaches.** South of the Lightfield Commons, through a warded gate that now

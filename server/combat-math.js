@@ -275,7 +275,7 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   const chance = Math.max(MIN_HIT, Math.min(1, raw));
   const overflowCrit = Math.max(0, raw - 1); // accuracy beyond a sure hit becomes crit
   const sighted = canSee(attacker.band, light);
-  if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false };
+  if (Math.random() >= chance) return { hit: false, sighted, damage: 0, crit: false, damageType };
   let base = rollDice(dice) + (attacker.dmgBonus || 0);
   const crit = Math.random() < ((attacker.crit || 0) + overflowCrit);
   if (crit) base *= 2; // a critical strike doubles the offensive damage, before mitigation
@@ -284,7 +284,7 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   // Ward (see wardNegates); a magical weapon always lands once it hits, but its
   // bite is reduced here.
   const damage = mitigate(base, damageType, defender);
-  return { hit: true, sighted, damage, crit };
+  return { hit: true, sighted, damage, crit, damageType };
 }
 
 module.exports = {

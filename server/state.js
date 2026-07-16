@@ -789,7 +789,7 @@ class GameState {
     events.push({
       type: "attack", by: attacker.kind, attackerId: attacker.id, attackerName: attacker.name,
       roomId: defender.roomId, targetId: defender.id, targetName: defender.name, targetKind: defender.kind,
-      hit: r.hit, sighted: r.sighted, damage: r.damage, crit: r.crit,
+      hit: r.hit, sighted: r.sighted, damage: r.damage, crit: r.crit, damageType: r.damageType,
       targetHp: Math.max(0, defender.actor.hp - r.damage),
       light: this.rooms[defender.roomId].light,
       attackerEmitsLight: attacker.emitsLight, targetEmitsLight: defender.emitsLight,
