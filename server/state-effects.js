@@ -13,6 +13,13 @@
 const { rollDice } = require("./dice");
 const { roomEffectFires } = require("./combat-math");
 
+// Default damage *type* for a room effect's `cause` (see applyRoomEffect): the dark
+// drinks life as "void", the ember rooms burn as "physical". Only causes with a
+// classified nature appear here; anything else stays untyped (untagged) unless the
+// effect names its own `damage.damageType`. Light-bane's "light" is set at its own
+// source (_environmentTick). Cosmetic today; a future resist pass reads the type.
+const ENV_DAMAGE_TYPE = { darkness: "void", heat: "physical" };
+
 // Out-of-combat recovery (see _recoverMobsTick): a wounded mob that
 // nothing is fighting or watching, in a room clear of living foes, knits its
 // wounds shut. It must hold OOC_REGEN_DELAY ticks past its last combat first (so
@@ -233,7 +240,12 @@ class EffectsMixin {
       // `cause` tags the hurt/death flavour (see events.js HURT_SRC); defaults to the
       // original darkness-drain wording so pre-existing rooms are unchanged.
       const cause = a.damage.cause || "darkness";
-      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause })) died = true;
+      // The damage *type* the console names (and a future resist pass will read):
+      // the dark drinks life as "void", the ember rooms burn as "physical". An
+      // effect may override per-room via `damage.damageType`; an unmapped cause
+      // stays untyped (untagged) rather than guessing.
+      const damageType = a.damage.damageType || ENV_DAMAGE_TYPE[cause] || null;
+      if (a.damage.hp != null && this._hurtPlayer(player, Math.max(1, rollDice(a.damage.hp)), events, { cause, damageType })) died = true;
       if (!died && a.damage.mana != null && this._drainMana(player, Math.max(1, rollDice(a.damage.mana)))) events.push({ type: "vitals", playerId: player.id });
     }
     return { fired: true, doused, died, silent };

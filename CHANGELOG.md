@@ -18,11 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so a lingering effect's nature is legible too (groundwork for a future
   resist-by-stat pass). Every DoT is now typed in the data (`damageType` on the
   `damage-over-time` spec: bleed/gash/venom/acid & the like physical; glimmer-burn,
-  gloom-rot, grave-chill, Witchfire magical). The type flows from the swing/cast's
-  `damageType`, or the DoT effect's, through the `attack`/`mob-cast`/`mob-hurt`/
-  `player-hurt` events (and `castSpell`'s result) to the render. Environmental
-  damage that isn't physical-or-magical (the searing light, room heat) keeps its
-  own cause and stays untagged.
+  gloom-rot, grave-chill, Witchfire magical). Environmental damage is typed too,
+  with its own elements: light-bane burns mobs as `light`
+  (`seared by the light. (-2 light)`), the dark drinks a delver's warmth as `void`
+  (`You take 1 damage from the creeping dark (void).`), and the ember rooms sear as
+  `physical`. The type flows from the swing/cast's `damageType`, the DoT effect's,
+  or the room/light-bane source, through the `attack`/`mob-cast`/`mob-hurt`/
+  `player-hurt` events (and `castSpell`'s result) to the render — one seam
+  (`events.dmgTag`) states it everywhere. All cosmetic today; the labels are the
+  groundwork a future resist-by-stat pass (e.g. Vitality vs physical, Wits vs void)
+  will read.
 
 ### Added
 - **Illa Llaqta — a living Umbral village at depth 10, the first the descent

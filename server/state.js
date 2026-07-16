@@ -937,7 +937,7 @@ class GameState {
         const lb = this.world.mobs[m.template].lightBane;
         if (!lb || rt.light <= (lb.above || 0)) continue;
         const dmg = Math.max(1, rollDice(lb.damage));
-        this._hurtMob(m, roomId, dmg, events, { cause: "light", killer: this._topThreat(m, playersHere) });
+        this._hurtMob(m, roomId, dmg, events, { cause: "light", damageType: lb.damageType || "light", killer: this._topThreat(m, playersHere) });
       }
     }
   }
