@@ -11,7 +11,7 @@
 // reaches methods that live in state.js or the other mixins. Pure relocation —
 // no behaviour change.
 const { rollDice } = require("./dice");
-const { roomEffectFires } = require("./combat-math");
+const { roomEffectFires, playerDefence, mobDefence, wardNegates, wardPoolFor } = require("./combat-math");
 
 // Default damage *type* for a room effect's `cause` (see applyRoomEffect): the dark
 // drinks life as "void", the ember rooms burn as "physical". Only causes with a
@@ -104,6 +104,19 @@ class EffectsMixin {
   }
 
   /**
+   * True if a defender's Ward fizzles this DoT pulse whole (no damage this tick).
+   * The all-or-nothing roll a hostile *cast* faces (see wardNegates), applied per
+   * due pulse against the pool that matches the tick's type — void → Voidward,
+   * any other classified type → Spellward. Only an explicitly-typed non-physical
+   * pulse can be resisted: physical (bleed/gash) and UNTYPED DoTs always land, so
+   * legacy untyped bleeds keep their old behaviour rather than gaining a stealth
+   * Spellward save. Each pulse rolls fresh; silent when it skips.
+   */
+  _dotResisted(s, defence) {
+    return !!s.damageType && s.damageType !== "physical" && wardNegates(wardPoolFor(s.damageType, defence));
+  }
+
+  /**
    * Tick active status effects on every actor (players and mobs): first apply any
    * `damage-over-time` (bleed/poison) through the shared damage sinks, then count
    * down timed effects and announce expiries. A DoT that kills its host stops that
@@ -115,6 +128,7 @@ class EffectsMixin {
       let dead = false;
       for (const s of p.states) {
         if (s.type !== "damage-over-time" || !s.damage) continue;
+        if (this._dotResisted(s, playerDefence(this.world, p))) continue; // Ward shrugs this pulse
         if (this._hurtPlayer(p, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType })) { dead = true; break; }
       }
       if (dead) continue;
@@ -132,6 +146,7 @@ class EffectsMixin {
         let dead = false;
         for (const s of m.states) {
           if (s.type !== "damage-over-time" || !s.damage) continue;
+          if (this._dotResisted(s, mobDefence(this.world.mobs[m.template], m))) continue; // Ward shrugs this pulse
           const src = s.sourceId ? this.players.get(s.sourceId) : null;
           if (this._hurtMob(m, roomId, Math.max(1, rollDice(s.damage)), events, { cause: s.name || "bleed", damageType: s.damageType, killer: src && src.hp > 0 ? src : null })) { dead = true; break; }
         }
