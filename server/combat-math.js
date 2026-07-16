@@ -128,22 +128,26 @@ function effectiveAttributes(world, player) {
 function playerDefence(world, player) {
   let armour = 0;
   let ward = 0;
+  let voidWard = 0; // vs `void` damage only — cut Ward-style but from its own pool
   for (const inst of Object.values(player.equipment || {})) {
     if (!inst) continue;
     const t = world.items[inst.template];
     if (t.armour) {
       armour += t.armour.armour || 0;
       ward += t.armour.ward || 0;
+      voidWard += t.armour.voidWard || 0;
     }
   }
   const wits = effectiveAttributes(world, player).wits || 0;
   ward += wits * WARD_PER_WITS;
-  // Temporary defensive buffs (Glimmerskin): each active "protect" state adds its
-  // baked-in armour/ward for as long as it lasts.
+  // Voidward is NOT granted by Wits — it comes only from Umbral gear/weaves, so a
+  // fresh delver faces void unmitigated until they attune (see mitigate's void arm).
+  // Temporary defensive buffs (Glimmerskin/Halo): each active "protect" state adds
+  // its baked-in armour/ward/voidWard for as long as it lasts.
   for (const s of player.states || []) {
-    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; }
+    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; voidWard += s.voidWard || 0; }
   }
-  return { armour, ward, evasion: wits * EVASION_PER_WITS };
+  return { armour, ward, voidWard, evasion: wits * EVASION_PER_WITS };
 }
 
 // Total action-speed penalty from equipped gear: heavy armour (`armour.speedPenalty`)
@@ -171,10 +175,11 @@ function effectiveSpeed(world, player) {
 function mobDefence(template, mob) {
   let armour = template.armour || 0;
   let ward = template.ward || 0;
+  let voidWard = template.voidWard || 0; // Umbral mobs may shrug off void (see mitigate)
   for (const s of (mob && mob.states) || []) {
-    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; }
+    if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; voidWard += s.voidWard || 0; }
   }
-  return { armour, ward, evasion: template.evasion || 0 };
+  return { armour, ward, voidWard, evasion: template.evasion || 0 };
 }
 
 // A flat damage bonus from a scaling attribute, e.g. {attr:"intellect", per:4}
@@ -213,23 +218,34 @@ function scaledAmount(attrs, spec) {
 const WARD_RESIST_PER_POINT = 0.01;
 
 /** True if a defender's Ward negates an incoming hostile spell this cast.
- *  Shared by both directions: player→mob (castSpell) and mob→player (_mobCast). */
+ *  Shared by both directions: player→mob (castSpell) and mob→player (_mobCast).
+ *  Callers pass the pool that governs the cast's type — see wardPoolFor. */
 function wardNegates(ward) {
   return (ward || 0) > 0 && Math.random() < ward * WARD_RESIST_PER_POINT;
 }
 
+/** Which resist pool of a `{ward, voidWard}` defence profile governs a hostile
+ *  cast of `damageType`: `void` casts are fizzled by Voidward (its own pool);
+ *  every other non-physical cast by Ward. A physical spell is a blow, never
+ *  fizzled, so callers gate on `!== "physical"` before consulting this. The seam
+ *  that keeps cast-negation aligned with mitigate()'s per-type reduction. */
+function wardPoolFor(damageType, defence) {
+  return damageType === "void" ? (defence.voidWard || 0) : (defence.ward || 0);
+}
+
 /** How much of a *landed* blow survives the defender's mitigation, keyed by
- *  damage type. `physical` is soaked flat by Armour; every other type (magical,
- *  and any future label until it earns its own rule) is cut by Ward as a PERCENT
- *  (ward 50 → halved). This is the reduction step ONLY — whether the blow lands
- *  at all is the caller's business (melee's accuracy roll; a spell cast's Ward
- *  fizzle, see wardNegates). Floor of 1 so any blow that lands still stings.
- *  The single seam shared by strike() (weapons) and the spell-damage paths, and
- *  the one place a new damage type's mitigation rule is added. */
+ *  damage type. `physical` is soaked flat by Armour; `void` is cut as a PERCENT
+ *  by its own Voidward pool (not touched by Ward — void demands Umbral attunement);
+ *  every other type (magical, and any future label until it earns its own rule)
+ *  is cut by Ward as a PERCENT (ward 50 → halved). This is the reduction step
+ *  ONLY — whether the blow lands at all is the caller's business (melee's accuracy
+ *  roll; a spell cast's fizzle, see wardNegates/wardPoolFor). Floor of 1 so any
+ *  blow that lands still stings. The single seam shared by strike() (weapons) and
+ *  the spell-damage paths, and the one place a new damage type's rule is added. */
 function mitigate(base, damageType, defence) {
-  return damageType === "physical"
-    ? Math.max(1, base - (defence.armour || 0))
-    : Math.max(1, Math.round(base * (1 - (defence.ward || 0) / 100)));
+  if (damageType === "physical") return Math.max(1, base - (defence.armour || 0));
+  if (damageType === "void") return Math.max(1, Math.round(base * (1 - (defence.voidWard || 0) / 100)));
+  return Math.max(1, Math.round(base * (1 - (defence.ward || 0) / 100)));
 }
 
 /** Weighted random choice from `[{weight}, ...]`; null if the list is empty. */
@@ -309,6 +325,7 @@ module.exports = {
   durationScaleBonus,
   scaledAmount,
   wardNegates,
+  wardPoolFor,
   mitigate,
   pickWeighted,
   roomEffectFires,

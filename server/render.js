@@ -78,7 +78,8 @@ function buildPlayerView(state, p) {
       posture: p.posture || "standing", // sit/sleep for rest recovery
 
       armour: defence.armour,
-      ward: defence.ward, // gear Ward + innate Ward from Wits
+      ward: defence.ward, // gear Ward + innate Ward from Wits (shown as "spellward")
+      voidWard: defence.voidWard, // vs void only, from Umbral gear/weaves (shown as "voidward")
       evasion: defence.evasion, // Wits-derived dodge (fraction, e.g. 0.06)
       crit: (eff.perception || 0) * 0.01, // Perception crit chance (fraction), gear-modified
       attributes: eff, // effective attributes (base + gear attrMod), matching what combat uses
@@ -191,8 +192,9 @@ function itemSpecLines(tmpl, w, viewer) {
     if (tmpl.weapon.crit) lines.push(`crit: +${Math.round(tmpl.weapon.crit * 100)}%`);
   }
   if (tmpl.armour) {
-    const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0;
+    const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0, vw = tmpl.armour.voidWard || 0;
     if (ar || wd) lines.push(`armour ${ar}, ward ${wd}`); // skip for pure-bonus gear (a ring, a coil)
+    if (vw) lines.push(`voidward ${vw}`); // Umbral gear only — turns void aside
     // A positive value slows the wearer (heavy plate); a negative one quickens them
     // (feather-light cloth) and reads as a speed bonus rather than a "penalty".
     if (tmpl.armour.speedPenalty > 0) lines.push(`speed penalty: ${tmpl.armour.speedPenalty}`);

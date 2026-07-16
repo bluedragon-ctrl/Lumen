@@ -14,7 +14,7 @@ const { rollDice } = require("./dice");
 const { DEFAULT_FACTION, DEFAULT_ACTION_COST } = require("./config");
 const { canSee, noticeChance } = require("./light");
 const {
-  playerDefence, mobDefence, wardNegates,
+  playerDefence, mobDefence, wardNegates, wardPoolFor,
   pickWeighted, strike, mobOnDamage, playerOnDamage,
 } = require("./combat-math");
 const { factionRelation, combatantFaction } = require("./factions");
@@ -846,7 +846,7 @@ class MobAIMixin {
     const { m, t, roomId, rt, events, target, isPlayer, tmt } = ctx;
     const eff = spell.effect || {};
     const targetName = isPlayer ? target.actor.name : tmt.name;
-    const resisted = eff.damageType !== "physical" && wardNegates(this._defenceOf(target).ward || 0);
+    const resisted = eff.damageType !== "physical" && wardNegates(wardPoolFor(eff.damageType, this._defenceOf(target)));
     let damage = 0, effectName = null, doused = false, drainFactor = 0;
     let manaDrain = false, manaDrained = 0;
     if (!resisted) {

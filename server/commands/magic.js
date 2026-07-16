@@ -37,7 +37,14 @@ function fmtTicks(ticks) {
 function fmtAmount(spec) {
   if (spec == null) return "0";
   if (typeof spec === "number") return String(spec);
-  const sc = spec.scale && spec.scale.attr ? `${spec.scale.attr}${spec.scale.per && spec.scale.per !== 1 ? `/${spec.scale.per}` : ""}` : "";
+  // `per` is a divisor in spellScaleBonus, so per>1 reads "attr/N" (1 point per N attr);
+  // a sub-1 `per` (used to grant several points per attr, e.g. Halo's voidward) reads
+  // as a "×M" multiplier so the spellbook shows "intellect×5", not "intellect/0.2".
+  let scTail = "";
+  if (spec.scale && spec.scale.attr && spec.scale.per && spec.scale.per !== 1) {
+    scTail = spec.scale.per < 1 ? `×${Math.round(1 / spec.scale.per)}` : `/${spec.scale.per}`;
+  }
+  const sc = spec.scale && spec.scale.attr ? `${spec.scale.attr}${scTail}` : "";
   if (spec.base && sc) return `${spec.base}+${sc}`;
   return sc || String(spec.base || 0);
 }
@@ -64,7 +71,8 @@ function spellList(state, player) {
     else if (e.type === "protect") {
       const parts = [];
       if (e.armour) parts.push(`armour ${fmtAmount(e.armour)}`);
-      if (e.ward) parts.push(`ward ${fmtAmount(e.ward)}`);
+      if (e.ward) parts.push(`spellward ${fmtAmount(e.ward)}`);
+      if (e.voidWard) parts.push(`voidward ${fmtAmount(e.voidWard)}`);
       if (e.emitLight) parts.push(`sheds ${e.emitLight} light`);
       const dur = (e.duration || 0) + durationScaleBonus(effectiveAttributes(w, player), e.durationScale);
       tail = ` — ${parts.join(", ")} for ${fmtTicks(dur)}${e.durationScale ? ` (${e.durationScale.attr})` : ""}`;
@@ -366,7 +374,8 @@ function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
   if (res.effect === "protect") {
     const parts = [];
     if (res.armour) parts.push(`+${res.armour} armour`);
-    if (res.ward) parts.push(`+${res.ward} ward`);
+    if (res.ward) parts.push(`+${res.ward} spellward`);
+    if (res.voidWard) parts.push(`+${res.voidWard} voidward`);
     if (res.light) parts.push(`${res.light} light`);
     const grant = parts.length ? parts.join(", ") : "a faint sheen";
     const sheath = res.light ? "a wreath of cold glimmer-light" : "a lattice of hardened light";
@@ -417,7 +426,8 @@ function castSupportAll(state, player, spell, ctx) {
   } else if (res.effect === "protect") {
     const parts = [];
     if (res.armour) parts.push(`+${res.armour} armour`);
-    if (res.ward) parts.push(`+${res.ward} ward`);
+    if (res.ward) parts.push(`+${res.ward} spellward`);
+    if (res.voidWard) parts.push(`+${res.voidWard} voidward`);
     if (res.light) parts.push(`${res.light} light`);
     clause = `a lattice of hardened light grants each ${parts.length ? parts.join(", ") : "a faint sheen"} for ${fmtTicks(res.duration)}`;
   } else if (res.effect === "cleanse") {

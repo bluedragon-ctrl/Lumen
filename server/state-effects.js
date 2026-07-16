@@ -50,6 +50,8 @@ class EffectsMixin {
       magnitude: spec.magnitude || 0,
       armour: spec.armour || 0, // flat defence buffs (see "protect" / playerDefence)
       ward: spec.ward || 0,
+      voidWard: spec.voidWard || 0, // vs void only, from a "protect" weave (Halo) — see playerDefence
+
       damage: spec.damage || null, // dice string, for "damage-over-time" (bleed/poison)
       damageType: spec.damageType || null, // "physical"/"magical" for a DoT tick, so the console names it (see _tickEffects)
       attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
