@@ -210,7 +210,16 @@
     "name": "the weaver's looms",
     "keywords": ["loom", "looms", "silk", "gloom-silk", "cloth", "thread", "weave"],
     "description": "Tall looms of worked bone and gut-line stand along the wall, strung with lengths of gloom-silk at every stage of the craft — raw chasm-moss fibre carded pale, half-woven bolts breathing a faint dark shimmer, finished cloth folded and stacked. The air smells of wet silk and cold stone. This is where the deep-folk's famous weave is made, thread by patient thread.",
-    "type": "scenery"
+    "type": "crafting",
+    "station": "weaving"
+  },
+  "umbral-loom": {
+    "id": "umbral-loom",
+    "name": "an Umbral loom",
+    "keywords": ["loom", "silk", "gloom-silk", "cloth", "thread", "weave", "umbral"],
+    "description": "A single upright loom of worked bone and taut gut-line, small enough for one patient pair of hands and strung with a half-woven length of gloom-silk that breathes a faint dark shimmer. Carded chasm-moss fibre and spare spools of thread are kept close by. It is the deep-folk's own craft in miniature — enough to card the raw fibre into thread and work it into cloth.",
+    "type": "crafting",
+    "station": "weaving"
   },
   "lapidary-bench": {
     "id": "lapidary-bench",

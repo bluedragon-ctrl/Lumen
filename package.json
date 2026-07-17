@@ -1,6 +1,6 @@
 {
   "name": "lumen",
-  "version": "0.6.39",
+  "version": "0.6.40",
   "description": "A browser-based MUD of descent, light, and survival.",
   "type": "commonjs",
   "main": "server/index.js",
