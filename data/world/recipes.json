@@ -378,7 +378,7 @@
   "weave-weeping-lash": {
     "id": "weave-weeping-lash",
     "name": "Weeping Lash",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "gloom-silk", "qty": 2 },
       { "template": "chitin-spike", "qty": 4 }
@@ -434,7 +434,7 @@
   "weave-iridescent-scale-cloak": {
     "id": "weave-iridescent-scale-cloak",
     "name": "Iridescent Scale-Cloak",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "iridescent-carapace", "qty": 6 },
       { "template": "gloom-silk", "qty": 5 }
@@ -578,7 +578,7 @@
   "process-gloom-silk": {
     "id": "process-gloom-silk",
     "name": "Gloom-Silk",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "weeping-chasm-moss", "qty": 3 }
     ],
@@ -587,7 +587,7 @@
   "weave-gloom-silk-robe": {
     "id": "weave-gloom-silk-robe",
     "name": "Gloom-silk Robe",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "gloom-silk", "qty": 3 },
       { "template": "glimmer-dust", "qty": 1 }
@@ -598,7 +598,7 @@
   "weave-gloom-silk-hood": {
     "id": "weave-gloom-silk-hood",
     "name": "Gloom-silk Hood",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "gloom-silk", "qty": 2 },
       { "template": "glimmer-dust", "qty": 1 }
@@ -609,7 +609,7 @@
   "weave-gloom-silk-cloak": {
     "id": "weave-gloom-silk-cloak",
     "name": "Gloom-silk Cloak",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "gloom-silk", "qty": 2 }
     ],
