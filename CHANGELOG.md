@@ -71,6 +71,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   predictable) and applies to explicitly-typed physical pulses only — untyped DoTs
   are unchanged. With this the deferred DoT-resist pass is complete for status
   effects; only environmental void's own hp drain still deals raw damage, by design.
+- **Evasion can now come directly from gear.** A worn piece may declare
+  `armour.evasion` (flat dodge — the same stat mobs already carry), and
+  `playerDefence` sums it on top of the Wits-derived part instead of deriving
+  evasion from Wits alone. Because the Wits part is still read *effective*, a heavy
+  shield with a Wits penalty pays its block back in lost dodge, while a light buckler
+  grants dodge outright — two honest ways to make a shield defend. The character
+  sheet's Evasion row already reads the combined figure, so it needs no change.
 
 ### Added
 - **Two-handed weapons and shields — a one-hand-versus-two-hand split, with a new
@@ -87,6 +94,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a two-handed weapon (a one-handed weapon and a shield coexist untouched). A
   shield's armour, speed penalty, and any bonuses fold into derived stats like any
   other worn piece.
+- **Craftable shields for every gear family — six of them, light and heavy.** Each
+  material set now has a shield that echoes its cuirass's character, and the light
+  families get bucklers rather than boards. Following the guidance that flat Armour
+  is strong, "normal" shields sit at **1 Armour** and lean on HP or evasion; only the
+  rare heavy tower reaches 2. **An iron shield** (1 armour, +3 HP, −1 Wits) joins the
+  *book of basic smithing*; **a chitin shield** (1 armour, +4 HP, −1 Wits) the *book
+  of chitin craft*; **an iridescent buckler** (light — 1 Spellward, +5% evasion, +1
+  Perception, no armour) the *book of the iridescent shell*; **a glimmerwood targe**
+  (light — 1 Spellward, +3% evasion, 5 Voidward, +3 max mana) the *Book of
+  Glimmerwood*, a caster's off-hand; **a glimmersteel shield** (1 armour, 1 Spellward,
+  5 Voidward, +4 HP) the *Book of Glimmersteel*; and **a dense chitin tower-shield**
+  (the heavy brick — 2 armour, +6 HP, −2 Wits, a stiff speed penalty) from a new
+  *dense chitin tower method* Mallki cuts, beside his cuirass method. The glimmerwood
+  targe and glimmersteel shield are the **first non-Umbral sources of Voidward** — a
+  deliberate widening, on the reasoning that glimmer is captured light and light is
+  what the void feeds on.
 - **A copper-bound focus — a cheap starter caster staff, for sale from Garrick.**
   A two-handed focus (1d6 physical, scales Might/3) that grants **+5 max mana**, so
   a fresh caster can afford a real spell pool before they find a glimmer staff.

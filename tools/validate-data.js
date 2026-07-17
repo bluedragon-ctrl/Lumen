@@ -322,6 +322,8 @@ function main() {
       checkSpikes(it.armour.spikes, `item ${id} armour`); checkOnDamage(it.armour.onDamage, `item ${id} armour`); // player thorns / when-struck triggers (forward-ready)
       if (it.armour.voidWard != null && (typeof it.armour.voidWard !== "number" || it.armour.voidWard < 0))
         errs.push(`item ${id}: armour.voidWard must be a non-negative number`); // vs void only — Umbral gear
+      if (it.armour.evasion != null && (typeof it.armour.evasion !== "number" || it.armour.evasion < 0))
+        errs.push(`item ${id}: armour.evasion must be a non-negative number`); // flat dodge from gear (a light buckler/targe)
       if (it.armour.maxHp != null && (typeof it.armour.maxHp !== "number" || it.armour.maxHp < 0))
         errs.push(`item ${id}: armour.maxHp must be a non-negative number`); // bonus durability from heavy gear
       if (it.armour.maxMana != null && (typeof it.armour.maxMana !== "number" || it.armour.maxMana < 0))

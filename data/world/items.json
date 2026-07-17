@@ -126,6 +126,77 @@
     "value": 24,
     "armour": { "armour": 1, "ward": 0, "speedPenalty": 1 }
   },
+  "iron-shield": {
+    "id": "iron-shield",
+    "name": "an iron shield",
+    "keywords": ["shield", "board", "iron", "heater"],
+    "description": "A heater of beaten pick-iron over a planed board, edged and bossed and honestly heavy. Tobin's pattern, forged not salvaged — where the quartermaster's banded board is knocked together from cart-scrap, this one is made to be leaned on, a broad face that takes a blow meant for the body and a rim that lets a delver put his weight behind it. It rides low and steady on the arm, and dulls the eye for what it hides behind.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 5,
+    "value": 38,
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0, "maxHp": 3, "attrMod": { "wits": -1 } }
+  },
+  "chitin-shield": {
+    "id": "chitin-shield",
+    "rarity": "uncommon",
+    "name": "a chitin shield",
+    "keywords": ["shield", "board", "chitin", "scute"],
+    "description": "A round of boiled and banded stonebug plate, the great grey scutes overlapped and lashed to an iron rim so the whole thing gives a little where beaten iron would crack. Lighter than it looks and springy under a blow, it soaks a hit into the shell instead of the arm behind it — a delver learns to trust the weight the first time a deep-thing's charge glances off it. The banded hood of it sits close over the brow and narrows what the eye can take in.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 4,
+    "value": 44,
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 0, "maxHp": 4, "attrMod": { "wits": -1 } }
+  },
+  "iridescent-buckler": {
+    "id": "iridescent-buckler",
+    "rarity": "uncommon",
+    "name": "an iridescent buckler",
+    "keywords": ["buckler", "shield", "iridescent", "shell"],
+    "description": "A small fist-shield of shed deep-bug carapace, no wider than a spread hand, the shell still throwing its faint oily rainbow when the light catches it. Too light to hide behind and never meant to — it is worn on a loose grip and worked, a live thing in the hand that turns a blade aside with a flick of the wrist rather than stopping it dead. The same cold sheen that fools the eye in the deep bleeds a little of the killing out of a glimmer-blow.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 1,
+    "value": 55,
+    "armour": { "armour": 0, "ward": 1, "speedPenalty": 0, "evasion": 0.05, "attrMod": { "perception": 1 } }
+  },
+  "glimmerwood-targe": {
+    "id": "glimmerwood-targe",
+    "rarity": "uncommon",
+    "name": "a glimmerwood targe",
+    "keywords": ["targe", "shield", "glimmerwood", "buckler"],
+    "description": "A light round of seasoned giant-mushroom timber, the pale wood banded with a single hoop of copper and set at the boss with a chip of raw glimmer that holds a cold, steady light. Halloran's pattern — a caster's shield, worn on the arm that isn't casting, worked to steady the wrist and deepen the well a mind draws from. Light enough to carry all day, and the trapped glimmer in the boss frays the edge off the void's cold reach the way a lamp frays the edge off the dark.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 2,
+    "value": 50,
+    "armour": { "armour": 0, "ward": 1, "speedPenalty": 0, "evasion": 0.03, "voidWard": 5, "maxMana": 3 }
+  },
+  "glimmersteel-shield": {
+    "id": "glimmersteel-shield",
+    "rarity": "rare",
+    "name": "a glimmersteel shield",
+    "keywords": ["shield", "board", "glimmersteel", "round"],
+    "description": "A round shield of folded glimmersteel, the captive light bedded all through the metal so the face holds a deep, even glow instead of a forge-blade's guttering spark. Tobin's finest defensive work — pared thin and curved true, no heavier on the arm than a good chitin board yet turning a blade like plate and blunting a glimmer-blow besides. Where the light lies thickest along the boss it stands against the void's cold hunger, a wall of held sun set between a delver and the dark.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 3,
+    "value": 150,
+    "armour": { "armour": 1, "ward": 1, "speedPenalty": 0, "voidWard": 5, "maxHp": 4 }
+  },
+  "dense-chitin-tower-shield": {
+    "id": "dense-chitin-tower-shield",
+    "rarity": "rare",
+    "name": "a dense chitin tower-shield",
+    "keywords": ["shield", "tower", "board", "dense", "chitin", "wall"],
+    "description": "A slab of the black dense-plate an old grinder sheds, layered thick and framed in an iron harness heavy enough to plant and stand behind — a wall a delver carries rather than a shield he swings. Set and braced, it stops a deep-thing's charge dead and covers a body head to knee; but it drags at every step and rides so high across the brow that a man behind it half-fights blind. Mallki cuts the method for it, for those who mean to hold a line in the dark and not give a pace of it.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 12,
+    "value": 85,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 2, "maxHp": 6, "attrMod": { "wits": -2 } }
+  },
   "foremans-brigandine": {
     "id": "foremans-brigandine",
     "rarity": "uncommon",
@@ -1225,7 +1296,7 @@
     "weight": 1,
     "value": 90,
     "stackable": true,
-    "teaches": { "recipes": ["craft-glimmerwood-spear", "craft-glimmerwood-staff", "craft-glimmerwood-glaive"] },
+    "teaches": { "recipes": ["craft-glimmerwood-spear", "craft-glimmerwood-staff", "craft-glimmerwood-glaive", "craft-glimmerwood-targe"] },
     "rarity": "rare"
   },
   "book-of-the-brood": {
@@ -1587,6 +1658,18 @@
     "recipe": "forge-dense-chitin-cuirass",
     "rarity": "rare"
   },
+  "schematic-dense-chitin-tower-shield": {
+    "id": "schematic-dense-chitin-tower-shield",
+    "name": "a dense chitin tower method",
+    "keywords": ["method", "schematic", "dense", "chitin", "tower", "shield"],
+    "description": "A strip of cured gut-skin marked in Mallki's careful hand — the layering of the black plate into a slab a man can stand behind, the working of the iron harness, the bracing of a rim heavy enough to plant against a charge. No words, only the sequence of steps, drawn for a hand that means to hold a line in the dark. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 50,
+    "stackable": true,
+    "recipe": "forge-dense-chitin-tower-shield",
+    "rarity": "rare"
+  },
   "chitin-maul": {
     "id": "chitin-maul",
     "name": "a chitin maul",
@@ -1718,7 +1801,7 @@
     "weight": 1,
     "value": 300,
     "stackable": true,
-    "teaches": { "recipes": ["forge-iridescent-cuirass", "forge-iridescent-cowl", "forge-iridescent-flense", "weave-iridescent-scale-cloak"] }
+    "teaches": { "recipes": ["forge-iridescent-cuirass", "forge-iridescent-cowl", "forge-iridescent-flense", "weave-iridescent-scale-cloak", "forge-iridescent-buckler"] }
   },
   "book-of-basic-smithing": {
     "id": "book-of-basic-smithing",
@@ -1728,7 +1811,7 @@
     "weight": 1,
     "value": 60,
     "stackable": true,
-    "teaches": { "recipes": ["forge-iron-sword", "forge-iron-mace", "forge-iron-cuirass", "forge-iron-helm"] }
+    "teaches": { "recipes": ["forge-iron-sword", "forge-iron-mace", "forge-iron-cuirass", "forge-iron-helm", "forge-iron-shield"] }
   },
   "book-of-chitin-craft": {
     "id": "book-of-chitin-craft",
@@ -1738,7 +1821,7 @@
     "weight": 1,
     "value": 400,
     "stackable": true,
-    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-spiked-chitin-armor"] },
+    "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-spiked-chitin-armor", "forge-chitin-shield"] },
     "rarity": "uncommon"
   },
   "book-of-glimmersteel": {
@@ -1751,7 +1834,7 @@
     "weight": 1,
     "value": 250,
     "stackable": true,
-    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-warhammer", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm"] }
+    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-warhammer", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm", "forge-glimmersteel-shield"] }
   },
   "schematic-gloom-silk": {
     "id": "schematic-gloom-silk",

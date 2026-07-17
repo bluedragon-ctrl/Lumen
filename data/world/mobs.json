@@ -1525,7 +1525,7 @@
     "shards": "2d6",
     "loot": [{ "template": "lamp-oil", "chance": 0.5 }, { "template": "palecap-mushroom", "chance": 0.5 }],
     "shop": {
-      "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "scroll-halo" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "umbral-weaving-method" }, { "template": "schematic-dense-chitin-cuirass" }, { "template": "schematic-barbed-bomb" }, { "template": "schematic-glimmerglass" }]
+      "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "scroll-halo" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "umbral-weaving-method" }, { "template": "schematic-dense-chitin-cuirass" }, { "template": "schematic-dense-chitin-tower-shield" }, { "template": "schematic-barbed-bomb" }, { "template": "schematic-glimmerglass" }]
     }
   },
   "umbral-chitin-warden": {
