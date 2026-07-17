@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Chitin plate is now common rarity.** The grey stonebug scute is basic
+  crafting stock, not an uncommon find — its explicit `rarity: "uncommon"` is
+  dropped so it renders neutral, matching the convention that common items omit
+  the field.
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
   `A gloom-touched crawler hits you for 6 (physical)!`,
