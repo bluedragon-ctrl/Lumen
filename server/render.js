@@ -42,6 +42,7 @@ function itemView(inst, world) {
   if (!inst) return null;
   const t = world.items[inst.template];
   const v = { id: inst.id, template: inst.template, name: t.name, type: t.type, slot: t.slot || null, rarity: t.rarity || "common" };
+  if (t.weapon && t.weapon.twoHanded) v.twoHanded = true; // client tags the hand slot "2H"
   if (t.filterGroup) v.filterGroup = t.filterGroup; // honour the authored inventory-tab override client-side
   if (inst.qty != null) v.qty = inst.qty;
   if (t.light) {
@@ -190,6 +191,8 @@ function itemSpecLines(tmpl, w, viewer) {
     lines.push(`damage: ${dmg} ${cur}(${sc.attr}/${sc.per || 1})`, `action cost: ${tmpl.weapon.actionCost}`);
     // Flat crit the weapon adds on top of the viewer's Perception crit.
     if (tmpl.weapon.crit) lines.push(`crit: +${Math.round(tmpl.weapon.crit * 100)}%`);
+    // Two-handed weapons fill both hands — no shield alongside them.
+    if (tmpl.weapon.twoHanded) lines.push("two-handed (no shield)");
   }
   if (tmpl.armour) {
     const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0, vw = tmpl.armour.voidWard || 0;

@@ -122,13 +122,16 @@ function effectiveAttributes(world, player) {
 }
 
 /** Defensive profile of a player: Armour (vs physical) and Ward (vs magical)
- *  from equipped gear plus innate Ward from Wits, and Wits-derived evasion.
- *  Mirrors the {armour, ward} block on armour items. Wits is read effective —
- *  heavy gear that dulls Wits costs both Ward and evasion. */
+ *  from equipped gear plus innate Ward from Wits, and evasion from both Wits and
+ *  gear. Mirrors the {armour, ward} block on armour items. Wits is read effective —
+ *  heavy gear that dulls Wits costs both Ward and evasion, so a heavy shield with a
+ *  Wits penalty trades dodge for block; a light buckler grants evasion directly
+ *  (`armour.evasion`), the same flat dodge stat mobs carry (see mobDefence). */
 function playerDefence(world, player) {
   let armour = 0;
   let ward = 0;
   let voidWard = 0; // vs `void` damage only — cut Ward-style but from its own pool
+  let evasion = 0; // flat dodge granted directly by gear, on top of the Wits-derived part
   for (const inst of Object.values(player.equipment || {})) {
     if (!inst) continue;
     const t = world.items[inst.template];
@@ -136,6 +139,7 @@ function playerDefence(world, player) {
       armour += t.armour.armour || 0;
       ward += t.armour.ward || 0;
       voidWard += t.armour.voidWard || 0;
+      evasion += t.armour.evasion || 0;
     }
   }
   const wits = effectiveAttributes(world, player).wits || 0;
@@ -147,7 +151,7 @@ function playerDefence(world, player) {
   for (const s of player.states || []) {
     if (s.type === "protect") { armour += s.armour || 0; ward += s.ward || 0; voidWard += s.voidWard || 0; }
   }
-  return { armour, ward, voidWard, evasion: wits * EVASION_PER_WITS };
+  return { armour, ward, voidWard, evasion: evasion + wits * EVASION_PER_WITS };
 }
 
 // Total action-speed penalty from equipped gear: heavy armour (`armour.speedPenalty`)

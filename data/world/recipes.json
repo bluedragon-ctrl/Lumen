@@ -264,6 +264,16 @@
     "shards": 5,
     "output": { "template": "iron-helm", "qty": 1 }
   },
+  "forge-iron-shield": {
+    "id": "forge-iron-shield",
+    "name": "Iron Shield",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iron-bar", "qty": 3 }
+    ],
+    "shards": 7,
+    "output": { "template": "iron-shield", "qty": 1 }
+  },
   "forge-chitin-helm": {
     "id": "forge-chitin-helm",
     "name": "Chitin Helm",
@@ -309,6 +319,17 @@
     "shards": 12,
     "output": { "template": "dense-chitin-cuirass", "qty": 1 }
   },
+  "forge-dense-chitin-tower-shield": {
+    "id": "forge-dense-chitin-tower-shield",
+    "name": "Dense Chitin Tower-Shield",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 2 },
+      { "template": "iron-bar", "qty": 2 }
+    ],
+    "shards": 12,
+    "output": { "template": "dense-chitin-tower-shield", "qty": 1 }
+  },
   "forge-heavy-chitin-plate": {
     "id": "forge-heavy-chitin-plate",
     "name": "Heavy Chitin Plate",
@@ -331,6 +352,17 @@
     ],
     "shards": 7,
     "output": { "template": "chitin-maul", "qty": 1 }
+  },
+  "forge-chitin-shield": {
+    "id": "forge-chitin-shield",
+    "name": "Chitin Shield",
+    "station": "smithing",
+    "inputs": [
+      { "template": "chitin-plate", "qty": 4 },
+      { "template": "iron-bar", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "chitin-shield", "qty": 1 }
   },
   "weave-weeping-lash": {
     "id": "weave-weeping-lash",
@@ -399,6 +431,17 @@
     "shards": 12,
     "output": { "template": "iridescent-scale-cloak", "qty": 1 }
   },
+  "forge-iridescent-buckler": {
+    "id": "forge-iridescent-buckler",
+    "name": "Iridescent Buckler",
+    "station": "smithing",
+    "inputs": [
+      { "template": "iridescent-carapace", "qty": 3 },
+      { "template": "gloom-silk", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "iridescent-buckler", "qty": 1 }
+  },
   "smelt-silver": {
     "id": "smelt-silver",
     "name": "Silver Bar",
@@ -448,6 +491,16 @@
     ],
     "shards": 8,
     "output": { "template": "glimmersteel-helm", "qty": 1 }
+  },
+  "forge-glimmersteel-shield": {
+    "id": "forge-glimmersteel-shield",
+    "name": "Glimmersteel Shield",
+    "station": "smithing",
+    "inputs": [
+      { "template": "glimmersteel-bar", "qty": 2 }
+    ],
+    "shards": 10,
+    "output": { "template": "glimmersteel-shield", "qty": 1 }
   },
   "craft-glimmersteel-staff": {
     "id": "craft-glimmersteel-staff",
@@ -648,6 +701,18 @@
     ],
     "shards": 8,
     "output": { "template": "glimmerwood-glaive", "qty": 1 }
+  },
+  "craft-glimmerwood-targe": {
+    "id": "craft-glimmerwood-targe",
+    "name": "Glimmerwood Targe",
+    "station": "smithing",
+    "inputs": [
+      { "template": "fungal-hardwood", "qty": 2 },
+      { "template": "crystal", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 6,
+    "output": { "template": "glimmerwood-targe", "qty": 1 }
   },
   "bind-warp-fang-dirk": {
     "id": "bind-warp-fang-dirk",

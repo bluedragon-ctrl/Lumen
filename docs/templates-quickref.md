@@ -34,14 +34,15 @@ Map of `itemId → template`. Common fields, then ONE type-specific block.
   "name": "an iron dagger",            // includes the article; lowercase
   "description": "A short, plain blade forged from abyssal iron.",
   "type": "weapon",                    // light|weapon|armour|currency|treasure|material|consumable|scroll|recipe|book
-  "slot": "hand",                      // ONLY if equippable: hand|body|head|light (slots are dynamic)
+  "slot": "hand",                      // ONLY if equippable: hand|shield|body|head|light (slots are dynamic)
   "weight": 1,
   "value": 24,                         // buy price. REQUIRED & ≥0 unless type==="currency"
   "sellValue": 12,                     // optional; sell = sellValue if set, else 20% of value
   "stackable": true,                   // for materials/consumables/currency
   "weapon": { "damage": { "physical": "1d6" }, "actionCost": 12,
               "scale": { "attr": "might", "per": 2 },    // per +2 might → +1 dmg (optional)
-              "crit": 0.05 }                             // optional flat crit chance (0..1) on top of Perception crit
+              "crit": 0.05,                              // optional flat crit chance (0..1) on top of Perception crit
+              "twoHanded": true }                        // optional; fills both hands — can't share the grip with a shield
 }
 ```
 

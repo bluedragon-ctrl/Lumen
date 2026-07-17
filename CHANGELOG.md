@@ -71,8 +71,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   predictable) and applies to explicitly-typed physical pulses only — untyped DoTs
   are unchanged. With this the deferred DoT-resist pass is complete for status
   effects; only environmental void's own hp drain still deals raw damage, by design.
+- **Evasion can now come directly from gear.** A worn piece may declare
+  `armour.evasion` (flat dodge — the same stat mobs already carry), and
+  `playerDefence` sums it on top of the Wits-derived part instead of deriving
+  evasion from Wits alone. Because the Wits part is still read *effective*, a heavy
+  shield with a Wits penalty pays its block back in lost dodge, while a light buckler
+  grants dodge outright — two honest ways to make a shield defend. The character
+  sheet's Evasion row already reads the combined figure, so it needs no change.
 
 ### Added
+- **Two-handed weapons and shields — a one-hand-versus-two-hand split, with a new
+  off-hand `shield` slot.** Heavy greatweapons now declare `weapon.twoHanded`: the
+  polearms and mauls (halberd, glimmerwood glaive, glimmerwood spear, chitin maul,
+  glimmersteel warhammer, prospector's hatchet) and every staff (warder's,
+  glimmersteel, glimmerwood, and the staff of drinking dark). A two-handed weapon
+  is tagged **2H** in the Equipment panel and reads *"two-handed (no shield)"* in
+  the Inspect window. A new **`shield`** equip slot rounds out the off-hand, seeded
+  empty on fresh characters so `unequip shield` works from the start; the first
+  shield — **a banded shield** (1 armour, small speed penalty) — is for sale from
+  Garrick the quartermaster at the plaza. The two compete for the grip: wielding a
+  two-handed weapon auto-stows an equipped shield, and equipping a shield auto-stows
+  a two-handed weapon (a one-handed weapon and a shield coexist untouched). A
+  shield's armour, speed penalty, and any bonuses fold into derived stats like any
+  other worn piece.
+- **Craftable shields for every gear family — six of them, light and heavy.** Each
+  material set now has a shield that echoes its cuirass's character, and the light
+  families get bucklers rather than boards. Following the guidance that flat Armour
+  is strong, "normal" shields sit at **1 Armour** and lean on HP or evasion; only the
+  rare heavy tower reaches 2. **An iron shield** (1 armour, +3 HP, −1 Wits) joins the
+  *book of basic smithing*; **a chitin shield** (1 armour, +4 HP, −1 Wits) the *book
+  of chitin craft*; **an iridescent buckler** (light — 1 Spellward, +5% evasion, +1
+  Perception, no armour) the *book of the iridescent shell*; **a glimmerwood targe**
+  (light — 1 Spellward, +3% evasion, 5 Voidward, +3 max mana) the *Book of
+  Glimmerwood*, a caster's off-hand; **a glimmersteel shield** (1 armour, 1 Spellward,
+  5 Voidward, +4 HP) the *Book of Glimmersteel*; and **a dense chitin tower-shield**
+  (the heavy brick — 2 armour, +6 HP, −2 Wits, a stiff speed penalty) from a new
+  *dense chitin tower method* Mallki cuts, beside his cuirass method. The glimmerwood
+  targe and glimmersteel shield are the **first non-Umbral sources of Voidward** — a
+  deliberate widening, on the reasoning that glimmer is captured light and light is
+  what the void feeds on.
+- **A graven heater — a fancy outland shield, for sale from Silas.** A rare surface
+  masterwork the visiting outland-factor carries down the old road: **2 armour, +5%
+  evasion, and no speed or Wits penalty** — the premium *bought* shield. Its luxury
+  is carrying armour 2 **clean** where every other armour-2 shield pays for it (the
+  dense chitin tower eats speed −2 and Wits −2), plus the dodge of a buckler on top.
+  Deliberately mundane steel — **no Spellward or Voidward** — so the deep's own
+  glimmer-craft still rules against magic and the void; this is only the king of
+  *physical* defence coin can buy. Sold by Silas at 300, a buy-only import with no
+  recipe or book.
+- **A copper-bound focus — a cheap starter caster staff, for sale from Garrick.**
+  A two-handed focus (1d6 physical, scales Might/3) that grants **+5 max mana**, so
+  a fresh caster can afford a real spell pool before they find a glimmer staff.
+- **Two-handed weapon scaling brought in line.** Every two-handed weapon now scales
+  at least at its attribute over 3 (the reward for giving up the shield): the
+  **glimmerwood staff** goes Intellect/4 → **Intellect/3**, matching the warder's
+  staff and the staff of drinking dark. The **glimmersteel staff** now also grants
+  **+2 Wits** (on top of its +1 Intellect / +5 max mana), rounding it out as a
+  defensive caster focus.
+- **One-handed Might weapons normalised to the Might/4 baseline.** The reverse of
+  the two-hander rule: a one-hander scales at Might/4 because it keeps the shield
+  hand free. Three that scaled better are brought to baseline — the **iron mace**
+  and **longsword** (were Might/2 and Might/3) now scale Might/4, earning their
+  edge through damage die and speed rather than scaling; the rare **glimmersteel
+  sword** drops from Might/2 to Might/4 but keeps its perk as **+2 Might** (up from
+  +1), so it still lends strength to the arm without out-scaling a shielded
+  greatweapon fighter.
 - **`attributes` (`attr` / `stats`) — a live character sheet that explains what
   every attribute is doing for you.** Reads your attributes *effective* (base +
   gear `attrMod` + active buffs, exactly what combat reads) and shows the real

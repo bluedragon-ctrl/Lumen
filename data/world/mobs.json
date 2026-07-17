@@ -464,7 +464,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "banded-shield" }, { "template": "copper-bound-focus" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
     }
   },
   "visiting-trader": {
@@ -499,7 +499,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "lamp-oil", "price": 10 }, { "template": "half-plate-harness", "price": 190 }, { "template": "great-helm", "price": 100 }, { "template": "longsword", "price": 95 }, { "template": "halberd", "price": 135 }, { "template": "embroidered-mantle", "price": 90 }, { "template": "healing-potion", "price": 75 }, { "template": "mana-potion", "price": 65 }, { "template": "fine-lantern", "price": 110 }, { "template": "gilt-spirits", "price": 55 }, { "template": "warded-signet-ring", "price": 320 }]
+      "sells": [{ "template": "lamp-oil", "price": 10 }, { "template": "half-plate-harness", "price": 190 }, { "template": "great-helm", "price": 100 }, { "template": "longsword", "price": 95 }, { "template": "halberd", "price": 135 }, { "template": "embroidered-mantle", "price": 90 }, { "template": "healing-potion", "price": 75 }, { "template": "mana-potion", "price": 65 }, { "template": "fine-lantern", "price": 110 }, { "template": "gilt-spirits", "price": 55 }, { "template": "graven-heater", "price": 300 }, { "template": "warded-signet-ring", "price": 320 }]
     }
   },
   "rim-smith": {
@@ -1525,7 +1525,7 @@
     "shards": "2d6",
     "loot": [{ "template": "lamp-oil", "chance": 0.5 }, { "template": "palecap-mushroom", "chance": 0.5 }],
     "shop": {
-      "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "scroll-halo" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "umbral-weaving-method" }, { "template": "schematic-dense-chitin-cuirass" }, { "template": "schematic-barbed-bomb" }, { "template": "schematic-glimmerglass" }]
+      "sells": [{ "template": "lamp-oil" }, { "template": "scroll-glimmer-spike" }, { "template": "scroll-glimmer-storm" }, { "template": "scroll-glimmer-husk" }, { "template": "scroll-glimmerskin" }, { "template": "scroll-halo" }, { "template": "book-of-chitin-craft", "price": 80 }, { "template": "umbral-mind-charm" }, { "template": "umbral-glimmer-ring" }, { "template": "witchglow-cap", "price": 12 }, { "template": "schematic-gloom-silk" }, { "template": "umbral-weaving-method" }, { "template": "schematic-dense-chitin-cuirass" }, { "template": "schematic-dense-chitin-tower-shield" }, { "template": "schematic-barbed-bomb" }, { "template": "schematic-glimmerglass" }]
     }
   },
   "umbral-chitin-warden": {

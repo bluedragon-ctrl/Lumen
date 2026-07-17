@@ -536,6 +536,7 @@ function renderPlayer(p) {
     if (item) {
       let sub = slot;
       if (item.type === "light") sub += item.lit ? ` · lit · fuel ${Math.floor(item.fuel)}/${item.fuelMax}` : ` · unlit · fuel ${Math.floor(item.fuel)}/${item.fuelMax}`;
+      if (item.twoHanded) sub += " · 2H";
       const rar = item.rarity && item.rarity !== "common" ? " rarity-" + item.rarity : "";
       li.innerHTML = `<span class="item-name${rar}">${item.name}</span><span class="sub">${sub}</span>`;
     } else {

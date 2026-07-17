@@ -154,6 +154,13 @@ function move(state, player, dir, ctx) {
   return msgs;
 }
 
+// True if an equipped/carried instance is a two-handed weapon (fills both hands,
+// so it can't share the grip with a shield).
+function isTwoHanded(world, inst) {
+  const t = inst && world.items[inst.template];
+  return !!(t && t.weapon && t.weapon.twoHanded);
+}
+
 function equip(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return err("Equip what?");
@@ -164,13 +171,28 @@ function equip(state, player, arg, ctx) {
   const prevHp = player.maxHp;
   const prevMana = player.maxMana;
   const prev = equipItem(player, player.inventory.splice(idx, 1)[0], w);
+  // Two-handed weapons and shields compete for the grip: taking up one frees the
+  // other back to the pack. A 2H weapon frees the shield slot; a shield frees the
+  // hand when it holds a 2H weapon (a one-handed weapon and shield coexist fine).
+  let freed = null;
+  const conflictSlot = t.weapon && t.weapon.twoHanded
+    ? "shield"
+    : t.slot === "shield" && player.equipment.hand && isTwoHanded(w, player.equipment.hand)
+      ? "hand"
+      : null;
+  if (conflictSlot && player.equipment[conflictSlot]) {
+    freed = player.equipment[conflictSlot];
+    player.equipment[conflictSlot] = null;
+    player.inventory.push(freed);
+  }
   state.deriveStats(player); // gear may carry an armour.maxHp / armour.maxMana bonus
   if (player.maxHp > prevHp) player.hp += player.maxHp - prevHp; // grant the new capacity (like training)
   if (player.maxMana > prevMana) player.mana += player.maxMana - prevMana;
   player.hp = Math.min(player.hp, player.maxHp);
   player.mana = Math.min(player.mana, player.maxMana);
   relight(state, ctx, player);
-  const stowed = prev ? `, stowing ${w.items[prev.template].name}` : "";
+  const stowNames = [prev, freed].filter(Boolean).map((i) => w.items[i.template].name);
+  const stowed = stowNames.length ? `, stowing ${joinList(stowNames)}` : "";
   const kindled = t.slot === "light" && player.equipment.light && player.equipment.light.lit ? " It kindles, and the dark recedes." : "";
   return selfAndViews(state, player, `You equip ${t.name}${stowed}.${kindled}`);
 }
