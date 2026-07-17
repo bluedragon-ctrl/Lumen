@@ -110,6 +110,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   targe and glimmersteel shield are the **first non-Umbral sources of Voidward** — a
   deliberate widening, on the reasoning that glimmer is captured light and light is
   what the void feeds on.
+- **A graven heater — a fancy outland shield, for sale from Silas.** A rare surface
+  masterwork the visiting outland-factor carries down the old road: **2 armour, +5%
+  evasion, and no speed or Wits penalty** — the premium *bought* shield. Its luxury
+  is carrying armour 2 **clean** where every other armour-2 shield pays for it (the
+  dense chitin tower eats speed −2 and Wits −2), plus the dodge of a buckler on top.
+  Deliberately mundane steel — **no Spellward or Voidward** — so the deep's own
+  glimmer-craft still rules against magic and the void; this is only the king of
+  *physical* defence coin can buy. Sold by Silas at 300, a buy-only import with no
+  recipe or book.
 - **A copper-bound focus — a cheap starter caster staff, for sale from Garrick.**
   A two-handed focus (1d6 physical, scales Might/3) that grants **+5 max mana**, so
   a fresh caster can afford a real spell pool before they find a glimmer staff.

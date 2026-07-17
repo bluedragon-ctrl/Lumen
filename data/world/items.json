@@ -197,6 +197,18 @@
     "value": 85,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 2, "maxHp": 6, "attrMod": { "wits": -2 } }
   },
+  "graven-heater": {
+    "id": "graven-heater",
+    "rarity": "rare",
+    "name": "a graven heater",
+    "keywords": ["heater", "shield", "graven", "kite", "blazon", "escutcheon"],
+    "description": "A heater-shield of fine outland steel, its face graven edge to edge with a blazon no one down here can read — the mark of some far surface house, or the shield-wright who served it. It came down the old road in Silas's pack, oiled and wrapped, worth more than a season's digging. Master-work through and through: pared thin and balanced so true it rides the arm light as a buckler yet turns a blade like plate, quick to the block and quicker off it. It knows nothing of glimmer or the deep's cold hungers — only steel, and steel done as well as steel is ever done.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 5,
+    "value": 280,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "evasion": 0.05 }
+  },
   "foremans-brigandine": {
     "id": "foremans-brigandine",
     "rarity": "uncommon",
