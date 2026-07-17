@@ -230,11 +230,11 @@
     "biome": "rim",
     "tags": ["patrol"],
     "name": "The Craftsmen's Row",
-    "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. The plaza is back to the east.",
+    "description": "A narrow lane of workshops ringing with the smith's hammer and the roar of the smelter. A coal forge glows beside the squat stone furnace; this is where the Rim turns raw ore and the spoils of the deep into gear that might keep a delver alive. At the far end, Tobin's tinker-bench sputters and fumes amid a clutter of half-built contraptions. The plaza is back to the east.",
     "depth": 0,
     "ambientLight": 3,
     "exits": { "east": "d0.plaza" },
-    "fixtures": ["forge", "smelter", "lamp", { "template": "makers-mark", "hidden": { "perception": 2 } }],
+    "fixtures": ["forge", "smelter", "tinkers-bench", "lamp", { "template": "makers-mark", "hidden": { "perception": 2 } }],
     "groundItems": [{ "template": "vial", "qty": 1 }],
     "spawns": [{ "mob": "rim-smith", "max": 1, "respawn": 120 }]
   },

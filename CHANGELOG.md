@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **An alchemy station on the Rim — Tobin's tinker-bench.** The Craftsmen's Row
+  (`d0.workshop`) gains a `crafting` fixture with the **alchemy** station beside
+  its forge and smelter, so a delver can cure and cook the fiddly stuff at the
+  Rim without trekking down to a deeper bench. Themed to Tobin the tinker-smith —
+  a burner, glass retorts, and a clutter of half-built contraptions.
+
 ### Changed
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
