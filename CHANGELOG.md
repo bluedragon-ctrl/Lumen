@@ -5,7 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Weaving is its own craft now — gloom-silk is woven on a loom, not brewed at
+  an alchemy bench.** A new **`weaving`** crafting station, provided by looms: the
+  Weaver's Hall in the Umbral village (`d10.village.weaver`) gains a functional
+  station on its existing looms, and a new **an Umbral loom** fixture stands in
+  **Mallki's Hollow** (`d3.umbral.dwelling`) beside his forge — so a delver who
+  buys the weave-methods from Mallki can card and work the silk right there.
+
 ### Changed
+- **Gloom-silk recipes moved from `alchemy` to the new `weaving` station.** The
+  four core recipes — processing raw chasm-moss into **gloom-silk**, and weaving
+  the **robe**, **hood**, and **cloak** — now require a loom rather than an
+  alchemist's bench. (Recipes that merely *use* gloom-silk as an input — the
+  iridescent carapace gear, warp-fang bindings, weeping lash — are unchanged.)
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
   `A gloom-touched crawler hits you for 6 (physical)!`,
