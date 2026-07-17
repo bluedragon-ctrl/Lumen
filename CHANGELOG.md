@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **The saltpetre torch — a brighter, longer-lasting torch cured from bat
+  guano.** The guano scraped out of the roost-flues and the Guano Sump finally
+  earns its keep: leach the saltpetre out of it, boil it clean, and work it back
+  through a torch's pitch for a light that burns a shade brighter (**output 4**
+  to a common torch's 3) and holds the flame near twice as long (**360** ticks
+  of fuel to 200). It slots between the plain torch and the refuelable
+  lantern/glimmersteel tier — a disposable step up for a delver headed deeper.
+  Crafted at an **alchemy** station from **1 torch + 2 guano** (2 shards); the
+  method is a schematic **Tobin the tinker-smith** sells at the Rim for 6 shards.
+
 ### Changed
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
