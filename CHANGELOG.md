@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **The saltpetre torch — a brighter, longer-lasting torch cured from bat
+  guano.** The guano scraped out of the roost-flues and the Guano Sump finally
+  earns its keep: leach the saltpetre out of it, boil it clean, and work it back
+  through a torch's pitch for a light that burns a shade brighter (**output 4**
+  to a common torch's 3) and holds the flame near twice as long (**360** ticks
+  of fuel to 200). It slots between the plain torch and the refuelable
+  lantern/glimmersteel tier — a disposable step up for a delver headed deeper.
+  Crafted at an **alchemy** station from **1 torch + 2 guano** (2 shards); the
+  method is a schematic **Tobin the tinker-smith** sells at the Rim for 6 shards.
 - **Weaving is its own craft now — gloom-silk is woven on a loom, not brewed at
   an alchemy bench.** A new **`weaving`** crafting station, provided by looms: the
   Weaver's Hall in the Umbral village (`d10.village.weaver`) gains a functional
