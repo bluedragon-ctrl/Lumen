@@ -87,6 +87,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a two-handed weapon (a one-handed weapon and a shield coexist untouched). A
   shield's armour, speed penalty, and any bonuses fold into derived stats like any
   other worn piece.
+- **A copper-bound focus — a cheap starter caster staff, for sale from Garrick.**
+  A two-handed focus (1d6 physical, scales Might/3) that grants **+5 max mana**, so
+  a fresh caster can afford a real spell pool before they find a glimmer staff.
+- **Two-handed weapon scaling brought in line.** Every two-handed weapon now scales
+  at least at its attribute over 3 (the reward for giving up the shield): the
+  **glimmerwood staff** goes Intellect/4 → **Intellect/3**, matching the warder's
+  staff and the staff of drinking dark. The **glimmersteel staff** now also grants
+  **+2 Wits** (on top of its +1 Intellect / +5 max mana), rounding it out as a
+  defensive caster focus.
 - **`attributes` (`attr` / `stats`) — a live character sheet that explains what
   every attribute is doing for you.** Reads your attributes *effective* (base +
   gear `attrMod` + active buffs, exactly what combat reads) and shows the real

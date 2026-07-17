@@ -934,7 +934,19 @@
     "weight": 2,
     "value": 180,
     "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12, "twoHanded": true },
-    "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
+    "armour": { "attrMod": { "intellect": 1, "wits": 2 }, "maxMana": 5 }
+  },
+  "copper-bound-focus": {
+    "id": "copper-bound-focus",
+    "name": "a copper-bound focus",
+    "keywords": ["focus", "staff", "rod", "copper", "mage", "wand"],
+    "description": "A length of plain pit-pine banded in copper wire, a chip of raw glimmer no bigger than a thumbnail soldered into the split head. Garrick sells them by the armful to anyone who fancies themselves a caster — cheap, honest work, no attunement to speak of. Held while casting it steadies the will just enough to deepen the well a mind draws from; and if the magic won't come, there's always the heavy end. It asks both hands.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 2,
+    "value": 40,
+    "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12, "twoHanded": true },
+    "armour": { "maxMana": 5 }
   },
   "glimmersteel-cuirass": {
     "id": "glimmersteel-cuirass",
@@ -1975,7 +1987,7 @@
     "slot": "hand",
     "weight": 2,
     "value": 160,
-    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 4 }, "twoHanded": true, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
+    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 }, "twoHanded": true, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
     "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
   },
   "glimmerwood-glaive": {
