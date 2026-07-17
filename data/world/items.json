@@ -73,7 +73,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 26,
-    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 } }
+    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "twoHanded": true }
   },
   "leather-jerkin": {
     "id": "leather-jerkin",
@@ -115,6 +115,17 @@
     "value": 26,
     "armour": { "armour": 2, "ward": 0, "speedPenalty": 0, "attrMod": { "wits": -1 } }
   },
+  "banded-shield": {
+    "id": "banded-shield",
+    "name": "a banded shield",
+    "keywords": ["shield", "board", "banded", "buckler"],
+    "description": "A round of salvaged cart-boards, planed flat and banded across the face with strips of worn pick-iron riveted to a central boss. Quartermaster's work — knocked together from what the pit throws out and sold for what the desperate will pay. It rides heavy on the arm and drags at a swing, but a bossed edge turns a blow that bare hide would let through, and a delver learns to love the weight the first time it saves them.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 4,
+    "value": 24,
+    "armour": { "armour": 1, "ward": 0, "speedPenalty": 1 }
+  },
   "foremans-brigandine": {
     "id": "foremans-brigandine",
     "rarity": "uncommon",
@@ -137,7 +148,7 @@
     "slot": "hand",
     "weight": 2,
     "value": 90,
-    "weapon": { "damage": { "magical": "1d4" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 } },
+    "weapon": { "damage": { "magical": "1d4" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 3 }, "twoHanded": true },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 3 }
   },
   "graveworked-apron": {
@@ -910,7 +921,7 @@
     "slot": "hand",
     "weight": 5,
     "value": 200,
-    "weapon": { "damage": { "physical": "1d12" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 16 },
+    "weapon": { "damage": { "physical": "1d12" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 16, "twoHanded": true },
     "armour": { "attrMod": { "might": 1 } }
   },
   "glimmersteel-staff": {
@@ -922,7 +933,7 @@
     "slot": "hand",
     "weight": 2,
     "value": 180,
-    "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12 },
+    "weapon": { "damage": { "physical": "1d6" }, "scale": { "attr": "might", "per": 3 }, "actionCost": 12, "twoHanded": true },
     "armour": { "attrMod": { "intellect": 1 }, "maxMana": 5 }
   },
   "glimmersteel-cuirass": {
@@ -1572,7 +1583,7 @@
     "slot": "hand",
     "weight": 4,
     "value": 34,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } },
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true },
     "rarity": "uncommon"
   },
   "weeping-lash": {
@@ -1904,6 +1915,7 @@
       "damage": { "magical": "1d6" },
       "actionCost": 12,
       "scale": { "attr": "intellect", "per": 3 },
+      "twoHanded": true,
       "onHit": [{ "type": "restore", "hp": 2, "target": "self", "chance": 1 }]
     },
     "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
@@ -1950,7 +1962,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 150,
-    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 }, "crit": 0.05 },
+    "weapon": { "damage": { "physical": "1d10" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "twoHanded": true },
     "armour": { "attrMod": { "might": 1 } }
   },
   "glimmerwood-staff": {
@@ -1963,7 +1975,7 @@
     "slot": "hand",
     "weight": 2,
     "value": 160,
-    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 4 }, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
+    "weapon": { "damage": { "magical": "1d6" }, "actionCost": 12, "scale": { "attr": "intellect", "per": 4 }, "twoHanded": true, "onHit": [{ "type": "restore", "mana": 2, "target": "self", "chance": 1 }] },
     "armour": { "attrMod": { "intellect": 2 }, "maxMana": 6 }
   },
   "glimmerwood-glaive": {
@@ -1976,7 +1988,7 @@
     "slot": "hand",
     "weight": 4,
     "value": 180,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 16, "scale": { "attr": "might", "per": 2 }, "crit": 0.05, "twoHanded": true, "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }] },
     "armour": { "attrMod": { "might": 1 } }
   },
   "warp-fang-dirk": {
@@ -2192,7 +2204,7 @@
     "slot": "hand",
     "weight": 5,
     "value": 85,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 } }
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true }
   },
   "embroidered-mantle": {
     "id": "embroidered-mantle",

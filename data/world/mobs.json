@@ -464,7 +464,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
+      "sells": [{ "template": "torch" }, { "template": "lantern" }, { "template": "lamp-oil" }, { "template": "vial" }, { "template": "prospectors-hatchet" }, { "template": "leather-jerkin" }, { "template": "leather-helm" }, { "template": "iron-cuirass" }, { "template": "iron-helm" }, { "template": "banded-shield" }, { "template": "iron-bar" }, { "template": "regeneration-draught" }, { "template": "schematic-render-oil" }]
     }
   },
   "visiting-trader": {

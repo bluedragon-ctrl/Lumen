@@ -73,6 +73,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   effects; only environmental void's own hp drain still deals raw damage, by design.
 
 ### Added
+- **Two-handed weapons and shields — a one-hand-versus-two-hand split, with a new
+  off-hand `shield` slot.** Heavy greatweapons now declare `weapon.twoHanded`: the
+  polearms and mauls (halberd, glimmerwood glaive, glimmerwood spear, chitin maul,
+  glimmersteel warhammer, prospector's hatchet) and every staff (warder's,
+  glimmersteel, glimmerwood, and the staff of drinking dark). A two-handed weapon
+  is tagged **2H** in the Equipment panel and reads *"two-handed (no shield)"* in
+  the Inspect window. A new **`shield`** equip slot rounds out the off-hand, seeded
+  empty on fresh characters so `unequip shield` works from the start; the first
+  shield — **a banded shield** (1 armour, small speed penalty) — is for sale from
+  Garrick the quartermaster at the plaza. The two compete for the grip: wielding a
+  two-handed weapon auto-stows an equipped shield, and equipping a shield auto-stows
+  a two-handed weapon (a one-handed weapon and a shield coexist untouched). A
+  shield's armour, speed penalty, and any bonuses fold into derived stats like any
+  other worn piece.
 - **`attributes` (`attr` / `stats`) — a live character sheet that explains what
   every attribute is doing for you.** Reads your attributes *effective* (base +
   gear `attrMod` + active buffs, exactly what combat reads) and shows the real
