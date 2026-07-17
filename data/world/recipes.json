@@ -367,7 +367,7 @@
   "weave-weeping-lash": {
     "id": "weave-weeping-lash",
     "name": "Weeping Lash",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "gloom-silk", "qty": 2 },
       { "template": "chitin-spike", "qty": 4 }
@@ -423,7 +423,7 @@
   "weave-iridescent-scale-cloak": {
     "id": "weave-iridescent-scale-cloak",
     "name": "Iridescent Scale-Cloak",
-    "station": "alchemy",
+    "station": "weaving",
     "inputs": [
       { "template": "iridescent-carapace", "qty": 6 },
       { "template": "gloom-silk", "qty": 5 }

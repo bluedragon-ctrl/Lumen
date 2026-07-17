@@ -14,11 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   buys the weave-methods from Mallki can card and work the silk right there.
 
 ### Changed
-- **Gloom-silk recipes moved from `alchemy` to the new `weaving` station.** The
-  four core recipes — processing raw chasm-moss into **gloom-silk**, and weaving
-  the **robe**, **hood**, and **cloak** — now require a loom rather than an
-  alchemist's bench. (Recipes that merely *use* gloom-silk as an input — the
-  iridescent carapace gear, warp-fang bindings, weeping lash — are unchanged.)
+- **Gloom-silk recipes moved from `alchemy` to the new `weaving` station.** Six
+  cloth recipes now require a loom rather than an alchemist's bench: processing
+  raw chasm-moss into **gloom-silk**, weaving the **robe**, **hood**, and
+  **cloak**, and the two other woven pieces — the **Iridescent Scale-Cloak** and
+  the **Weeping Lash**. (Recipes that merely *use* gloom-silk as an input — the
+  iridescent carapace armour, warp-fang bindings — stay on their current
+  stations.)
 - **Combat lines now state the damage type on every hit.** Each landed blow is
   tagged with its type in the console — `You hit a giant rat for 4 (magical).`,
   `A gloom-touched crawler hits you for 6 (physical)!`,
