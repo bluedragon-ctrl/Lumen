@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   buys the weave-methods from Mallki can card and work the silk right there.
 
 ### Changed
+- **Chitin plate is now common rarity.** The grey stonebug scute is basic
+  crafting stock, not an uncommon find — its explicit `rarity: "uncommon"` is
+  dropped so it renders neutral, matching the convention that common items omit
+  the field.
 - **Gloom-silk recipes moved from `alchemy` to the new `weaving` station.** Six
   cloth recipes now require a loom rather than an alchemist's bench: processing
   raw chasm-moss into **gloom-silk**, weaving the **robe**, **hood**, and

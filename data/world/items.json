@@ -1330,8 +1330,7 @@
     "type": "material",
     "weight": 1,
     "value": 9,
-    "stackable": true,
-    "rarity": "uncommon"
+    "stackable": true
   },
   "dense-chitin-plate": {
     "id": "dense-chitin-plate",
