@@ -96,6 +96,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   staff and the staff of drinking dark. The **glimmersteel staff** now also grants
   **+2 Wits** (on top of its +1 Intellect / +5 max mana), rounding it out as a
   defensive caster focus.
+- **One-handed Might weapons normalised to the Might/4 baseline.** The reverse of
+  the two-hander rule: a one-hander scales at Might/4 because it keeps the shield
+  hand free. Three that scaled better are brought to baseline — the **iron mace**
+  and **longsword** (were Might/2 and Might/3) now scale Might/4, earning their
+  edge through damage die and speed rather than scaling; the rare **glimmersteel
+  sword** drops from Might/2 to Might/4 but keeps its perk as **+2 Might** (up from
+  +1), so it still lends strength to the arm without out-scaling a shielded
+  greatweapon fighter.
 - **`attributes` (`attr` / `stats`) — a live character sheet that explains what
   every attribute is doing for you.** Reads your attributes *effective* (base +
   gear `attrMod` + active buffs, exactly what combat reads) and shows the real

@@ -908,8 +908,8 @@
     "slot": "hand",
     "weight": 2,
     "value": 180,
-    "weapon": { "damage": { "physical": "1d8" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 12 },
-    "armour": { "attrMod": { "might": 1 } }
+    "weapon": { "damage": { "physical": "1d8" }, "scale": { "attr": "might", "per": 4 }, "actionCost": 12 },
+    "armour": { "attrMod": { "might": 2 } }
   },
   "glimmersteel-warhammer": {
     "id": "glimmersteel-warhammer",
@@ -1528,7 +1528,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 30,
-    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 2 } }
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 4 } }
   },
   "chitin-helm": {
     "id": "chitin-helm",
@@ -2204,7 +2204,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 60,
-    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 13, "scale": { "attr": "might", "per": 3 } }
+    "weapon": { "damage": { "physical": "1d8" }, "actionCost": 13, "scale": { "attr": "might", "per": 4 } }
   },
   "halberd": {
     "id": "halberd",
