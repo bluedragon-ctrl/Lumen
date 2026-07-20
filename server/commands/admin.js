@@ -2,9 +2,11 @@
 /**
  * Admin-only commands, prefixed with '@'. A dev affordance, not authored content.
  */
+const crypto = require("crypto");
 const { buildPlayerView } = require("../render");
 const { makeItemInstance } = require("../state");
 const accounts = require("../accounts");
+const { INVITE_KEY_HASH } = require("../config");
 const { ADMIN_HELP_SECTION, helpEntry } = require("./help");
 const {
   cap, NOOP_CTX, TRAINABLE, selfAndViews, err, logMsg, announce, announceLevelUps, addToInventory,
@@ -133,6 +135,45 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
         return err(`Usage: @tide <${PHASES.join("|")}|auto|status>. Unknown phase "${a}".`);
       for (const ev of state.forceTidePhase(a)) ctx.emit(ev);
       return logMsg(`Tide forced to "${a}" (pinned — "@tide auto" to resume the clock).`);
+    }
+    case "@invite-key": {
+      // Set / rotate / clear the new-player registration key live, without a
+      // restart — useful where the boot env is awkward to change (e.g. Fly.io).
+      // A runtime override (accounts.writeInviteHash) wins over the
+      // INVITE_KEY_HASH env default; only the hash is stored, so an existing key
+      // can be reset but never read back. Subcommands: status | new | set <key> |
+      // off. See server/index.js activeInviteHash for the precedence.
+      const [sub, ...rest] = (arg || "").trim().split(/\s+/);
+      const cmd = (sub || "status").toLowerCase();
+      const source = () => (accounts.loadInviteHash() ? "server (@invite-key)" : INVITE_KEY_HASH ? "INVITE_KEY_HASH env" : null);
+      if (cmd === "status") {
+        const src = source();
+        return logMsg(
+          src
+            ? `Invite gate: ON (${src}). New players need the key. The key is stored hashed — it can't be shown, only reset with "@invite-key new". "@invite-key off" clears the server override.`
+            : `Invite gate: OFF — registration is open. "@invite-key new" generates a key and turns it on.`
+        );
+      }
+      if (cmd === "new") {
+        const key = crypto.randomBytes(12).toString("base64url"); // ~16 shareable chars
+        accounts.writeInviteHash(accounts.hashInviteKey(key));
+        return logMsg(
+          `New invitation key: <#gold>${key}<#reset>\nShare it with invitees — it's stored hashed and won't be shown again. The gate is now ON (server override).`
+        );
+      }
+      if (cmd === "set") {
+        const key = rest.join(" ");
+        if (key.length < 6) return err('Usage: @invite-key set <key> (min 6 characters).');
+        accounts.writeInviteHash(accounts.hashInviteKey(key));
+        return logMsg(`Invitation key set (server override). The gate is now ON. New players must present this key.`);
+      }
+      if (cmd === "off" || cmd === "clear") {
+        const had = accounts.clearInviteHash();
+        if (INVITE_KEY_HASH)
+          return logMsg(`${had ? "Server invite override cleared." : "No server override was set."} The gate falls back to the INVITE_KEY_HASH env key (still ON).`);
+        return logMsg(had ? "Invite gate disabled — registration is now open." : "No invitation key was set — registration is already open.");
+      }
+      return err('Usage: @invite-key <status|new|set <key>|off>.');
     }
     case "@help": {
       const lines = ["<#gold>Admin commands<#reset>", ""];

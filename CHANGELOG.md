@@ -32,6 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for one. A deliberately light gate for now; a fuller invite/registration system
   is left to a later security-hardening pass. A new **`.env.example`** documents
   this alongside `ADMIN_PASSWORD`, `PORT`, and `SHOW_ADMIN_LOGIN`.
+- **Admins can set/rotate the invitation key live with `@invite-key`.** For hosts
+  where changing the boot environment is awkward (e.g. a Fly.io deploy),
+  `@invite-key new` generates a fresh key (shown once) and turns the gate on,
+  `@invite-key set <key>` sets a chosen one, `@invite-key off` clears it, and
+  `@invite-key status` reports the state. The key is stored **hashed** in a
+  runtime file (`data/runtime/invite.json`) that takes precedence over the env
+  default, so it can be reset but never read back. Like player saves it only
+  survives a redeploy if `data/runtime/` is on a persistent volume; otherwise it
+  falls back to the env key.
 - **The saltpetre torch — a brighter, longer-lasting torch cured from bat
   guano.** The guano scraped out of the roost-flues and the Guano Sump finally
   earns its keep: leach the saltpetre out of it, boil it clean, and work it back

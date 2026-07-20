@@ -85,9 +85,15 @@ matching `inviteKey`; the roster's `requireInvite` flag tells the client to show
 the field. The configured value is a hashed `salt:hash` string (the plaintext key
 never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
 `tools/hash-invite-key.js`) and share the plaintext with invitees. It's one shared
-secret, not per-character. A light gate for now; a fuller invite/registration
-system is deferred to a later security-hardening pass. See `.env.example` for all
-server env vars.
+secret, not per-character. An admin can also set/rotate the key live from in-game
+with **`@invite-key`** (`new` | `set <key>` | `off` | `status`) — handy where the
+boot env is awkward to change (e.g. Fly.io). That writes the hash to a runtime
+file (`data/runtime/invite.json`) which takes precedence over the env default;
+the key can be reset but, being hashed, never read back. Precedence: runtime file
+→ env → open (see `activeInviteHash` in index.js). Like player saves, the runtime
+file only survives a redeploy on a persistent volume, else it falls back to the
+env key. A light gate for now; a fuller invite/registration system is deferred to
+a later security-hardening pass. See `.env.example` for all server env vars.
 
 Admin accounts never appear in `accounts` — they're offered separately via
 `adminName`, and the whole admin option is hidden (and admin logins refused)

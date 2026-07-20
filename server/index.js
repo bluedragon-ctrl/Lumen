@@ -49,10 +49,20 @@ if (SHOW_ADMIN_LOGIN && !accounts.hasPassword(accounts.load("admin"))) {
   );
 }
 console.log(
-  INVITE_KEY_HASH
-    ? "[lumen] new-player registration is gated by INVITE_KEY_HASH."
-    : "[lumen] no INVITE_KEY_HASH set — new-player registration is open."
+  activeInviteHash()
+    ? `[lumen] new-player registration is gated by an invitation key (${
+        accounts.loadInviteHash() ? "set on the server via @invite-key" : "INVITE_KEY_HASH env"
+      }).`
+    : "[lumen] registration is open — no invitation key set (env or @invite-key)."
 );
+
+// The invitation key in force right now: an admin's live `@invite-key` override
+// (a runtime file) wins over the boot-time INVITE_KEY_HASH env default; null
+// means registration is open. Resolved on each use so an admin change takes
+// effect without a restart (see server/commands/admin.js).
+function activeInviteHash() {
+  return accounts.loadInviteHash() || INVITE_KEY_HASH;
+}
 
 function send(ws, msg) {
   if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
@@ -183,7 +193,7 @@ function accountsPayload(notice) {
     showAdmin: SHOW_ADMIN_LOGIN && adminName != null,
     adminName: SHOW_ADMIN_LOGIN ? adminName : null,
     adminNeedsPassword: SHOW_ADMIN_LOGIN ? adminNeedsPassword : false,
-    requireInvite: !!INVITE_KEY_HASH, // create needs an invitation key when set
+    requireInvite: !!activeInviteHash(), // create needs an invitation key when set
     notice: notice || null,
   };
 }
@@ -230,7 +240,8 @@ function createAccount(ws, rawName, password, inviteKey) {
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (accounts.exists(v.name))
     return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
-  if (INVITE_KEY_HASH && !accounts.verifyInviteKey(inviteKey, INVITE_KEY_HASH))
+  const inviteHash = activeInviteHash();
+  if (inviteHash && !accounts.verifyInviteKey(inviteKey, inviteHash))
     return void send(ws, { type: "error", text: "That invitation key isn't valid." });
   const pv = accounts.validatePassword(password);
   if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });

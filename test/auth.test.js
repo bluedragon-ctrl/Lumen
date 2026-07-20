@@ -99,3 +99,21 @@ test("invite key: missing/malformed stored value returns false, never throws", (
   assert.equal(accounts.verifyInviteKey("key", ":onlyhash"), false);
   assert.equal(accounts.verifyInviteKey(undefined, "salt:hash"), false);
 });
+
+test("invite key runtime store: write → load → clear round-trips (admin @invite-key)", () => {
+  const prior = accounts.loadInviteHash(); // usually null; restored in finally
+  try {
+    assert.equal(accounts.clearInviteHash(), prior != null ? true : false); // start clean
+    assert.equal(accounts.loadInviteHash(), null);
+    const stored = accounts.hashInviteKey("runtime-rotated");
+    accounts.writeInviteHash(stored);
+    assert.equal(accounts.loadInviteHash(), stored);
+    assert.equal(accounts.verifyInviteKey("runtime-rotated", accounts.loadInviteHash()), true);
+    assert.equal(accounts.clearInviteHash(), true);
+    assert.equal(accounts.loadInviteHash(), null);
+    assert.equal(accounts.clearInviteHash(), false); // nothing left to clear
+  } finally {
+    if (prior) accounts.writeInviteHash(prior);
+    else accounts.clearInviteHash();
+  }
+});

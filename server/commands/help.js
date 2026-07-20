@@ -77,6 +77,7 @@ const ADMIN_HELP_SECTION = ["Admin", [
   "@give <itemId> [count] — conjure an item into your pack",
   "@teleport <roomId> — jump straight to any room by id",
   "@tide <calm|stirring|tide|receding|auto|status> — drive the world clock",
+  "@invite-key <status|new|set <key>|off> — manage the registration invite key",
 ]];
 
 // Colour one "signature — description" entry: green signature, default rest.

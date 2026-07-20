@@ -100,6 +100,37 @@ function verifyInviteKey(key, saltHash) {
   return verifyPassword(key, saltHash.slice(0, sep), saltHash.slice(sep + 1));
 }
 
+// Runtime override for the invitation key, set live by an admin (`@invite-key`)
+// rather than the boot-time INVITE_KEY_HASH env var — handy where the env is
+// awkward to change (e.g. a Fly.io deploy). Stored as one small file on the same
+// gitignored runtime tree as player saves; only the hash is written, never the
+// plaintext. When present it takes precedence over the env default (the
+// precedence itself lives in server/index.js). NOTE: like player saves, this
+// only survives a redeploy if data/runtime/ is on a persistent volume; otherwise
+// it resets and the env default (if any) takes back over.
+const INVITE_FILE = path.join(RUNTIME_DIR, "invite.json");
+
+function loadInviteHash() {
+  try {
+    const data = JSON.parse(fs.readFileSync(INVITE_FILE, "utf8"));
+    return typeof data.inviteKeyHash === "string" ? data.inviteKeyHash : null;
+  } catch {
+    return null; // missing or unreadable → no runtime override
+  }
+}
+
+function writeInviteHash(saltHash) {
+  ensureDir();
+  fs.writeFileSync(INVITE_FILE, JSON.stringify({ inviteKeyHash: saltHash }, null, 2));
+}
+
+// Remove the runtime override. Returns false if there was nothing to clear.
+function clearInviteHash() {
+  if (!fs.existsSync(INVITE_FILE)) return false;
+  fs.unlinkSync(INVITE_FILE);
+  return true;
+}
+
 const keyOf = (name) => name.trim().toLowerCase();
 const fileOf = (name) => path.join(PLAYERS_DIR, keyOf(name) + ".json");
 
@@ -189,5 +220,5 @@ function remove(name) {
 module.exports = {
   validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR,
   validatePassword, hashPassword, verifyPassword, hasPassword, checkPassword,
-  hashInviteKey, verifyInviteKey,
+  hashInviteKey, verifyInviteKey, loadInviteHash, writeInviteHash, clearInviteHash,
 };
