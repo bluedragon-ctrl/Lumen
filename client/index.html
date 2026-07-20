@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <!-- Login screen: pick, create, or delete a prospector before the game loads.
-       Dev-only, name-only (no passwords). The "Log in as Admin" entry is
-       hideable via SHOW_ADMIN_LOGIN in server/config.js. Shown as a full-screen
-       overlay until the server confirms authentication. -->
+  <!-- Login screen: pick, create, claim, or delete a password-protected
+       prospector before the game loads. Picking / creating / deleting opens the
+       password modal below. The "Log in as Admin" entry is hideable via
+       SHOW_ADMIN_LOGIN in server/config.js. Shown as a full-screen overlay until
+       the server confirms authentication. -->
   <div id="login" class="login-screen" hidden>
     <div class="login-card">
       <h1 class="login-title">Lumen</h1>
@@ -28,15 +29,21 @@
       <button id="login-admin" class="login-btn login-admin" type="button" hidden>Log in as Admin</button>
     </div>
 
-    <!-- Delete confirmation -->
-    <div id="login-confirm" class="login-confirm" hidden>
-      <div class="login-card login-confirm-card">
-        <p id="login-confirm-text" class="login-confirm-text"></p>
+    <!-- Password modal — one component drives log in, create, claim, and delete.
+         The second (confirm) field and danger styling toggle by mode in app.js. -->
+    <div id="login-auth" class="login-confirm" hidden>
+      <form id="login-auth-form" class="login-card login-confirm-card">
+        <p id="login-auth-title" class="login-confirm-text"></p>
+        <p id="login-auth-msg" class="login-msg" hidden></p>
+        <input id="login-auth-pw" type="password" autocomplete="off"
+               maxlength="200" placeholder="password" />
+        <input id="login-auth-pw2" type="password" autocomplete="off"
+               maxlength="200" placeholder="confirm password" hidden />
         <div class="login-confirm-actions">
-          <button id="login-confirm-cancel" class="login-btn ghost" type="button">Cancel</button>
-          <button id="login-confirm-delete" class="login-btn danger" type="button">Delete</button>
+          <button id="login-auth-cancel" class="login-btn ghost" type="button">Cancel</button>
+          <button id="login-auth-submit" class="login-btn" type="submit">Continue</button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 

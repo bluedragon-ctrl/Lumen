@@ -49,32 +49,47 @@ JSON messages over a single socket per player.
 ### Login
 
 On connect (and after every create/delete) the server sends the login-screen
-roster; the client renders it as a pick / create / delete screen (dev-only,
-name-only identity — no passwords):
+roster; the client renders it as a pick / create / claim / delete screen. Every
+account is **password-protected** — a password guards account *identity* (only
+the owner logs in as, or deletes, a character), not server access:
 
 ```json
-// server → client: the roster (each prospector carries their level)
+// server → client: the roster. `needsPassword` marks an account with no
+// password yet — claimed by setting one on first login (see below).
 { "type": "accounts",
-  "accounts": [{ "name": "Bob", "level": 3 }, { "name": "Kara", "level": 1 }],
-  "showAdmin": true, "adminName": "admin", "notice": null }
+  "accounts": [{ "name": "Bob", "level": 3, "needsPassword": false },
+               { "name": "Kara", "level": 1, "needsPassword": true }],
+  "showAdmin": true, "adminName": "admin", "adminNeedsPassword": false, "notice": null }
 
-// client → server: pick, create, or delete a prospector
-{ "type": "login", "name": "Bob" }
-{ "type": "create-account", "name": "Kara" }
-{ "type": "delete-account", "name": "Kara" }
+// client → server: log in, claim (set a first password), create, or delete.
+{ "type": "login", "name": "Bob", "password": "…" }
+{ "type": "claim-password", "name": "Kara", "password": "…" }   // migration first login
+{ "type": "create-account", "name": "Zed", "password": "…" }    // auto-logs in on success
+{ "type": "delete-account", "name": "Kara", "password": "…" }
 
-// server → client: on a successful login
+// server → client: on a successful login / create / claim
 { "type": "authenticated", "name": "Bob", "admin": false }
 ```
+
+Passwords are hashed with Node's built-in `crypto` (scrypt + a random per-account
+salt, constant-time verify — no third-party dep); `salt` + `passwordHash` live on
+the per-character JSON. Wrong password → a clear error, no login. **Claim-on-first-
+login:** an account written before passwords existed has no hash; setting one via
+`claim-password` locks it in. Wrong-password, missing-password (claim needed), and
+already-logged-in are all reported as `error` frames.
 
 Admin accounts never appear in `accounts` — they're offered separately via
 `adminName`, and the whole admin option is hidden (and admin logins refused)
 when `SHOW_ADMIN_LOGIN` is off in `server/config.js` (env: `SHOW_ADMIN_LOGIN=0`).
-Delete is refused for admin accounts and for any prospector currently logged in.
-The `admin` account is auto-created on first boot; admins can also create
-prospectors in-game with `@create-player <name>`. Accounts persist as one JSON file
-per character under `data/runtime/players/` (gitignored), saved on disconnect
-and periodically.
+The `admin` account is auto-created on first boot and reads its password from the
+**`ADMIN_PASSWORD`** environment variable, stamped on each boot so an operator can
+set or rotate it without editing the account file — set it before a public deploy
+so the first visitor can't claim admin. Left unset in local dev, admin claims a
+password on first login like any other account (the server logs a warning while
+it's unclaimed). Admins can also create prospectors in-game with `@create-player
+<name>`. Delete is refused for admin accounts and for any prospector currently
+logged in. Accounts persist as one JSON file per character under
+`data/runtime/players/` (gitignored), saved on disconnect and periodically.
 
 ### Commands
 

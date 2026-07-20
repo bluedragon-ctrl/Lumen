@@ -63,19 +63,22 @@ function sendCommand(text) {
   // command line so the player can keep typing without clicking back in.
   cmdEl.focus();
 }
-function sendLogin(name) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name }));
+function sendLogin(name, password) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name, password }));
 }
-function sendCreateAccount(name) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name }));
+function sendClaimPassword(name, password) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "claim-password", name, password }));
 }
-function sendDeleteAccount(name) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "delete-account", name }));
+function sendCreateAccount(name, password) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name, password }));
+}
+function sendDeleteAccount(name, password) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "delete-account", name, password }));
 }
 function setPrompt() {
   cmdEl.placeholder = authed
     ? 'type a command — try "look", "down", "light", "help"'
-    : 'enter your prospector name (or "admin") and press Enter';
+    : "log in above to begin";
 }
 
 // --- Login screen ----------------------------------------------------------
@@ -88,11 +91,12 @@ const loginMsgEl = $("login-msg");
 const loginNameEl = $("login-name");
 const loginAdminEl = $("login-admin");
 let adminName = null; // who the "Log in as Admin" button logs in as
-let pendingDelete = null; // prospector awaiting delete confirmation
+let adminNeedsPassword = false; // admin account hasn't set a password yet (claimable)
 
 function showLogin() { loginEl.hidden = false; }
 function hideLogin() {
   loginEl.hidden = true;
+  closeAuth();
   showLoginMsg(null);
   cmdEl.focus();
 }
@@ -106,7 +110,9 @@ function showLoginMsg(text, kind) {
 function renderLogin(msg) {
   authed = false;
   showLogin();
+  closeAuth(); // a fresh roster supersedes any half-finished password prompt
   adminName = msg.adminName || null;
+  adminNeedsPassword = !!msg.adminNeedsPassword;
   loginAdminEl.hidden = !msg.showAdmin;
 
   loginListEl.innerHTML = "";
@@ -117,7 +123,7 @@ function renderLogin(msg) {
     li.textContent = "No prospectors yet — create one below.";
     loginListEl.appendChild(li);
   }
-  for (const { name, level } of prospectors) {
+  for (const { name, level, needsPassword } of prospectors) {
     const li = document.createElement("li");
     li.className = "login-row";
     const pick = document.createElement("button");
@@ -130,14 +136,16 @@ function renderLogin(msg) {
     lvl.className = "login-lvl";
     lvl.textContent = "Lv " + (level ?? 1);
     pick.append(nm, lvl);
-    pick.addEventListener("click", () => { showLoginMsg(null); sendLogin(name); });
+    // A hash-less account is claimed by setting a password; otherwise it's a
+    // normal password login. Either way the modal handles it.
+    pick.addEventListener("click", () => openAuth(needsPassword ? "claim" : "login", name));
     const del = document.createElement("button");
     del.type = "button";
     del.className = "login-del";
     del.title = `Delete ${name}`;
     del.setAttribute("aria-label", `Delete ${name}`);
     del.textContent = "✕";
-    del.addEventListener("click", () => askDelete(name));
+    del.addEventListener("click", () => askDelete(name, needsPassword));
     li.appendChild(pick);
     li.appendChild(del);
     loginListEl.appendChild(li);
@@ -150,28 +158,108 @@ function renderLogin(msg) {
   else showLoginMsg(null);
 }
 
-// Delete needs a confirmation step — it removes the character permanently.
-function askDelete(name) {
-  pendingDelete = name;
-  $("login-confirm-text").textContent =
-    `Delete prospector “${name}”? This removes their character permanently and cannot be undone.`;
-  $("login-confirm").hidden = false;
+// --- Password modal --------------------------------------------------------
+// One modal drives all four password flows. `authMode` is the live flow (null
+// when closed), `authName` the prospector it targets.
+//   login  — enter an existing password
+//   claim  — set a password on a pre-password account (migration first login)
+//   create — set a password for a brand-new prospector
+//   delete — confirm a permanent delete with the account's password
+// "claim" and "create" ask for the password twice (set + confirm); "delete"
+// styles the submit as destructive.
+const authEl = $("login-auth");
+const authTitleEl = $("login-auth-title");
+const authMsgEl = $("login-auth-msg");
+const authPwEl = $("login-auth-pw");
+const authPw2El = $("login-auth-pw2");
+const authSubmitEl = $("login-auth-submit");
+let authMode = null;
+let authName = null;
+
+const AUTH_SETS_PASSWORD = { claim: true, create: true }; // flows with a confirm field
+
+function authTitle(mode, name) {
+  switch (mode) {
+    case "login": return `Enter the password for “${name}”.`;
+    case "claim": return `“${name}” has no password yet. Set one to claim this prospector — only someone with the password can log in as, or delete, them.`;
+    case "create": return `Set a password for your new prospector “${name}”.`;
+    case "delete": return `Delete “${name}” permanently. Enter their password to confirm — this cannot be undone.`;
+    default: return "";
+  }
 }
-function closeConfirm() { pendingDelete = null; $("login-confirm").hidden = true; }
+
+function showAuthMsg(text, kind) {
+  if (!text) { authMsgEl.hidden = true; authMsgEl.textContent = ""; return; }
+  authMsgEl.hidden = false;
+  authMsgEl.textContent = text;
+  authMsgEl.className = "login-msg" + (kind ? " " + kind : "");
+}
+
+function openAuth(mode, name) {
+  authMode = mode;
+  authName = name;
+  showLoginMsg(null);
+  authTitleEl.textContent = authTitle(mode, name);
+  const setsPw = !!AUTH_SETS_PASSWORD[mode];
+  authPwEl.value = "";
+  authPw2El.value = "";
+  authPw2El.hidden = !setsPw;
+  authPwEl.placeholder = setsPw ? "new password" : "password";
+  authSubmitEl.textContent = mode === "delete" ? "Delete" : "Continue";
+  authSubmitEl.classList.toggle("danger", mode === "delete");
+  showAuthMsg(null);
+  authEl.hidden = false;
+  authPwEl.focus();
+}
+
+function closeAuth() {
+  authMode = null;
+  authName = null;
+  authEl.hidden = true;
+  authPwEl.value = "";
+  authPw2El.value = "";
+  showAuthMsg(null);
+}
+
+function submitAuth() {
+  if (!authMode) return;
+  const pw = authPwEl.value;
+  if (!pw) return void showAuthMsg("Enter a password.", "error");
+  if (AUTH_SETS_PASSWORD[authMode]) {
+    if (pw.length < 6) return void showAuthMsg("Passwords must be at least 6 characters.", "error");
+    if (pw !== authPw2El.value) return void showAuthMsg("The passwords don't match.", "error");
+  }
+  showAuthMsg(null);
+  // The modal stays open until the server answers: an error lands in the modal
+  // (see handle()), success arrives as `authenticated` (login/create/claim) or a
+  // fresh `accounts` roster (delete), both of which close it.
+  switch (authMode) {
+    case "login": return void sendLogin(authName, pw);
+    case "claim": return void sendClaimPassword(authName, pw);
+    case "create": return void sendCreateAccount(authName, pw);
+    case "delete": return void sendDeleteAccount(authName, pw);
+  }
+}
+
+// Delete opens the password modal; a still-unclaimed account has no password to
+// check against, so steer the user to claim it first instead of prompting.
+function askDelete(name, needsPassword) {
+  if (needsPassword)
+    return void showLoginMsg(`“${name}” has no password yet — claim it (log in and set one) before it can be deleted.`, "error");
+  openAuth("delete", name);
+}
 
 $("login-create").addEventListener("submit", (e) => {
   e.preventDefault();
   const name = loginNameEl.value.trim();
   if (!name) return;
   showLoginMsg(null);
-  sendCreateAccount(name);
+  openAuth("create", name);
 });
-loginAdminEl.addEventListener("click", () => { showLoginMsg(null); sendLogin(adminName || "admin"); });
-$("login-confirm-cancel").addEventListener("click", closeConfirm);
-$("login-confirm-delete").addEventListener("click", () => {
-  if (pendingDelete) sendDeleteAccount(pendingDelete);
-  closeConfirm();
-});
+loginAdminEl.addEventListener("click", () =>
+  openAuth(adminNeedsPassword ? "claim" : "login", adminName || "admin"));
+$("login-auth-form").addEventListener("submit", (e) => { e.preventDefault(); submitAuth(); });
+$("login-auth-cancel").addEventListener("click", closeAuth);
 
 // --- Message handling ------------------------------------------------------
 function handle(msg) {
@@ -180,9 +268,15 @@ function handle(msg) {
     case "authenticated": authed = true; setPrompt(); hideLogin(); break;
     case "system": addLine(msg.text, "system"); break;
     // Before login the console is hidden behind the login screen, so surface
-    // login errors (bad name, already-logged-in, delete refused) on the screen
-    // itself; once in-game they scroll past in the console as before.
-    case "error": if (!authed) showLoginMsg(msg.text, "error"); else addLine(msg.text, "error"); break;
+    // login errors (bad name/password, already-logged-in, delete refused) on the
+    // screen itself — inside the password modal when one is open, so a wrong
+    // password shows where the user is looking and they can retry in place. Once
+    // in-game, errors scroll past in the console as before.
+    case "error":
+      if (authMode) showAuthMsg(msg.text, "error");
+      else if (!authed) showLoginMsg(msg.text, "error");
+      else addLine(msg.text, "error");
+      break;
     case "log": addLine(msg.text, "log"); break;
     case "goodbye": addLine(msg.text, "system"); loggedOff = true; if (ws) ws.close(); break;
     case "combat": addLine(msg.text, "combat"); break;

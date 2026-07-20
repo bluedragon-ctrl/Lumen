@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Player accounts are password-protected.** Login is no longer name-only — a
+  password now guards account *identity*, so only the owner can log in as, or
+  delete, a character (the first step toward a public deploy; open registration
+  stays). Hashing uses Node's built-in `crypto` (scrypt + a random per-account
+  salt, constant-time verify) — no new dependency — storing `salt` +
+  `passwordHash` on the per-character JSON. Creating a prospector sets its
+  password (and drops you straight in); logging in and deleting both require it.
+  **Existing accounts migrate by claim-on-first-login:** a character with no
+  password yet is claimed by setting one, which locks it to you. The auto-created
+  **admin** reads its password from the **`ADMIN_PASSWORD`** environment variable
+  at boot (set/rotated on each start) so a public deploy can't have it claimed by
+  the first visitor; left unset in local dev, admin claims a password on first
+  login like anyone else (with a startup warning while it's unclaimed).
+  `SHOW_ADMIN_LOGIN` behaviour is unchanged. The login screen gains a password
+  modal wired through log-in / create / claim / delete. *Out of scope for now:
+  email, password reset, rate limiting, account lockout, an invite gate.*
 - **The saltpetre torch — a brighter, longer-lasting torch cured from bat
   guano.** The guano scraped out of the roost-flues and the Guano Sump finally
   earns its keep: leach the saltpetre out of it, boil it clean, and work it back

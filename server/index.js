@@ -25,10 +25,28 @@ console.log(
     `${Object.keys(world.mobs).length} mob templates, ${Object.keys(world.items).length} items.`
 );
 
-// The default admin account is always present (auto-created if missing).
+// The default admin account is always present (auto-created if missing). On a
+// public deploy, set ADMIN_PASSWORD in the environment so the admin can't be
+// claimed by the first visitor to reach the login screen; it's stamped onto the
+// account at boot (creating or rotating the password). In local dev you can
+// leave it unset and claim a password on first login like any other account.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 if (!accounts.exists("admin")) {
-  accounts.save(state.createCharacter("admin", { isAdmin: true }));
+  const admin = state.createCharacter("admin", { isAdmin: true });
+  if (ADMIN_PASSWORD) Object.assign(admin, accounts.hashPassword(ADMIN_PASSWORD));
+  accounts.save(admin);
   console.log('[lumen] created default admin account ("admin").');
+} else if (ADMIN_PASSWORD) {
+  const admin = accounts.load("admin");
+  Object.assign(admin, accounts.hashPassword(ADMIN_PASSWORD));
+  accounts.save(admin);
+  console.log("[lumen] admin password set from ADMIN_PASSWORD.");
+}
+if (SHOW_ADMIN_LOGIN && !accounts.hasPassword(accounts.load("admin"))) {
+  console.warn(
+    "[lumen] WARNING: the admin account has no password — the first visitor can claim it. " +
+      "Set ADMIN_PASSWORD before a public deploy (or SHOW_ADMIN_LOGIN=0 to hide admin login)."
+  );
 }
 
 function send(ws, msg) {
@@ -144,10 +162,14 @@ const wss = new WebSocketServer({ server: httpServer });
 // hand back so the client's one-click button knows who to log in as.
 function accountsPayload(notice) {
   const prospectors = [];
-  let adminName = null;
+  let adminName = null, adminNeedsPassword = false;
   for (const a of accounts.summaries()) {
-    if (a.isAdmin) adminName = adminName || a.name;
-    else prospectors.push({ name: a.name, level: a.level });
+    // `needsPassword` rides each entry so the client's modal opens in the right
+    // mode — "set a password to claim" for a hash-less account, "enter password"
+    // otherwise — without a round-trip to discover which.
+    if (a.isAdmin) {
+      if (adminName == null) { adminName = a.name; adminNeedsPassword = a.needsPassword; }
+    } else prospectors.push({ name: a.name, level: a.level, needsPassword: a.needsPassword });
   }
   prospectors.sort((a, b) => a.name.localeCompare(b.name));
   return {
@@ -155,60 +177,27 @@ function accountsPayload(notice) {
     accounts: prospectors,
     showAdmin: SHOW_ADMIN_LOGIN && adminName != null,
     adminName: SHOW_ADMIN_LOGIN ? adminName : null,
+    adminNeedsPassword: SHOW_ADMIN_LOGIN ? adminNeedsPassword : false,
     notice: notice || null,
   };
 }
 
-// Create a fresh character from the login screen (dev affordance — no passwords,
-// anyone at the screen may add a prospector). Mirrors admin `@create-player`,
-// then refreshes the caller's roster so the new name appears.
-function createAccount(ws, rawName) {
-  const v = accounts.validateName(rawName);
-  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
-  if (accounts.exists(v.name))
-    return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
-  accounts.save(state.createCharacter(v.name, {}));
-  console.log(`[lumen] created prospector "${v.name}" from the login screen.`);
-  send(ws, accountsPayload(`Created prospector "${v.name}".`));
+// Reject a name that's currently logged in (shared by login/create/claim/delete).
+// Returns true (and sends the error) when the name is in play.
+function refuseIfOnline(ws, name, verb) {
+  for (const p of state.players.values()) {
+    if (p.name.toLowerCase() === name.toLowerCase()) {
+      send(ws, { type: "error", text: `"${p.name}" is currently logged in — can't ${verb} them.` });
+      return true;
+    }
+  }
+  return false;
 }
 
-// Permanently delete a character from the login screen. Guarded against the two
-// cases that would corrupt live state: an admin account (never deletable here)
-// and a prospector who is currently logged in.
-function deleteAccount(ws, rawName) {
-  const v = accounts.validateName(rawName);
-  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
-  if (!accounts.exists(v.name))
-    return void send(ws, { type: "error", text: `No prospector named "${v.name}".` });
-  if (accounts.load(v.name).isAdmin)
-    return void send(ws, { type: "error", text: "The admin account can't be deleted." });
-  for (const p of state.players.values()) {
-    if (p.name.toLowerCase() === v.name.toLowerCase())
-      return void send(ws, { type: "error", text: `"${p.name}" is currently logged in — can't delete them.` });
-  }
-  accounts.remove(v.name);
-  console.log(`[lumen] deleted prospector "${v.name}" from the login screen.`);
-  send(ws, accountsPayload(`Deleted prospector "${v.name}".`));
-}
-
-function login(ws, rawName) {
-  const v = accounts.validateName(rawName);
-  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
-  for (const p of state.players.values()) {
-    if (p.name.toLowerCase() === v.name.toLowerCase())
-      return void send(ws, { type: "error", text: `"${p.name}" is already logged in.` });
-  }
-  if (!accounts.exists(v.name)) {
-    return void send(ws, {
-      type: "error",
-      text: `No prospector named "${v.name}".`,
-    });
-  }
-  const data = accounts.load(v.name);
-  // Admin logins can be switched off in config; the account still exists and
-  // boots, but it can't be entered from the client.
-  if (data.isAdmin && !SHOW_ADMIN_LOGIN)
-    return void send(ws, { type: "error", text: "Admin login is disabled." });
+// Drop an authenticated character into the world: admit, wire the socket, and
+// send the opening frames. Callers own authentication (password / claim); this
+// is the shared "you're in" path for login, create, and claim.
+function enterGame(ws, data) {
   const player = state.admit(data);
   ws.playerId = player.id;
   connections.set(player.id, ws);
@@ -223,6 +212,93 @@ function login(ws, rawName) {
   send(ws, buildRoomView(state, player));
   send(ws, { type: "tide", ...state.tideStatus() }); // seed the HUD tide indicator
   console.log(`[lumen] ${player.name} logged in (${state.players.size} online).`);
+}
+
+// Create a fresh character from the login screen (open registration), setting
+// its password in the same step, then drop the creator straight into the world —
+// they've just proven intent by choosing the password. Mirrors admin `@create-player`.
+function createAccount(ws, rawName, password) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
+  const pv = accounts.validatePassword(password);
+  if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
+  const data = state.createCharacter(v.name, {});
+  Object.assign(data, accounts.hashPassword(password));
+  accounts.save(data);
+  console.log(`[lumen] created prospector "${v.name}" from the login screen.`);
+  enterGame(ws, data);
+}
+
+// Claim a pre-password account by setting its password on first login (the
+// migration path). Refuses accounts that already have a password — only an
+// unclaimed account can be claimed — then logs the claimer in.
+function claimPassword(ws, rawName, password) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (!accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `No prospector named "${v.name}".` });
+  if (refuseIfOnline(ws, v.name, "claim")) return;
+  const data = accounts.load(v.name);
+  if (accounts.hasPassword(data))
+    return void send(ws, { type: "error", text: `"${data.name}" already has a password — log in instead.` });
+  if (data.isAdmin && !SHOW_ADMIN_LOGIN)
+    return void send(ws, { type: "error", text: "Admin login is disabled." });
+  const pv = accounts.validatePassword(password);
+  if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
+  Object.assign(data, accounts.hashPassword(password));
+  accounts.save(data);
+  console.log(`[lumen] "${data.name}" claimed a password (first login).`);
+  enterGame(ws, data);
+}
+
+// Permanently delete a character from the login screen. The account's password
+// is required — this is the most destructive unauthenticated action. Also guarded
+// against the two cases that would corrupt live state: an admin account (never
+// deletable here) and a prospector who is currently logged in.
+function deleteAccount(ws, rawName, password) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (!accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `No prospector named "${v.name}".` });
+  const data = accounts.load(v.name);
+  if (data.isAdmin)
+    return void send(ws, { type: "error", text: "The admin account can't be deleted." });
+  if (refuseIfOnline(ws, v.name, "delete")) return;
+  const chk = accounts.checkPassword(data, password);
+  if (!chk.ok)
+    return void send(ws, {
+      type: "error",
+      text: chk.reason === "needs-claim"
+        ? `"${data.name}" has no password set yet — claim it (log in and set one) before it can be deleted.`
+        : "Incorrect password.",
+    });
+  accounts.remove(v.name);
+  console.log(`[lumen] deleted prospector "${v.name}" from the login screen.`);
+  send(ws, accountsPayload(`Deleted prospector "${v.name}".`));
+}
+
+function login(ws, rawName, password) {
+  const v = accounts.validateName(rawName);
+  if (!v.ok) return void send(ws, { type: "error", text: v.reason });
+  if (!accounts.exists(v.name))
+    return void send(ws, { type: "error", text: `No prospector named "${v.name}".` });
+  if (refuseIfOnline(ws, v.name, "log in as")) return;
+  const data = accounts.load(v.name);
+  // Admin logins can be switched off in config; the account still exists and
+  // boots, but it can't be entered from the client.
+  if (data.isAdmin && !SHOW_ADMIN_LOGIN)
+    return void send(ws, { type: "error", text: "Admin login is disabled." });
+  const chk = accounts.checkPassword(data, password);
+  if (!chk.ok)
+    return void send(ws, {
+      type: "error",
+      text: chk.reason === "needs-claim"
+        ? `"${data.name}" has no password yet — set one to claim this prospector.`
+        : "Incorrect password.",
+    });
+  enterGame(ws, data);
 }
 
 wss.on("connection", (ws) => {
@@ -242,11 +318,13 @@ wss.on("connection", (ws) => {
       switch (msg.type) {
         case "login":
           if (typeof msg.name !== "string") return void send(ws, { type: "error", text: "Please choose a prospector." });
-          return void login(ws, msg.name);
+          return void login(ws, msg.name, msg.password);
+        case "claim-password":
+          return void claimPassword(ws, msg.name, msg.password);
         case "create-account":
-          return void createAccount(ws, msg.name);
+          return void createAccount(ws, msg.name, msg.password);
         case "delete-account":
-          return void deleteAccount(ws, msg.name);
+          return void deleteAccount(ws, msg.name, msg.password);
         default:
           return void send(ws, { type: "error", text: "Please choose or create a prospector first." });
       }
