@@ -23,6 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   buys the weave-methods from Mallki can card and work the silk right there.
 
 ### Changed
+- **Stacked delver light now has diminishing returns.** A crowd sharing a room no
+  longer sums every torch into instant `searing` — a party of four ordinary
+  torches used to tip a dark room to light 12 (searing); now it settles at 6
+  (bright). Each player's *own* carried light (lit lamp + their own glow effect)
+  is unchanged; across players the brightest counts in full, every dimmer light
+  adds half (floored), and the total extra is capped at the brightest value — so
+  player light can at most double, and its ceiling scales with light *quality*,
+  not head-count. Ordinary torches can never manufacture searing; strong
+  dedicated lights (blaze-lanterns) still can. Ambient, fixtures, and mobs are
+  untouched and still sum normally.
 - **Chitin plate is now common rarity.** The grey stonebug scute is basic
   crafting stock, not an uncommon find — its explicit `rarity: "uncommon"` is
   dropped so it renders neutral, matching the convention that common items omit

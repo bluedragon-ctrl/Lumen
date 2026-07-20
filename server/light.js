@@ -30,6 +30,29 @@ function effectiveLight(ambient, sourceOutputs = []) {
   return clampLight((ambient || 0) + sum);
 }
 
+/**
+ * The single light value a *crowd* of players contributes, with diminishing
+ * returns so grouping up can't trivially manufacture `searing`. Each entry is
+ * one player's own carried light (their lit lamp + their own glow effect — that
+ * per-player stack is unchanged). Across players the brightest counts in full,
+ * every dimmer light contributes half (floored), and the total extra is capped
+ * at the brightest value — so player light can at most *double*, and its ceiling
+ * scales with light quality, not head-count. A room full of ordinary torches
+ * (output 3) tops out at 6 (bright); only strong dedicated lights combine into
+ * searing. A room's non-player sources (ambient, fixtures, mobs) are unaffected
+ * and still sum normally — this shapes only stacked delver light.
+ * @param {number[]} perPlayerOutputs each present player's own carried-light total
+ * @returns {number} the combined player contribution (0 if nobody carries light)
+ */
+function playerLightContribution(perPlayerOutputs = []) {
+  const lit = perPlayerOutputs.filter((o) => o > 0).sort((a, b) => b - a);
+  if (lit.length === 0) return 0;
+  const brightest = lit[0];
+  let extra = 0;
+  for (let i = 1; i < lit.length; i++) extra += Math.floor(lit[i] / 2);
+  return brightest + Math.min(extra, brightest);
+}
+
 /** Can an actor with the given perception band see at this light level? A
  *  dark-adapted creature with `blindAbove` is *dazzled* by light past that band
  *  (the bright-side mirror of `blindBelow`) and sees nothing — players carry no
@@ -93,6 +116,7 @@ module.exports = {
   bandOf,
   clampLight,
   effectiveLight,
+  playerLightContribution,
   canSee,
   isHarmedByLight,
   hitChance,

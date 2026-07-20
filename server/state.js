@@ -1,5 +1,5 @@
 "use strict";
-const { effectiveLight } = require("./light");
+const { effectiveLight, playerLightContribution } = require("./light");
 const { rollDice } = require("./dice");
 const { POINTS_PER_LEVEL, DEATH_DELAY_TICKS, DEFAULT_HIDDEN_ITEM_RESPAWN, DEFAULT_MOB_SPEED, ENERGY_BANK_ACTIONS } = require("./config");
 const { tidePhaseAt, resolveTide } = require("./world-clock");
@@ -269,15 +269,22 @@ class GameState {
       if (ft.switch && f.on) outputs.push(ft.switch.emitsLight || 0); // a lit lamp, etc.
       else if (ft.emitsLight) outputs.push(ft.emitsLight); // an always-glowing fixture (witchglow, sky-fissure)
     }
+    // Player-carried light stacks with diminishing returns across a crowd so a
+    // group can't trivially manufacture `searing`; each player's own lamp+glow
+    // stack is unchanged (see playerLightContribution).
+    const perPlayer = [];
     for (const p of this.playersIn(roomId)) {
+      let own = 0;
       const lightItem = p.equipment && p.equipment.light;
       if (lightItem && lightItem.lit && lightItem.fuel > 0) {
         const tmpl = this.world.items[lightItem.template];
-        if (tmpl && tmpl.light) outputs.push(tmpl.light.output);
+        if (tmpl && tmpl.light) own += tmpl.light.output;
       }
-      const e = actorEmitLight(p); // a held Light effect (potion/spell) glows too
-      if (e) outputs.push(e);
+      own += actorEmitLight(p); // a held Light effect (potion/spell) glows too
+      if (own > 0) perPlayer.push(own);
     }
+    const crowdLight = playerLightContribution(perPlayer);
+    if (crowdLight > 0) outputs.push(crowdLight);
     return effectiveLight(room.ambientLight + this.tideOffsetFor(roomId), outputs);
   }
 

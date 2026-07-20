@@ -3,7 +3,7 @@ const { test } = require("node:test");
 const assert = require("node:assert");
 const {
   bandOf, clampLight, LIGHT_MIN, LIGHT_MAX,
-  canSee, hitChance, noticeChance,
+  canSee, hitChance, noticeChance, playerLightContribution,
 } = require("../server/light");
 
 test("bandOf: sub-zero light is the void band", () => {
@@ -26,6 +26,30 @@ test("clampLight: floor is LIGHT_MIN, ceiling is LIGHT_MAX", () => {
   assert.equal(clampLight(-30), -20);
   assert.equal(clampLight(-5), -5);
   assert.equal(clampLight(30), 20);
+});
+
+// --- playerLightContribution: diminishing returns on stacked delver light ------
+test("crowd light: a soloist's carried light is unchanged", () => {
+  assert.equal(playerLightContribution([]), 0);      // nobody lit
+  assert.equal(playerLightContribution([3]), 3);     // one torch
+  assert.equal(playerLightContribution([7]), 7);     // one blaze-lantern (own lamp+glow already summed by caller)
+});
+
+test("crowd light: a second light helps a bit (half, floored)", () => {
+  assert.equal(playerLightContribution([3, 3]), 4);  // 3 + floor(3/2)
+  assert.equal(playerLightContribution([7, 3]), 8);  // brightest full, dimmer at half
+});
+
+test("crowd light: a room of ordinary torches never manufactures searing", () => {
+  // extra is capped at the brightest value → torches (3) top out at 6 (bright)
+  assert.equal(playerLightContribution([3, 3, 3, 3]), 6);
+  assert.equal(playerLightContribution([3, 3, 3, 3, 3, 3, 3, 3]), 6);
+  assert.equal(bandOf(playerLightContribution([3, 3, 3, 3])), "bright");
+});
+
+test("crowd light: strong dedicated lights can still combine into searing", () => {
+  assert.equal(playerLightContribution([7, 7]), 10); // 7 + min(3, 7)
+  assert.equal(bandOf(playerLightContribution([7, 7])), "searing");
 });
 
 // --- blindAbove: the bright-side stealth cap for dark-adapted hunters ----------
