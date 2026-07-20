@@ -542,7 +542,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "book-of-glimmersteel" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
+      "sells": [{ "template": "schematic-searing-flare", "price": 5 }, { "template": "schematic-saltpetre-torch", "price": 6 }, { "template": "schematic-shard-grenade", "price": 8 }, { "template": "book-of-basic-smithing", "price": 12 }, { "template": "schematic-glimmersteel-bar" }, { "template": "book-of-glimmersteel" }, { "template": "schematic-glimmersteel-lamp" }, { "template": "schematic-glimmersteel-coil" }]
     }
   },
   "rim-hatcher": {

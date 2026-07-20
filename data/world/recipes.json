@@ -10,6 +10,17 @@
     "shards": 2,
     "output": { "template": "minor-light-potion", "qty": 1 }
   },
+  "saltpetre-torch": {
+    "id": "saltpetre-torch",
+    "name": "Saltpetre Torch",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "torch", "qty": 1 },
+      { "template": "guano", "qty": 2 }
+    ],
+    "shards": 2,
+    "output": { "template": "saltpetre-torch", "qty": 1 }
+  },
   "regeneration-draught": {
     "id": "regeneration-draught",
     "name": "Regeneration Draught",

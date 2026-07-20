@@ -45,6 +45,18 @@
     "armour": { "armour": 0, "ward": 0, "speedPenalty": 0, "attrMod": { "perception": 2 } },
     "light": { "output": 7, "fuelMax": 600, "burnPerTick": 5, "fuelItem": "lamp-oil", "refuelPerUnit": 300 }
   },
+  "saltpetre-torch": {
+    "id": "saltpetre-torch",
+    "name": "a saltpetre torch",
+    "keywords": ["torch", "saltpetre", "light"],
+    "description": "A torch cured the delvers' way — the pitch worked through with saltpetre leached and washed from bat guano, so it takes a spark hard and burns a hotter, whiter light than raw pitch ever gives. It sits a shade brighter than a common torch and holds the flame near twice as long before it gutters. The old reek of the roost never quite leaves it, but a delver learns to love the smell of a light that lasts.",
+    "type": "light",
+    "slot": "light",
+    "weight": 1,
+    "value": 18,
+    "light": { "output": 4, "fuelMax": 360, "burnPerTick": 1 },
+    "rarity": "uncommon"
+  },
   "short-sword": {
     "id": "short-sword",
     "name": "a short sword",
@@ -1108,6 +1120,18 @@
     "recipe": "searing-flare",
     "rarity": "uncommon"
   },
+  "schematic-saltpetre-torch": {
+    "id": "schematic-saltpetre-torch",
+    "name": "a saltpetre-torch method",
+    "keywords": ["method", "schematic", "saltpetre", "torch"],
+    "description": "One of Tobin's cleaner diagrams — the leaching of saltpetre out of a lump of bat guano, the boiling of it clean, and the working of it back through a torch's pitch so the flame burns brighter and far longer. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 8,
+    "stackable": true,
+    "recipe": "saltpetre-torch",
+    "rarity": "uncommon"
+  },
   "schematic-barbed-bomb": {
     "id": "schematic-barbed-bomb",
     "name": "a barbed-bomb method",
@@ -1330,8 +1354,7 @@
     "type": "material",
     "weight": 1,
     "value": 9,
-    "stackable": true,
-    "rarity": "uncommon"
+    "stackable": true
   },
   "dense-chitin-plate": {
     "id": "dense-chitin-plate",

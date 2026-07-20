@@ -69,6 +69,7 @@ const HELP_TIPS = [
 
 const ADMIN_HELP_SECTION = ["Admin", [
   "@create-player <name> — create a new player account",
+  "@reset-password <name> — clear a player's password (they set a new one on next login)",
   "@list-players — list every account",
   "@shards <amount> — grant yourself shards",
   "@xp <amount> — grant yourself experience",
@@ -77,6 +78,7 @@ const ADMIN_HELP_SECTION = ["Admin", [
   "@give <itemId> [count] — conjure an item into your pack",
   "@teleport <roomId> — jump straight to any room by id",
   "@tide <calm|stirring|tide|receding|auto|status> — drive the world clock",
+  "@invite-key <status|new|set <key>|off> — manage the registration invite key",
 ]];
 
 // Colour one "signature — description" entry: green signature, default rest.

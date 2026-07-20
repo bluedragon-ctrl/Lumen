@@ -29,7 +29,9 @@ dev console** — a bare WebSocket tester so the server is previewable.
 ## Architecture
 
 - **`config.js`** — ports, tick interval, paths, version.
-- **`light.js`** — the light model: `bandOf`, `effectiveLight`, `canSee`, `isHarmedByLight`.
+- **`light.js`** — the light model: `bandOf`, `effectiveLight`, `canSee`,
+  `isHarmedByLight`, and `playerLightContribution` (diminishing returns on
+  stacked delver light so a crowd can't trivially reach `searing`).
 - **`world.js`** — `loadWorld()`: reads static content into a frozen object.
 - **`state.js`** — `GameState`: authoritative dynamic state (players, per-room
   mob/item instances), light computation, tick advance, snapshotting.
@@ -47,32 +49,71 @@ JSON messages over a single socket per player.
 ### Login
 
 On connect (and after every create/delete) the server sends the login-screen
-roster; the client renders it as a pick / create / delete screen (dev-only,
-name-only identity — no passwords):
+roster; the client renders it as a pick / create / claim / delete screen. Every
+account is **password-protected** — a password guards account *identity* (only
+the owner logs in as, or deletes, a character), not server access:
 
 ```json
-// server → client: the roster (each prospector carries their level)
+// server → client: the roster. `needsPassword` marks an account with no
+// password yet — claimed by setting one on first login (see below).
 { "type": "accounts",
-  "accounts": [{ "name": "Bob", "level": 3 }, { "name": "Kara", "level": 1 }],
-  "showAdmin": true, "adminName": "admin", "notice": null }
+  "accounts": [{ "name": "Bob", "level": 3, "needsPassword": false },
+               { "name": "Kara", "level": 1, "needsPassword": true }],
+  "showAdmin": true, "adminName": "admin", "adminNeedsPassword": false,
+  "requireInvite": false, "notice": null }
 
-// client → server: pick, create, or delete a prospector
-{ "type": "login", "name": "Bob" }
-{ "type": "create-account", "name": "Kara" }
-{ "type": "delete-account", "name": "Kara" }
+// client → server: log in, claim (set a first password), create, or delete.
+{ "type": "login", "name": "Bob", "password": "…" }
+{ "type": "claim-password", "name": "Kara", "password": "…" }   // migration first login
+{ "type": "create-account", "name": "Zed", "password": "…", "inviteKey": "…" }  // auto-logs in
+{ "type": "delete-account", "name": "Kara", "password": "…" }
 
-// server → client: on a successful login
+// server → client: on a successful login / create / claim
 { "type": "authenticated", "name": "Bob", "admin": false }
 ```
+
+Passwords are hashed with Node's built-in `crypto` (scrypt + a random per-account
+salt, constant-time verify — no third-party dep); `salt` + `passwordHash` live on
+the per-character JSON. Wrong password → a clear error, no login. **Claim-on-first-
+login:** an account written before passwords existed has no hash; setting one via
+`claim-password` locks it in. Wrong-password, missing-password (claim needed), and
+already-logged-in are all reported as `error` frames.
+
+**Password recovery.** There's no email/self-service reset. An admin runs
+**`@reset-password <name>`**, which clears that account's password so it reverts
+to claimable — the player then sets a fresh password themselves on next login
+(claim-on-first-login). The admin never handles the plaintext. Refused while the
+target is logged in (a live snapshot would rewrite the hash) and for the `admin`
+account (managed via `ADMIN_PASSWORD`).
+
+**Registration gate.** Creating a prospector is open by default. Set the
+**`INVITE_KEY_HASH`** environment variable and `create-account` then requires a
+matching `inviteKey`; the roster's `requireInvite` flag tells the client to show
+the field. The configured value is a hashed `salt:hash` string (the plaintext key
+never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
+`tools/hash-invite-key.js`) and share the plaintext with invitees. It's one shared
+secret, not per-character. An admin can also set/rotate the key live from in-game
+with **`@invite-key`** (`new` | `set <key>` | `off` | `status`) — handy where the
+boot env is awkward to change (e.g. Fly.io). That writes the hash to a runtime
+file (`data/runtime/invite.json`) which takes precedence over the env default;
+the key can be reset but, being hashed, never read back. Precedence: runtime file
+→ env → open (see `activeInviteHash` in index.js). Like player saves, the runtime
+file only survives a redeploy on a persistent volume, else it falls back to the
+env key. A light gate for now; a fuller invite/registration system is deferred to
+a later security-hardening pass. See `.env.example` for all server env vars.
 
 Admin accounts never appear in `accounts` — they're offered separately via
 `adminName`, and the whole admin option is hidden (and admin logins refused)
 when `SHOW_ADMIN_LOGIN` is off in `server/config.js` (env: `SHOW_ADMIN_LOGIN=0`).
-Delete is refused for admin accounts and for any prospector currently logged in.
-The `admin` account is auto-created on first boot; admins can also create
-prospectors in-game with `@create-player <name>`. Accounts persist as one JSON file
-per character under `data/runtime/players/` (gitignored), saved on disconnect
-and periodically.
+The `admin` account is auto-created on first boot and reads its password from the
+**`ADMIN_PASSWORD`** environment variable, stamped on each boot so an operator can
+set or rotate it without editing the account file — set it before a public deploy
+so the first visitor can't claim admin. Left unset in local dev, admin claims a
+password on first login like any other account (the server logs a warning while
+it's unclaimed). Admins can also create prospectors in-game with `@create-player
+<name>`. Delete is refused for admin accounts and for any prospector currently
+logged in. Accounts persist as one JSON file per character under
+`data/runtime/players/` (gitignored), saved on disconnect and periodically.
 
 ### Commands
 
