@@ -59,12 +59,13 @@ the owner logs in as, or deletes, a character), not server access:
 { "type": "accounts",
   "accounts": [{ "name": "Bob", "level": 3, "needsPassword": false },
                { "name": "Kara", "level": 1, "needsPassword": true }],
-  "showAdmin": true, "adminName": "admin", "adminNeedsPassword": false, "notice": null }
+  "showAdmin": true, "adminName": "admin", "adminNeedsPassword": false,
+  "requireInvite": false, "notice": null }
 
 // client → server: log in, claim (set a first password), create, or delete.
 { "type": "login", "name": "Bob", "password": "…" }
 { "type": "claim-password", "name": "Kara", "password": "…" }   // migration first login
-{ "type": "create-account", "name": "Zed", "password": "…" }    // auto-logs in on success
+{ "type": "create-account", "name": "Zed", "password": "…", "inviteKey": "…" }  // auto-logs in
 { "type": "delete-account", "name": "Kara", "password": "…" }
 
 // server → client: on a successful login / create / claim
@@ -77,6 +78,16 @@ the per-character JSON. Wrong password → a clear error, no login. **Claim-on-f
 login:** an account written before passwords existed has no hash; setting one via
 `claim-password` locks it in. Wrong-password, missing-password (claim needed), and
 already-logged-in are all reported as `error` frames.
+
+**Registration gate.** Creating a prospector is open by default. Set the
+**`INVITE_KEY_HASH`** environment variable and `create-account` then requires a
+matching `inviteKey`; the roster's `requireInvite` flag tells the client to show
+the field. The configured value is a hashed `salt:hash` string (the plaintext key
+never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
+`tools/hash-invite-key.js`) and share the plaintext with invitees. It's one shared
+secret, not per-character. A light gate for now; a fuller invite/registration
+system is deferred to a later security-hardening pass. See `.env.example` for all
+server env vars.
 
 Admin accounts never appear in `accounts` — they're offered separately via
 `adminName`, and the whole admin option is hidden (and admin logins refused)

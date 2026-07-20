@@ -78,3 +78,24 @@ test("checkPassword: right password passes, wrong password is bad-password", () 
   assert.equal(bad.ok, false);
   assert.equal(bad.reason, "bad-password");
 });
+
+// --- Invitation key (new-player registration gate) -------------------------
+
+test("invite key: the right key verifies against its salt:hash", () => {
+  const stored = accounts.hashInviteKey("let-me-in-2026");
+  assert.match(stored, /^[0-9a-f]+:[0-9a-f]+$/, "stored as salt:hash hex");
+  assert.equal(accounts.verifyInviteKey("let-me-in-2026", stored), true);
+});
+
+test("invite key: the wrong key is rejected", () => {
+  const stored = accounts.hashInviteKey("correct-key");
+  assert.equal(accounts.verifyInviteKey("wrong-key", stored), false);
+  assert.equal(accounts.verifyInviteKey("", stored), false);
+});
+
+test("invite key: missing/malformed stored value returns false, never throws", () => {
+  assert.equal(accounts.verifyInviteKey("key", undefined), false);
+  assert.equal(accounts.verifyInviteKey("key", "no-colon-here"), false);
+  assert.equal(accounts.verifyInviteKey("key", ":onlyhash"), false);
+  assert.equal(accounts.verifyInviteKey(undefined, "salt:hash"), false);
+});

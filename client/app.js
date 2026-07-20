@@ -69,8 +69,8 @@ function sendLogin(name, password) {
 function sendClaimPassword(name, password) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "claim-password", name, password }));
 }
-function sendCreateAccount(name, password) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name, password }));
+function sendCreateAccount(name, password, inviteKey) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name, password, inviteKey }));
 }
 function sendDeleteAccount(name, password) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "delete-account", name, password }));
@@ -92,6 +92,7 @@ const loginNameEl = $("login-name");
 const loginAdminEl = $("login-admin");
 let adminName = null; // who the "Log in as Admin" button logs in as
 let adminNeedsPassword = false; // admin account hasn't set a password yet (claimable)
+let requireInvite = false; // creating a prospector needs an invitation key (server-gated)
 
 function showLogin() { loginEl.hidden = false; }
 function hideLogin() {
@@ -113,6 +114,7 @@ function renderLogin(msg) {
   closeAuth(); // a fresh roster supersedes any half-finished password prompt
   adminName = msg.adminName || null;
   adminNeedsPassword = !!msg.adminNeedsPassword;
+  requireInvite = !!msg.requireInvite;
   loginAdminEl.hidden = !msg.showAdmin;
 
   loginListEl.innerHTML = "";
@@ -170,6 +172,7 @@ function renderLogin(msg) {
 const authEl = $("login-auth");
 const authTitleEl = $("login-auth-title");
 const authMsgEl = $("login-auth-msg");
+const authInviteEl = $("login-auth-invite");
 const authPwEl = $("login-auth-pw");
 const authPw2El = $("login-auth-pw2");
 const authSubmitEl = $("login-auth-submit");
@@ -201,6 +204,11 @@ function openAuth(mode, name) {
   showLoginMsg(null);
   authTitleEl.textContent = authTitle(mode, name);
   const setsPw = !!AUTH_SETS_PASSWORD[mode];
+  // The invitation-key field shows only when creating and the server gates
+  // registration; it leads the modal (a prerequisite to setting a password).
+  const wantsInvite = mode === "create" && requireInvite;
+  authInviteEl.value = "";
+  authInviteEl.hidden = !wantsInvite;
   authPwEl.value = "";
   authPw2El.value = "";
   authPw2El.hidden = !setsPw;
@@ -209,13 +217,14 @@ function openAuth(mode, name) {
   authSubmitEl.classList.toggle("danger", mode === "delete");
   showAuthMsg(null);
   authEl.hidden = false;
-  authPwEl.focus();
+  (wantsInvite ? authInviteEl : authPwEl).focus();
 }
 
 function closeAuth() {
   authMode = null;
   authName = null;
   authEl.hidden = true;
+  authInviteEl.value = "";
   authPwEl.value = "";
   authPw2El.value = "";
   showAuthMsg(null);
@@ -223,6 +232,10 @@ function closeAuth() {
 
 function submitAuth() {
   if (!authMode) return;
+  // An invitation key gates create when the server asks for one.
+  const invite = authInviteEl.value.trim();
+  if (authMode === "create" && requireInvite && !invite)
+    return void showAuthMsg("Enter your invitation key.", "error");
   const pw = authPwEl.value;
   if (!pw) return void showAuthMsg("Enter a password.", "error");
   if (AUTH_SETS_PASSWORD[authMode]) {
@@ -236,7 +249,7 @@ function submitAuth() {
   switch (authMode) {
     case "login": return void sendLogin(authName, pw);
     case "claim": return void sendClaimPassword(authName, pw);
-    case "create": return void sendCreateAccount(authName, pw);
+    case "create": return void sendCreateAccount(authName, pw, invite);
     case "delete": return void sendDeleteAccount(authName, pw);
   }
 }

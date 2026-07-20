@@ -21,7 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   login like anyone else (with a startup warning while it's unclaimed).
   `SHOW_ADMIN_LOGIN` behaviour is unchanged. The login screen gains a password
   modal wired through log-in / create / claim / delete. *Out of scope for now:
-  email, password reset, rate limiting, account lockout, an invite gate.*
+  email, password reset, rate limiting, account lockout.*
+- **Optional invitation-key gate on new-player registration.** Set the
+  **`INVITE_KEY_HASH`** environment variable and creating a prospector then
+  requires an invitation key; leave it unset and registration stays open (a boot
+  notice says which). The stored value is a hashed `salt:hash` string — the
+  plaintext key never touches disk — generated with **`npm run hash-invite-key --
+  <key>`** and shared out-of-band with invitees (same scrypt hashing as
+  passwords). The create modal grows an invitation-key field when the server asks
+  for one. A deliberately light gate for now; a fuller invite/registration system
+  is left to a later security-hardening pass. A new **`.env.example`** documents
+  this alongside `ADMIN_PASSWORD`, `PORT`, and `SHOW_ADMIN_LOGIN`.
 - **The saltpetre torch — a brighter, longer-lasting torch cured from bat
   guano.** The guano scraped out of the roost-flues and the Guano Sump finally
   earns its keep: leach the saltpetre out of it, boil it clean, and work it back

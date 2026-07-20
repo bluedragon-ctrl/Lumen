@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { WebSocketServer } = require("ws");
 
-const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION, SHOW_ADMIN_LOGIN } = require("./config");
+const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION, SHOW_ADMIN_LOGIN, INVITE_KEY_HASH } = require("./config");
 const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView } = require("./render");
@@ -48,6 +48,11 @@ if (SHOW_ADMIN_LOGIN && !accounts.hasPassword(accounts.load("admin"))) {
       "Set ADMIN_PASSWORD before a public deploy (or SHOW_ADMIN_LOGIN=0 to hide admin login)."
   );
 }
+console.log(
+  INVITE_KEY_HASH
+    ? "[lumen] new-player registration is gated by INVITE_KEY_HASH."
+    : "[lumen] no INVITE_KEY_HASH set — new-player registration is open."
+);
 
 function send(ws, msg) {
   if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
@@ -178,6 +183,7 @@ function accountsPayload(notice) {
     showAdmin: SHOW_ADMIN_LOGIN && adminName != null,
     adminName: SHOW_ADMIN_LOGIN ? adminName : null,
     adminNeedsPassword: SHOW_ADMIN_LOGIN ? adminNeedsPassword : false,
+    requireInvite: !!INVITE_KEY_HASH, // create needs an invitation key when set
     notice: notice || null,
   };
 }
@@ -214,14 +220,18 @@ function enterGame(ws, data) {
   console.log(`[lumen] ${player.name} logged in (${state.players.size} online).`);
 }
 
-// Create a fresh character from the login screen (open registration), setting
-// its password in the same step, then drop the creator straight into the world —
-// they've just proven intent by choosing the password. Mirrors admin `@create-player`.
-function createAccount(ws, rawName, password) {
+// Create a fresh character from the login screen, setting its password in the
+// same step, then drop the creator straight into the world — they've just proven
+// intent by choosing the password. Registration is open unless INVITE_KEY_HASH is
+// configured, in which case a valid invitation key is required. Mirrors admin
+// `@create-player` (which, being admin-gated already, needs no invite key).
+function createAccount(ws, rawName, password, inviteKey) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (accounts.exists(v.name))
     return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
+  if (INVITE_KEY_HASH && !accounts.verifyInviteKey(inviteKey, INVITE_KEY_HASH))
+    return void send(ws, { type: "error", text: "That invitation key isn't valid." });
   const pv = accounts.validatePassword(password);
   if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
   const data = state.createCharacter(v.name, {});
@@ -322,7 +332,7 @@ wss.on("connection", (ws) => {
         case "claim-password":
           return void claimPassword(ws, msg.name, msg.password);
         case "create-account":
-          return void createAccount(ws, msg.name, msg.password);
+          return void createAccount(ws, msg.name, msg.password, msg.inviteKey);
         case "delete-account":
           return void deleteAccount(ws, msg.name, msg.password);
         default:

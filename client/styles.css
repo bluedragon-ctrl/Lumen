@@ -487,12 +487,13 @@ body {
 .login-confirm-text { margin: 0 0 14px; color: var(--text); line-height: 1.5; }
 .login-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-/* Password modal fields (shares .login-confirm chrome; two fields when setting). */
-#login-auth-pw, #login-auth-pw2 {
+/* Password modal fields (shares .login-confirm chrome; two fields when setting,
+   plus an invitation-key field when registration is gated). */
+#login-auth-invite, #login-auth-pw, #login-auth-pw2 {
   width: 100%; margin: 0 0 10px; padding: 10px 12px;
   background: var(--panel-2); color: var(--text);
   border: 1px solid var(--edge); border-radius: 6px; font: inherit;
 }
-#login-auth-pw:focus, #login-auth-pw2:focus { outline: none; border-color: var(--accent); }
-#login-auth-pw2[hidden] { display: none; }
+#login-auth-invite:focus, #login-auth-pw:focus, #login-auth-pw2:focus { outline: none; border-color: var(--accent); }
+#login-auth-invite[hidden], #login-auth-pw2[hidden] { display: none; }
 #login-auth .login-msg { margin-bottom: 12px; }

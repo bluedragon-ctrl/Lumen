@@ -82,6 +82,24 @@ function checkPassword(data, password) {
   return { ok: true };
 }
 
+// --- Invitation key --------------------------------------------------------
+// The new-player registration gate (server/config.js `INVITE_KEY_HASH`). Unlike
+// account passwords this is one shared secret, not per-character, and is never
+// stored per-player. The configured value is a "salt:hash" string produced by
+// tools/hash-invite-key.js; a submitted key is hashed with the stored salt and
+// compared constant-time (via verifyPassword). Plaintext never touches disk.
+function hashInviteKey(key) {
+  const { salt, passwordHash } = hashPassword(key);
+  return `${salt}:${passwordHash}`;
+}
+
+function verifyInviteKey(key, saltHash) {
+  if (typeof key !== "string" || typeof saltHash !== "string") return false;
+  const sep = saltHash.indexOf(":");
+  if (sep < 0) return false;
+  return verifyPassword(key, saltHash.slice(0, sep), saltHash.slice(sep + 1));
+}
+
 const keyOf = (name) => name.trim().toLowerCase();
 const fileOf = (name) => path.join(PLAYERS_DIR, keyOf(name) + ".json");
 
@@ -171,4 +189,5 @@ function remove(name) {
 module.exports = {
   validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR,
   validatePassword, hashPassword, verifyPassword, hasPassword, checkPassword,
+  hashInviteKey, verifyInviteKey,
 };
