@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   default, so it can be reset but never read back. Like player saves it only
   survives a redeploy if `data/runtime/` is on a persistent volume; otherwise it
   falls back to the env key.
+- **Admin password recovery with `@reset-password <name>`.** Since there's no
+  email/self-service reset, an admin can clear a player's password: the account
+  reverts to claimable and the player sets a fresh one themselves on next login
+  (claim-on-first-login) — the admin never handles the plaintext. Refused while
+  the player is logged in, and for the `admin` account (managed via
+  `ADMIN_PASSWORD`).
 - **The saltpetre torch — a brighter, longer-lasting torch cured from bat
   guano.** The guano scraped out of the roost-flues and the Guano Sump finally
   earns its keep: leach the saltpetre out of it, boil it clean, and work it back

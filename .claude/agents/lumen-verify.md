@@ -136,6 +136,7 @@ to hang; only screenshot when a genuinely visual result must be shown to the use
 | `@tide <phase\|auto\|status>` | drive the world clock — darkens rooms depth-scaled; good for light-band tests |
 | `@xp <n>` / `@shards <n>` | grant xp (levels up) / set purse |
 | `@create-player <name>` / `@list-players` | roster management (a created account is password-less until its first login *claims* one — see Log in) |
+| `@reset-password <name>` | clear a player's password → account is claimable again; they set a new one on next login. Handy to reset a test account you've lost the password to (refused if that player is online). See the "passwords persist across runs" gotcha |
 | `@invite-key <status\|new\|set <key>\|off>` | new-player registration gate. `new` prints a key + turns it on; `off` reopens. **Off by default** — only touch it to test the gate, and `@invite-key off` when done |
 | `@help` | list admin commands |
 

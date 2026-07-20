@@ -69,6 +69,7 @@ const HELP_TIPS = [
 
 const ADMIN_HELP_SECTION = ["Admin", [
   "@create-player <name> — create a new player account",
+  "@reset-password <name> — clear a player's password (they set a new one on next login)",
   "@list-players — list every account",
   "@shards <amount> — grant yourself shards",
   "@xp <amount> — grant yourself experience",

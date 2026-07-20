@@ -79,6 +79,24 @@ test("checkPassword: right password passes, wrong password is bad-password", () 
   assert.equal(bad.reason, "bad-password");
 });
 
+// --- Admin password reset (clear → claimable again) ------------------------
+
+test("clearPassword: reverts a claimed account to claimable (admin @reset-password)", () => {
+  const name = "verify-reset-tmp"; // a throwaway account file
+  if (accounts.exists(name)) return; // never clobber a real account
+  const data = { name, level: 1 };
+  Object.assign(data, accounts.hashPassword("forgotten"));
+  accounts.save(data);
+  try {
+    assert.equal(accounts.hasPassword(accounts.load(name)), true);
+    assert.equal(accounts.clearPassword(name), true);
+    assert.equal(accounts.hasPassword(accounts.load(name)), false, "now claimable again");
+    assert.equal(accounts.clearPassword(name), false, "nothing left to clear");
+  } finally {
+    accounts.remove(name);
+  }
+});
+
 // --- Invitation key (new-player registration gate) -------------------------
 
 test("invite key: the right key verifies against its salt:hash", () => {

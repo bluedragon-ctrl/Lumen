@@ -136,6 +136,25 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
       for (const ev of state.forceTidePhase(a)) ctx.emit(ev);
       return logMsg(`Tide forced to "${a}" (pinned — "@tide auto" to resume the clock).`);
     }
+    case "@reset-password": {
+      // Clear a player's password so they set a fresh one on next login (the
+      // recovery path — there's no email/self-service reset). The player picks
+      // their own new password via claim-on-first-login; the admin never handles
+      // plaintext. Refused while the target is online (a live snapshot would
+      // rewrite the hash back, and they wouldn't need a reset anyway) and for the
+      // admin account (its password is managed via the ADMIN_PASSWORD env).
+      const v = accounts.validateName(arg);
+      if (!v.ok) return err(v.reason);
+      if (!accounts.exists(v.name)) return err(`No player named "${v.name}".`);
+      const data = accounts.load(v.name);
+      if (data.isAdmin) return err("The admin password is managed via the ADMIN_PASSWORD env var, not here.");
+      for (const p of state.players.values())
+        if (p.name.toLowerCase() === v.name.toLowerCase())
+          return err(`"${p.name}" is currently logged in — have them log out before resetting.`);
+      if (!accounts.clearPassword(v.name))
+        return logMsg(`"${data.name}" has no password set — they'll set one on next login already.`);
+      return logMsg(`Reset "${data.name}". Their password is cleared — they set a new one on next login. Have them log in promptly (the account is claimable until they do).`);
+    }
     case "@invite-key": {
       // Set / rotate / clear the new-player registration key live, without a
       // restart — useful where the boot env is awkward to change (e.g. Fly.io).

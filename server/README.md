@@ -79,6 +79,13 @@ login:** an account written before passwords existed has no hash; setting one vi
 `claim-password` locks it in. Wrong-password, missing-password (claim needed), and
 already-logged-in are all reported as `error` frames.
 
+**Password recovery.** There's no email/self-service reset. An admin runs
+**`@reset-password <name>`**, which clears that account's password so it reverts
+to claimable — the player then sets a fresh password themselves on next login
+(claim-on-first-login). The admin never handles the plaintext. Refused while the
+target is logged in (a live snapshot would rewrite the hash) and for the `admin`
+account (managed via `ADMIN_PASSWORD`).
+
 **Registration gate.** Creating a prospector is open by default. Set the
 **`INVITE_KEY_HASH`** environment variable and `create-account` then requires a
 matching `inviteKey`; the roster's `requireInvite` flag tells the client to show

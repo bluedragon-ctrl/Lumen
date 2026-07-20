@@ -82,6 +82,20 @@ function checkPassword(data, password) {
   return { ok: true };
 }
 
+// Admin password reset: strip an account's password so it reverts to claimable
+// and the owner sets a fresh one on next login (claim-on-first-login). We never
+// hand a password back — the player picks their own. Returns false if there was
+// no password to clear. Caller must ensure the account isn't currently logged in
+// (a live snapshot would otherwise rewrite the hash back).
+function clearPassword(name) {
+  const data = load(name);
+  if (!hasPassword(data)) return false;
+  delete data.salt;
+  delete data.passwordHash;
+  save(data);
+  return true;
+}
+
 // --- Invitation key --------------------------------------------------------
 // The new-player registration gate (server/config.js `INVITE_KEY_HASH`). Unlike
 // account passwords this is one shared secret, not per-character, and is never
@@ -219,6 +233,6 @@ function remove(name) {
 
 module.exports = {
   validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR,
-  validatePassword, hashPassword, verifyPassword, hasPassword, checkPassword,
+  validatePassword, hashPassword, verifyPassword, hasPassword, checkPassword, clearPassword,
   hashInviteKey, verifyInviteKey, loadInviteHash, writeInviteHash, clearInviteHash,
 };
