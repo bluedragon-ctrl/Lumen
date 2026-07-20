@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **An alchemy station on the Rim — Tobin's tinker-bench.** The Craftsmen's Row
+  (`d0.workshop`) gains a `crafting` fixture with the **alchemy** station beside
+  its forge and smelter, so a delver can cure and cook the fiddly stuff at the
+  Rim without trekking down to a deeper bench. Themed to Tobin the tinker-smith —
+  a burner, glass retorts, and a clutter of half-built contraptions.
 - **Player accounts are password-protected.** Login is no longer name-only — a
   password now guards account *identity*, so only the owner can log in as, or
   delete, a character (the first step toward a public deploy; open registration
