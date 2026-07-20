@@ -29,7 +29,9 @@ dev console** — a bare WebSocket tester so the server is previewable.
 ## Architecture
 
 - **`config.js`** — ports, tick interval, paths, version.
-- **`light.js`** — the light model: `bandOf`, `effectiveLight`, `canSee`, `isHarmedByLight`.
+- **`light.js`** — the light model: `bandOf`, `effectiveLight`, `canSee`,
+  `isHarmedByLight`, and `playerLightContribution` (diminishing returns on
+  stacked delver light so a crowd can't trivially reach `searing`).
 - **`world.js`** — `loadWorld()`: reads static content into a frozen object.
 - **`state.js`** — `GameState`: authoritative dynamic state (players, per-room
   mob/item instances), light computation, tick advance, snapshotting.
