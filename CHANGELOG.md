@@ -6,6 +6,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Player accounts are password-protected.** Login is no longer name-only — a
+  password now guards account *identity*, so only the owner can log in as, or
+  delete, a character (the first step toward a public deploy; open registration
+  stays). Hashing uses Node's built-in `crypto` (scrypt + a random per-account
+  salt, constant-time verify) — no new dependency — storing `salt` +
+  `passwordHash` on the per-character JSON. Creating a prospector sets its
+  password (and drops you straight in); logging in and deleting both require it.
+  **Existing accounts migrate by claim-on-first-login:** a character with no
+  password yet is claimed by setting one, which locks it to you. The auto-created
+  **admin** reads its password from the **`ADMIN_PASSWORD`** environment variable
+  at boot (set/rotated on each start) so a public deploy can't have it claimed by
+  the first visitor; left unset in local dev, admin claims a password on first
+  login like anyone else (with a startup warning while it's unclaimed).
+  `SHOW_ADMIN_LOGIN` behaviour is unchanged. The login screen gains a password
+  modal wired through log-in / create / claim / delete. *Out of scope for now:
+  email, password reset, rate limiting, account lockout.*
+- **Optional invitation-key gate on new-player registration.** Set the
+  **`INVITE_KEY_HASH`** environment variable and creating a prospector then
+  requires an invitation key; leave it unset and registration stays open (a boot
+  notice says which). The stored value is a hashed `salt:hash` string — the
+  plaintext key never touches disk — generated with **`npm run hash-invite-key --
+  <key>`** and shared out-of-band with invitees (same scrypt hashing as
+  passwords). The create modal grows an invitation-key field when the server asks
+  for one. A deliberately light gate for now; a fuller invite/registration system
+  is left to a later security-hardening pass. A new **`.env.example`** documents
+  this alongside `ADMIN_PASSWORD`, `PORT`, and `SHOW_ADMIN_LOGIN`.
+- **Admins can set/rotate the invitation key live with `@invite-key`.** For hosts
+  where changing the boot environment is awkward (e.g. a Fly.io deploy),
+  `@invite-key new` generates a fresh key (shown once) and turns the gate on,
+  `@invite-key set <key>` sets a chosen one, `@invite-key off` clears it, and
+  `@invite-key status` reports the state. The key is stored **hashed** in a
+  runtime file (`data/runtime/invite.json`) that takes precedence over the env
+  default, so it can be reset but never read back. Like player saves it only
+  survives a redeploy if `data/runtime/` is on a persistent volume; otherwise it
+  falls back to the env key.
+- **Admin password recovery with `@reset-password <name>`.** Since there's no
+  email/self-service reset, an admin can clear a player's password: the account
+  reverts to claimable and the player sets a fresh one themselves on next login
+  (claim-on-first-login) — the admin never handles the plaintext. Refused while
+  the player is logged in, and for the `admin` account (managed via
+  `ADMIN_PASSWORD`).
 - **The saltpetre torch — a brighter, longer-lasting torch cured from bat
   guano.** The guano scraped out of the roost-flues and the Guano Sump finally
   earns its keep: leach the saltpetre out of it, boil it clean, and work it back

@@ -51,22 +51,47 @@ Always run `npm test` and `npm run validate` (or the `data-validator` agent) too
 
 ## Log in (do NOT type the name into `#cmd`)
 
-The command box `#cmd` **ignores input until you're authed** — its placeholder is
-misleading. Login happens on the login screen (`#login`) only:
+The command box `#cmd` **ignores input until you're authed**. Login happens on the
+login screen (`#login`) only. **Accounts are now password-protected** — clicking a
+roster row or the admin button opens a password modal (`#login-auth`); you drive
+*that*, not `#cmd`. The modal has three modes:
+
+- **claim** — a never-claimed account (a fresh `admin` with no `ADMIN_PASSWORD`
+  set, and every `@create-player` account) sets its password on first login.
+  Both `#login-auth-pw` and `#login-auth-pw2` (confirm) are visible.
+- **login** — an already-claimed account enters its one password (`#login-auth-pw`
+  only; `#login-auth-pw2` is `hidden`).
+- **create** — the new-prospector form; sets a password (pw + pw2) and, only if
+  the server's invite gate is on, an invitation key (`#login-auth-invite`).
+
+Pick one throwaway password and reuse it across your test accounts. Helper that
+handles claim **and** login (fill pw2 only when it's shown):
 
 ```js
-// Admin (auto-created; the "Log in as Admin" button is #login-admin):
-document.getElementById('login-admin').click();
-// An existing player — click their row in the roster:
-[...document.querySelectorAll('#login-list .login-pick')]
-  .find(b => b.textContent.includes('Player1'))?.click();
+function loginAs(name, password = 'testpass') {           // name, or 'admin'
+  if (name === 'admin') document.getElementById('login-admin').click();
+  else [...document.querySelectorAll('#login-list .login-pick')]
+        .find(b => b.textContent.includes(name)).click();  // opens the modal
+  document.getElementById('login-auth-pw').value = password;
+  const pw2 = document.getElementById('login-auth-pw2');
+  if (!pw2.hidden) pw2.value = password;                   // claim/create mode
+  document.getElementById('login-auth-submit').click();
+}
+// PASS when #login is hidden and #p-name shows the character:
+// document.getElementById('login').hidden === true
 ```
 
-Create test players as admin, then log each in on its own tab: `@create-player
-Player1`, `@create-player Player2`. New players spawn in **The Rim Plaza**, so
-they start co-located. For a fresh character from the login screen instead, set
-`#login-name`.value and submit `#login-create` (that *creates*; then click the
-new roster row to log in).
+Create test players as admin (`@create-player Player1`, `@create-player Player2`),
+then `loginAs('Player1')` on its own tab — their first login claims the password.
+New players spawn in **The Rim Plaza**, co-located. To make a fresh character from
+the login screen instead: set `#login-name`.value, submit `#login-create`, then
+fill the create modal (pw + pw2) and submit — **create auto-logs you in** (no need
+to click a roster row afterward).
+
+If the invitation gate is on (`@invite-key` set — see the admin table), the create
+modal also needs `#login-auth-invite`. It's **off by default** on a fresh dev
+server, so normal test-account creation needs no key; turn it on only to test the
+gate itself.
 
 ## Drive commands (once authed)
 
@@ -110,7 +135,9 @@ to hang; only screenshot when a genuinely visual result must be shown to the use
 | `@attr <might\|vitality\|intellect\|wits\|perception> <n>` | set an attribute (e.g. `@attr perception 20` to pass search checks) |
 | `@tide <phase\|auto\|status>` | drive the world clock — darkens rooms depth-scaled; good for light-band tests |
 | `@xp <n>` / `@shards <n>` | grant xp (levels up) / set purse |
-| `@create-player <name>` / `@list-players` | roster management |
+| `@create-player <name>` / `@list-players` | roster management (a created account is password-less until its first login *claims* one — see Log in) |
+| `@reset-password <name>` | clear a player's password → account is claimable again; they set a new one on next login. Handy to reset a test account you've lost the password to (refused if that player is online). See the "passwords persist across runs" gotcha |
+| `@invite-key <status\|new\|set <key>\|off>` | new-player registration gate. `new` prints a key + turns it on; `off` reopens. **Off by default** — only touch it to test the gate, and `@invite-key off` when done |
 | `@help` | list admin commands |
 
 ## Manipulating room light (for light-tier / perception tests)
@@ -145,6 +172,12 @@ To lower light: `@tide` to a darker phase, `unequip light`, or descend.
 - **A dazzled mob won't attack you** (light > its `blindAbove`: it can't perceive
   anyone), so you can observe it safely. A merely *reeling* / still-seeing mob
   **will** attack.
+- **Passwords persist across runs.** An account is claimed once and keeps that
+  password in its `data/runtime/players/<name>.json` file. If `admin` (or a test
+  player) was already claimed with a password you don't have, `loginAs` with the
+  default won't work — either use the known password, or reset the account to
+  claimable by deleting its file (`rm data/runtime/players/<name>.json`) and
+  restarting; a fresh `admin` is auto-recreated (claimable) if you delete it.
 - **`@spawn` never sets `hidden`.** Real hidden lurkers exist only via room spawn
   configs (e.g. `d8.necropolis.niches`). To reveal one for testing, `@attr
   perception 20` then `search` (needs effective Perception ≥ the mob's

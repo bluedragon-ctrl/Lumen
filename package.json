@@ -1,6 +1,6 @@
 {
   "name": "lumen",
-  "version": "0.6.41",
+  "version": "0.6.45",
   "description": "A browser-based MUD of descent, light, and survival.",
   "type": "commonjs",
   "main": "server/index.js",
@@ -8,6 +8,7 @@
     "start": "node server/index.js",
     "validate": "node tools/validate-data.js",
     "release": "node tools/release.js",
+    "hash-invite-key": "node tools/hash-invite-key.js",
     "test": "node --test",
     "edit-mobs": "node tools/mob-editor/mob-editor.js",
     "edit-items": "node tools/item-editor/item-editor.js",
