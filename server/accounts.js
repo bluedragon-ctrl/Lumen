@@ -2,15 +2,18 @@
 /**
  * Player account persistence. Accounts are one JSON file per character under
  * data/runtime/players/ (gitignored). Each account is password-protected: a
- * per-account random salt and a scrypt-derived `passwordHash` (both hex) are
- * stored on the character JSON. Anyone may register — passwords protect account
- * *identity* (only the owner logs in as, or deletes, a character), not server
- * access. Accounts written before passwords existed carry neither field and are
- * claimed by setting a password on first login (see `hasPassword`).
+ * self-describing scrypt hash string (`passwordHash`, format under
+ * "Passwords" below) is stored on the character JSON. Anyone may register —
+ * passwords protect account *identity* (only the owner logs in as, or deletes,
+ * a character), not server access. Accounts written before passwords existed
+ * carry no `passwordHash` and are claimed by setting a password on first login
+ * (see `hasPassword`); accounts from the first password era store a legacy
+ * salt+hash field pair, verified as such and re-stamped on login.
  */
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const { promisify } = require("util");
 const { RUNTIME_DIR } = require("./config");
 
 const PLAYERS_DIR = path.join(RUNTIME_DIR, "players");
@@ -32,9 +35,25 @@ function validateName(name) {
 // Hashing uses Node's built-in scrypt only — the repo deliberately ships one
 // dependency (`ws`), so no bcrypt/argon2. Each account gets a fresh random salt;
 // verification is constant-time (timingSafeEqual) to avoid leaking via timing.
+//
+// A stored hash is one self-describing string, "scrypt:N:r:p:<salt>:<hash>"
+// (salt/hash hex), so the cost parameters ride with the hash: SCRYPT below can
+// be raised at any time and every old hash still verifies with the params it
+// was made with (a successful login re-stamps it — see checkPassword's
+// `rehash`). Colons rather than PHC-style '$' because the same format is pasted
+// into .env files, and '$' gets interpolated by docker-compose and some shells.
+// Accounts from before this format (separate hex `salt` + `passwordHash`
+// fields, Node's default params) still verify via the legacy path.
+const SCRYPT = { N: 16384, r: 8, p: 1 }; // Node's current defaults, pinned explicitly
 const SCRYPT_KEYLEN = 64;
+// Ceiling on the memory a *stored* hash may demand at verify time (scrypt needs
+// 128·N·r bytes) — a hand-edited player file must fail closed, not allocate GBs.
+const MAX_MEM = 64 * 1024 * 1024;
 const PW_MIN = 6;
 const PW_MAX = 200; // scrypt cost scales with input; cap to keep it cheap.
+
+const scryptAsync = promisify(crypto.scrypt);
+const scryptOpts = ({ N, r, p }) => ({ N, r, p, maxmem: MAX_MEM * 2 });
 
 function validatePassword(pw) {
   if (typeof pw !== "string" || pw.length < PW_MIN)
@@ -44,42 +63,98 @@ function validatePassword(pw) {
   return { ok: true };
 }
 
-// Derive a fresh { salt, passwordHash } (both hex) for a plaintext password.
-function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const passwordHash = crypto.scryptSync(password, salt, SCRYPT_KEYLEN).toString("hex");
-  return { salt, passwordHash };
+const formatHash = (salt, hash, { N, r, p }) => `scrypt:${N}:${r}:${p}:${salt}:${hash}`;
+
+// Parse a stored "scrypt:N:r:p:salt:hash" string; null for anything malformed
+// or demanding absurd parameters (verification executes what's stored, so a
+// tampered file must be rejected here, before it can cost memory or time).
+function parseHash(stored) {
+  if (typeof stored !== "string") return null;
+  const parts = stored.split(":");
+  if (parts.length !== 6 || parts[0] !== "scrypt") return null;
+  const [N, r, p] = parts.slice(1, 4).map(Number);
+  const [salt, hash] = parts.slice(4);
+  if (!Number.isInteger(N) || N < 2 || (N & (N - 1)) !== 0) return null; // power of two
+  if (!Number.isInteger(r) || r < 1 || !Number.isInteger(p) || p < 1 || p > 16) return null;
+  if (128 * N * r > MAX_MEM) return null;
+  if (!/^[0-9a-f]{2,}$/.test(salt) || !/^(?:[0-9a-f]{2})+$/.test(hash)) return null;
+  return { N, r, p, salt, hash };
 }
 
-// Constant-time check of a plaintext password against a stored salt+hash.
-// Returns false (never throws) on any missing/mismatched/garbage input.
-function verifyPassword(password, salt, passwordHash) {
-  if (typeof password !== "string" || typeof salt !== "string" || typeof passwordHash !== "string")
-    return false;
+// Derive a fresh { passwordHash } (self-describing string, see above) for a
+// plaintext password. Async — scrypt runs on the thread pool, so a login never
+// stalls the tick loop.
+async function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const buf = await scryptAsync(password, salt, SCRYPT_KEYLEN, scryptOpts(SCRYPT));
+  return { passwordHash: formatHash(salt, buf.toString("hex"), SCRYPT) };
+}
+
+// Sync twin for the few places where blocking is correct: the boot-time
+// ADMIN_PASSWORD stamp (runs before listen()), the @invite-key admin command,
+// and tools/hash-invite-key.js. Never call this on a socket-driven path.
+function hashPasswordSync(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, SCRYPT_KEYLEN, scryptOpts(SCRYPT)).toString("hex");
+  return { passwordHash: formatHash(salt, hash, SCRYPT) };
+}
+
+// Constant-time check of a plaintext password against a parsed stored hash.
+// Returns false (never throws) on any garbage input.
+async function verifyParsed(password, { N, r, p, salt, hash }) {
+  if (typeof password !== "string") return false;
   let derived, stored;
   try {
-    derived = crypto.scryptSync(password, salt, SCRYPT_KEYLEN);
-    stored = Buffer.from(passwordHash, "hex");
+    stored = Buffer.from(hash, "hex");
+    derived = await scryptAsync(password, salt, stored.length, scryptOpts({ N, r, p }));
   } catch {
     return false;
   }
   return stored.length === derived.length && crypto.timingSafeEqual(stored, derived);
 }
 
-// Whether an account has a password set. Pre-password saves have neither field
-// and must claim a password on first login (claim-on-first-login migration).
+// Legacy pre-format hashes: separate hex `salt` + `passwordHash` fields, made
+// with Node's default scrypt params (exactly what SCRYPT pins today). Verified
+// so existing accounts keep working; a successful login re-stamps them into the
+// current format (checkPassword's `rehash`).
+async function verifyLegacy(password, salt, hexHash) {
+  if (typeof password !== "string" || typeof salt !== "string" || typeof hexHash !== "string") return false;
+  let derived, stored;
+  try {
+    stored = Buffer.from(hexHash, "hex");
+    derived = await scryptAsync(password, salt, SCRYPT_KEYLEN, scryptOpts(SCRYPT));
+  } catch {
+    return false;
+  }
+  return stored.length === derived.length && crypto.timingSafeEqual(stored, derived);
+}
+
+// Whether an account has a password set — any stored `passwordHash` string
+// counts (current format or the legacy pair), so an unreadable/corrupt hash
+// locks the account (admin @reset-password recovers it) rather than leaving it
+// claimable by anyone. Pre-password saves carry no `passwordHash` at all and
+// must claim one on first login (claim-on-first-login migration).
 function hasPassword(data) {
-  return !!(data && typeof data.salt === "string" && typeof data.passwordHash === "string");
+  return !!(data && typeof data.passwordHash === "string");
 }
 
 // Pure auth decision for a login/delete attempt against loaded account data, so
 // index.js and the tests share one rule. An account with no password yet can't
 // be entered or deleted — it must be claimed first (reason "needs-claim");
 // a set password must match (reason "bad-password"); otherwise { ok: true }.
-function checkPassword(data, password) {
+// A success may carry `rehash: true` — verified, but stored in the legacy
+// format or with stale cost params — telling the caller to re-stamp via
+// hashPassword now, while it still holds the plaintext (lazy migration).
+async function checkPassword(data, password) {
   if (!hasPassword(data)) return { ok: false, reason: "needs-claim" };
-  if (!verifyPassword(password, data.salt, data.passwordHash)) return { ok: false, reason: "bad-password" };
-  return { ok: true };
+  const parsed = parseHash(data.passwordHash);
+  if (parsed) {
+    if (!(await verifyParsed(password, parsed))) return { ok: false, reason: "bad-password" };
+    const stale = parsed.N !== SCRYPT.N || parsed.r !== SCRYPT.r || parsed.p !== SCRYPT.p;
+    return stale ? { ok: true, rehash: true } : { ok: true };
+  }
+  if (!(await verifyLegacy(password, data.salt, data.passwordHash))) return { ok: false, reason: "bad-password" };
+  return { ok: true, rehash: true };
 }
 
 // Admin password reset: strip an account's password so it reverts to claimable
@@ -99,19 +174,23 @@ function clearPassword(name) {
 // --- Invitation key --------------------------------------------------------
 // The new-player registration gate (server/config.js `INVITE_KEY_HASH`). Unlike
 // account passwords this is one shared secret, not per-character, and is never
-// stored per-player. The configured value is a "salt:hash" string produced by
-// tools/hash-invite-key.js; a submitted key is hashed with the stored salt and
-// compared constant-time (via verifyPassword). Plaintext never touches disk.
+// stored per-player. The configured value is the same self-describing
+// "scrypt:N:r:p:salt:hash" string as account passwords, produced by
+// tools/hash-invite-key.js or `@invite-key`; pre-format "salt:hash" values from
+// older deployments still verify. Plaintext never touches disk. Hashing is sync
+// (it runs inside the @invite-key admin command and the CLI tool — rare,
+// admin-gated paths); verification is async (it runs on account creation).
 function hashInviteKey(key) {
-  const { salt, passwordHash } = hashPassword(key);
-  return `${salt}:${passwordHash}`;
+  return hashPasswordSync(key).passwordHash;
 }
 
-function verifyInviteKey(key, saltHash) {
-  if (typeof key !== "string" || typeof saltHash !== "string") return false;
-  const sep = saltHash.indexOf(":");
+async function verifyInviteKey(key, stored) {
+  if (typeof key !== "string" || typeof stored !== "string") return false;
+  const parsed = parseHash(stored);
+  if (parsed) return verifyParsed(key, parsed);
+  const sep = stored.indexOf(":"); // legacy "salt:hash"
   if (sep < 0) return false;
-  return verifyPassword(key, saltHash.slice(0, sep), saltHash.slice(sep + 1));
+  return verifyLegacy(key, stored.slice(0, sep), stored.slice(sep + 1));
 }
 
 // Runtime override for the invitation key, set live by an admin (`@invite-key`)
@@ -233,6 +312,6 @@ function remove(name) {
 
 module.exports = {
   validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR,
-  validatePassword, hashPassword, verifyPassword, hasPassword, checkPassword, clearPassword,
+  validatePassword, hashPassword, hashPasswordSync, parseHash, hasPassword, checkPassword, clearPassword,
   hashInviteKey, verifyInviteKey, loadInviteHash, writeInviteHash, clearInviteHash,
 };

@@ -66,8 +66,8 @@ function sendCommand(text) {
 function sendLogin(name, password) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "login", name, password }));
 }
-function sendClaimPassword(name, password) {
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "claim-password", name, password }));
+function sendClaimPassword(name, password, inviteKey) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "claim-password", name, password, inviteKey }));
 }
 function sendCreateAccount(name, password, inviteKey) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "create-account", name, password, inviteKey }));
@@ -204,9 +204,11 @@ function openAuth(mode, name) {
   showLoginMsg(null);
   authTitleEl.textContent = authTitle(mode, name);
   const setsPw = !!AUTH_SETS_PASSWORD[mode];
-  // The invitation-key field shows only when creating and the server gates
-  // registration; it leads the modal (a prerequisite to setting a password).
-  const wantsInvite = mode === "create" && requireInvite;
+  // The invitation-key field shows when the server gates registration, for both
+  // flows that take over a name — create AND claim (an unclaimed account is
+  // otherwise a side door past the gate); it leads the modal (a prerequisite to
+  // setting a password).
+  const wantsInvite = (mode === "create" || mode === "claim") && requireInvite;
   authInviteEl.value = "";
   authInviteEl.hidden = !wantsInvite;
   authPwEl.value = "";
@@ -232,9 +234,9 @@ function closeAuth() {
 
 function submitAuth() {
   if (!authMode) return;
-  // An invitation key gates create when the server asks for one.
+  // An invitation key gates create and claim when the server asks for one.
   const invite = authInviteEl.value.trim();
-  if (authMode === "create" && requireInvite && !invite)
+  if ((authMode === "create" || authMode === "claim") && requireInvite && !invite)
     return void showAuthMsg("Enter your invitation key.", "error");
   const pw = authPwEl.value;
   if (!pw) return void showAuthMsg("Enter a password.", "error");
@@ -248,7 +250,7 @@ function submitAuth() {
   // fresh `accounts` roster (delete), both of which close it.
   switch (authMode) {
     case "login": return void sendLogin(authName, pw);
-    case "claim": return void sendClaimPassword(authName, pw);
+    case "claim": return void sendClaimPassword(authName, pw, invite);
     case "create": return void sendCreateAccount(authName, pw, invite);
     case "delete": return void sendDeleteAccount(authName, pw);
   }

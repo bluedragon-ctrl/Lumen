@@ -11,6 +11,7 @@ const { buildRoomView, buildPlayerView } = require("./render");
 const { execute } = require("./commands");
 const { createDispatcher } = require("./events");
 const accounts = require("./accounts");
+const throttle = require("./throttle");
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -33,12 +34,13 @@ console.log(
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 if (!accounts.exists("admin")) {
   const admin = state.createCharacter("admin", { isAdmin: true });
-  if (ADMIN_PASSWORD) Object.assign(admin, accounts.hashPassword(ADMIN_PASSWORD));
+  if (ADMIN_PASSWORD) Object.assign(admin, accounts.hashPasswordSync(ADMIN_PASSWORD));
   accounts.save(admin);
   console.log('[lumen] created default admin account ("admin").');
 } else if (ADMIN_PASSWORD) {
   const admin = accounts.load("admin");
-  Object.assign(admin, accounts.hashPassword(ADMIN_PASSWORD));
+  Object.assign(admin, accounts.hashPasswordSync(ADMIN_PASSWORD));
+  delete admin.salt; // drop a legacy-format leftover so only the fresh hash remains
   accounts.save(admin);
   console.log("[lumen] admin password set from ADMIN_PASSWORD.");
 }
@@ -210,6 +212,28 @@ function refuseIfOnline(ws, name, verb) {
   return false;
 }
 
+// --- Guess throttling --------------------------------------------------------
+// Two layers against brute-forcing from the login screen. Layer 1, per-target
+// lockout (server/throttle.js): repeated wrong guesses against one account name
+// (or the shared invite key) lock that target briefly, whatever the connection.
+// Layer 2, a per-socket fuse: a connection that keeps guessing wrong secrets is
+// closed after a few tries — reconnecting resets it, but layer 1 persists, so
+// the fuse just makes a tight guessing loop pay a handshake per handful of
+// guesses. Neither counts validation errors or unknown names, only wrong secrets.
+const MAX_SOCKET_FAILS = 5;
+function guessFailed(ws) {
+  ws.authFails = (ws.authFails || 0) + 1;
+  if (ws.authFails >= MAX_SOCKET_FAILS) {
+    send(ws, { type: "error", text: "Too many failed attempts — connection closed." });
+    ws.close();
+  }
+}
+const throttleKey = (name) => "name:" + name.toLowerCase();
+const tooMany = (retryMs) => ({
+  type: "error",
+  text: `Too many attempts — try again in ${Math.ceil(retryMs / 1000)}s.`,
+});
+
 // Drop an authenticated character into the world: admit, wire the socket, and
 // send the opening frames. Callers own authentication (password / claim); this
 // is the shared "you're in" path for login, create, and claim.
@@ -235,18 +259,30 @@ function enterGame(ws, data) {
 // intent by choosing the password. Registration is open unless INVITE_KEY_HASH is
 // configured, in which case a valid invitation key is required. Mirrors admin
 // `@create-player` (which, being admin-gated already, needs no invite key).
-function createAccount(ws, rawName, password, inviteKey) {
+async function createAccount(ws, rawName, password, inviteKey) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (accounts.exists(v.name))
     return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
   const inviteHash = activeInviteHash();
-  if (inviteHash && !accounts.verifyInviteKey(inviteKey, inviteHash))
-    return void send(ws, { type: "error", text: "That invitation key isn't valid." });
+  if (inviteHash) {
+    // One shared lockout bucket for invite-key guesses — the key is one shared
+    // secret, so repeated failures lock the gate server-wide for a spell (real
+    // invitees paste the right key first try; a guessing script doesn't).
+    const gate = throttle.check("invite");
+    if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
+    if (!(await accounts.verifyInviteKey(inviteKey, inviteHash))) {
+      throttle.fail("invite");
+      guessFailed(ws);
+      return void send(ws, { type: "error", text: "That invitation key isn't valid." });
+    }
+  }
   const pv = accounts.validatePassword(password);
   if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
   const data = state.createCharacter(v.name, {});
-  Object.assign(data, accounts.hashPassword(password));
+  Object.assign(data, await accounts.hashPassword(password));
+  if (accounts.exists(v.name)) // re-check: another socket may have taken the name during the awaits
+    return void send(ws, { type: "error", text: `A prospector named "${v.name}" already exists.` });
   accounts.save(data);
   console.log(`[lumen] created prospector "${v.name}" from the login screen.`);
   enterGame(ws, data);
@@ -255,7 +291,7 @@ function createAccount(ws, rawName, password, inviteKey) {
 // Claim a pre-password account by setting its password on first login (the
 // migration path). Refuses accounts that already have a password — only an
 // unclaimed account can be claimed — then logs the claimer in.
-function claimPassword(ws, rawName, password) {
+async function claimPassword(ws, rawName, password, inviteKey) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (!accounts.exists(v.name))
@@ -266,9 +302,28 @@ function claimPassword(ws, rawName, password) {
     return void send(ws, { type: "error", text: `"${data.name}" already has a password — log in instead.` });
   if (data.isAdmin && !SHOW_ADMIN_LOGIN)
     return void send(ws, { type: "error", text: "Admin login is disabled." });
+  // When the registration gate is on, claiming needs the invitation key too —
+  // unclaimed accounts sit on a public roster, and without this the gate has a
+  // side door: anyone could take over a pre-password character. Same shared
+  // lockout bucket as create (it's the same secret being guessed).
+  const inviteHash = activeInviteHash();
+  if (inviteHash) {
+    const gate = throttle.check("invite");
+    if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
+    if (!(await accounts.verifyInviteKey(inviteKey, inviteHash))) {
+      throttle.fail("invite");
+      guessFailed(ws);
+      return void send(ws, { type: "error", text: "That invitation key isn't valid." });
+    }
+  }
   const pv = accounts.validatePassword(password);
   if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
-  Object.assign(data, accounts.hashPassword(password));
+  Object.assign(data, await accounts.hashPassword(password));
+  // Re-check after the await: another socket may have claimed (or entered) the
+  // account while the hash derived — first claim wins, this one bows out.
+  if (accounts.hasPassword(accounts.load(v.name)))
+    return void send(ws, { type: "error", text: `"${data.name}" already has a password — log in instead.` });
+  if (refuseIfOnline(ws, v.name, "claim")) return;
   accounts.save(data);
   console.log(`[lumen] "${data.name}" claimed a password (first login).`);
   enterGame(ws, data);
@@ -278,7 +333,7 @@ function claimPassword(ws, rawName, password) {
 // is required — this is the most destructive unauthenticated action. Also guarded
 // against the two cases that would corrupt live state: an admin account (never
 // deletable here) and a prospector who is currently logged in.
-function deleteAccount(ws, rawName, password) {
+async function deleteAccount(ws, rawName, password) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (!accounts.exists(v.name))
@@ -287,20 +342,26 @@ function deleteAccount(ws, rawName, password) {
   if (data.isAdmin)
     return void send(ws, { type: "error", text: "The admin account can't be deleted." });
   if (refuseIfOnline(ws, v.name, "delete")) return;
-  const chk = accounts.checkPassword(data, password);
-  if (!chk.ok)
+  const gate = throttle.check(throttleKey(v.name)); // before the scrypt work
+  if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
+  const chk = await accounts.checkPassword(data, password);
+  if (!chk.ok) {
+    if (chk.reason === "bad-password") { throttle.fail(throttleKey(v.name)); guessFailed(ws); }
     return void send(ws, {
       type: "error",
       text: chk.reason === "needs-claim"
         ? `"${data.name}" has no password set yet — claim it (log in and set one) before it can be deleted.`
         : "Incorrect password.",
     });
+  }
+  throttle.clear(throttleKey(v.name));
+  if (refuseIfOnline(ws, v.name, "delete")) return; // re-check: they may have logged in during the await
   accounts.remove(v.name);
   console.log(`[lumen] deleted prospector "${v.name}" from the login screen.`);
   send(ws, accountsPayload(`Deleted prospector "${v.name}".`));
 }
 
-function login(ws, rawName, password) {
+async function login(ws, rawName, password) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (!accounts.exists(v.name))
@@ -311,15 +372,45 @@ function login(ws, rawName, password) {
   // boots, but it can't be entered from the client.
   if (data.isAdmin && !SHOW_ADMIN_LOGIN)
     return void send(ws, { type: "error", text: "Admin login is disabled." });
-  const chk = accounts.checkPassword(data, password);
-  if (!chk.ok)
+  const gate = throttle.check(throttleKey(v.name)); // before the scrypt work
+  if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
+  const chk = await accounts.checkPassword(data, password);
+  if (!chk.ok) {
+    if (chk.reason === "bad-password") { throttle.fail(throttleKey(v.name)); guessFailed(ws); }
     return void send(ws, {
       type: "error",
       text: chk.reason === "needs-claim"
         ? `"${data.name}" has no password yet — set one to claim this prospector.`
         : "Incorrect password.",
     });
+  }
+  throttle.clear(throttleKey(v.name));
+  if (chk.rehash) {
+    // Verified against a legacy or stale-params hash — re-stamp with the current
+    // format while we hold the plaintext (lazy migration; see accounts.js).
+    Object.assign(data, await accounts.hashPassword(password));
+    delete data.salt;
+    accounts.save(data);
+  }
+  if (refuseIfOnline(ws, v.name, "log in as")) return; // re-check: another socket may have won the await
   enterGame(ws, data);
+}
+
+// Route one pre-auth message (the login screen's four intents) to its handler.
+async function handleAuth(ws, msg) {
+  switch (msg.type) {
+    case "login":
+      if (typeof msg.name !== "string") return void send(ws, { type: "error", text: "Please choose a prospector." });
+      return login(ws, msg.name, msg.password);
+    case "claim-password":
+      return claimPassword(ws, msg.name, msg.password, msg.inviteKey);
+    case "create-account":
+      return createAccount(ws, msg.name, msg.password, msg.inviteKey);
+    case "delete-account":
+      return deleteAccount(ws, msg.name, msg.password);
+    default:
+      return void send(ws, { type: "error", text: "Please choose or create a prospector first." });
+  }
 }
 
 wss.on("connection", (ws) => {
@@ -334,21 +425,19 @@ wss.on("connection", (ws) => {
       return void send(ws, { type: "error", text: "malformed message (expected JSON)" });
     }
     // Login phase: the socket drives the login screen (pick / create / delete)
-    // until a successful login attaches a playerId.
+    // until a successful login attaches a playerId. Handlers are async (scrypt
+    // runs off the event loop), so serialize per socket: one attempt in flight,
+    // extras dropped — the client only sends on submit anyway.
     if (!ws.playerId) {
-      switch (msg.type) {
-        case "login":
-          if (typeof msg.name !== "string") return void send(ws, { type: "error", text: "Please choose a prospector." });
-          return void login(ws, msg.name, msg.password);
-        case "claim-password":
-          return void claimPassword(ws, msg.name, msg.password);
-        case "create-account":
-          return void createAccount(ws, msg.name, msg.password, msg.inviteKey);
-        case "delete-account":
-          return void deleteAccount(ws, msg.name, msg.password);
-        default:
-          return void send(ws, { type: "error", text: "Please choose or create a prospector first." });
-      }
+      if (ws.authPending) return;
+      ws.authPending = true;
+      handleAuth(ws, msg)
+        .catch((e) => {
+          console.error("[lumen] auth error:", e);
+          send(ws, { type: "error", text: "Something went wrong — please try again." });
+        })
+        .finally(() => { ws.authPending = false; });
+      return;
     }
     const player = state.players.get(ws.playerId);
     if (msg.type === "command" && typeof msg.text === "string") {
