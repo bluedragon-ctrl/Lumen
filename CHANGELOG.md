@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Nothing-known-matches still names the closest unknown recipe
   (`You don't know how to make …`), so discovery hints are unchanged
   (`server/query.js` gains `matchRank`; `craft` uses it).
+- **`examine` shows what you can make before what the vendor sells.** A recipe
+  sheet on a trader's counter carries its subject's keywords (*a barbed-bomb
+  method* answers to "barbed bomb"), so once you'd learned the recipe,
+  `examine barbed bomb` kept showing the sheet on sale instead of the bomb you
+  wanted to size up before crafting. The known-craftable fallback now resolves
+  *before* shop wares — your own craft knowledge wins the name clash — and the
+  sheet stays reachable by its own words (`examine method`).
 
 ### Changed
 - **Auth hardening — future-proof hashes, async scrypt, guess throttling.**

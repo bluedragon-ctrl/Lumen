@@ -4,6 +4,7 @@ const assert = require("node:assert");
 const { GameState } = require("../server/state");
 const { craft } = require("../server/commands/craft");
 const { NOOP_CTX, countItem } = require("../server/commands/shared");
+const { buildExamineView } = require("../server/render");
 
 // A minimal lit world for craft target-resolution tests. The regression under
 // test: `craft bar` used to resolve against ALL world recipes in definition
@@ -14,14 +15,19 @@ function makeCraftWorld(fixtures, oreQty) {
   const band = { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
   return {
     rooms: {
-      forge: { id: "forge", name: "Forge", description: "", depth: 0, ambientLight: 5, exits: {}, fixtures, spawns: [] },
+      forge: { id: "forge", name: "Forge", description: "", depth: 0, ambientLight: 5, exits: {}, fixtures, spawns: [{ mob: "trader", max: 1 }] },
     },
     items: {
       rion_ore: { id: "rion_ore", name: "a lump of rion ore", description: "", type: "material", stackable: true },
       rion_bar: { id: "rion_bar", name: "a rion bar", description: "", type: "material", stackable: true },
       barbed_bomb: { id: "barbed_bomb", name: "a barbed bomb", description: "", type: "consumable", stackable: true },
+      // A vendor recipe sheet whose keywords collide with the bomb it teaches —
+      // the real "a barbed-bomb method" carries barbed/bomb keywords too.
+      bomb_method: { id: "bomb_method", name: "a barbed-bomb method", description: "", type: "recipe", keywords: ["method", "barbed", "bomb"], value: 12, stackable: true, recipe: "barbed_bomb" },
     },
-    mobs: {},
+    mobs: {
+      trader: { id: "trader", name: "a tinker", description: "", keywords: ["tinker"], maxHp: 10, xp: 1, faction: "rim", perception: band, shop: { sells: [{ template: "bomb_method", price: 12 }] } },
+    },
     spells: {},
     fixtures: {
       furnace: { id: "furnace", name: "a squat furnace", description: "", type: "scenery", station: "furnace" },
@@ -100,4 +106,33 @@ test("craft reports no recipe for a query matching nothing", () => {
   const out = craft(state, p, "widget", NOOP_CTX);
   assert.equal(out[0].type, "error");
   assert.match(out[0].text, /You know no recipe for "widget"/);
+});
+
+// --- examine: a known craftable outranks the vendor's stock --------------------
+
+test("examine resolves a known craftable before a vendor ware with clashing keywords", () => {
+  // The tinker sells "a barbed-bomb method" (keywords barbed/bomb); the player
+  // KNOWS the recipe it teaches. `examine barbed bomb` must show the bomb you
+  // can make (recall), not the sheet on the counter.
+  const { state, p } = setup({ knownRecipes: ["barbed_bomb"] });
+  const view = buildExamineView(state, p, "barbed bomb");
+  assert.ok(view, "resolves to an examine view");
+  assert.equal(view.entity.name, "a barbed bomb");
+  assert.ok((view.entity.hints || []).some((h) => /Craftable/.test(h)), "shows the craftable recall view");
+});
+
+test("examine still resolves the vendor ware by its own keyword", () => {
+  const { state, p } = setup({ knownRecipes: ["barbed_bomb"] });
+  const view = buildExamineView(state, p, "method");
+  assert.ok(view, "resolves to an examine view");
+  assert.equal(view.entity.name, "a barbed-bomb method");
+  assert.ok((view.entity.hints || []).some((h) => /On sale/.test(h)), "shows the ware with its price");
+});
+
+test("examine falls back to the vendor ware when the recipe is unknown", () => {
+  const { state, p } = setup({ knownRecipes: [] });
+  const view = buildExamineView(state, p, "barbed bomb");
+  assert.ok(view, "resolves to an examine view");
+  assert.equal(view.entity.name, "a barbed-bomb method");
+  assert.ok((view.entity.hints || []).some((h) => /On sale/.test(h)), "the counter is all that matches now");
 });

@@ -369,37 +369,13 @@ function buildExamineView(state, p, q) {
       return entity("item", slot.id, t.name, t.description, { rarity: t.rarity || "common", lines: itemSpecLines(t, w, p) });
     }
   }
-  // Shop wares on display. After everything you can hold or perceive as a real
-  // instance has missed, fall back to the present trader's stock: a ware is a
-  // template offer, not a room instance, but a visible shopkeeper lets you
-  // inspect it before buying — as CircleMUD does with `look <ware>` at the
-  // counter. Anything you already carry above wins a name clash, so this only
-  // fires for goods you don't have. Quest-gated stock stays invisible until earned.
-  if (see) {
-    const trader = rt.mobs.find((m) => mobVisibleTo(state, p, m) && w.mobs[m.template].shop);
-    if (trader) {
-      const done = (p.quests && p.quests.done) || [];
-      for (const o of w.mobs[trader.template].shop.sells || []) {
-        if (o.requiresQuest && !done.includes(o.requiresQuest)) continue;
-        const t = w.items[o.template];
-        if (!hit(o.template, t.name, t.keywords)) continue;
-        if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
-        const price = o.price != null ? o.price : buyValueOf(t);
-        return entity("item", o.template, t.name, t.description, {
-          rarity: t.rarity || "common",
-          lines: itemSpecLines(t, w, p),
-          hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
-          actions: [{ label: `Buy (${price})`, command: `buy ${o.template}` }],
-        });
-      }
-    }
-  }
-  // Craftable goods. Last of all — after anything real you hold, perceive, or can
-  // buy — fall back to the output of a recipe you KNOW: a craftable is a template
-  // you could make, not an instance, so (like a recipe sheet, which `recipes`
-  // shows regardless of light) it's recall rather than sight and examines clearly
-  // even in the dark. Anything you already carry or a ware on a counter wins a
-  // name clash, so this only fires for things you don't have but could make.
+  // Craftable goods. After anything real you hold or perceive, fall back to the
+  // output of a recipe you KNOW: a craftable is a template you could make, not
+  // an instance, so (like a recipe sheet, which `recipes` shows regardless of
+  // light) it's recall rather than sight and examines clearly even in the dark.
+  // Checked BEFORE the trader's stock: your own craft knowledge wins a name
+  // clash with the counter — `examine acid bomb` shows the bomb you can make,
+  // not the "acid bomb recipe" sheet on sale (still reachable by its full name).
   for (const rid of p.knownRecipes || []) {
     const r = w.recipes[rid];
     if (!r || !r.output) continue;
@@ -419,6 +395,32 @@ function buildExamineView(state, p, q) {
       ],
       actions: [{ label: "Craft", command: `craft ${rid}` }],
     });
+  }
+  // Shop wares on display. Last of all — after everything you hold, perceive or
+  // could make yourself — fall back to the present trader's stock: a ware is a
+  // template offer, not a room instance, but a visible shopkeeper lets you
+  // inspect it before buying — as CircleMUD does with `look <ware>` at the
+  // counter. Anything you carry or know how to craft above wins a name clash,
+  // so this only fires for goods that are truly the vendor's. Quest-gated stock
+  // stays invisible until earned.
+  if (see) {
+    const trader = rt.mobs.find((m) => mobVisibleTo(state, p, m) && w.mobs[m.template].shop);
+    if (trader) {
+      const done = (p.quests && p.quests.done) || [];
+      for (const o of w.mobs[trader.template].shop.sells || []) {
+        if (o.requiresQuest && !done.includes(o.requiresQuest)) continue;
+        const t = w.items[o.template];
+        if (!hit(o.template, t.name, t.keywords)) continue;
+        if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
+        const price = o.price != null ? o.price : buyValueOf(t);
+        return entity("item", o.template, t.name, t.description, {
+          rarity: t.rarity || "common",
+          lines: itemSpecLines(t, w, p),
+          hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
+          actions: [{ label: `Buy (${price})`, command: `buy ${o.template}` }],
+        });
+      }
+    }
   }
   return null;
 }
