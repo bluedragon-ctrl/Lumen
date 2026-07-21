@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   plate. It touches only `physical` blows (Ward, the percent cut on magical
   hits, is untouched) and never drives the soak below zero. Shown on `examine`
   as `armour pierce: N`.
+- **The item editor gained a structured Weapon section.** Weapon stats (damage
+  dice, action cost, scale attribute + divisor, crit, **armour pierce**, and
+  two-handed; `onHit` stays raw JSON) now edit as labelled fields instead of
+  being buried in the Advanced raw-JSON box — the weapon block is pulled out of
+  Advanced so there's no double-editing. `item-editor` also gains the
+  `launch.json` entry the other editors already had.
 
 ### Changed
 - **A blunt/anti-armour weapon line now runs through every tier.** The iron

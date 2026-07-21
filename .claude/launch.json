@@ -27,6 +27,12 @@
       "port": 3940
     },
     {
+      "name": "item-editor",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/item-editor/item-editor.js"],
+      "port": 3941
+    },
+    {
       "name": "depth-viewer",
       "runtimeExecutable": "node",
       "runtimeArgs": ["tools/depth-viewer/depth-viewer.js"],
