@@ -938,7 +938,7 @@
     "slot": "hand",
     "weight": 1,
     "value": 8,
-    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12 }
+    "weapon": { "damage": { "physical": "1d4" }, "actionCost": 12, "pierce": 1 }
   },
   "tobins-hammer": {
     "id": "tobins-hammer",
@@ -950,7 +950,7 @@
     "slot": "hand",
     "weight": 1,
     "value": 120,
-    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 9, "crit": 0.05 }
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 9, "crit": 0.05, "pierce": 1 }
   },
   "glimmer-dust": {
     "id": "glimmer-dust",
@@ -1016,7 +1016,7 @@
     "slot": "hand",
     "weight": 5,
     "value": 200,
-    "weapon": { "damage": { "physical": "1d12" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 16, "twoHanded": true },
+    "weapon": { "damage": { "physical": "1d12" }, "scale": { "attr": "might", "per": 2 }, "actionCost": 16, "twoHanded": true, "pierce": 3 },
     "armour": { "attrMod": { "might": 1 } }
   },
   "glimmersteel-staff": {
@@ -1634,7 +1634,7 @@
     "slot": "hand",
     "weight": 3,
     "value": 30,
-    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 4 } }
+    "weapon": { "damage": { "physical": "1d6" }, "actionCost": 13, "scale": { "attr": "might", "per": 4 }, "pierce": 2 }
   },
   "chitin-helm": {
     "id": "chitin-helm",
@@ -1713,7 +1713,7 @@
     "slot": "hand",
     "weight": 4,
     "value": 34,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true },
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true, "pierce": 2 },
     "rarity": "uncommon"
   },
   "weeping-lash": {
@@ -2334,7 +2334,7 @@
     "slot": "hand",
     "weight": 5,
     "value": 85,
-    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true }
+    "weapon": { "damage": { "physical": "1d12" }, "actionCost": 17, "scale": { "attr": "might", "per": 3 }, "twoHanded": true, "pierce": 2 }
   },
   "embroidered-mantle": {
     "id": "embroidered-mantle",

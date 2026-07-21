@@ -5,6 +5,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
+  (mirrored on a mob's `attack.pierce`) ignores that many points of the
+  defender's Armour before the physical soak — a blunt head cracking shell or
+  plate. It touches only `physical` blows (Ward, the percent cut on magical
+  hits, is untouched) and never drives the soak below zero. Shown on `examine`
+  as `armour pierce: N`.
+- **The item editor gained a structured Weapon section.** Weapon stats (damage
+  dice, action cost, scale attribute + divisor, crit, **armour pierce**, and
+  two-handed; `onHit` stays raw JSON) now edit as labelled fields instead of
+  being buried in the Advanced raw-JSON box — the weapon block is pulled out of
+  Advanced so there's no double-editing. `item-editor` also gains the
+  `launch.json` entry the other editors already had.
+
+### Changed
+- **A blunt/anti-armour weapon line now runs through every tier.** The iron
+  mace previously lost to the iron sword on every axis — smaller die (1d6 vs
+  1d8), slower, heavier, dearer — while its `scale` merely re-stated the default
+  Might/4 every weapon already gets, so it had no real edge. The crushing family
+  now carries `pierce` matched to its flavour and tier: **rusty hammer** 1,
+  **iron mace** 2, **chitin maul** 2, **halberd** 2, **Tobin's hammer** 1,
+  **glimmersteel warhammer** 3 (its flavour already promised *"crushing through
+  shell and plate that would turn a blade"*). Against unarmoured foes the
+  sword/spear/dagger families still win; against shelled or plated things these
+  crack through where a blade turns aside — turning "which weapon?" into a real
+  matchup question. Edged, finesse, and caster weapons are deliberately left
+  without pierce.
 ### Changed
 - **Smith-craft schematics moved from Vesper to Tobin.** The starsilver
   schematic now sits on Tobin's counter (beside his glimmersteel-bar

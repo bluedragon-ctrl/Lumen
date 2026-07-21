@@ -784,6 +784,7 @@ class MobAIMixin {
       hitBonus: (t.attack.hitBonus) || 0, // a keen-eyed mob (data-driven, default 0)
       dmgBonus: (t.attack.bonus) || 0,
       crit: (t.attack.crit) || 0, // mirrors player crit; default 0 → no live change
+      pierce: (t.attack.pierce) || 0, // Armour ignored; default 0 → no live change
     };
     const r = strike(swing, defence, rt.light, t.attack.damage, t.attack.type || "physical");
     const defender = isPlayer

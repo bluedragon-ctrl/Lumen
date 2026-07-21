@@ -191,6 +191,8 @@ function itemSpecLines(tmpl, w, viewer) {
     lines.push(`damage: ${dmg} ${cur}(${sc.attr}/${sc.per || 1})`, `action cost: ${tmpl.weapon.actionCost}`);
     // Flat crit the weapon adds on top of the viewer's Perception crit.
     if (tmpl.weapon.crit) lines.push(`crit: +${Math.round(tmpl.weapon.crit * 100)}%`);
+    // Armour a blunt weapon cracks through before the defender's physical soak.
+    if (tmpl.weapon.pierce) lines.push(`armour pierce: ${tmpl.weapon.pierce}`);
     // Two-handed weapons fill both hands — no shield alongside them.
     if (tmpl.weapon.twoHanded) lines.push("two-handed (no shield)");
   }

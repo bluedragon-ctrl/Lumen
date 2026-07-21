@@ -63,10 +63,14 @@
 </div>
 <script>
 const KNOWN = ["id","name","description","type","slot","rarity","weight","value","sellValue","stackable","filterGroup","keywords"];
+// Blocks that get their own structured section, so they're pulled out of the
+// raw-JSON Advanced box (and protected from its delete-unknown-keys sweep).
+const STRUCTURED = ["weapon"];
 const NUMS = ["weight","value","sellValue"];
 const TYPE_OPTS = ["light","weapon","armour","currency","treasure","material","consumable","scroll","recipe","book"];
 const SLOT_OPTS = ["light","hand","body","head","neck","finger"];
 const RARITY_OPTS = ["common","uncommon","rare","epic","legendary"];
+const ATTR_OPTS = ["might","vitality","intellect","wits","perception"];
 
 let original = {};   // pristine, parsed from disk
 let items = {};      // working copy (mutated as you edit)
@@ -151,6 +155,9 @@ function renderForm() {
   cls.append(flags);
   main.append(cls);
 
+  // --- weapon (structured; shown for weapons) ---
+  if (it.type === "weapon" || it.weapon) main.append(weaponSection(it));
+
   // --- trade & weight ---
   const trade = el("fieldset"); trade.append(el("legend", {}, "Trade & weight"));
   const tg = el("div", { className:"grid" });
@@ -171,7 +178,7 @@ function renderForm() {
   kwL.append(kwI); kw.append(kwL); main.append(kw);
 
   // --- advanced (raw JSON for the type-specific blocks) ---
-  const advKeys = Object.keys(it).filter((k) => !KNOWN.includes(k));
+  const advKeys = Object.keys(it).filter((k) => !KNOWN.includes(k) && !STRUCTURED.includes(k));
   const adv = el("fieldset"); adv.append(el("legend", {}, "Advanced — raw JSON (light, weapon, armour, consumable, scroll, recipe, teaches, …)"));
   const advObj = {}; for (const k of advKeys) advObj[k] = it[k];
   const at = el("textarea", { id:"adv", value: JSON.stringify(advObj, null, 2) });
@@ -180,7 +187,7 @@ function renderForm() {
     try {
       const parsed = at.value.trim() ? JSON.parse(at.value) : {};
       err.textContent = "";
-      for (const k of Object.keys(it)) if (!KNOWN.includes(k)) delete it[k]; // drop removed advanced keys
+      for (const k of Object.keys(it)) if (!KNOWN.includes(k) && !STRUCTURED.includes(k)) delete it[k]; // drop removed advanced keys (never the structured blocks)
       for (const k of Object.keys(parsed)) it[k] = parsed[k];
       touch();
     } catch (e) { err.textContent = "Invalid JSON: " + e.message; }
@@ -189,6 +196,87 @@ function renderForm() {
 
   main.append(actionBar());
   main.append(el("div", { id:"out" }));
+}
+
+// The weapon block, edited as structured fields (so combat stats — damage,
+// speed, scaling, crit, armour pierce — aren't buried in raw JSON). `weapon` is
+// created lazily on first edit and pulled out of the Advanced box (STRUCTURED).
+// onHit stays raw JSON: it's an open-ended effect array, like the other blocks.
+function ensureWeapon(it) { return (it.weapon = it.weapon || {}); }
+
+function weaponSection(it) {
+  const fs = el("fieldset"); fs.append(el("legend", {}, "Weapon"));
+  const g = el("div", { className:"grid" });
+  g.append(field("damage — physical (dice, e.g. 1d8)", wpDmgInput(it, "physical")));
+  g.append(field("damage — magical (dice; cut by Ward, not Armour)", wpDmgInput(it, "magical")));
+  g.append(field("action cost (energy per swing; lower = faster)", wpNumInput(it, "actionCost", "1")));
+  g.append(field("scale attribute (empty = default Might/4)", wpScaleAttr(it)));
+  g.append(field("scale per (÷ this many points → +1 damage)", wpScalePer(it)));
+  g.append(field("crit (flat chance 0–1, e.g. 0.05)", wpNumInput(it, "crit", "0.01")));
+  g.append(field("armour pierce (Armour ignored before the physical soak)", wpNumInput(it, "pierce", "1")));
+  fs.append(g);
+  const flags = el("div", { className:"grid", style:"margin-top:.6rem" });
+  flags.append(wpBoolField(it, "twoHanded", "two-handed — fills both hands, no shield alongside"));
+  fs.append(flags);
+  fs.append(el("p", { className:"hint", textContent:"Armour pierce only affects physical blows (Ward is untouched) and never drives the soak below zero — a blunt head cracking shell/plate. Leave the scale attribute empty to inherit the default Might/4 every weapon gets." }));
+  // onHit — open-ended effect array, kept as raw JSON like the other blocks.
+  const oh = field("onHit — effects on a landed hit (raw JSON array)", null, "full");
+  const ta = el("textarea", { value: it.weapon && it.weapon.onHit ? JSON.stringify(it.weapon.onHit, null, 2) : "" });
+  const err = el("div", { className:"jsonerr" });
+  ta.oninput = () => {
+    const t = ta.value.trim();
+    if (t === "") { if (it.weapon) delete it.weapon.onHit; err.textContent = ""; return touch(); }
+    try { ensureWeapon(it).onHit = JSON.parse(t); err.textContent = ""; touch(); }
+    catch (e) { err.textContent = "Invalid JSON: " + e.message; }
+  };
+  oh.append(ta, err); fs.append(oh);
+  return fs;
+}
+// A dice-string input for weapon.damage[dtype]; empties prune the sub-key (and
+// the damage object when the last one goes) so no `"damage": {}` is left behind.
+function wpDmgInput(it, dtype) {
+  const cur = it.weapon && it.weapon.damage ? it.weapon.damage[dtype] : "";
+  const i = el("input", { type:"text", value: cur ?? "", placeholder:"e.g. 1d8" });
+  i.oninput = () => {
+    const wp = ensureWeapon(it); wp.damage = wp.damage || {};
+    if (i.value.trim() === "") delete wp.damage[dtype]; else wp.damage[dtype] = i.value.trim();
+    if (!Object.keys(wp.damage).length) delete wp.damage;
+    touch();
+  };
+  return i;
+}
+function wpNumInput(it, key, step) {
+  const cur = it.weapon ? it.weapon[key] : "";
+  const i = el("input", { type:"number", value: cur ?? "", step: step || "any" });
+  i.oninput = () => { const wp = ensureWeapon(it); if (i.value === "") delete wp[key]; else wp[key] = Number(i.value); touch(); };
+  return i;
+}
+function wpBoolField(it, key, label) {
+  const c = el("input", { type:"checkbox", checked: !!(it.weapon && it.weapon[key]) });
+  c.onchange = () => { const wp = ensureWeapon(it); if (c.checked) wp[key] = true; else delete wp[key]; touch(); };
+  const l = el("label", { className:"row" }); l.append(c, el("span", {}, label || key)); return l;
+}
+// Scale is an {attr, per} pair. Clearing the attribute drops the whole block
+// (so the weapon falls back to the default Might/4); picking one seeds per=4.
+function wpScaleAttr(it) {
+  const cur = it.weapon && it.weapon.scale ? it.weapon.scale.attr : "";
+  const s = el("select");
+  s.append(el("option", { value:"", textContent:"— default (Might/4) —" }));
+  for (const a of ATTR_OPTS) s.append(el("option", { value:a, textContent:a, selected:a === cur }));
+  s.onchange = () => {
+    const wp = ensureWeapon(it);
+    if (s.value === "") delete wp.scale;
+    else { wp.scale = wp.scale || {}; wp.scale.attr = s.value; if (wp.scale.per == null) wp.scale.per = 4; }
+    touch(); renderForm();
+  };
+  return s;
+}
+function wpScalePer(it) {
+  const has = it.weapon && it.weapon.scale;
+  const i = el("input", { type:"number", value: has ? it.weapon.scale.per ?? "" : "", step:"1", disabled: !has });
+  if (!has) i.title = "Pick a scale attribute first.";
+  i.oninput = () => { if (!it.weapon || !it.weapon.scale) return; if (i.value === "") delete it.weapon.scale.per; else it.weapon.scale.per = Number(i.value); touch(); };
+  return i;
 }
 
 function field(text, control, cls) {
@@ -244,7 +332,8 @@ function touch() { renderList(); }
 async function save(mode) {
   const btns = Array.prototype.slice.call(arguments, 1);
   const out = $("#out"); out.textContent = "";
-  if ($("#adverr") && $("#adverr").textContent) { return msg(out, "err", "Fix the invalid JSON in the Advanced block first."); }
+  const jsonErr = Array.prototype.slice.call(document.querySelectorAll(".jsonerr")).find((e) => e.textContent);
+  if (jsonErr) { return msg(out, "err", "Fix the invalid JSON highlighted above first."); }
   btns.forEach((b) => b.disabled = true);
   out.append(el("p", { className:"sub", textContent:"Working…", style:"color:var(--dim)" }));
   try {
