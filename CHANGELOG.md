@@ -14,13 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as `armour pierce: N`.
 
 ### Changed
-- **The iron mace is now the anti-armour option, not a strictly-worse sword.**
-  It previously lost to the iron sword on every axis — smaller die (1d6 vs
+- **A blunt/anti-armour weapon line now runs through every tier.** The iron
+  mace previously lost to the iron sword on every axis — smaller die (1d6 vs
   1d8), slower, heavier, dearer — while its `scale` merely re-stated the default
-  Might/4 every weapon already gets, so it had no real edge. It now carries
-  `pierce: 2`: against unarmoured foes the sword still wins, but against
-  shelled/plated things (stonebugs, armoured deep-dwellers) the mace cracks
-  through where a blade turns aside — matching its flavour at last.
+  Might/4 every weapon already gets, so it had no real edge. The crushing family
+  now carries `pierce` matched to its flavour and tier: **rusty hammer** 1,
+  **iron mace** 2, **chitin maul** 2, **halberd** 2, **Tobin's hammer** 1,
+  **glimmersteel warhammer** 3 (its flavour already promised *"crushing through
+  shell and plate that would turn a blade"*). Against unarmoured foes the
+  sword/spear/dagger families still win; against shelled or plated things these
+  crack through where a blade turns aside — turning "which weapon?" into a real
+  matchup question. Edged, finesse, and caster weapons are deliberately left
+  without pierce.
 
 ### Fixed
 - **`craft` now resolves to a recipe you actually know.** The command used to
