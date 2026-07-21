@@ -403,7 +403,7 @@ class GameState {
       isAdmin: !!opts.isAdmin,
       level: t.level,
       xp: t.xp,
-      unspentPoints: 0, // attribute points banked from level-ups, spent via `train`
+      unspentPoints: t.unspentPoints || 0, // attribute points banked from level-ups, spent via `train`; the template seeds level 1's grant
       shards: t.shards || 0,
       attributes: { ...t.attributes },
       manaRegen: t.manaRegen || 0,

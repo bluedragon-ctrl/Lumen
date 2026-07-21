@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the claim modal asks for the key just like create.
 
 ### Added
+- **New characters start with 2 training points.** The player template
+  (`data/templates/player.json`) can now seed `unspentPoints`, and it seeds 2 —
+  a fresh level-1 prospector has a level's worth of attribute points to spend
+  with `train` right away, instead of banking their first points only at level 2.
 - **An alchemy station on the Rim — Tobin's tinker-bench.** The Craftsmen's Row
   (`d0.workshop`) gains a `crafting` fixture with the **alchemy** station beside
   its forge and smelter, so a delver can cure and cook the fiddly stuff at the

@@ -833,10 +833,12 @@ The blueprint a new player is instantiated from.
 balance, shown in the player panel). New characters start with the template's value.
 `knownRecipes` lists the recipe ids a fresh character can already `craft`; the field
 is backfilled from this template onto older saves that predate it.
+`unspentPoints` (optional, default 0) seeds a fresh character's bank of attribute
+points to spend with `train` — the level-1 grant.
 
 ```json
 {
-  "level": 1, "xp": 0, "shards": 10,
+  "level": 1, "xp": 0, "unspentPoints": 2, "shards": 10,
   "attributes": { "might": 5, "vitality": 5, "intellect": 5, "wits": 5, "perception": 5 },
   "maxHp": 18, "maxMana": 10, "speed": 12,
   "perception": { "blindBelow": 1, "dimBelow": 3, "harmedAbove": 9 },

@@ -1,6 +1,7 @@
 {
   "level": 1,
   "xp": 0,
+  "unspentPoints": 2,
   "shards": 10,
   "attributes": { "might": 3, "vitality": 3, "intellect": 3, "wits": 3, "perception": 3 },
   "manaRegen": 0.125,
