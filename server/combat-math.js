@@ -39,11 +39,12 @@ function weaponOf(world, player) {
         actionCost: t.weapon.actionCost || DEFAULT_ACTION_COST,
         scale: t.weapon.scale || MELEE_SCALE,
         crit: t.weapon.crit || 0, // flat crit chance the weapon grants, on top of Perception
+        pierce: t.weapon.pierce || 0, // flat Armour ignored before the physical soak (a mace's blunt head)
         onHit: t.weapon.onHit || null, // on-hit effects applied to the struck defender
       };
     }
   }
-  return { dice: "1d2", actionCost: UNARMED_ACTION_COST, scale: MELEE_SCALE, crit: 0, onHit: null, damageType: "physical" }; // unarmed
+  return { dice: "1d2", actionCost: UNARMED_ACTION_COST, scale: MELEE_SCALE, crit: 0, pierce: 0, onHit: null, damageType: "physical" }; // unarmed
 }
 
 // --- Defender-side triggers (onDamage) -------------------------------------
@@ -293,8 +294,9 @@ function roomEffectFires(effect, light) {
 const MIN_HIT = 0.05;
 
 /** Resolve one swing.
- *  @param attacker { band, hitBonus, dmgBonus, crit } — light-perception band,
- *         flat to-hit bonus (Perception), flat damage bonus (weapon scale), crit chance.
+ *  @param attacker { band, hitBonus, dmgBonus, crit, pierce } — light-perception band,
+ *         flat to-hit bonus (Perception), flat damage bonus (weapon scale), crit chance,
+ *         and Armour ignored before the physical soak (armour-piercing weapons).
  *  @param defender { armour, ward, evasion } — mitigation + dodge.
  *  Accuracy is the light tier (clear 100% / glare 50% / can't-see 5%) plus the
  *  attacker's hit bonus minus the defender's evasion, clamped to [MIN_HIT, 1].
@@ -315,7 +317,14 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   // as a PERCENT (see mitigate). A spell *cast* is instead negated wholesale by
   // Ward (see wardNegates); a magical weapon always lands once it hits, but its
   // bite is reduced here.
-  const damage = mitigate(base, damageType, defender);
+  // An armour-piercing weapon (a mace's blunt head) ignores a flat slice of the
+  // defender's Armour before that physical soak — nothing to Ward, which is a
+  // percent cut on magical blows, not a plate to crack.
+  const pierce = attacker.pierce || 0;
+  const def = pierce && damageType === "physical"
+    ? { ...defender, armour: Math.max(0, (defender.armour || 0) - pierce) }
+    : defender;
+  const damage = mitigate(base, damageType, def);
   return { hit: true, sighted, damage, crit, damageType };
 }
 

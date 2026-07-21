@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
+  (mirrored on a mob's `attack.pierce`) ignores that many points of the
+  defender's Armour before the physical soak — a blunt head cracking shell or
+  plate. It touches only `physical` blows (Ward, the percent cut on magical
+  hits, is untouched) and never drives the soak below zero. Shown on `examine`
+  as `armour pierce: N`.
+
+### Changed
+- **The iron mace is now the anti-armour option, not a strictly-worse sword.**
+  It previously lost to the iron sword on every axis — smaller die (1d6 vs
+  1d8), slower, heavier, dearer — while its `scale` merely re-stated the default
+  Might/4 every weapon already gets, so it had no real edge. It now carries
+  `pierce: 2`: against unarmoured foes the sword still wins, but against
+  shelled/plated things (stonebugs, armoured deep-dwellers) the mace cracks
+  through where a blade turns aside — matching its flavour at last.
+
 ### Fixed
 - **`craft` now resolves to a recipe you actually know.** The command used to
   take the first name match in world definition order across *all* recipes, so

@@ -867,6 +867,7 @@ class GameState {
         hitBonus: per * HIT_PER_PERCEPTION,
         dmgBonus: spellScaleBonus(attrs, weapon.scale),
         crit: per * CRIT_PER_PERCEPTION + (weapon.crit || 0),
+        pierce: weapon.pierce || 0, // Armour the weapon cracks through (a mace)
       };
       // A dozing/resting mob is jolted awake the instant a delver strikes it —
       // the authored ambush payoff: free opening blows, then it fights back.
