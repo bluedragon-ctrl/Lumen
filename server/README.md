@@ -73,11 +73,19 @@ the owner logs in as, or deletes, a character), not server access:
 ```
 
 Passwords are hashed with Node's built-in `crypto` (scrypt + a random per-account
-salt, constant-time verify — no third-party dep); `salt` + `passwordHash` live on
-the per-character JSON. Wrong password → a clear error, no login. **Claim-on-first-
-login:** an account written before passwords existed has no hash; setting one via
-`claim-password` locks it in. Wrong-password, missing-password (claim needed), and
-already-logged-in are all reported as `error` frames.
+salt, constant-time verify — no third-party dep). The per-character JSON stores one
+self-describing `passwordHash` string — `scrypt:N:r:p:<salt>:<hash>` — so the cost
+parameters ride with each hash and can be raised later without breaking old
+accounts: a login that verifies against a legacy (`salt` + hex-hash pair) or
+stale-params hash is re-stamped into the current format on the spot. Hashing runs
+**async** (off the event loop via the thread pool), so a login never stalls the
+tick. **Guess throttling** (`server/throttle.js`): repeated wrong passwords lock
+that account name out briefly (wrong invite keys share one server-wide bucket),
+and a socket that keeps guessing is closed — checked before any scrypt work, so a
+throttled attempt costs nothing. Wrong password → a clear error, no login.
+**Claim-on-first-login:** an account written before passwords existed has no hash;
+setting one via `claim-password` locks it in. Wrong-password, missing-password
+(claim needed), throttled, and already-logged-in are all reported as `error` frames.
 
 **Password recovery.** There's no email/self-service reset. An admin runs
 **`@reset-password <name>`**, which clears that account's password so it reverts
@@ -89,8 +97,9 @@ account (managed via `ADMIN_PASSWORD`).
 **Registration gate.** Creating a prospector is open by default. Set the
 **`INVITE_KEY_HASH`** environment variable and `create-account` then requires a
 matching `inviteKey`; the roster's `requireInvite` flag tells the client to show
-the field. The configured value is a hashed `salt:hash` string (the plaintext key
-never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
+the field. The configured value is the same self-describing hash string as account
+passwords (pre-format `salt:hash` values from older deploys still verify; the
+plaintext key never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
 `tools/hash-invite-key.js`) and share the plaintext with invitees. It's one shared
 secret, not per-character. An admin can also set/rotate the key live from in-game
 with **`@invite-key`** (`new` | `set <key>` | `off` | `status`) — handy where the

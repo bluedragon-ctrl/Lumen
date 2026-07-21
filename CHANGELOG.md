@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Auth hardening — future-proof hashes, async scrypt, guess throttling.**
+  Password hashes are now stored as one self-describing string
+  (`scrypt:N:r:p:<salt>:<hash>`) with the cost parameters pinned explicitly and
+  riding along with each hash, so they can be raised later without breaking a
+  single account — a login that verifies against a legacy pair or stale params
+  is silently re-stamped into the current format (lazy migration; the invitation
+  key uses the same format, and old `salt:hash` env values still verify).
+  Password hashing on the login screen now runs **async** on the thread pool, so
+  a login (or a hostile client hammering attempts) can no longer stall the world
+  tick. New **guess throttling** (`server/throttle.js`): five wrong passwords
+  against one name inside 15 minutes lock that name for 60 s, wrong invitation
+  keys share one server-wide bucket, and a socket that keeps guessing wrong
+  secrets is dropped — all checked before any hashing work. A corrupt stored
+  hash now locks the account (recoverable via `@reset-password`) instead of
+  leaving it claimable. No client or protocol changes.
+
 ### Added
 - **An alchemy station on the Rim — Tobin's tinker-bench.** The Craftsmen's Row
   (`d0.workshop`) gains a `crafting` fixture with the **alchemy** station beside
