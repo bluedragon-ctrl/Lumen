@@ -122,7 +122,7 @@
     "manaCost": 6,
     "hostile": false,
     "target": "creature",
-    "effect": { "type": "cleanse", "name": "Cleanse", "good": true }
+    "effect": { "type": "cleanse", "name": "Cleanse", "guard": 5, "good": true }
   },
   "purge": {
     "id": "purge",
@@ -131,7 +131,7 @@
     "manaCost": 10,
     "hostile": false,
     "target": "room",
-    "effect": { "type": "cleanse", "name": "Purge", "good": true }
+    "effect": { "type": "cleanse", "name": "Purge", "guard": 5, "good": true }
   },
   "sleep": {
     "id": "sleep",

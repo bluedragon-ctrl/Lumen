@@ -192,6 +192,12 @@ function createDispatcher({
       markPlayerView(ev.playerId);
     }),
 
+    "effect-guarded": (ev) => withPlayer(ev.playerId, () => {
+      // A hostile DoT (a venomous bite, a bleed) met the player's cleansing
+      // sheen (dot-guard) and failed to take hold — mirror of effect-applied.
+      sendToPlayer(ev.playerId, { type: "log", text: `Your cleansing sheen turns the ${ev.name} aside.` });
+    }),
+
     "room-effect": (ev) => withPlayer(ev.playerId, (player) => {
       // A room acted on a player (douse / regen / drain). Show the flavour line and
       // refresh their views; if the room dimmed (a douse), refresh it for others too.
@@ -298,6 +304,7 @@ function createDispatcher({
           const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
           let line;
           if (ev.resisted) line = `${cap(an)} hurls ${ev.spellName} at ${tn}, but its ward turns it aside.`;
+          else if (ev.guarded) line = `${cap(an)} casts ${ev.spellName} on ${tn}, but it slides off without catching.`;
           else if (ev.effectName) line = `${cap(an)} casts ${ev.spellName} on ${tn} — the ${ev.effectName} takes hold.`;
           else line = `${cap(an)} blasts ${tn} with ${ev.spellName} for ${ev.damage}${dmgTag(ev.damageType)}.`;
           sendToPlayer(o.id, { type: "combat", text: line });
@@ -309,6 +316,7 @@ function createDispatcher({
       const who = seen ? ev.mobName : "something";
       let youLine;
       if (ev.resisted) youLine = `${cap(who)} hurls ${ev.spellName} at you, but your ward turns it aside.`;
+      else if (ev.guarded) youLine = `${cap(who)} casts ${ev.spellName} at you, but your cleansing sheen turns it aside.`;
       else if (ev.doused) youLine = `${cap(who)} reaches out, and your light gutters and dies — the dark rushes in.`;
       else if (ev.manaDrain) youLine = ev.manaDrained > 0
         ? `${cap(who)} settles against you and drinks — the warmth of your will drains away (-${ev.manaDrained} mana).`

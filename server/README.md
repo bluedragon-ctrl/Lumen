@@ -236,6 +236,10 @@ when a player is clearly responsible (else the kill is pure environment).
   sourceId }`): a bleed/poison primitive ticked on **both players and mobs** by
   `_tickEffects`; a DoT kill credits its recorded `sourceId`. The scaffolding is
   in place; no bleed-inflicting content is authored yet.
+- **Dot-guard** (`dot-guard` status effect): while it holds, `applyEffect`
+  refuses any NEW `damage-over-time` on the bearer (existing burns keep
+  ticking). Left behind by a `cleanse` effect's optional `guard` field (Cleanse
+  and Purge leave 5 ticks) so the very next venomous swing can't undo the cast.
 
 **Repop** is data-driven per spawn rule: `{ mob, max, respawn }`. Each tick a
 spawner below its `max` counts down `respawn` ticks and then puts one mob back in

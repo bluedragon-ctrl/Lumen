@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Cleanse now guards against immediate re-poisoning.** Cleanse and Purge
+  leave a 5-second *dot-guard* after-sheen on everyone they scour: while it
+  holds, any NEW hostile damage-over-time (a venomous bite, a bleed, witchfire)
+  is turned aside — previously the very next swing could re-apply the affliction
+  and the cast was wasted. The sheen shows in the effects panel, its length is
+  data-driven (`guard` on the spell's cleanse effect), existing burns are
+  unaffected (cleanse already removed them), and all other effect types land
+  as usual.
 - **Auth hardening — future-proof hashes, async scrypt, guess throttling.**
   Password hashes are now stored as one self-describing string
   (`scrypt:N:r:p:<salt>:<hash>`) with the cost parameters pinned explicitly and

@@ -848,7 +848,7 @@ class MobAIMixin {
     const targetName = isPlayer ? target.actor.name : tmt.name;
     const resisted = eff.damageType !== "physical" && wardNegates(wardPoolFor(eff.damageType, this._defenceOf(target)));
     let damage = 0, effectName = null, doused = false, drainFactor = 0;
-    let manaDrain = false, manaDrained = 0;
+    let manaDrain = false, manaDrained = 0, guarded = false;
     if (!resisted) {
       // Per-type resolution is the shared core (state._applyHostileSpellEffect),
       // scaled by the mob's own attributes; no sourceId — a mob credits no one.
@@ -870,6 +870,10 @@ class MobAIMixin {
         // A burn or a hex: the state is already applied by the shared core; name
         // it so the mob-cast event narrates "the X takes hold".
         effectName = applied.name;
+      } else if (applied.kind === "dot-guarded") {
+        // The burn met the target's cleansing sheen (a fresh Cleanse) and slid
+        // off whole — the event narrates the turn-aside instead of a take-hold.
+        guarded = true;
       }
     }
     if (doused) rt.light = this.computeRoomLight(roomId); // the snuffed flame leaves the room darker
@@ -883,7 +887,7 @@ class MobAIMixin {
     events.push({
       type: "mob-cast", roomId, mobId: m.id, mobName: t.name, emitsLight: t.emitsLight > 0, light: rt.light,
       targetId: target.id, targetName, targetKind: target.kind, targetEmitsLight: isPlayer ? false : tmt.emitsLight > 0,
-      spellName: spell.name, resisted, damage, damageType: eff.damageType || "magical", effectName, doused, killed, drained, manaDrain, manaDrained,
+      spellName: spell.name, resisted, guarded, damage, damageType: eff.damageType || "magical", effectName, doused, killed, drained, manaDrain, manaDrained,
       targetHp: Math.max(0, target.actor.hp - damage), targetMaxHp: target.actor.maxHp,
     });
     if (damage > 0) {
