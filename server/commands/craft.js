@@ -5,20 +5,47 @@
 const { makeItemInstance, sellValueOf } = require("../state");
 const quests = require("../quests");
 const {
-  selfAndViews, err, logMsg, announce, announceLevelUps, matchesQuery,
+  selfAndViews, err, logMsg, announce, announceLevelUps, matchRank, closestName, whichDoYouMean,
   countItem, removeItem, addToInventory, stationLabel,
 } = require("./shared");
 
 function craft(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return err("Craft what? Try `recipes`.");
-  const entry = Object.entries(w.recipes).find(
-    ([id, r]) => matchesQuery(arg, r.name || id, r.keywords, id)
-  );
-  if (!entry) return err(`You know no recipe for "${arg}".`);
+  // Rank every recipe the query could mean instead of taking the first name
+  // match in definition order (which made `craft bar` refuse over an unlearned
+  // Barbed Bomb while you stood at the smelter with iron ore). Knowing the
+  // recipe dominates everything; then whatever you could craft right now —
+  // being at its station and holding its inputs each lift the score — and a
+  // whole-word match ("bar" in Iron Bar) beats a mere prefix ("bar" in
+  // Barbed). Ties keep world definition order.
+  const known = new Set(player.knownRecipes || []);
+  const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
+  let entry = null, best = 0, ties = [];
+  for (const [id, r] of Object.entries(w.recipes)) {
+    const rank = matchRank(arg, r.name || id, r.keywords, id);
+    if (!rank) continue;
+    const score = rank
+      + (known.has(id) ? 1000 : 0)
+      + (here.has(r.station) ? 100 : 0)
+      + (canAfford(player, r) ? 100 : 0);
+    if (score > best) { entry = [id, r]; best = score; ties = [r.name || id]; }
+    else if (score === best) ties.push(r.name || id);
+  }
+  if (!entry) {
+    // Nothing matched at all — a typo, most likely. Offer the closest recipe
+    // the player KNOWS (suggesting an unlearned one would only lead to a
+    // "you don't know how" dead end).
+    const close = closestName(arg, [...known].map((id) => w.recipes[id]).filter(Boolean));
+    return err(`You know no recipe for "${arg}".${close ? ` Did you mean ${close}?` : ""}`);
+  }
+  // A dead-even tie between recipes you know is genuinely ambiguous — crafting
+  // spends materials, so ask rather than guess. (Ties among unknown recipes
+  // don't matter: that path only picks which name the refusal cites.)
+  if (best >= 1000 && ties.length > 1) return whichDoYouMean(ties);
   const [rid, r] = entry;
   const label = r.name || rid;
-  if (!(player.knownRecipes || []).includes(rid))
+  if (!known.has(rid))
     return err(`You don't know how to make ${label}.`);
   // Must be at a fixture providing the recipe's station.
   const rt = state.rooms[player.location];

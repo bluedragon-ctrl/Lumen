@@ -5,6 +5,43 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **`craft` now resolves to a recipe you actually know.** The command used to
+  take the first name match in world definition order across *all* recipes, so
+  `craft bar` hit the unlearned **Barbed Bomb** ("bar" as a prefix of "barbed")
+  and refused — even while you knew Iron Bar, held the ore and stood at the
+  smelter. Matching is now ranked: known recipes outrank unknown ones; among
+  those, what you could craft right now ranks highest — being at the recipe's
+  station and holding its inputs each lift the score — and a whole-word match
+  ("bar" in *Iron Bar*) outranks a mere prefix ("bar" in *Barbed*).
+  Nothing-known-matches still names the closest unknown recipe
+  (`You don't know how to make …`), so discovery hints are unchanged
+  (`server/query.js` gains `matchRank`; `craft` uses it).
+- **Ranked matching everywhere a wrong guess costs something.** The `craft`
+  ranking now backs the other resolvers: **`buy`** honours authored keywords at
+  last (it was the lone name-substring matcher), prefers wares you can pay for,
+  and deprioritises a schematic/scroll you already know; **`attack`** (and a
+  hostile cast) prefers the mobs out for your blood, so `attack rat` swings at
+  the cave rat and not the rat-catcher beside it — `talk`/`give` mirror it and
+  prefer the peaceable; **`learn`** studies the sheet that still teaches
+  something new instead of refusing over one you've already memorised.
+- **A dead-even tie asks instead of guessing** (Evennia-style) on the verbs
+  that spend something — `craft`, `buy`, `sell` — e.g. knowing both bar
+  recipes, `craft bar` answers `Which do you mean: Iron Bar or Silver Bar?`
+  rather than silently picking one.
+- **"Did you mean?" now covers nouns, not just verbs.** A failed `craft`,
+  `buy`, or `cast` runs the same edit-distance hint the verb dispatcher uses —
+  `craft irn bar` → *Did you mean Iron Bar?* — against your own recipe book /
+  spellbook / the trader's counter (`editDistance`/`closestName` moved to
+  `server/query.js`).
+- **`examine` shows what you can make before what the vendor sells.** A recipe
+  sheet on a trader's counter carries its subject's keywords (*a barbed-bomb
+  method* answers to "barbed bomb"), so once you'd learned the recipe,
+  `examine barbed bomb` kept showing the sheet on sale instead of the bomb you
+  wanted to size up before crafting. The known-craftable fallback now resolves
+  *before* shop wares — your own craft knowledge wins the name clash — and the
+  sheet stays reachable by its own words (`examine method`).
+
 ### Changed
 - **Cleanse now guards against immediate re-poisoning.** Cleanse and Purge
   leave a 5-second *dot-guard* after-sheen on everyone they scour: while it
