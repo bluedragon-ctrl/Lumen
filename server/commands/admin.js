@@ -169,7 +169,7 @@ function handleAdmin(state, player, verb, arg, ctx = NOOP_CTX) {
         const src = source();
         return logMsg(
           src
-            ? `Invite gate: ON (${src}). New players need the key. The key is stored hashed — it can't be shown, only reset with "@invite-key new". "@invite-key off" clears the server override.`
+            ? `Invite gate: ON (${src}). Creating a prospector and claiming an unclaimed one both need the key. The key is stored hashed — it can't be shown, only reset with "@invite-key new". "@invite-key off" clears the server override.`
             : `Invite gate: OFF — registration is open. "@invite-key new" generates a key and turns it on.`
         );
       }

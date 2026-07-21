@@ -26,13 +26,14 @@ module.exports = {
       ? true
       : !/^(0|false|no|off)$/i.test(process.env.SHOW_ADMIN_LOGIN.trim()),
 
-  // New-player registration gate. When set, creating a prospector requires an
-  // invitation key. The value is a hashed "salt:hash" string (the plaintext key
-  // is never stored) — generate one with `node tools/hash-invite-key.js <key>`
-  // and share the plaintext key out-of-band with invitees. Left unset,
-  // registration is open (the current behaviour) — a boot notice says so. This
-  // is a light gate for now; a fuller invite/registration system is deferred to
-  // a later security-hardening pass.
+  // New-player registration gate. When set, creating a prospector — and
+  // claiming a pre-password one (they sit on a public roster, so an ungated
+  // claim would be a side door) — requires an invitation key. The value is a
+  // hashed string (the plaintext key is never stored) — generate one with
+  // `node tools/hash-invite-key.js <key>` and share the plaintext key
+  // out-of-band with invitees. Left unset, registration is open (the current
+  // behaviour) — a boot notice says so. This is a light gate for now; a fuller
+  // invite/registration system is deferred to a later security-hardening pass.
   INVITE_KEY_HASH: (process.env.INVITE_KEY_HASH || "").trim() || null,
 
   // Leveling: `xp` is a lifetime total. The XP increment for level N→N+1 is

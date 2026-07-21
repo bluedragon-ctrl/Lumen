@@ -20,7 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   keys share one server-wide bucket, and a socket that keeps guessing wrong
   secrets is dropped — all checked before any hashing work. A corrupt stored
   hash now locks the account (recoverable via `@reset-password`) instead of
-  leaving it claimable. No client or protocol changes.
+  leaving it claimable. **The invite gate now also covers claiming**: when a
+  key is set, claiming a pre-password account requires it too (unclaimed
+  accounts sit on a public roster — without this the gate had a side door),
+  and the claim modal asks for the key just like create.
 
 ### Added
 - **An alchemy station on the Rim — Tobin's tinker-bench.** The Craftsmen's Row

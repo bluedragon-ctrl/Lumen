@@ -95,9 +95,10 @@ target is logged in (a live snapshot would rewrite the hash) and for the `admin`
 account (managed via `ADMIN_PASSWORD`).
 
 **Registration gate.** Creating a prospector is open by default. Set the
-**`INVITE_KEY_HASH`** environment variable and `create-account` then requires a
-matching `inviteKey`; the roster's `requireInvite` flag tells the client to show
-the field. The configured value is the same self-describing hash string as account
+**`INVITE_KEY_HASH`** environment variable and `create-account` — and
+`claim-password`, since unclaimed accounts sit on a public roster and an ungated
+claim would be a side door past the gate — then require a matching `inviteKey`;
+the roster's `requireInvite` flag tells the client to show the field. The configured value is the same self-describing hash string as account
 passwords (pre-format `salt:hash` values from older deploys still verify; the
 plaintext key never touches disk) — generate it with `npm run hash-invite-key -- <key>` (→
 `tools/hash-invite-key.js`) and share the plaintext with invitees. It's one shared

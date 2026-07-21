@@ -291,7 +291,7 @@ async function createAccount(ws, rawName, password, inviteKey) {
 // Claim a pre-password account by setting its password on first login (the
 // migration path). Refuses accounts that already have a password — only an
 // unclaimed account can be claimed — then logs the claimer in.
-async function claimPassword(ws, rawName, password) {
+async function claimPassword(ws, rawName, password, inviteKey) {
   const v = accounts.validateName(rawName);
   if (!v.ok) return void send(ws, { type: "error", text: v.reason });
   if (!accounts.exists(v.name))
@@ -302,6 +302,20 @@ async function claimPassword(ws, rawName, password) {
     return void send(ws, { type: "error", text: `"${data.name}" already has a password — log in instead.` });
   if (data.isAdmin && !SHOW_ADMIN_LOGIN)
     return void send(ws, { type: "error", text: "Admin login is disabled." });
+  // When the registration gate is on, claiming needs the invitation key too —
+  // unclaimed accounts sit on a public roster, and without this the gate has a
+  // side door: anyone could take over a pre-password character. Same shared
+  // lockout bucket as create (it's the same secret being guessed).
+  const inviteHash = activeInviteHash();
+  if (inviteHash) {
+    const gate = throttle.check("invite");
+    if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
+    if (!(await accounts.verifyInviteKey(inviteKey, inviteHash))) {
+      throttle.fail("invite");
+      guessFailed(ws);
+      return void send(ws, { type: "error", text: "That invitation key isn't valid." });
+    }
+  }
   const pv = accounts.validatePassword(password);
   if (!pv.ok) return void send(ws, { type: "error", text: pv.reason });
   Object.assign(data, await accounts.hashPassword(password));
@@ -389,7 +403,7 @@ async function handleAuth(ws, msg) {
       if (typeof msg.name !== "string") return void send(ws, { type: "error", text: "Please choose a prospector." });
       return login(ws, msg.name, msg.password);
     case "claim-password":
-      return claimPassword(ws, msg.name, msg.password);
+      return claimPassword(ws, msg.name, msg.password, msg.inviteKey);
     case "create-account":
       return createAccount(ws, msg.name, msg.password, msg.inviteKey);
     case "delete-account":
