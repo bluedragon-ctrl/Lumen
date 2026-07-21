@@ -10,11 +10,11 @@ const { NOOP_CTX, countItem } = require("../server/commands/shared");
 // order, so it hit "Barbed Bomb" (defined first, "bar" is a prefix of
 // "barbed") and refused with "You don't know how to make Barbed Bomb" — even
 // when the player knew Rion Bar, held the ore and stood at the furnace.
-function makeCraftWorld() {
+function makeCraftWorld(fixtures, oreQty) {
   const band = { blindBelow: 1, dimBelow: 3, harmedAbove: 9 };
   return {
     rooms: {
-      forge: { id: "forge", name: "Forge", description: "", depth: 0, ambientLight: 5, exits: {}, fixtures: ["furnace", "bench"], spawns: [] },
+      forge: { id: "forge", name: "Forge", description: "", depth: 0, ambientLight: 5, exits: {}, fixtures, spawns: [] },
     },
     items: {
       rion_ore: { id: "rion_ore", name: "a lump of rion ore", description: "", type: "material", stackable: true },
@@ -39,15 +39,15 @@ function makeCraftWorld() {
       manaRegen: 0, speed: 12,
       perception: band,
       startLocation: "forge",
-      startInventory: [{ template: "rion_ore", qty: 2 }],
+      startInventory: [{ template: "rion_ore", qty: oreQty }],
       startEquipment: { light: null, body: null },
       knownRecipes: ["rion_bar"], knownSpells: [],
     },
   };
 }
 
-function setup(knownRecipes) {
-  const state = new GameState(makeCraftWorld());
+function setup({ knownRecipes, fixtures = ["furnace", "bench"], oreQty = 2 } = {}) {
+  const state = new GameState(makeCraftWorld(fixtures, oreQty));
   const p = state.createCharacter("Smith");
   state.admit(p);
   state.setPlayerLocation(p, "forge");
@@ -64,11 +64,28 @@ test("craft prefers a known recipe over an unknown definition-order match", () =
   assert.equal(countItem(p, "rion_ore"), 0, "ore consumed");
 });
 
-test("craft prefers a whole-word match over a prefix match when both are known", () => {
-  const { state, p } = setup(["barbed_bomb", "rion_bar"]);
+test("craft prefers a whole-word match over a prefix match when both are known and craftable", () => {
+  const { state, p } = setup({ knownRecipes: ["barbed_bomb", "rion_bar"] });
   const out = craft(state, p, "bar", NOOP_CTX);
   assert.ok(out.some((m) => m.type !== "error" && /You craft a rion bar/.test(m.text || "")),
     `"bar" is a whole word of Rion Bar but only a prefix of Barbed Bomb, got: ${JSON.stringify(out[0])}`);
+});
+
+test("craft prefers the known recipe whose station is here", () => {
+  // Only the tinker-bench is present; both recipes are known and affordable, so
+  // the here-and-now Barbed Bomb outranks Rion Bar's better name match.
+  const { state, p } = setup({ knownRecipes: ["barbed_bomb", "rion_bar"], fixtures: ["bench"] });
+  const out = craft(state, p, "bar", NOOP_CTX);
+  assert.ok(out.some((m) => m.type !== "error" && /You craft a barbed bomb/.test(m.text || "")),
+    `the bomb is craftable at this station, the bar is not, got: ${JSON.stringify(out[0])}`);
+});
+
+test("craft prefers the known recipe whose inputs are in pocket", () => {
+  // Both stations present, but one ore only affords the bomb (the bar needs 2).
+  const { state, p } = setup({ knownRecipes: ["barbed_bomb", "rion_bar"], oreQty: 1 });
+  const out = craft(state, p, "bar", NOOP_CTX);
+  assert.ok(out.some((m) => m.type !== "error" && /You craft a barbed bomb/.test(m.text || "")),
+    `only the bomb's inputs are affordable, got: ${JSON.stringify(out[0])}`);
 });
 
 test("craft still names the unknown recipe when nothing known matches", () => {

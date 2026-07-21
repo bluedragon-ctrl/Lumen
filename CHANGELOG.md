@@ -10,9 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   take the first name match in world definition order across *all* recipes, so
   `craft bar` hit the unlearned **Barbed Bomb** ("bar" as a prefix of "barbed")
   and refused — even while you knew Iron Bar, held the ore and stood at the
-  smelter. Matching is now ranked: known recipes outrank unknown ones, and a
-  whole-word match ("bar" in *Iron Bar*) outranks a mere prefix ("bar" in
-  *Barbed*). Nothing-known-matches still names the closest unknown recipe
+  smelter. Matching is now ranked: known recipes outrank unknown ones; among
+  those, what you could craft right now ranks highest — being at the recipe's
+  station and holding its inputs each lift the score — and a whole-word match
+  ("bar" in *Iron Bar*) outranks a mere prefix ("bar" in *Barbed*).
+  Nothing-known-matches still names the closest unknown recipe
   (`You don't know how to make …`), so discovery hints are unchanged
   (`server/query.js` gains `matchRank`; `craft` uses it).
 

@@ -12,16 +12,23 @@ const {
 function craft(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return err("Craft what? Try `recipes`.");
-  // Rank every recipe the query could mean: recipes the player knows outrank
-  // unknown ones, and within a tier a stronger match wins (whole word over
-  // prefix) — so `craft bar` makes your Rion Bar instead of refusing over an
-  // unlearned Barbed Bomb. Ties keep world definition order.
+  // Rank every recipe the query could mean instead of taking the first name
+  // match in definition order (which made `craft bar` refuse over an unlearned
+  // Barbed Bomb while you stood at the smelter with iron ore). Knowing the
+  // recipe dominates everything; then whatever you could craft right now —
+  // being at its station and holding its inputs each lift the score — and a
+  // whole-word match ("bar" in Iron Bar) beats a mere prefix ("bar" in
+  // Barbed). Ties keep world definition order.
   const known = new Set(player.knownRecipes || []);
+  const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
   let entry = null, best = 0;
   for (const [id, r] of Object.entries(w.recipes)) {
     const rank = matchRank(arg, r.name || id, r.keywords, id);
     if (!rank) continue;
-    const score = rank + (known.has(id) ? 10 : 0);
+    const score = rank
+      + (known.has(id) ? 1000 : 0)
+      + (here.has(r.station) ? 100 : 0)
+      + (canAfford(player, r) ? 100 : 0);
     if (score > best) { entry = [id, r]; best = score; }
   }
   if (!entry) return err(`You know no recipe for "${arg}".`);
