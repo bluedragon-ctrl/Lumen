@@ -5,20 +5,29 @@
 const { makeItemInstance, sellValueOf } = require("../state");
 const quests = require("../quests");
 const {
-  selfAndViews, err, logMsg, announce, announceLevelUps, matchesQuery,
+  selfAndViews, err, logMsg, announce, announceLevelUps, matchRank,
   countItem, removeItem, addToInventory, stationLabel,
 } = require("./shared");
 
 function craft(state, player, arg, ctx) {
   const w = state.world;
   if (!arg) return err("Craft what? Try `recipes`.");
-  const entry = Object.entries(w.recipes).find(
-    ([id, r]) => matchesQuery(arg, r.name || id, r.keywords, id)
-  );
+  // Rank every recipe the query could mean: recipes the player knows outrank
+  // unknown ones, and within a tier a stronger match wins (whole word over
+  // prefix) — so `craft bar` makes your Rion Bar instead of refusing over an
+  // unlearned Barbed Bomb. Ties keep world definition order.
+  const known = new Set(player.knownRecipes || []);
+  let entry = null, best = 0;
+  for (const [id, r] of Object.entries(w.recipes)) {
+    const rank = matchRank(arg, r.name || id, r.keywords, id);
+    if (!rank) continue;
+    const score = rank + (known.has(id) ? 10 : 0);
+    if (score > best) { entry = [id, r]; best = score; }
+  }
   if (!entry) return err(`You know no recipe for "${arg}".`);
   const [rid, r] = entry;
   const label = r.name || rid;
-  if (!(player.knownRecipes || []).includes(rid))
+  if (!known.has(rid))
     return err(`You don't know how to make ${label}.`);
   // Must be at a fixture providing the recipe's station.
   const rt = state.rooms[player.location];

@@ -24,12 +24,22 @@ function nameTokens(name) {
 //      AND semantics, so "glimmer crystal" needs both keywords present.
 //   3. legacy fallback: `q` is a substring of the full display name.
 function matchesQuery(q, name, keywords, id) {
-  const ql = (q || "").trim().toLowerCase();
-  if (!ql) return false;
-  if (id && String(id).toLowerCase() === ql) return true;
-  const kws = keywords && keywords.length ? keywords.map((k) => k.toLowerCase()) : nameTokens(name);
-  if (ql.split(/\s+/).every((qw) => kws.some((kw) => kw === qw || kw.startsWith(qw)))) return true;
-  return (name || "").toLowerCase().includes(ql);
+  return matchRank(q, name, keywords, id) > 0;
 }
 
-module.exports = { STOP_WORDS, nameTokens, matchesQuery };
+// How well `q` names the thing: 0 = no match, 1 = prefix/substring match,
+// 2 = every query word equals a keyword outright, 3 = exact id. Callers that
+// pick one candidate from many (craft) prefer higher ranks, so `bar` resolves
+// to "Rion Bar" (whole word) over "Barbed Bomb" (mere prefix).
+function matchRank(q, name, keywords, id) {
+  const ql = (q || "").trim().toLowerCase();
+  if (!ql) return 0;
+  if (id && String(id).toLowerCase() === ql) return 3;
+  const kws = keywords && keywords.length ? keywords.map((k) => k.toLowerCase()) : nameTokens(name);
+  const words = ql.split(/\s+/);
+  if (words.every((qw) => kws.includes(qw))) return 2;
+  if (words.every((qw) => kws.some((kw) => kw.startsWith(qw)))) return 1;
+  return (name || "").toLowerCase().includes(ql) ? 1 : 0;
+}
+
+module.exports = { STOP_WORDS, nameTokens, matchesQuery, matchRank };

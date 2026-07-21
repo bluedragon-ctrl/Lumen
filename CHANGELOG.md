@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **`craft` now resolves to a recipe you actually know.** The command used to
+  take the first name match in world definition order across *all* recipes, so
+  `craft bar` hit the unlearned **Barbed Bomb** ("bar" as a prefix of "barbed")
+  and refused — even while you knew Iron Bar, held the ore and stood at the
+  smelter. Matching is now ranked: known recipes outrank unknown ones, and a
+  whole-word match ("bar" in *Iron Bar*) outranks a mere prefix ("bar" in
+  *Barbed*). Nothing-known-matches still names the closest unknown recipe
+  (`You don't know how to make …`), so discovery hints are unchanged
+  (`server/query.js` gains `matchRank`; `craft` uses it).
+
 ### Changed
 - **Auth hardening — future-proof hashes, async scrypt, guess throttling.**
   Password hashes are now stored as one self-describing string

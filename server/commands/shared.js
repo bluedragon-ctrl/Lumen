@@ -11,7 +11,7 @@
 const { buildRoomView, buildPlayerView } = require("../render");
 const { canSee } = require("../light");
 const { mobVisibleTo, fixtureVisibleTo } = require("../state");
-const { STOP_WORDS, nameTokens, matchesQuery } = require("../query");
+const { STOP_WORDS, nameTokens, matchesQuery, matchRank } = require("../query");
 const quests = require("../quests");
 
 const cap = (s) => (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
@@ -242,7 +242,7 @@ function stickToSurvivor(state, player, results) {
 module.exports = {
   cap, NOOP_CTX, TRAINABLE, questKill, selfAndViews, announceLevelUps,
   err, logMsg, roomLog, announce, relight, consumeOne,
-  STOP_WORDS, nameTokens, matchesQuery, parseTarget, itemMatches, findItem, findMobInRoom, findFixture,
+  STOP_WORDS, nameTokens, matchesQuery, matchRank, parseTarget, itemMatches, findItem, findMobInRoom, findFixture,
   addToInventory, countItem, removeItem, joinList, stationLabel, equipItem,
   autoStand, restoreGain, roomHostiles, stickToSurvivor,
 };
