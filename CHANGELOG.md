@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   data-driven (`guard` on the spell's cleanse effect), existing burns are
   unaffected (cleanse already removed them), and all other effect types land
   as usual.
+- **The shop `list` now matches the other sheets.** `list`/`shop`/`wares`
+  renders in the same style as `attributes`, `recipes`, and `spells`: a gold
+  `Trade — <trader>` title, a cyan `Sells (you buy)` section header, ware names
+  in green when you can afford them (the whole row grey when you can't, like
+  the recipes list), and the sell-rate blurb + shard balance as grey footnotes.
 - **Auth hardening — future-proof hashes, async scrypt, guess throttling.**
   Password hashes are now stored as one self-describing string
   (`scrypt:N:r:p:<salt>:<hash>`) with the cost parameters pinned explicitly and

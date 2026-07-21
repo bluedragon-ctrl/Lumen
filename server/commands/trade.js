@@ -68,23 +68,29 @@ function shopList(state, player, filter) {
     );
     if (!sells.length) return logMsg(`${sh.t.name} has nothing for sale matching "${filter.trim()}".`);
   }
-  const lines = [q ? `${sh.t.name} trades (matching "${filter.trim()}"):` : `${sh.t.name} trades:`];
+  // Styled like the other sheets (`attributes` / `recipes` / `spells`): a gold
+  // title, cyan section headers after a blank line, indented rows with the ware
+  // name green when you can afford it (grey whole-row when you can't, matching
+  // the recipes list's can/can't-make colouring), grey footnotes at the bottom.
+  const lines = [q ? `<#gold>Trade<#reset> — ${sh.t.name} (matching "${filter.trim()}")` : `<#gold>Trade<#reset> — ${sh.t.name}`];
   const purse = player.shards || 0;
   if (sells.length) {
-    lines.push("Sells (you buy):");
+    lines.push("", "<#cyan>Sells (you buy)<#reset>");
     for (const o of sells) {
       const item = w.items[o.template];
       const price = buyPrice(o, item);
       // Flag teachables you'd gain nothing from, so `(known)` warns before a wasted buy.
       const known = alreadyKnown(player, item) ? " (known)" : "";
-      const line = `  ${item.name} — ${price} shards`;
-      lines.push(price > purse ? `<#gray>${line}${known}` : `${line}${known ? `<#gray>${known}<#reset>` : ""}`);
+      lines.push(price > purse
+        ? `  <#gray>${item.name} — ${price} shards${known}<#reset>`
+        : `  <#green>${item.name}<#reset> — ${price} shards${known ? `<#gray>${known}<#reset>` : ""}`);
     }
   }
   // The generic sell-rate blurb is about selling, not the filtered view — skip it
   // when the player has narrowed the list to specific wares.
-  if (!q) lines.push(`Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.`);
-  lines.push(`You have ${player.shards || 0} shards.`);
+  lines.push("");
+  if (!q) lines.push(`<#gray>Buys most goods at ${Math.round(SELL_RATE * 100)}% of value — \`sell <item>\` for an offer.<#reset>`);
+  lines.push(`<#gray>You have ${player.shards || 0} shards.<#reset>`);
   return logMsg(lines.join("\n"));
 }
 
