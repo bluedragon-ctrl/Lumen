@@ -5,7 +5,7 @@
 const { makeItemInstance, sellValueOf } = require("../state");
 const quests = require("../quests");
 const {
-  selfAndViews, err, logMsg, announce, announceLevelUps, matchRank,
+  selfAndViews, err, logMsg, announce, announceLevelUps, matchRank, closestName, whichDoYouMean,
   countItem, removeItem, addToInventory, stationLabel,
 } = require("./shared");
 
@@ -21,7 +21,7 @@ function craft(state, player, arg, ctx) {
   // Barbed). Ties keep world definition order.
   const known = new Set(player.knownRecipes || []);
   const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
-  let entry = null, best = 0;
+  let entry = null, best = 0, ties = [];
   for (const [id, r] of Object.entries(w.recipes)) {
     const rank = matchRank(arg, r.name || id, r.keywords, id);
     if (!rank) continue;
@@ -29,9 +29,20 @@ function craft(state, player, arg, ctx) {
       + (known.has(id) ? 1000 : 0)
       + (here.has(r.station) ? 100 : 0)
       + (canAfford(player, r) ? 100 : 0);
-    if (score > best) { entry = [id, r]; best = score; }
+    if (score > best) { entry = [id, r]; best = score; ties = [r.name || id]; }
+    else if (score === best) ties.push(r.name || id);
   }
-  if (!entry) return err(`You know no recipe for "${arg}".`);
+  if (!entry) {
+    // Nothing matched at all — a typo, most likely. Offer the closest recipe
+    // the player KNOWS (suggesting an unlearned one would only lead to a
+    // "you don't know how" dead end).
+    const close = closestName(arg, [...known].map((id) => w.recipes[id]).filter(Boolean));
+    return err(`You know no recipe for "${arg}".${close ? ` Did you mean ${close}?` : ""}`);
+  }
+  // A dead-even tie between recipes you know is genuinely ambiguous — crafting
+  // spends materials, so ask rather than guess. (Ties among unknown recipes
+  // don't matter: that path only picks which name the refusal cites.)
+  if (best >= 1000 && ties.length > 1) return whichDoYouMean(ties);
   const [rid, r] = entry;
   const label = r.name || rid;
   if (!known.has(rid))

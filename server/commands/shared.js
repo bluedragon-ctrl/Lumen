@@ -11,7 +11,7 @@
 const { buildRoomView, buildPlayerView } = require("../render");
 const { canSee } = require("../light");
 const { mobVisibleTo, fixtureVisibleTo } = require("../state");
-const { STOP_WORDS, nameTokens, matchesQuery, matchRank } = require("../query");
+const { STOP_WORDS, nameTokens, matchesQuery, matchRank, closestName } = require("../query");
 const quests = require("../quests");
 
 const cap = (s) => (s || "").charAt(0).toUpperCase() + (s || "").slice(1);
@@ -120,21 +120,61 @@ function findItem(list, world, q) {
   return pick === undefined ? -1 : pick;
 }
 
+// Ranked findItem, for callers where picking the wrong match costs something
+// (sell consumes the item, learn consumes the sheet). A whole-word match beats
+// a prefix, `boost(inst, tmpl)` (optional) lifts what the caller plausibly
+// means, ties keep pack order, and the `N.` ordinal picks within the ranked
+// order. Returns { inst, ties }: `ties` lists the distinct item names sharing
+// the top score when nothing broke the tie, so the caller can ask instead of
+// guessing.
+function rankedFindItem(list, world, q, boost = null) {
+  const { ordinal, keyword } = parseTarget(q);
+  if (!keyword) return { inst: null, ties: [] };
+  const scored = [];
+  list.forEach((inst, i) => {
+    const t = world.items[inst.template];
+    const rank = matchRank(keyword, t.name, t.keywords, inst.id);
+    if (rank) scored.push({ inst, i, name: t.name, score: rank + (boost ? boost(inst, t) : 0) });
+  });
+  scored.sort((a, b) => b.score - a.score || a.i - b.i);
+  const pick = scored[(ordinal || 1) - 1];
+  const ties = ordinal > 1 || !scored.length
+    ? []
+    : [...new Set(scored.filter((s) => s.score === scored[0].score).map((s) => s.name))];
+  return { inst: pick ? pick.inst : null, ties: ties.length > 1 ? ties : [] };
+}
+
 // Resolve a mob in the player's room by query, honouring an `N.` ordinal prefix.
-// `requireVisible` gates hidden-mob reveals; `cast` historically skips that
-// check, so it passes false. Returns the mob instance or null.
-function findMobInRoom(state, player, q, requireVisible = true) {
+// Matches are ranked before the ordinal picks: a whole-word match beats a
+// prefix, and `prefer` — an optional (mob, tmpl) predicate — lifts the mobs the
+// caller plausibly means (attack lifts hostiles, talk the peaceable), so
+// `attack rat` swings at the cave rat and not the rat-catcher beside it. Ties
+// keep room order. `requireVisible` gates hidden-mob reveals; `cast`
+// historically skips that check, so it passes false. Returns the mob or null.
+function findMobInRoom(state, player, q, requireVisible = true, prefer = null) {
   const w = state.world;
   const rt = state.rooms[player.location];
   const see = canSee(player.perception, rt.light);
   const { ordinal, keyword } = parseTarget(q);
   if (!keyword) return null;
-  const matches = rt.mobs.filter((m) => {
+  const scored = [];
+  rt.mobs.forEach((m, i) => {
     const t = w.mobs[m.template];
-    return (!requireVisible || mobVisibleTo(state, player, m)) && (see || t.emitsLight) && matchesQuery(keyword, t.name, t.keywords, m.id);
+    if (requireVisible && !mobVisibleTo(state, player, m)) return;
+    if (!(see || t.emitsLight)) return;
+    const rank = matchRank(keyword, t.name, t.keywords, m.id);
+    if (rank) scored.push({ m, i, score: rank + (prefer && prefer(m, t) ? 10 : 0) });
   });
-  return matches[(ordinal || 1) - 1] || null;
+  scored.sort((a, b) => b.score - a.score || a.i - b.i);
+  const pick = scored[(ordinal || 1) - 1];
+  return pick ? pick.m : null;
 }
+
+// The `prefer` predicate for aggressive verbs: a mob that is hostile by
+// template or already has its teeth in this player (mirrors roomHostiles).
+const hostileToward = (player) => (m, t) => t.hostile || (m.aggro && m.aggro[player.id] > 0);
+// …and its mirror for social verbs (talk/give): whoever isn't out for blood.
+const peaceable = () => (m, t) => !t.hostile;
 
 // Find a visible fixture in the player's room that `ql` (lower-cased) names by
 // id, authored keyword or display name and that satisfies `pred(ft)`. The
@@ -180,6 +220,17 @@ function joinList(names) {
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
+
+// joinList with "or" — for disambiguation asks ("Which do you mean: A or B?").
+function orList(names) {
+  if (names.length <= 1) return names[0] || "";
+  return `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
+}
+
+// The standard refusal for a genuinely ambiguous target — a dead-even tie
+// between different things on a side-effectful verb (craft spends materials,
+// buy spends shards, sell parts with the item) asks rather than guesses.
+const whichDoYouMean = (names) => err(`Which do you mean: ${orList(names)}? Name it more exactly.`);
 
 // Display name of the fixture that provides a crafting station (for hints).
 function stationLabel(world, station) {
@@ -242,7 +293,8 @@ function stickToSurvivor(state, player, results) {
 module.exports = {
   cap, NOOP_CTX, TRAINABLE, questKill, selfAndViews, announceLevelUps,
   err, logMsg, roomLog, announce, relight, consumeOne,
-  STOP_WORDS, nameTokens, matchesQuery, matchRank, parseTarget, itemMatches, findItem, findMobInRoom, findFixture,
-  addToInventory, countItem, removeItem, joinList, stationLabel, equipItem,
+  STOP_WORDS, nameTokens, matchesQuery, matchRank, closestName, parseTarget, itemMatches, findItem, rankedFindItem, findMobInRoom, findFixture,
+  hostileToward, peaceable, whichDoYouMean,
+  addToInventory, countItem, removeItem, joinList, orList, stationLabel, equipItem,
   autoStand, restoreGain, roomHostiles, stickToSurvivor,
 };

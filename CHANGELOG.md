@@ -17,6 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Nothing-known-matches still names the closest unknown recipe
   (`You don't know how to make …`), so discovery hints are unchanged
   (`server/query.js` gains `matchRank`; `craft` uses it).
+- **Ranked matching everywhere a wrong guess costs something.** The `craft`
+  ranking now backs the other resolvers: **`buy`** honours authored keywords at
+  last (it was the lone name-substring matcher), prefers wares you can pay for,
+  and deprioritises a schematic/scroll you already know; **`attack`** (and a
+  hostile cast) prefers the mobs out for your blood, so `attack rat` swings at
+  the cave rat and not the rat-catcher beside it — `talk`/`give` mirror it and
+  prefer the peaceable; **`learn`** studies the sheet that still teaches
+  something new instead of refusing over one you've already memorised.
+- **A dead-even tie asks instead of guessing** (Evennia-style) on the verbs
+  that spend something — `craft`, `buy`, `sell` — e.g. knowing both bar
+  recipes, `craft bar` answers `Which do you mean: Iron Bar or Silver Bar?`
+  rather than silently picking one.
+- **"Did you mean?" now covers nouns, not just verbs.** A failed `craft`,
+  `buy`, or `cast` runs the same edit-distance hint the verb dispatcher uses —
+  `craft irn bar` → *Did you mean Iron Bar?* — against your own recipe book /
+  spellbook / the trader's counter (`editDistance`/`closestName` moved to
+  `server/query.js`).
 - **`examine` shows what you can make before what the vendor sells.** A recipe
   sheet on a trader's counter carries its subject's keywords (*a barbed-bomb
   method* answers to "barbed bomb"), so once you'd learned the recipe,

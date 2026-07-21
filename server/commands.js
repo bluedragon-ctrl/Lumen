@@ -22,9 +22,11 @@ const quests = require("./quests");
 const {
   cap, NOOP_CTX, TRAINABLE, selfAndViews, announceLevelUps, autoStand,
   err, logMsg, roomLog, announce, relight, consumeOne,
-  parseTarget, itemMatches, findItem, findMobInRoom,
+  parseTarget, itemMatches, findItem, rankedFindItem, findMobInRoom,
+  hostileToward, peaceable, whichDoYouMean,
   addToInventory, joinList, equipItem,
 } = require("./commands/shared");
+const { editDistance } = require("./query");
 const { buildHelp } = require("./commands/help");
 const { attributesSheet } = require("./commands/attributes");
 const { shopList, buy, sell } = require("./commands/trade");
@@ -363,7 +365,9 @@ function lookAt(state, player, arg) {
 function attack(state, player, arg) {
   if (!arg) return err("Attack what?");
   const woke = autoStand(player); // you spring to your feet before swinging (and regain sight)
-  const mob = findMobInRoom(state, player, arg);
+  // Prefer the mobs that are out for your blood — `attack rat` swings at the
+  // cave rat, not a rat-catcher trader who happens to share the keyword.
+  const mob = findMobInRoom(state, player, arg, true, hostileToward(player));
   if (!mob) return err(`You see no "${arg}" here to attack.`);
   player.pending = { type: "attack", targetId: mob.id };
   const ready = { type: "combat", text: `You ready your attack on ${state.world.mobs[mob.template].name}.` };
@@ -401,14 +405,11 @@ function search(state, player, ctx) {
 // thing learned. A book (`teaches`) can teach several at once. All three item
 // shapes normalise to one {kind, id} list and share the consume-on-study flow;
 // an item that holds nothing new isn't consumed.
-function learn(state, player, arg, ctx) {
-  const w = state.world;
-  if (!arg) return err("Learn what? Study a scroll or schematic you're carrying.");
-  const idx = findItem(player.inventory, w, arg);
-  if (idx < 0) return err(`You aren't carrying "${arg}".`);
-  const inst = player.inventory[idx];
-  const t = w.items[inst.template];
-  const entries = t.teaches
+// The {kind, id} list an item can teach: a book (`teaches`, several entries), a
+// scroll (one spell), a schematic (one recipe). Shared by `learn` and its
+// ranked pick below.
+function teachEntries(t) {
+  return t.teaches
     ? [
         ...(t.teaches.recipes || []).map((id) => ({ kind: "recipe", id })),
         ...(t.teaches.spells || []).map((id) => ({ kind: "spell", id })),
@@ -418,6 +419,23 @@ function learn(state, player, arg, ctx) {
       : t.recipe
         ? [{ kind: "recipe", id: t.recipe }]
         : [];
+}
+
+function learn(state, player, arg, ctx) {
+  const w = state.world;
+  if (!arg) return err("Learn what? Study a scroll or schematic you're carrying.");
+  // Ranked pick, biased toward the useful sheet: holding two teachables that
+  // answer the same word, prefer the one with something NEW to teach — `learn
+  // method` studies the unknown schematic instead of refusing over one you've
+  // already committed to memory. Studying consumes the item, so a dead-even
+  // tie between different items asks rather than guesses.
+  const teachesNew = (t) => teachEntries(t).some((e) =>
+    !((e.kind === "spell" ? player.knownSpells : player.knownRecipes) || []).includes(e.id));
+  const { inst, ties } = rankedFindItem(player.inventory, w, arg, (i, t) => (teachesNew(t) ? 10 : 0));
+  if (ties.length) return whichDoYouMean(ties);
+  if (!inst) return err(`You aren't carrying "${arg}".`);
+  const t = w.items[inst.template];
+  const entries = teachEntries(t);
   if (!entries.length) return err(`There is nothing to learn from ${t.name}.`);
   if (!player.knownRecipes) player.knownRecipes = [];
   if (!player.knownSpells) player.knownSpells = [];
@@ -488,7 +506,9 @@ function train(state, player, arg) {
 function talk(state, player, arg, ctx) {
   if (!arg) return err("Talk to whom?");
   const w = state.world;
-  const mob = findMobInRoom(state, player, arg);
+  // The social mirror of attack's preference: talk to whoever ISN'T out for
+  // blood when a keyword straddles both.
+  const mob = findMobInRoom(state, player, arg, true, peaceable());
   if (!mob) return err(`You see no "${arg}" here to talk to.`);
   const t = w.mobs[mob.template];
   roomLog(ctx, player, `${player.name} speaks with ${t.name}.`);
@@ -522,7 +542,7 @@ function give(state, player, arg, ctx) {
   else { const toks = arg.trim().split(/\s+/); npcQ = toks[toks.length - 1]; itemQ = toks.slice(0, -1).join(" "); }
   if (!itemQ || !npcQ) return err("Give what to whom? (give <item> <npc>)");
 
-  const mob = findMobInRoom(state, player, npcQ);
+  const mob = findMobInRoom(state, player, npcQ, true, peaceable());
   if (!mob) return err(`You see no "${npcQ}" here to give anything to.`);
   const iidx = findItem(player.inventory, w, itemQ);
   if (iidx < 0) return err(`You aren't carrying "${itemQ}".`);
@@ -535,18 +555,8 @@ function give(state, player, arg, ctx) {
   return [...res.msgs, buildRoomView(state, player), buildPlayerView(state, player)];
 }
 
-// Levenshtein edit distance, bounded use only — VERBS is short. Drives the
-// "did you mean?" hint for a mistyped verb that prefix-abbreviation can't catch.
-function editDistance(a, b) {
-  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
-  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
-  for (let i = 1; i <= a.length; i++)
-    for (let j = 1; j <= b.length; j++)
-      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  return dp[a.length][b.length];
-}
-
 // The known verb closest to a typo, if it's near enough to be worth suggesting.
+// (editDistance lives in ./query, shared with the noun-side "did you mean?".)
 function closestVerb(verb) {
   let best = null, bestD = Infinity;
   for (const v of VERBS) {

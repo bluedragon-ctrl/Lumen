@@ -42,4 +42,33 @@ function matchRank(q, name, keywords, id) {
   return (name || "").toLowerCase().includes(ql) ? 1 : 0;
 }
 
-module.exports = { STOP_WORDS, nameTokens, matchesQuery, matchRank };
+// Levenshtein edit distance — bounded use only (a verb table, a recipe book, a
+// trader's counter are all small). Drives every "did you mean?" hint.
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+
+// The noun-side "did you mean?": the display name among `things` ({name,
+// keywords}) whose name or any keyword sits within 2 edits of `q`, or null if
+// nothing is close enough to be worth suggesting on a failed lookup.
+function closestName(q, things) {
+  const ql = (q || "").trim().toLowerCase();
+  if (!ql) return null;
+  let best = null, bestD = Infinity;
+  for (const t of things) {
+    if (!t || !t.name) continue;
+    const kws = t.keywords && t.keywords.length ? t.keywords.map((k) => k.toLowerCase()) : nameTokens(t.name);
+    for (const term of [t.name.toLowerCase(), ...kws]) {
+      const d = editDistance(ql, term);
+      if (d < bestD) { bestD = d; best = t.name; }
+    }
+  }
+  return bestD <= 2 ? best : null;
+}
+
+module.exports = { STOP_WORDS, nameTokens, matchesQuery, matchRank, editDistance, closestName };

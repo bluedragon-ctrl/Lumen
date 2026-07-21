@@ -7,7 +7,10 @@
 const { canSee } = require("../light");
 const { makeItemInstance, buyValueOf, sellValueOf, SELL_RATE } = require("../state");
 const quests = require("../quests");
-const { selfAndViews, err, logMsg, roomLog, consumeOne, parseTarget, itemMatches, findItem, addToInventory } = require("./shared");
+const {
+  selfAndViews, err, logMsg, roomLog, consumeOne, parseTarget, itemMatches,
+  rankedFindItem, addToInventory, matchRank, closestName, whichDoYouMean,
+} = require("./shared");
 
 // A trader you can currently deal with: a mob in the room carrying a `shop` block,
 // visible in the present light. Returns { mob, t } or null.
@@ -93,11 +96,29 @@ function buy(state, player, arg, ctx) {
   const sh = shopHere(state, player);
   if (!sh) return err("There is no one here to trade with.");
   const w = state.world;
-  const ql = arg.toLowerCase();
-  const offer = (sh.t.shop.sells || []).find(
-    (s) => offerUnlocked(player, s) && (s.template.toLowerCase() === ql || w.items[s.template].name.toLowerCase().includes(ql))
-  );
-  if (!offer) return err(`${sh.t.name} doesn't sell "${arg}".`);
+  // Rank the counter the way `craft` ranks recipes: authored keywords count, a
+  // whole-word match beats a prefix, an offer you can pay for beats one you
+  // can't, and a teachable you already know is deprioritised (`list` flags it
+  // "(known)" — buying it again teaches nothing). A dead-even tie between
+  // different wares asks rather than guesses; a miss suggests the nearest name.
+  const offers = (sh.t.shop.sells || []).filter((s) => offerUnlocked(player, s));
+  let offer = null, best = 0, ties = [];
+  for (const s of offers) {
+    const item = w.items[s.template];
+    const rank = matchRank(arg, item.name, item.keywords, s.template);
+    if (!rank) continue;
+    const score = rank
+      + ((player.shards || 0) >= buyPrice(s, item) ? 100 : 0)
+      + (alreadyKnown(player, item) ? 0 : 10);
+    if (score > best) { offer = s; best = score; ties = [item.name]; }
+    else if (score === best) ties.push(item.name);
+  }
+  if (!offer) {
+    const close = closestName(arg, offers.map((s) => w.items[s.template]));
+    return err(`${sh.t.name} doesn't sell "${arg}".${close ? ` Did you mean ${close}?` : ""}`);
+  }
+  const distinct = [...new Set(ties)];
+  if (distinct.length > 1) return whichDoYouMean(distinct);
   const name = w.items[offer.template].name;
   const price = buyPrice(offer, w.items[offer.template]);
   if ((player.shards || 0) < price)
@@ -137,9 +158,11 @@ function sell(state, player, arg, ctx) {
     roomLog(ctx, player, `${player.name} trades with ${sh.t.name}.`);
     return selfAndViews(state, player, `You sell ${sold.join(", ")} for ${total} shards. (${player.shards} total)`);
   }
-  const idx = findItem(player.inventory, w, arg);
-  if (idx < 0) return err(`You aren't carrying "${arg}".`);
-  const inst = player.inventory[idx];
+  // Ranked resolution with a tie ask — selling the wrong thing parts with it at
+  // 20% of value, so a dead-even tie between different items refuses to guess.
+  const { inst, ties } = rankedFindItem(player.inventory, w, arg);
+  if (ties.length) return whichDoYouMean(ties);
+  if (!inst) return err(`You aren't carrying "${arg}".`);
   const t = w.items[inst.template];
   const price = sellValueOf(t);
   if (!t.value || price <= 0) return err(`${sh.t.name} won't give you anything for ${t.name}.`);

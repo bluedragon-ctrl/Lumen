@@ -7,7 +7,7 @@
 const { effectiveAttributes, spellScaleBonus, durationScaleBonus } = require("../state");
 const { canSee } = require("../light");
 const {
-  selfAndViews, err, logMsg, announce, matchesQuery, findMobInRoom, questKill,
+  selfAndViews, err, logMsg, announce, matchesQuery, closestName, findMobInRoom, hostileToward, questKill,
   autoStand, roomHostiles, stickToSurvivor, joinList,
 } = require("./shared");
 
@@ -144,7 +144,11 @@ function cast(state, player, arg, ctx) {
     // name can't be told apart from a bare target tail, so this is the honest guess.
     const atIdx = tokens.findIndex((tk) => tk.toLowerCase() === "at");
     const tried = (atIdx > 0 ? tokens.slice(0, atIdx) : tokens).join(" ");
-    return err(`You don't know any spell called "${tried}". Try \`spells\`.`);
+    // A typo, most likely — offer the nearest spell the caster knows. The first
+    // word alone is checked too, since the tail may be a target name.
+    const close = closestName(tried, known.map((id) => w.spells[id]).filter(Boolean))
+      || closestName(tokens[0], known.map((id) => w.spells[id]).filter(Boolean));
+    return err(`You don't know any spell called "${tried}".${close ? ` Did you mean ${close}?` : ""} Try \`spells\`.`);
   }
   const spell = w.spells[spellId];
   const eff = spell.effect || {};
@@ -186,7 +190,8 @@ function cast(state, player, arg, ctx) {
 
   let mob;
   if (targetQ) {
-    mob = findMobInRoom(state, player, targetQ, false);
+    // A hostile cast prefers the mobs out for your blood, mirroring `attack`.
+    mob = findMobInRoom(state, player, targetQ, false, hostileToward(player));
     if (!mob) return err(`You see no "${targetQ}" here to target.`);
   } else {
     // No explicit target: fall back to the foe you're already engaged with — the
