@@ -1869,7 +1869,7 @@
     "weight": 1,
     "value": 250,
     "stackable": true,
-    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-warhammer", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm", "forge-glimmersteel-shield"] }
+    "teaches": { "recipes": ["forge-glimmersteel-sword", "forge-glimmersteel-warhammer", "forge-glimmersteel-cuirass", "forge-glimmersteel-helm", "forge-glimmersteel-shield", "craft-glimmersteel-staff"] }
   },
   "schematic-gloom-silk": {
     "id": "schematic-gloom-silk",

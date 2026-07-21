@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Smith-craft schematics moved from Vesper to Tobin.** The starsilver
+  schematic now sits on Tobin's counter (beside his glimmersteel-bar
+  schematic), and the glimmersteel staff recipe folds into Tobin's **Book of
+  Glimmersteel** rather than selling as Vesper's separate schematic. The old
+  staff schematic item remains defined — copies already bought still study
+  fine — it just isn't sold anymore.
+
 ### Fixed
 - **`craft` now resolves to a recipe you actually know.** The command used to
   take the first name match in world definition order across *all* recipes, so
