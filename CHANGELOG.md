@@ -32,6 +32,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crack through where a blade turns aside — turning "which weapon?" into a real
   matchup question. Edged, finesse, and caster weapons are deliberately left
   without pierce.
+### Changed
+- **Smith-craft schematics moved from Vesper to Tobin.** The starsilver
+  schematic now sits on Tobin's counter (beside his glimmersteel-bar
+  schematic), and the glimmersteel staff recipe folds into Tobin's **Book of
+  Glimmersteel** rather than selling as Vesper's separate schematic. The old
+  staff schematic item remains defined — copies already bought still study
+  fine — it just isn't sold anymore.
 
 ### Fixed
 - **`craft` now resolves to a recipe you actually know.** The command used to
