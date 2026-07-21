@@ -216,6 +216,10 @@ function cast(state, player, arg, ctx) {
     if (player.pending && player.pending.targetId === mob.id) player.pending = null;
     roomText = `${player.name} weaves a drowsy hush over ${mt.name}, and it sinks into slumber.`;
     selfText = `You weave ${spell.name} over ${mt.name}; its limbs go slack and it sinks into a deep slumber.`;
+  } else if (res.guarded) {
+    // The burn met a dot-guard (a cleansing sheen) on the target and slid off.
+    roomText = `${player.name}'s ${verb} slides off ${mt.name} without catching.`;
+    selfText = `You set ${spell.name} at ${mt.name}, but a cleansing sheen turns the burn aside.`;
   } else if (res.dot) {
     const span = res.duration ? ` for ${fmtTicks(res.duration)}` : "";
     roomText = `${player.name}'s ${verb} catches on ${mt.name}, and it begins to smoulder.`;
@@ -385,9 +389,12 @@ function castSupport(state, player, spell, targetQ, ctx, selfOnly = false) {
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; a mote of light kindles overhead, shedding ${res.perPulse} light for ${fmtTicks(res.duration)}.`);
   }
   if (res.effect === "cleanse") {
+    // The `guard` after-sheen (see state-effects.applyEffect) is worth naming:
+    // it's the reason a cleanse can't be undone by the very next swing.
+    const sheen = res.guard ? `a clean sheen wards off new afflictions for ${fmtTicks(res.guard)}` : "";
     const tail = res.removed > 0
-      ? `; ${res.removed} clinging affliction${res.removed === 1 ? "" : "s"} burn${res.removed === 1 ? "s" : ""} away`
-      : "; but nothing clings to burn away";
+      ? `; ${res.removed} clinging affliction${res.removed === 1 ? "" : "s"} burn${res.removed === 1 ? "s" : ""} away${sheen ? `, and ${sheen}` : ""}`
+      : sheen ? `; nothing clings to burn away, but ${sheen}` : "; but nothing clings to burn away";
     return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}${tail}.`);
   }
   return selfAndViews(state, player, `You cast ${spell.name} on ${onWhom}; ${res.perPulse} HP will knit every ${res.interval} tick${res.interval === 1 ? "" : "s"}.`);
@@ -432,9 +439,10 @@ function castSupportAll(state, player, spell, ctx) {
     clause = `a lattice of hardened light grants each ${parts.length ? parts.join(", ") : "a faint sheen"} for ${fmtTicks(res.duration)}`;
   } else if (res.effect === "cleanse") {
     const removed = results.reduce((s, r) => s + r.res.removed, 0);
+    const sheen = res.guard ? `a clean sheen wards each off new afflictions for ${fmtTicks(res.guard)}` : "";
     clause = removed > 0
-      ? `${removed} clinging affliction${removed === 1 ? "" : "s"} burn${removed === 1 ? "s" : ""} away`
-      : "but nothing clings to burn away";
+      ? `${removed} clinging affliction${removed === 1 ? "" : "s"} burn${removed === 1 ? "s" : ""} away${sheen ? `, and ${sheen}` : ""}`
+      : sheen ? `nothing clings to burn away, but ${sheen}` : "but nothing clings to burn away";
   } else if (res.effect === "emit-light") {
     clause = `motes of light kindle overhead, shedding ${res.perPulse} light each for ${fmtTicks(res.duration)}`;
   } else {

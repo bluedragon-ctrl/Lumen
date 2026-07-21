@@ -787,6 +787,10 @@ function main() {
       if (eff.hp == null && eff.mana == null) errs.push(`spell ${id}: restore effect needs at least one of hp/mana`);
       if (eff.hp != null && (typeof eff.hp !== "number" || eff.hp <= 0)) errs.push(`spell ${id}: effect.hp must be a positive number`);
       if (eff.mana != null && (typeof eff.mana !== "number" || eff.mana <= 0)) errs.push(`spell ${id}: effect.mana must be a positive number`);
+    } else if (eff.type === "cleanse") {
+      // The scour's optional after-sheen: `guard` ticks of dot-guard, during which
+      // new hostile DoTs are turned aside (see state-effects.applyEffect).
+      if (eff.guard != null && (typeof eff.guard !== "number" || eff.guard <= 0)) errs.push(`spell ${id}: effect.guard must be a positive number (ticks)`);
     }
   }
 

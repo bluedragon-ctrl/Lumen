@@ -760,8 +760,11 @@ class GameState {
       return null;
     }
     const s = creditId ? { ...spec, sourceId: creditId } : spec;
-    this.applyEffect(target.actor, s);
-    this._narrateEffectApplied(events, target, s.name || s.type, s.type);
+    // A dot-guard on the target (a fresh cleanse's after-sheen) turns a new DoT
+    // aside — narrate the turn-aside to a guarded player instead of a take-hold
+    // (a guarded mob slides it off silently; no mob carries the sheen today).
+    if (this.applyEffect(target.actor, s)) this._narrateEffectApplied(events, target, s.name || s.type, s.type);
+    else if (target.kind === "player") events.push({ type: "effect-guarded", playerId: target.id, name: s.name || s.type });
     return null;
   }
 

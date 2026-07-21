@@ -192,6 +192,7 @@ class SpellsMixin {
    *   { kind: "damage", damage }        — rolled+scaled (Armour-mitigated if
    *                                       `damageType: "physical"`); caller applies it
    *   { kind: "dot", name, duration }   — burn (+ its glow) already applied
+   *   { kind: "dot-guarded", name }     — burn turned aside by the target's dot-guard
    *   { kind: "sleep" }                 — mob target dropped into slumber
    *   { kind: "douse", doused, name }   — target's carried light snuffed (players only)
    *   { kind: "status", name }          — any other type: a hostile status (a
@@ -237,7 +238,10 @@ class SpellsMixin {
         // scales with the caster (more total damage, a longer-lasting mark)
         // rather than hitting harder. Per-tick damage runs in _tickEffects.
         const duration = (eff.duration || 0) + durationScaleBonus(attrs, eff.durationScale);
-        this.applyEffect(target.actor, { type: "damage-over-time", name, damage: eff.damage, duration, sourceId, good: false });
+        // A dot-guard on the target (a fresh cleanse's after-sheen) turns the
+        // whole burn — and its glow — aside; the caller narrates the slide-off.
+        if (!this.applyEffect(target.actor, { type: "damage-over-time", name, damage: eff.damage, duration, sourceId, good: false }))
+          return { kind: "dot-guarded", name };
         // The burning glimmer glows: a matching emit-light state marks the foe in
         // the dark for as long as it smoulders (summed in by computeRoomLight).
         if (eff.emitLight) this.applyEffect(target.actor, { type: "emit-light", name, magnitude: eff.emitLight, duration, good: false });
@@ -331,6 +335,11 @@ class SpellsMixin {
       result.dot = true;
       result.duration = applied.duration;
       result.name = applied.name;
+    } else if (applied.kind === "dot-guarded") {
+      // The burn met a cleansing sheen and slid off whole; ire is still drawn.
+      this._addThreat(mob, player.id, 1);
+      result.guarded = true;
+      result.name = applied.name;
     } else if (spell.hostile) {
       this._addThreat(mob, player.id, 1);
     }
@@ -421,11 +430,13 @@ class SpellsMixin {
       // stamped with the thrower so a corrosion kill credits them (like a bleed).
       let dot = false;
       if (spec.dot && !death) {
-        this.applyEffect(mob, { type: "damage-over-time", name: spec.dot.name || spec.cause || "poison", damage: spec.dot.damage, duration: spec.dot.duration, sourceId: player.id, good: false });
-        // A burning cloud (Flame Burst) sheds its own light for as long as it smoulders.
-        if (spec.dot.emitLight) this.applyEffect(mob, { type: "emit-light", name: spec.dot.name || spec.cause || "poison", magnitude: spec.dot.emitLight, duration: spec.dot.duration, good: false });
+        // A dot-guard on the foe turns the cling aside whole (dot stays false).
+        if (this.applyEffect(mob, { type: "damage-over-time", name: spec.dot.name || spec.cause || "poison", damage: spec.dot.damage, duration: spec.dot.duration, sourceId: player.id, good: false })) {
+          // A burning cloud (Flame Burst) sheds its own light for as long as it smoulders.
+          if (spec.dot.emitLight) this.applyEffect(mob, { type: "emit-light", name: spec.dot.name || spec.cause || "poison", magnitude: spec.dot.emitLight, duration: spec.dot.duration, good: false });
+          dot = true;
+        }
         this._addThreat(mob, player.id, 1); // the splash sticks the thrower in its sights
-        dot = true;
       }
       if (!death) this._rouseMob(mob, roomId, events);
       results.push({ id: mob.id, name: t.name, damage, dot, killed: !!death, death });
@@ -484,7 +495,12 @@ class SpellsMixin {
       const states = target.actor.states || [];
       const removed = states.filter((s) => s.type === "damage-over-time");
       target.actor.states = states.filter((s) => s.type !== "damage-over-time");
-      return { effect: "cleanse", name: spell.name, removed: removed.length, threat: removed.length || 1 };
+      // The scour leaves an after-sheen: a `dot-guard` that turns aside NEW
+      // afflictions for `guard` ticks (applyEffect refuses fresh DoTs while it
+      // holds) — without it, the very next venomous swing undoes the cast.
+      const guard = eff.guard || 0;
+      if (guard) this.applyEffect(target.actor, { type: "dot-guard", name: eff.name || "cleanse", duration: guard, refresh: true, good: true });
+      return { effect: "cleanse", name: spell.name, removed: removed.length, guard, threat: removed.length || 1 };
     }
 
     // Status effects (heal-over-time, emit-light, and future buffs). Bake any

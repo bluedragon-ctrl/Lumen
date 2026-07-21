@@ -39,9 +39,17 @@ class EffectsMixin {
    * `spec.refresh` opts out of stacking: any existing instance of the same
    * type+name is dropped first, so re-applying just resets the timer (the right
    * behaviour for buffs like Glimmerskin; DoTs leave it unset to keep stacking).
+   * Returns true when the effect took hold, false when it was turned aside.
    */
   applyEffect(actor, spec) {
     if (!actor.states) actor.states = [];
+    // A `dot-guard` (Cleanse's after-sheen) turns aside any NEW damage-over-time
+    // while it holds — without it, the very next venomous swing undoes the
+    // cleanse and the cast is wasted. Only fresh DoTs are refused; every other
+    // effect type lands as usual. Callers read the false to skip the take-hold
+    // narration (and any companion state, e.g. a smoulder's glow).
+    if (spec.type === "damage-over-time" && actor.states.some((s) => s.type === "dot-guard"))
+      return false;
     const name = spec.name || spec.type;
     if (spec.refresh) actor.states = actor.states.filter((s) => !(s.type === spec.type && s.name === name));
     actor.states.push({
@@ -67,6 +75,7 @@ class EffectsMixin {
     // grant the added capacity as current HP (like a level-up). Player-only —
     // mobs carry a static template maxHp. Expiry clamps it back in _tickEffects.
     if (spec.maxHp && this.players.get(actor.id) === actor) this._refreshMaxHp(actor);
+    return true;
   }
 
   /**
