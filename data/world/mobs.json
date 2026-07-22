@@ -2863,6 +2863,17 @@
         "reactions": [
           {
             "if": {
+              "delivery": true
+            },
+            "messages": [
+              {
+                "target": "marks the crown at your belt with a slow eye: \"You have it, then. Lay it here, yaku-runa, and I will call the naming kept.\"",
+                "room": "regards {name}'s pack, unhurried."
+              }
+            ]
+          },
+          {
+            "if": {
               "hpBelow": 0.4
             },
             "messages": [
