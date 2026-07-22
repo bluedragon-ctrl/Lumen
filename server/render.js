@@ -222,7 +222,9 @@ function spellGist(s, w, viewer) {
   }
 }
 
-function itemSpecLines(tmpl, w, viewer) {
+// `opts.salePrice` (a ware at a visible trader's counter) rides the value line
+// rather than a hint of its own, keeping the block short.
+function itemSpecLines(tmpl, w, viewer, opts = {}) {
   // Type and slot share a line (like value · sells) to keep the block short.
   const lines = [tmpl.slot ? `type: ${tmpl.type} · slot: ${tmpl.slot}` : `type: ${tmpl.type}`];
   if (tmpl.weapon) {
@@ -333,7 +335,8 @@ function itemSpecLines(tmpl, w, viewer) {
     ];
     if (taught.length) lines.push(`study: learn ${taught.join(", ")}`);
   }
-  if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}`);
+  if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}${opts.salePrice != null ? ` · on sale for ${opts.salePrice}` : ""}`);
+  else if (opts.salePrice != null) lines.push(`on sale for ${opts.salePrice}`); // a valueless ware still shows its price
   return lines;
 }
 
@@ -511,10 +514,11 @@ function buildExamineView(state, p, q) {
         if (!hit(o.template, t.name, t.keywords)) continue;
         if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
         const price = o.price != null ? o.price : buyValueOf(t);
+        // The price rides the value line (no hint) — `buy` itself is taught by
+        // the trader's own examine hint.
         return entity("item", o.template, t.name, t.description, {
           rarity: t.rarity || "common",
-          lines: itemSpecLines(t, w, p),
-          hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
+          lines: itemSpecLines(t, w, p, { salePrice: price }),
         });
       }
     }

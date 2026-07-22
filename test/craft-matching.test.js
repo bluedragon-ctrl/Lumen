@@ -270,9 +270,9 @@ test("examine resolves a known craftable before a vendor ware with clashing keyw
   const view = buildExamineView(state, p, "barbed bomb");
   assert.ok(view, "resolves to an examine view");
   assert.equal(view.entity.name, "a barbed bomb");
-  // The recall view is the bare item — no sale hint (and no crafting recap;
+  // The recall view is the bare item — no sale price (and no crafting recap;
   // inputs/station live in `recipes`).
-  assert.ok(!(view.entity.hints || []).some((h) => /On sale/.test(h)), "not the vendor's sheet");
+  assert.ok(!(view.entity.lines || []).some((l) => /on sale/.test(l)), "not the vendor's sheet");
 });
 
 test("examine still resolves the vendor ware by its own keyword", () => {
@@ -280,7 +280,7 @@ test("examine still resolves the vendor ware by its own keyword", () => {
   const view = buildExamineView(state, p, "method");
   assert.ok(view, "resolves to an examine view");
   assert.equal(view.entity.name, "a barbed-bomb method");
-  assert.ok((view.entity.hints || []).some((h) => /On sale/.test(h)), "shows the ware with its price");
+  assert.ok((view.entity.lines || []).some((l) => /on sale for \d/.test(l)), "shows the ware with its price");
 });
 
 test("examine falls back to the vendor ware when the recipe is unknown", () => {
@@ -288,5 +288,5 @@ test("examine falls back to the vendor ware when the recipe is unknown", () => {
   const view = buildExamineView(state, p, "barbed bomb");
   assert.ok(view, "resolves to an examine view");
   assert.equal(view.entity.name, "a barbed-bomb method");
-  assert.ok((view.entity.hints || []).some((h) => /On sale/.test(h)), "the counter is all that matches now");
+  assert.ok((view.entity.lines || []).some((l) => /on sale for \d/.test(l)), "the counter is all that matches now");
 });

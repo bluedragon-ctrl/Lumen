@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   head`); and a wearable compares itself against what you have equipped in
   that slot (`vs an iron cap: armour +1, speed +1`). Consumable action
   prefixes unify on `use:` (the verb that always works). Examining a
-  craftable no longer repeats its inputs/station — that lives in `recipes`.
+  craftable no longer repeats its inputs/station — that lives in `recipes` —
+  and a shop ware's price rides the value line (`value: 25 shards · sells
+  for 5 · on sale for 25`) instead of a hint of its own.
 - **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
   (mirrored on a mob's `attack.pierce`) ignores that many points of the
   defender's Armour before the physical soak — a blunt head cracking shell or

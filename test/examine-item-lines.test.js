@@ -120,6 +120,14 @@ test("examine lines: the worn piece itself (or a copy) draws no comparison", () 
   assert.ok(!lines.some((l) => l.startsWith("vs ")));
 });
 
+test("examine lines: a shop ware's price rides the value line", () => {
+  const t = { type: "material", value: 20 };
+  const lines = itemSpecLines(t, world, viewer, { salePrice: 26 });
+  assert.ok(lines.includes("value: 20 shards · sells for 4 · on sale for 26"));
+  // Without the option (not at a counter) the value line stays bare.
+  assert.ok(itemSpecLines(t, world, viewer).includes("value: 20 shards · sells for 4"));
+});
+
 test("examine lines: an empty slot draws no comparison", () => {
   const bare = { attributes: {}, equipment: {}, knownSpells: [], knownRecipes: [] };
   const t = { id: "fine-helm", type: "armour", slot: "head", armour: { armour: 3 } };
