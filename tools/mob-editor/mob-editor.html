@@ -63,7 +63,11 @@
 </div>
 <script>
 const KNOWN = ["id","name","description","maxHp","speed","armour","ward","xp","emitsLight","shards","faction","hostile","behavior","posture","helper","ambush","remembers","pursues","pursueRange","pursueVerb","attributes","perception"];
+// Blocks that get their own structured section, so they're pulled out of the
+// raw-JSON Advanced box (and protected from its delete-unknown-keys sweep).
+const STRUCTURED = ["attack"];
 const NUMS = ["maxHp","speed","armour","ward","xp","emitsLight"];
+const ATK_TYPE_OPTS = ["physical","magical"];
 const ATTRS = ["might","vitality","intellect","wits","perception"];
 const PERC = ["blindBelow","dimBelow","harmedAbove","blindAbove"];
 // Light-ascending band; hints keep the (optional, validator-gated) fields honest.
@@ -183,8 +187,11 @@ function renderForm() {
   for (const k of PERC) pg.append(field(PERC_LABELS[k] || k, numInput(m.perception, k)));
   perc.append(pg); main.append(perc);
 
+  // --- attack (structured; melee profile) ---
+  main.append(attackSection(m));
+
   // --- advanced (raw JSON for everything else) ---
-  const advKeys = Object.keys(m).filter((k) => !KNOWN.includes(k));
+  const advKeys = Object.keys(m).filter((k) => !KNOWN.includes(k) && !STRUCTURED.includes(k));
   const adv = el("fieldset"); adv.append(el("legend", {}, "Advanced — raw JSON (attack, loot, actions, shop, …)"));
   const advObj = {}; for (const k of advKeys) advObj[k] = m[k];
   const at = el("textarea", { id:"adv", value: JSON.stringify(advObj, null, 2) });
@@ -193,7 +200,7 @@ function renderForm() {
     try {
       const parsed = at.value.trim() ? JSON.parse(at.value) : {};
       err.textContent = "";
-      for (const k of Object.keys(m)) if (!KNOWN.includes(k)) delete m[k]; // drop removed advanced keys
+      for (const k of Object.keys(m)) if (!KNOWN.includes(k) && !STRUCTURED.includes(k)) delete m[k]; // drop removed advanced keys (never the structured blocks)
       for (const k of Object.keys(parsed)) m[k] = parsed[k];
       touch();
     } catch (e) { err.textContent = "Invalid JSON: " + e.message; }
@@ -202,6 +209,60 @@ function renderForm() {
 
   main.append(actionBar());
   main.append(el("div", { id:"out" }));
+}
+
+// The melee profile, edited as structured fields (so combat stats — damage,
+// speed, bonus, crit, armour pierce — aren't buried in raw JSON). `attack` is
+// created lazily on first edit and pulled out of the Advanced box (STRUCTURED).
+// onHit stays raw JSON: it's an open-ended effect array, like loot/actions.
+function ensureAttack(m) { return (m.attack = m.attack || {}); }
+
+function attackSection(m) {
+  const fs = el("fieldset"); fs.append(el("legend", {}, "Attack (melee profile)"));
+  const g = el("div", { className:"grid" });
+  g.append(field("damage (dice, e.g. 1d4 — leave blank for no melee)", atkDmgInput(m)));
+  g.append(field("action cost (energy per swing; lower = faster)", atkNumInput(m, "actionCost", "1")));
+  g.append(field("type (empty = physical, soaked by Armour)", atkTypeInput(m)));
+  g.append(field("bonus (flat damage added to each hit)", atkNumInput(m, "bonus", "1")));
+  g.append(field("hitBonus (flat to-hit, e.g. 0.1 = +10%)", atkNumInput(m, "hitBonus", "0.01")));
+  g.append(field("crit (flat chance 0–1, e.g. 0.05)", atkNumInput(m, "crit", "0.01")));
+  g.append(field("armour pierce (target Armour ignored before the physical soak)", atkNumInput(m, "pierce", "1")));
+  fs.append(g);
+  fs.append(el("p", { className:"hint", textContent:"Armour pierce only affects physical swings (Ward is untouched) and never drives the target's soak below zero — a crushing or spiked attack cracking plate. Leave every field blank for a mob with no melee attack." }));
+  // onHit — open-ended effect array, kept as raw JSON like loot/actions.
+  const oh = field("onHit — effects on a landed hit (raw JSON array)", null, "full");
+  const ta = el("textarea", { value: m.attack && m.attack.onHit ? JSON.stringify(m.attack.onHit, null, 2) : "" });
+  const err = el("div", { className:"jsonerr" });
+  ta.oninput = () => {
+    const t = ta.value.trim();
+    if (t === "") { if (m.attack) delete m.attack.onHit; err.textContent = ""; return touch(); }
+    try { ensureAttack(m).onHit = JSON.parse(t); err.textContent = ""; touch(); }
+    catch (e) { err.textContent = "Invalid JSON: " + e.message; }
+  };
+  oh.append(ta, err); fs.append(oh);
+  return fs;
+}
+// A dice-string input for attack.damage; empties prune the key so no stray
+// `"damage": ""` is left behind on a mob that has no melee attack.
+function atkDmgInput(m) {
+  const i = el("input", { type:"text", value: (m.attack && m.attack.damage) ?? "", placeholder:"e.g. 1d4" });
+  i.oninput = () => { const a = ensureAttack(m); if (i.value.trim() === "") delete a.damage; else a.damage = i.value.trim(); touch(); };
+  return i;
+}
+function atkNumInput(m, key, step) {
+  const cur = m.attack ? m.attack[key] : "";
+  const i = el("input", { type:"number", value: cur ?? "", step: step || "any" });
+  i.oninput = () => { const a = ensureAttack(m); if (i.value === "") delete a[key]; else a[key] = Number(i.value); touch(); };
+  return i;
+}
+// Physical is the default when `type` is absent; picking it clears the key.
+function atkTypeInput(m) {
+  const cur = m.attack && m.attack.type ? m.attack.type : "";
+  const s = el("select");
+  s.append(el("option", { value:"", textContent:"— physical (default) —" }));
+  for (const o of ATK_TYPE_OPTS) s.append(el("option", { value:o, textContent:o, selected:o === cur }));
+  s.onchange = () => { const a = ensureAttack(m); if (s.value === "" || s.value === "physical") delete a.type; else a.type = s.value; touch(); };
+  return s;
 }
 
 function field(text, control, cls) {
@@ -257,7 +318,8 @@ function touch() { renderList(); }
 async function save(mode) {
   const btns = Array.prototype.slice.call(arguments, 1);
   const out = $("#out"); out.textContent = "";
-  if ($("#adverr") && $("#adverr").textContent) { return msg(out, "err", "Fix the invalid JSON in the Advanced block first."); }
+  const jsonErr = Array.prototype.slice.call(document.querySelectorAll(".jsonerr")).find((e) => e.textContent);
+  if (jsonErr) { return msg(out, "err", "Fix the invalid JSON highlighted above first."); }
   btns.forEach((b) => b.disabled = true);
   out.append(el("p", { className:"sub", textContent:"Working…", style:"color:var(--dim)" }));
   try {

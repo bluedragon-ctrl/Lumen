@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   being buried in the Advanced raw-JSON box — the weapon block is pulled out of
   Advanced so there's no double-editing. `item-editor` also gains the
   `launch.json` entry the other editors already had.
+- **The mob editor gained a structured Attack section.** A mob's melee profile
+  (damage dice, action cost, damage type, flat bonus, hitBonus, crit, and
+  **armour pierce**; `onHit` stays raw JSON) now edits as labelled fields
+  instead of living in the Advanced raw-JSON box — the `attack` block is pulled
+  out of Advanced so there's no double-editing. This exposes the mob-side
+  `attack.pierce` the engine already honours, mirroring the item editor's Weapon
+  section.
 
 ### Changed
 - **A blunt/anti-armour weapon line now runs through every tier.** The iron
