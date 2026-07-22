@@ -49,12 +49,36 @@ Always run `npm test` and `npm run validate` (or the `data-validator` agent) too
    `preview_start` after server edits. JSON data is re-read on restart too.
 2. It opens a tab; note the `tabId` for the browser tools.
 
+> **Boot with `DEV_ADMIN_NO_PASSWORD=1` to skip all admin-login friction.** With
+> this env flag set, the `admin` account logs in name-only — one click, no
+> password, no claim (see *Log in* below). This is the recommended way to
+> verify, since most checks need admin (`@teleport`, `@spawn`, …). If your
+> preview tool can't inject env into the `{ name: "lumen" }` launch config, start
+> the server from the shell instead and point the in-app browser at it:
+>
+> ```bash
+> DEV_ADMIN_NO_PASSWORD=1 npm start   # run in background; then browse http://localhost:3737
+> ```
+>
+> The flag is dev-only and **ignored whenever `ADMIN_PASSWORD` is set** (a real
+> admin password always wins), so it can't affect a real deployment. The server
+> logs `DEV_ADMIN_NO_PASSWORD is ON …` at boot when it's active.
+
 ## Log in (do NOT type the name into `#cmd`)
 
 The command box `#cmd` **ignores input until you're authed**. Login happens on the
-login screen (`#login`) only. **Accounts are now password-protected** — clicking a
+login screen (`#login`) only. **Accounts are password-protected** — clicking a
 roster row or the admin button opens a password modal (`#login-auth`); you drive
-*that*, not `#cmd`. The modal has three modes:
+*that*, not `#cmd`.
+
+**Fast path — passwordless admin.** When the server booted with
+`DEV_ADMIN_NO_PASSWORD=1` (see *Start the server*), the **"Log in as Admin"**
+button (`#login-admin`) logs straight in with **no modal at all** — the roster
+row hands back an `adminNoPassword` flag and the client sends the login itself.
+This is the frictionless path and covers almost every verification run (admin
+gives you `@teleport`, `@spawn`, and the rest). The `loginAs` helper below
+detects the no-modal case automatically. The three password-modal modes below
+still apply to **prospector** accounts (and to admin when the flag is off):
 
 - **claim** — a never-claimed account (a fresh `admin` with no `ADMIN_PASSWORD`
   set, and every `@create-player` account) sets its password on first login.
@@ -72,6 +96,8 @@ function loginAs(name, password = 'testpass') {           // name, or 'admin'
   if (name === 'admin') document.getElementById('login-admin').click();
   else [...document.querySelectorAll('#login-list .login-pick')]
         .find(b => b.textContent.includes(name)).click();  // opens the modal
+  // DEV_ADMIN_NO_PASSWORD: admin logs in with no modal — nothing more to do.
+  if (document.getElementById('login-auth').hidden) return;
   document.getElementById('login-auth-pw').value = password;
   const pw2 = document.getElementById('login-auth-pw2');
   if (!pw2.hidden) pw2.value = password;                   // claim/create mode
@@ -178,6 +204,11 @@ To lower light: `@tide` to a darker phase, `unequip light`, or descend.
   default won't work — either use the known password, or reset the account to
   claimable by deleting its file (`rm data/runtime/players/<name>.json`) and
   restarting; a fresh `admin` is auto-recreated (claimable) if you delete it.
+  **For `admin` specifically, this whole problem vanishes with
+  `DEV_ADMIN_NO_PASSWORD=1`** — the flag logs admin in name-only regardless of
+  any stored password (it doesn't clear it — it just skips the check), so boot
+  with the flag and you never touch the admin password again. Test *prospectors*
+  still authenticate normally.
 - **`@spawn` never sets `hidden`.** Real hidden lurkers exist only via room spawn
   configs (e.g. `d8.necropolis.niches`). To reveal one for testing, `@attr
   perception 20` then `search` (needs effective Perception ≥ the mob's
