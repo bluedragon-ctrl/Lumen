@@ -39,6 +39,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crack through where a blade turns aside — turning "which weapon?" into a real
   matchup question. Edged, finesse, and caster weapons are deliberately left
   without pierce.
+- **Crushing and spiked monsters now pierce player Armour.** Following the
+  weapon line, mobs whose attacks drive a point home carry `attack.pierce`:
+  the **Foreman** (heavy pick) and **Old Grinder** 2; **steam-mantis**,
+  **vent-scorpion**, **elder-thornbug**, **elder-stonebug**, **chitin warden**,
+  **ember-snapper**, **Gnaw** and the **Pale Mother** 1; and among the bosses
+  **The Gorgon** 2 / **gorgon-tendril** 1, **the Great Glut** 2, and the Umbral
+  keepers **Ñawpa** / **Aya-Keeper** 1. Pierce cuts flat Armour before the soak
+  (Ward untouched), so armour-stacking no longer trivialises these fights.
+- **The void horrors deal magical damage now.** **Supay, the Interred Night**
+  and **the Starving Dark** — coils of living unlight, not blades — switch their
+  attack to `type: "magical"`, so their killing cold is cut by Ward rather than
+  soaked by Armour. Plate no longer tanks the dark; their true counter remains
+  bright light.
 ### Changed
 - **Smith-craft schematics moved from Vesper to Tobin.** The starsilver
   schematic now sits on Tobin's counter (beside his glimmersteel-bar
