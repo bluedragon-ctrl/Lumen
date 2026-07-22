@@ -1557,6 +1557,36 @@
     ],
     "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "chitin-spike", "chance": 0.5 }]
   },
+  "umbral-deepward": {
+    "id": "umbral-deepward",
+    "faction": "umbral",
+    "name": "a bound deepward",
+    "keywords": ["deepward", "wardbeast", "guardian", "bound", "warden", "umbral"],
+    "description": "A great pale burrower, longer than two men and low to the ground, its overlapping plates worked and scored end to end with the deep-folk's glimmer-glyphs — the same binding-marks the trader cuts into his little watch-bug, but grown here across something the deep made big and old before the Umbrals ever tamed it. A cold blue light moves in the seams of its carapace where the glyphs are cut deepest. It lies across the threshold the way a hound lies across a door, unblinking and unbothered, and does not stir for a prospector who keeps their hands still. Raise a blade at it, or at what it keeps, and the patience goes out of it all at once.",
+    "maxHp": 90,
+    "speed": 13,
+    "armour": 4,
+    "ward": 3,
+    "attributes": { "might": 9, "vitality": 9, "intellect": 0, "wits": 6, "perception": 7 },
+    "perception": { "blindBelow": -20, "dimBelow": -20, "harmedAbove": 9 },
+    "emitsLight": 1,
+    "behavior": "guard",
+    "hostile": false,
+    "helper": true,
+    "remembers": true,
+    "xp": 46,
+    "attack": { "pierce": 4, "damage": "2d6", "actionCost": 12,
+      "onHit": [{ "type": "immobilize", "name": "pinned", "duration": 3, "chance": 0.5 }] },
+    "spikes": { "damage": "1d6", "chance": 1 },
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "idle", "weight": 6 },
+      { "type": "emote", "weight": 2, "messages": ["shifts its bulk across the threshold and settles again", "rasps its glyph-scored plates against the worked stone", "swivels its blind head toward the cold dark west, then stills", "the glimmer in its carapace-seams pulses once, slow"] },
+      { "type": "emote", "weight": 3, "phase": ["stirring", "tide"], "messages": ["heaves itself square to the western dark as the Tide gathers, every plate bristling", "the glyph-light in its seams brightens as the deep breathes cold against the gate", "sets itself before the arch and does not move, a wall of scored shell"] }
+    ],
+    "shards": "3d6",
+    "loot": [{ "template": "chitin-plate", "chance": 1 }, { "template": "chitin-spike", "chance": 0.6 }]
+  },
   "umbral-paqo": {
     "id": "umbral-paqo",
     "faction": "umbral",

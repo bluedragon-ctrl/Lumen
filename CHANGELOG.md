@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A way east from the Umbral Sanctuary into the Ember Deep.** Two new depth-9
+  rooms bridge The Glow Garden and The Firethread: *The Warded Brink*, a dark
+  transitional seam where the sanctuary's warded light gives out, and *The
+  Umbral Gate*, a worked arch of the old hand (new `umbral-gate` fixture) at the
+  threshold where the cold warded dark gives way to the warm, light-native
+  gloaming. The link is two-way, joining the `umbral-sanctuary` and
+  `the-ember-deep` zones at depth 9.
+- **A bound deepward guards the gate (new `umbral-deepward` mob).** A strong,
+  reusable Umbral guardian archetype: a great glyph-bound deep-beast that is
+  `hostile: false` (it never starts a fight and lets a prospector pass) but is a
+  serious depth-9 threat if provoked — 90 HP, Armour 4 / Ward 3, a `2d6` bite
+  that pierces 4 Armour and can pin you in the room (`immobilize`), and
+  contact spikes. `helper`/`remembers` so it assists other Umbrals and holds a
+  grudge. Drop it into any Umbral kept-place that wants a ward.
 - **`examine` now tells the whole truth about an item.** The Inspect window's
   spec lines cover everything the engine acts on: consumables show what they
   actually do (`use: restores 8 HP, 6 mana`, heal-over-time pulses, what a
