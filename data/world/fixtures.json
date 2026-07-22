@@ -198,6 +198,14 @@
     "type": "switch",
     "switch": { "emitsLight": 4, "on": true }
   },
+  "umbral-gate": {
+    "id": "umbral-gate",
+    "name": "a warded gate of the old hand",
+    "keywords": ["gate", "arch", "ward", "gateway", "uprights", "lintel", "glyph"],
+    "description": "Two great uprights of worked stone stand across the passage, carved end to end with the old hand and joined overhead by a single dressed lintel. Set into the arch a fist of raw glimmer rests in a cut cradle, breathing a cold blue-white ward that has not gone out in all the years since the deep-folk raised it. This is the edge of their kept country — the mark set where the cold dark they warded against gives way to a deep that needs no warding.",
+    "type": "scenery",
+    "emitsLight": 1
+  },
   "village-cradle": {
     "id": "village-cradle",
     "name": "the community cradle",

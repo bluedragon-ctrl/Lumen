@@ -2082,7 +2082,10 @@
     "depth": 9,
     "ambientLight": 3,
     "description": "South of the shelf a stream of molten rock crosses the floor — no wider than a man is tall, but moving, a slow bright ribbon of orange threading a black channel it has cut for itself, skinning over grey and cracking open bright and skinning over again. The heat off it is a wall you lean into to pass. A margin of cooled crust runs alongside where the footing holds, littered with the glassy spatter the thread throws when it gulps, and the air above the flow shivers and swims so that the far wall seems to breathe. The shelf lies back north; eastward, past the head of the thread, a hollow booms and hisses on some slow clock of its own.",
-    "exits": { "north": "d9.ember.landing", "east": "d9.ember.geyser" },
+    "exits": { "north": "d9.ember.landing", "east": "d9.ember.geyser", "up": "d9.ember.gate" },
+    "exitMessages": {
+      "up": "You climb the worn pitch away from the thread, the heat falling off your back hand over hand and the light dimming to a sullen glow below, until the cold blue ward of the Umbral gate stands over you and the air runs wet and grey again."
+    },
     "fixtures": [],
     "groundItems": [],
     "spawns": [
@@ -2843,13 +2846,43 @@
     "depth": 9,
     "ambientLight": 1,
     "description": "East of the shrine the chamber widens into a tended garden of light — bed upon bed of pale mushrooms breathing their weak, steady glow, and a great fan of witchglow spread cold and green across the far wall, all of it crowding the warded light the way fungus crowds any glow in the deep. It has the look of something once kept and now only left to grow: old planting-rows gone soft at the edges, the deep-folk's work carried on by nothing but the dark's own slow gardening. Armoured grey stonebugs trundle the beds on patient mandibles, and squat thornbugs bristle between the fattest caps, none of them troubled by you — there is forage enough here, and the light keeps the hunters out. The shrine lies back west.",
-    "exits": { "west": "d9.sanctuary.shrine" },
+    "exits": { "west": "d9.sanctuary.shrine", "east": "d9.sanctuary.brink" },
     "fixtures": ["pale-cluster", "witchglow-cluster"],
     "groundItems": [],
     "spawns": [
       { "mob": "stonebug", "max": 2, "respawn": 200 },
       { "mob": "thornbug", "max": 3, "respawn": 150 },
       { "mob": "elder-stonebug", "max": 1, "respawn": 600 }
+    ]
+  },
+  "d9.sanctuary.brink": {
+    "id": "d9.sanctuary.brink",
+    "zone": "umbral-sanctuary",
+    "name": "The Warded Brink",
+    "depth": 9,
+    "ambientLight": 0,
+    "description": "East of the garden the planting-beds thin and fail. The pale caps grow sparse and then stop, the great fan of witchglow falls behind, and with it goes the warded light — a few last stragglers of glow, then the cold dark closes over you the way it does everywhere the Umbrals have not kept it out. This is the plain deep again: bare wet stone, close air, nothing tended and nothing lit but what you carry. The passage runs on east, and from somewhere ahead — faint, and wrong for this cold — comes the first dry breath of warmth. The garden's glow lies back west.",
+    "exits": { "west": "d9.sanctuary.garden", "east": "d9.ember.gate" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d9.ember.gate": {
+    "id": "d9.ember.gate",
+    "zone": "the-ember-deep",
+    "biome": "gloaming",
+    "name": "The Umbral Gate",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "The dark ends at a made thing. Two great uprights of worked stone stand across the passage, carved end to end with the old hand and joined overhead by a lintel of the same, and set into the arch a cold knot of glimmer still breathes its blue-white ward after all this time — a gate the deep-folk raised at the very edge of their kept country, where the cold dark they warded against gives way to a deep that needs no warding. Past the arch the stone itself changes: wet grey warms to scorched black, the air turns dry and tastes of hot iron, and a restless orange glow wells up from below instead of being carried down against it. The Umbrals set their light here to hold the dark back as they always have — but beyond this stone the dark was never the danger. Cold dark lies back west; and past the arch the floor itself breaks and pitches away, a worn drop going down toward moving light and heat.",
+    "exits": { "west": "d9.sanctuary.brink", "down": "d9.ember.firethread" },
+    "exitMessages": {
+      "down": "You leave the gate's cold ward behind and pick your way down the broken pitch, the wet grey stone giving way to scorched black under your hands, the air drying and the heat climbing to meet you until the molten thread's light throws your shadow up the wall."
+    },
+    "fixtures": ["umbral-gate"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "umbral-deepward", "max": 1, "respawn": 900 }
     ]
   },
   "d9.sanctuary.hollow": {
