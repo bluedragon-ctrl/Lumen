@@ -2416,5 +2416,54 @@
     "weight": 0,
     "value": 200,
     "armour": { "armour": 0, "ward": 4, "speedPenalty": 0, "attrMod": { "wits": 2 } }
+  },
+  "warp-feeler": {
+    "id": "warp-feeler",
+    "name": "a severed warp-feeler",
+    "keywords": [
+      "feeler",
+      "antenna",
+      "warp-feeler",
+      "warp",
+      "proof"
+    ],
+    "description": "A single feeler hacked from the Bloated Horror, thick as a wrist and still faintly warm — its chitin swollen and split, leaking the same hot, wrong blue-white light that leaked from the thing's every seam. Glimmer has grown all through it, past any shape a centipede's feeler was meant to hold. Proof enough, laid before the shrine, that the Culling Pit's warding was kept.",
+    "type": "material",
+    "weight": 1,
+    "value": 40,
+    "rarity": "uncommon"
+  },
+  "unspent-glow": {
+    "id": "unspent-glow",
+    "name": "a knot of un-drunk light",
+    "keywords": [
+      "glow",
+      "light",
+      "knot",
+      "unspent",
+      "un-drunk",
+      "proof"
+    ],
+    "description": "The last of what the Kept Dark had swallowed and not yet spent, left crystallised where the living shadow was undone — a knot of trapped light, cold and dim and aching in the palm, half shadow and half the glow it stole. It will not warm and it will not brighten, but it holds. Proof, laid before the shrine, that the Shadewell drinks no longer.",
+    "type": "material",
+    "weight": 0,
+    "value": 60,
+    "rarity": "rare"
+  },
+  "amaru-fang": {
+    "id": "amaru-fang",
+    "name": "a fang of the Amaru",
+    "keywords": [
+      "fang",
+      "tooth",
+      "amaru-fang",
+      "amaru",
+      "proof"
+    ],
+    "description": "A single foreclaw-fang broken from the Amaru, longer than a dagger and harder — a fused spike of dragon-scale chitin that punched through plate as though it were cloth. Its edge is still keen enough to open a palm that grips it careless. The seam's own warded grate answers to it: the ward reads the fang for the proof it is, and lifts. Proof, too, laid before the shrine, that the deepest warding may at last rest easy.",
+    "type": "material",
+    "weight": 3,
+    "value": 120,
+    "rarity": "rare"
   }
 }

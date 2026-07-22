@@ -563,5 +563,43 @@
     "description": "The floor of the crawl is banked deep with cast husks and cracked shell — the moults of something that has grown here a long time, and the picked-clean plate of everything it has dragged back to eat. Here and there a whole curve of carapace lies unbroken, glinting oil-bright in the gloom, sound enough to lift and carry.",
     "type": "resource",
     "harvest": { "template": "iridescent-carapace", "verb": "prise", "yield": 1, "charges": 3, "respawn": 300, "energy": 12 }
+  },
+  "trial-glyphs": {
+    "id": "trial-glyphs",
+    "name": "the trial-glyphs",
+    "keywords": [
+      "glyph",
+      "glyphs",
+      "ward",
+      "wards",
+      "trial",
+      "trials",
+      "rim",
+      "mark",
+      "marks"
+    ],
+    "description": "Rings of the paqo's own warding-glyphs, cut and chalked fresh around each pit's mouth — the knotted, rounded marks of the Umbral tongue, set here not as memory but as a seal. They name what the ward holds and ask the light to keep holding it, and the deep-folk recut them by hand and by feel, over and over, so long as the thing below still stirs.",
+    "type": "scenery"
+  },
+  "seam-gate": {
+    "id": "seam-gate",
+    "name": "the warded seam-grate",
+    "keywords": [
+      "grate",
+      "gate",
+      "ward",
+      "bars",
+      "seal",
+      "glyph",
+      "up"
+    ],
+    "description": "A grate of glimmer-wire and black Umbral iron seals the shaft overhead — the only way back up out of the seam. Its bars are scored deep with the paqo's binding-glyphs, and it answers to no iron key and no strength of arm: the ward reads what a climber carries, and lifts only for one who bears proof the seam's terror is dead. Until then it holds shut, and holds the dark in with you.",
+    "type": "door",
+    "door": {
+      "dir": "up",
+      "to": "d10.proving.floor",
+      "open": false,
+      "key": "amaru-fang"
+    }
   }
 }

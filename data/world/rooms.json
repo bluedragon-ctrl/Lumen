@@ -3247,7 +3247,7 @@
     "depth": 10,
     "ambientLight": 2,
     "description": "West of the plaza the ground opens into the village market: worked-stone stalls under a ring of cold glimmer-lamps, and beds of tended crop breathing their soft blue-green light between them, so the produce grows where it is sold. A qhatuq keeps a stall of river-shell, folded silk, and dried cap, sorting the goods into even rows with long unhurried fingers. Lightbugs drift low over the stalls. It is a quiet trade — the deep-folk buy and sell among themselves, and let the surface-folk look. The plaza lies back east; a reagent-reek leaks from the glimmer-worker's west.",
-    "exits": { "east": "d10.village.plaza", "west": "d10.village.glimmer" },
+    "exits": { "east": "d10.village.plaza", "west": "d10.village.glimmer", "south": "d10.proving.stair" },
     "fixtures": ["umbral-coldlamp", "umbral-garden-beds"],
     "groundItems": [],
     "spawns": [
@@ -3389,5 +3389,122 @@
     "fixtures": [],
     "groundItems": [],
     "spawns": []
+  },
+    "d10.proving.stair": {
+    "id": "d10.proving.stair",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Warded Stair",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "South of the market stalls the worked stone steps down, narrow and square-cut, each riser scored with a shallow ward-line the deep-folk chalk fresh by hand. Stakes of raw glimmer set at every turn breathe a low, steady blue-white, just enough to keep footing sure and no more — this is not a hall meant to be lingered in, only a threshold kept lit as far as the ward reaches and not a pace further. The air sharpens as the steps go down, a mineral cold rising to meet you. The market lies back up the steps to the north; the shaft drops on down to the proving floor.",
+    "exits": { "north": "d10.village.market", "down": "d10.proving.floor" },
+    "fixtures": ["glimmer-ward"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d10.proving.floor": {
+    "id": "d10.proving.floor",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Proving Floor",
+    "depth": 10,
+    "ambientLight": 2,
+    "description": "The stair opens into a broad floor cut square from the rock, quieter even than the plaza above and colder underfoot. Three warded mouths break the floor — pits sunk into the stone, each rimmed with the paqo's own glyphs, cut new and chalked bright, each keeping shut a place the dark has settled into rather than a thing the village would dig free. A lone qhawaq-master keeps this floor, unhurried and watchful, naming each trial for the prospector the shrine has judged ready to hear it. Cold glimmer-lamps stand at the floor's edge, throwing just enough light to find the rims and no farther in. The stair climbs back up to the market; a trial opens west, another south, and the deepest drops away straight down.",
+    "exits": {
+      "up": "d10.proving.stair",
+      "west": "d10.proving.culling",
+      "south": "d10.proving.shadewell",
+      "down": "d10.proving.seam"
+    },
+    "fixtures": [
+      "umbral-coldlamp",
+      "trial-glyphs"
+    ],
+    "groundItems": [],
+    "spawns": [
+      {
+        "mob": "umbral-qhawaq-master",
+        "max": 1,
+        "respawn": 600
+      }
+    ]
+  },
+  "d10.proving.culling": {
+    "id": "d10.proving.culling",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Trial of the Brood",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "West of the proving floor the rock opens into a deep, dim pit the deep-folk call the Culling Pit, its rim scored with the same warding glyphs as the floor above but its throat sunk well past where the cold lamps reach. Something has denned in the loose stone below — glimmer has warped its body the way it warps rat and root alike, swollen it past any shape it was born to — and the village has kept this mouth shut rather than dig the thing free by hand. The air hangs thick and close, and carries up a low, wet, bloated sound from further down. The proving floor lies back east.",
+    "exits": {
+      "east": "d10.proving.floor"
+    },
+    "fixtures": [
+      "glimmer-ward"
+    ],
+    "groundItems": [],
+    "spawns": [
+      {
+        "mob": "the-bloated-horror",
+        "max": 1,
+        "respawn": 900
+      }
+    ]
+  },
+  "d10.proving.shadewell": {
+    "id": "d10.proving.shadewell",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Trial of the Dark",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "South of the proving floor a second mouth — the Shadewell — drops away into true black. No lamp is kept here, no ward-stake left lit, because whatever has settled in it drinks light the way a wick drinks oil, and any flame carried down is a mercy spent quickly. The paqo's glyphs still ring the rim, chalked by feel in a dark no deep-folk eye minds, but past them the pit takes back every step of light a prospector brings. The proving floor lies back north, and its light with it.",
+    "exits": {
+      "north": "d10.proving.floor"
+    },
+    "fixtures": [
+      "trial-glyphs"
+    ],
+    "groundItems": [],
+    "spawns": [
+      {
+        "mob": "the-kept-dark",
+        "max": 1,
+        "respawn": 900
+      }
+    ]
+  },
+  "d10.proving.seam": {
+    "id": "d10.proving.seam",
+    "zone": "umbral-village",
+    "biome": "umbral",
+    "name": "The Trial of the Amaru",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "The drop from the proving floor lands you in the deepest of the three pits — the Deep Seam, a throat of scored black rock that goes down further than any lamp-line the deep-folk have ever run, and colder for it. No ward-light is spent here, and there is no way back up but one: a warded grate sealed across the shaft overhead, that the paqo's glyphs will lift only for a climber who bears proof the thing below is dead. The rock underfoot is scored through with old, deep gouges, wider than any blade should leave — and something vast is already moving in the black to meet you.",
+    "exits": {},
+    "fixtures": [
+      "trial-glyphs",
+      "seam-gate"
+    ],
+    "groundItems": [],
+    "spawns": [
+      {
+        "mob": "the-amaru",
+        "max": 1,
+        "respawn": 1200
+      }
+    ],
+    "effects": [
+      {
+        "trigger": "enter",
+        "action": {
+          "douse": true
+        },
+        "message": "The seam takes your light the instant you drop into it — the flame gutters out as though the dark reached up and pinched it, and something vast shifts in the black to meet you."
+      }
+    ]
   }
 }

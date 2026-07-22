@@ -280,5 +280,83 @@
       "shards": 45,
       "items": [{ "template": "warp-fang" }]
     }
+  },
+  "proving-culling": {
+    "id": "proving-culling",
+    "name": "The Trial of the Brood",
+    "description": "The paqo's blessing rings the Culling Pit's rim — the village has warded the bloated thing denned below shut rather than dig it free, and now asks a prospector to put it down.",
+    "start": {
+      "trigger": "enter",
+      "room": "d10.proving.culling",
+      "offerText": "A marker of chalked glyphs rings the pit's mouth, cut by the paqo's own hand and carrying her blessing down into the dark: \"Whatever has denned here, the ward has held it and no more. Go down, prospector, and put it under — not for glory, but so the ward may rest. Bring back what it leaves, and the shrine will know the trial kept.\""
+    },
+    "steps": [
+      {
+        "kill": "the-bloated-horror",
+        "count": 1,
+        "text": "Put down the Bloated Horror denned in the Culling Pit"
+      },
+      {
+        "deliver": "warp-feeler",
+        "count": 1,
+        "npc": "umbral-paqo",
+        "text": "Bring the severed feeler to the paqo at the shrine"
+      }
+    ],
+    "rewards": {
+      "xp": 90
+    }
+  },
+  "proving-shadewell": {
+    "id": "proving-shadewell",
+    "name": "The Trial of the Dark",
+    "description": "The paqo's blessing is cut into the Shadewell's rim by feel, not sight — something has drunk that pit's light dry for longer than the village can say, and the trial asks a prospector to end it.",
+    "start": {
+      "trigger": "enter",
+      "room": "d10.proving.shadewell",
+      "offerText": "Where the last light gives out, the paqo's blessing is cut into the rim by feel alone, meant to be read by touch as much as by eye: \"No lamp holds long in the Shadewell, and no lamp should. Go down blind if you must, and put an end to what drinks the dark there. Bring back what it has swallowed, that the shrine may know the debt paid.\""
+    },
+    "steps": [
+      {
+        "kill": "the-kept-dark",
+        "count": 1,
+        "text": "Put an end to the Kept Dark denned in the Shadewell"
+      },
+      {
+        "deliver": "unspent-glow",
+        "count": 1,
+        "npc": "umbral-paqo",
+        "text": "Bring the knot of un-drunk light to the paqo at the shrine"
+      }
+    ],
+    "rewards": {
+      "xp": 130
+    }
+  },
+  "proving-seam": {
+    "id": "proving-seam",
+    "name": "The Trial of the Amaru",
+    "description": "The paqo's blessing is cut deepest of the three at the Deep Seam's mouth — the oldest denning the village still keeps warded, and the last trial seals a prospector in with it until one of the two is dead.",
+    "start": {
+      "trigger": "enter",
+      "room": "d10.proving.seam",
+      "offerText": "You drop into the seam and the light dies, and only then do you read the paqo's blessing cut into the shaft-wall by the sealed grate above: \"There is no climbing back but by the ward, and the ward lifts only for one who carries proof the thing below is slain. Go down certain, prospector, or do not go down. The Amaru or you — the seam keeps whichever it can.\""
+    },
+    "steps": [
+      {
+        "kill": "the-amaru",
+        "count": 1,
+        "text": "Put down the Amaru denned in the Deep Seam"
+      },
+      {
+        "deliver": "amaru-fang",
+        "count": 1,
+        "npc": "umbral-paqo",
+        "text": "Bring a fang of the Amaru to the paqo at the shrine"
+      }
+    ],
+    "rewards": {
+      "xp": 200
+    }
   }
 }
