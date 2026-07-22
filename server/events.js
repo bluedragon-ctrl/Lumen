@@ -17,6 +17,13 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 // magical is cut by Ward (see combat-math mitigate). No type on the event (a
 // pre-tag save, an odd path) → no tag rather than a wrong one.
 const dmgTag = (t) => (t ? ` (${t})` : "");
+// A melee blow's tag: the damage type plus, when an armour-piercing hit actually
+// bit, `pierced N` (N = Armour ignored this hit) so the mechanic reads in the
+// log — on your blows and on the ones that land on you alike.
+const hitTag = (ev) => {
+  const parts = [ev.damageType || null, ev.pierced ? `pierced ${ev.pierced}` : null].filter(Boolean);
+  return parts.length ? ` (${parts.join(", ")})` : "";
+};
 // Can this player make out the mob — room bright enough for them, or it's self-lit?
 const canSeeMob = (player, light, emitsLight) => !!emitsLight || canSee(player.perception, light);
 
@@ -246,7 +253,7 @@ function createDispatcher({
       if (ev.by === "player") {
         // The attacker targeted it, so they always know what it is.
         const verb = ev.hit
-          ? `hit ${ev.targetName} for ${ev.damage}${dmgTag(ev.damageType)}`
+          ? `hit ${ev.targetName} for ${ev.damage}${hitTag(ev)}`
           : ev.sighted
             ? `swing at ${ev.targetName} and miss`
             : `flail at ${ev.targetName} in the dark and miss`;
@@ -271,7 +278,7 @@ function createDispatcher({
           const an = canSeeMob(o, ev.light, ev.attackerEmitsLight) ? ev.attackerName : "something";
           const tn = canSeeMob(o, ev.light, ev.targetEmitsLight) ? ev.targetName : "something";
           const line = ev.hit
-            ? `${cap(an)} strikes ${tn} for ${ev.damage}${dmgTag(ev.damageType)}.${ev.crit ? " A critical hit!" : ""}`
+            ? `${cap(an)} strikes ${tn} for ${ev.damage}${hitTag(ev)}.${ev.crit ? " A critical hit!" : ""}`
             : `${cap(an)} ${ev.sighted ? `swings at ${tn} and misses` : `lunges at ${tn} in the dark and misses`}.`;
           sendToPlayer(o.id, { type: "combat", text: line });
         }
@@ -280,7 +287,7 @@ function createDispatcher({
         const seen = target && canSeeMob(target, ev.light, ev.attackerEmitsLight);
         const who = seen ? ev.attackerName : "something";
         const youLine = ev.hit
-          ? `${cap(who)} hits you for ${ev.damage}${dmgTag(ev.damageType)}!${ev.crit ? " A critical hit!" : ""}`
+          ? `${cap(who)} hits you for ${ev.damage}${hitTag(ev)}!${ev.crit ? " A critical hit!" : ""}`
           : seen
             ? `${cap(who)} ${ev.sighted ? "misses you" : "lunges out of the dark and misses"}.`
             : "Something lunges out of the dark and misses.";

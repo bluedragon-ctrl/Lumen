@@ -321,11 +321,12 @@ function strike(attacker, defender, light, dice, damageType = "physical") {
   // defender's Armour before that physical soak — nothing to Ward, which is a
   // percent cut on magical blows, not a plate to crack.
   const pierce = attacker.pierce || 0;
-  const def = pierce && damageType === "physical"
-    ? { ...defender, armour: Math.max(0, (defender.armour || 0) - pierce) }
-    : defender;
+  // `pierced` is the Armour actually ignored this hit (never more than the
+  // target has) — surfaced so combat narration can show when pierce bit.
+  const pierced = pierce && damageType === "physical" ? Math.min(pierce, defender.armour || 0) : 0;
+  const def = pierced ? { ...defender, armour: (defender.armour || 0) - pierced } : defender;
   const damage = mitigate(base, damageType, def);
-  return { hit: true, sighted, damage, crit, damageType };
+  return { hit: true, sighted, damage, crit, damageType, pierced };
 }
 
 module.exports = {

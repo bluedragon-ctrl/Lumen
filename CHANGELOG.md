@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   plate. It touches only `physical` blows (Ward, the percent cut on magical
   hits, is untouched) and never drives the soak below zero. Shown on `examine`
   as `armour pierce: N`.
+- **Combat now shows when a hit pierced Armour.** A melee blow that ignores at
+  least one point of the target's Armour reads `pierced N` in its damage tag —
+  e.g. *"You hit the stonebug for 7 (physical, pierced 2)"* — where N is the
+  Armour actually bypassed. It appears only when pierce bit (an unarmoured
+  target shows the plain type), on your blows and on the ones landing on you
+  alike, so the mechanic is visible instead of silent.
 - **The item editor gained a structured Weapon section.** Weapon stats (damage
   dice, action cost, scale attribute + divisor, crit, **armour pierce**, and
   two-handed; `onHit` stays raw JSON) now edit as labelled fields instead of

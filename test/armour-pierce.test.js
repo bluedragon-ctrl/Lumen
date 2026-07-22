@@ -33,3 +33,15 @@ test("pierce does nothing to a magical blow (Ward is a percent cut, not a plate)
   assert.equal(plain.damage, 5);
   assert.equal(pierced.damage, 5);
 });
+
+test("strike reports `pierced` — the Armour actually ignored — for combat narration", () => {
+  // Reported amount is min(pierce, armour): what the tag shows the player.
+  const bit = strike({ band, hitBonus: 0, dmgBonus: 0, crit: 0, pierce: 2 }, armoured, CLEAR, "10");
+  assert.equal(bit.pierced, 2); // armour 4, pierce 2 → 2 points ignored
+  const capped = strike({ band, hitBonus: 0, dmgBonus: 0, crit: 0, pierce: 5 }, armoured, CLEAR, "10");
+  assert.equal(capped.pierced, 4); // pierce 5 vs armour 4 → only 4 there to ignore
+  const none = strike({ band, hitBonus: 0, dmgBonus: 0, crit: 0, pierce: 2 }, { armour: 0, ward: 0, evasion: 0 }, CLEAR, "10");
+  assert.equal(none.pierced, 0); // unarmoured target → pierce bit nothing, so no tag
+  const magical = strike({ band, hitBonus: 0, dmgBonus: 0, crit: 0, pierce: 5 }, armoured, CLEAR, "10", "magical");
+  assert.equal(magical.pierced, 0); // pierce never applies to magical blows
+});
