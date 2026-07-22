@@ -2801,5 +2801,339 @@
     "shop": {
       "sells": [{ "template": "book-of-emberfruit" }, { "template": "book-of-glimmerwood" }, { "template": "book-of-the-brood" }, { "template": "book-of-the-iridescent-shell" }, { "template": "lamp-oil" }, { "template": "emberfruit" }, { "template": "bug-meat" }, { "template": "steam-fern" }]
     }
+  },
+  "umbral-qhawaq-master": {
+    "id": "umbral-qhawaq-master",
+    "faction": "umbral",
+    "name": "the qhawaq-master",
+    "keywords": [
+      "warden",
+      "qhawaq",
+      "master",
+      "umbral",
+      "proving"
+    ],
+    "description": "An old, spare figure standing motionless at the rim of the proving floor, wrapped in dark gloom-silk against a cold the village itself no longer feels. It was a qhawaq once, before the sentries now walking the lit lanes were whelped, and long ago it stopped standing rounds up above — instead it keeps this colder charge, naming each of the three trials to the prospector the shrine has judged fit to hear it, and watching, in an unhurried silence, to see whether the naming was deserved.",
+    "maxHp": 50,
+    "speed": 12,
+    "armour": 3,
+    "ward": 3,
+    "attributes": {
+      "might": 6,
+      "vitality": 7,
+      "intellect": 6,
+      "wits": 7,
+      "perception": 8
+    },
+    "perception": {
+      "blindBelow": -20,
+      "dimBelow": -20,
+      "harmedAbove": 7
+    },
+    "emitsLight": 1,
+    "behavior": "passive",
+    "hostile": false,
+    "remembers": true,
+    "attack": {
+      "damage": "1d6",
+      "actionCost": 14
+    },
+    "actions": [
+      {
+        "type": "attack",
+        "weight": 3
+      },
+      {
+        "type": "idle",
+        "weight": 12
+      },
+      {
+        "type": "emote",
+        "weight": 3,
+        "messages": [
+          "traces one of the three glyphs at the rim with a slow finger",
+          "stands with its back to a warded mouth, listening to what moves below it",
+          "says, low and even, to no one in particular: \"Three trials. One warding each. Choose, or don't.\""
+        ]
+      },
+      {
+        "type": "react",
+        "weight": 3,
+        "cooldown": 120,
+        "reactions": [
+          {
+            "if": {
+              "hpBelow": 0.4
+            },
+            "messages": [
+              {
+                "target": "regards your wounds without alarm: \"The pits take a toll before they take a life. Sit, if you must, before you go back down.\"",
+                "room": "regards {name}'s wounds, unhurried."
+              }
+            ]
+          },
+          {
+            "messages": [
+              {
+                "target": "says, without turning: \"Three mouths, three denning things, three wardings the village would rather keep than dig open. The seam does not give its climbers back but one way, yaku-runa — so go down it certain, or do not go down it. Down here we only ask that the ward holds.\"",
+                "room": "says something low and even to {name}, eyes on the warded mouths."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "shards": "2d4"
+  },
+  "the-bloated-horror": {
+    "id": "the-bloated-horror",
+    "name": "the Bloated Horror",
+    "keywords": [
+      "bloated",
+      "horror",
+      "warp",
+      "glimmer",
+      "boss"
+    ],
+    "description": "A sagging bulk of chitin and gorged flesh, fattened past any shape a centipede should hold by years of feeding on the raw glimmer seamed through these walls. Where its cousins run whip-fast on a hundred legs, this one barely moves at all — it doesn't need to. Its swollen hide glows faintly through cracked plates, a hot, wrong blue-white leaking from every seam as if something under it is still growing, and when it is roused it drags its own weight forward with a slow, dreadful patience while its warped brood boil out of the loose stone to do the killing for it.",
+    "maxHp": 80,
+    "speed": 14,
+    "armour": 3,
+    "ward": 1,
+    "attributes": {
+      "might": 10,
+      "vitality": 14,
+      "intellect": 0,
+      "wits": 4,
+      "perception": 5
+    },
+    "perception": {
+      "blindBelow": 0,
+      "dimBelow": 0,
+      "harmedAbove": 6
+    },
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 1,
+    "lightBane": {
+      "above": 6,
+      "damage": "1d3"
+    },
+    "attack": {
+      "damage": "2d6",
+      "bonus": 1,
+      "actionCost": 13
+    },
+    "xp": 90,
+    "shards": "4d6",
+    "actions": [
+      {
+        "type": "attack",
+        "weight": 7
+      },
+      {
+        "type": "summon",
+        "weight": 3,
+        "mob": "warp-rat",
+        "count": 2,
+        "max": 4,
+        "verb": "heaves, and its swollen seams split to let a warped rat squirm free"
+      },
+      {
+        "type": "idle",
+        "weight": 2
+      },
+      {
+        "type": "emote",
+        "weight": 2,
+        "messages": [
+          "heaves its bloated bulk a slow half-turn",
+          "leaks a hot, wrong light from a cracked seam, and something beneath the plate shifts",
+          "drags itself toward the warmth of your lamp with dreadful patience"
+        ]
+      }
+    ],
+    "loot": [
+      {
+        "template": "warp-feeler",
+        "chance": 1
+      },
+      {
+        "template": "glimmer-dust",
+        "chance": 0.4
+      },
+      {
+        "template": "crystal",
+        "chance": 0.2
+      }
+    ]
+  },
+  "the-kept-dark": {
+    "id": "the-kept-dark",
+    "name": "the Kept Dark",
+    "keywords": [
+      "kept",
+      "dark",
+      "shadow",
+      "shadewell",
+      "boss"
+    ],
+    "description": "A coil of living black that has settled in the Shadewell far longer than any ward the village raised against it, and drunk the pit's light dry so long ago that even the paqo's chalk glyphs are read here by touch, not sight. It does not so much move as unfold, a darker dark sliding over the dark, and it leans toward any flame a prospector is fool enough to carry down, hungry for it the way the deep's oldest terrors are hungry — smaller than those, and older than most, and never once let out.",
+    "maxHp": 110,
+    "speed": 11,
+    "armour": 3,
+    "ward": 2,
+    "attributes": {
+      "might": 8,
+      "vitality": 12,
+      "intellect": 8,
+      "wits": 7,
+      "perception": 9
+    },
+    "perception": {
+      "blindBelow": -20,
+      "dimBelow": -20,
+      "harmedAbove": 0
+    },
+    "emitsLight": -1,
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 1,
+    "lightBane": {
+      "above": 0,
+      "damage": "1d4"
+    },
+    "attack": {
+      "type": "magical",
+      "damage": "1d8",
+      "bonus": 1,
+      "actionCost": 12
+    },
+    "xp": 130,
+    "shards": "6d4",
+    "actions": [
+      {
+        "type": "cast",
+        "weight": 4,
+        "spell": "gloom-bolt"
+      },
+      {
+        "type": "cast",
+        "weight": 3,
+        "spell": "snuff"
+      },
+      {
+        "type": "attack",
+        "weight": 6
+      },
+      {
+        "type": "idle",
+        "weight": 1
+      },
+      {
+        "type": "emote",
+        "weight": 2,
+        "messages": [
+          "folds in on itself, and the killing cold of the pit deepens",
+          "shifts — a darker dark sliding across the dark",
+          "leans toward your light like a thing starved of it for an age",
+          "goes utterly still, and the Shadewell holds its breath"
+        ]
+      }
+    ],
+    "loot": [
+      {
+        "template": "unspent-glow",
+        "chance": 1
+      },
+      {
+        "template": "shadow-shard",
+        "chance": 0.3
+      },
+      {
+        "template": "crystal",
+        "chance": 0.2
+      }
+    ]
+  },
+  "the-amaru": {
+    "id": "the-amaru",
+    "name": "the Amaru",
+    "keywords": [
+      "amaru",
+      "centipede",
+      "dragon",
+      "seam",
+      "boss"
+    ],
+    "description": "A centipede grown past all reason down in the seam it has fed on for years uncounted — armoured plates fused into overlapping dragon-scale ridges down a body longer than a prospector is tall, tapering to a barbed, whip-quick tail. Where lesser broods still show soft joints between the plates, the Amaru's have grown into a single mailed hide that no ordinary blade turns easily, and its foreclaws are long enough, and hard enough, to punch clean through plate that would stop a spear. It is not the terror the deep tells its worst stories about — nothing that dens this shallow of the Abyss claims that name — but in the seam it has carved for itself, it is more than enough.",
+    "maxHp": 220,
+    "speed": 11,
+    "armour": 7,
+    "ward": 2,
+    "attributes": {
+      "might": 14,
+      "vitality": 20,
+      "intellect": 1,
+      "wits": 6,
+      "perception": 7
+    },
+    "perception": {
+      "blindBelow": 0,
+      "dimBelow": 0,
+      "harmedAbove": 9
+    },
+    "behavior": "guard",
+    "hostile": true,
+    "pursues": true,
+    "pursueRange": 1,
+    "attack": {
+      "pierce": 3,
+      "damage": "3d6",
+      "bonus": 3,
+      "actionCost": 13
+    },
+    "spikes": {
+      "damage": "1d6",
+      "chance": 0.5
+    },
+    "xp": 200,
+    "shards": "8d6",
+    "actions": [
+      {
+        "type": "attack",
+        "weight": 8
+      },
+      {
+        "type": "idle",
+        "weight": 1
+      },
+      {
+        "type": "emote",
+        "weight": 2,
+        "messages": [
+          "scrapes a hundred mailed legs across the seam floor at once",
+          "rears its barbed tail high, dragon-scale ridges catching what little light there is",
+          "punches a foreclaw clean through a jut of rock, testing it",
+          "coils the whole vast length of itself and goes still, watching"
+        ]
+      }
+    ],
+    "loot": [
+      {
+        "template": "amaru-fang",
+        "chance": 1
+      },
+      {
+        "template": "crystal",
+        "chance": 0.3
+      },
+      {
+        "template": "glimmer-dust",
+        "chance": 0.3
+      }
+    ]
   }
 }
