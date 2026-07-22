@@ -2465,5 +2465,41 @@
     "weight": 3,
     "value": 120,
     "rarity": "rare"
+  },
+  "voidwardens-cloak": {
+    "id": "voidwardens-cloak",
+    "rarity": "rare",
+    "name": "a voidwarden's cloak",
+    "keywords": ["cloak", "mantle", "voidwarden", "warden", "proving", "umbral"],
+    "description": "A long mantle the paqo lays across the shoulders of a prospector who has kept a warding — cut from doubled gloom-silk and worked through, thread by patient thread, with the cold that the deep-folk teach only to those who have stood against it. It hangs light and turns with the body rather than catching the dark, so a blade meant for the wearer finds only the space they have already left; and where the void reaches, the warded weave frays the edge off its cold. A voidwarden's mark, and not a weaver's to sell.",
+    "type": "armour",
+    "slot": "cloak",
+    "weight": 1,
+    "value": 140,
+    "armour": { "ward": 2, "voidWard": 6, "evasion": 0.08 }
+  },
+  "provens-band": {
+    "id": "provens-band",
+    "rarity": "rare",
+    "name": "the Proven's band",
+    "keywords": ["band", "ring", "proven", "proving", "warrior", "umbral"],
+    "description": "A plain band of cold grey Umbral metal, its face cut with the single warding-glyph the paqo strikes only for one who has gone down into a warded pit and climbed back. It is no glimmer-singer's charm — it holds no light and deepens no well — but a warrior's mark, and worn against the skin it does a warrior's work: it steadies the heart against the dark, stiffens the arm behind a blow, and carries a little of the deep-folk's cold warding into whoever earned it.",
+    "type": "armour",
+    "slot": "finger",
+    "weight": 0,
+    "value": 130,
+    "armour": { "maxHp": 8, "voidWard": 6, "attrMod": { "might": 1 } }
+  },
+  "honour-of-the-amaru": {
+    "id": "honour-of-the-amaru",
+    "rarity": "legendary",
+    "name": "the Honour of the Amaru",
+    "keywords": ["honour", "honor", "amaru", "harness", "cuirass", "armour", "armor", "proving", "umbral", "legendary"],
+    "description": "The paqo's highest blessing, and the deep-folk give it only once a prospector lays the Amaru's fang before the shrine: a harness beaten from the beast's own fused dragon-scale — the same chitin that punched through plate as through cloth — pared thin and curved close over a frame of drawn silver, and worked all through with the cold warding the Umbrals keep for their honoured dead. It sits feather-light for the guard it gives, quickens the step rather than burdening it, and lies thicker against the void than anything a delver has yet worn. To carry it is to wear the deep's oldest terror turned to a ward — and there can only ever be the one who slew the thing it came from.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 2,
+    "value": 280,
+    "armour": { "armour": 3, "ward": 2, "voidWard": 16, "speedPenalty": -1, "maxHp": 8, "attrMod": { "wits": 1 } }
   }
 }
