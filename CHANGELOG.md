@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - **Umbral Proving Grounds** (depth 10, south of the Umbral village market): a warding-rite side area — a hub kept by the qhawaq-master opening onto three graded trial pits, each a one-time quest turned in to the paqo. The Trial of the Brood (the Bloated Horror), the Trial of the Dark (the Kept Dark), and the Trial of the Amaru — a "win or die" sealed room: light doused on entry, exit gated by a grate keyed to the Amaru's fang.
+- **The Living Crown** — an extra qhawaq-master quest, the first beyond the three trials: a `talk`-triggered hunt to put down Maw, the Rat-King, in his warp-nest and bring back the Rat-King's crown as proof (`xp 150` + shards). The qhawaq-master also gains a delivery reaction so he acknowledges the owed crown.
 - **Proving Grounds trial rewards** — each trial now grants the paqo's blessing on completion: a matched set of the game's first void-warded (`voidWard`) gear, deliberately a mobile counterpoint to the heavy-chitin tanks. *A voidwarden's cloak* (rare, `cloak`: the game's highest `evasion` plus voidward), *the Proven's band* (rare, `finger`: a warrior's mark — maxHp, Might, voidward), and **the Honour of the Amaru** — the game's first **`legendary`** item (`body`: light, fast, and the strongest voidward yet, beaten from the Amaru's own dragon-scale).
 - **`DEV_ADMIN_NO_PASSWORD` — passwordless admin login for local dev.** A new
   opt-in env flag lets the built-in `admin` account log in name-only, skipping

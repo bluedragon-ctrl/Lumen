@@ -361,5 +361,32 @@
       "xp": 200,
       "items": [{ "template": "honour-of-the-amaru", "qty": 1 }]
     }
+  },
+  "qhawaq-rat-king": {
+    "id": "qhawaq-rat-king",
+    "name": "The Living Crown",
+    "description": "Beyond the three wardings, the qhawaq-master names another challenge — Maw, the Rat-King, who holds a warp-nest in the deep runs — and would have the crown off its shoulders brought back as proof the thing is dead.",
+    "start": {
+      "trigger": "talk",
+      "npc": "umbral-qhawaq-master",
+      "offerText": "The old qhawaq is silent a long moment. \"The pits below us no longer frighten you — I have watched. Then hear of a thing that should. Far from here, up where the deep warps what it feeds, a nest has made itself a king: a knot of rat and glimmer and bone the runs call Maw, and the whole warren wakes to fight when he does. That is no warding of ours, yaku-runa — but a hunter is a hunter wherever the danger dens. Go and put the thing down, and bring me the crown off its shoulders. Then I will know the naming was deserved.\""
+    },
+    "steps": [
+      {
+        "kill": "rat-king",
+        "count": 1,
+        "text": "Put down Maw, the Rat-King, in the warp-nest"
+      },
+      {
+        "deliver": "rat-king-crown",
+        "count": 1,
+        "npc": "umbral-qhawaq-master",
+        "text": "Bring the Rat-King's crown to the qhawaq-master"
+      }
+    ],
+    "rewards": {
+      "xp": 150,
+      "shards": 30
+    }
   }
 }
