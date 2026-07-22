@@ -304,7 +304,8 @@
       }
     ],
     "rewards": {
-      "xp": 90
+      "xp": 90,
+      "items": [{ "template": "voidwardens-cloak", "qty": 1 }]
     }
   },
   "proving-shadewell": {
@@ -330,7 +331,8 @@
       }
     ],
     "rewards": {
-      "xp": 130
+      "xp": 130,
+      "items": [{ "template": "provens-band", "qty": 1 }]
     }
   },
   "proving-seam": {
@@ -356,7 +358,8 @@
       }
     ],
     "rewards": {
-      "xp": 200
+      "xp": 200,
+      "items": [{ "template": "honour-of-the-amaru", "qty": 1 }]
     }
   }
 }
