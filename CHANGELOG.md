@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`examine` now tells the whole truth about an item.** The Inspect window's
+  spec lines cover everything the engine acts on: consumables show what they
+  actually do (`use: restores 8 HP, 6 mana`, heal-over-time pulses, what a
+  thornbug egg hatches) instead of a bare effect-type word; weapon `onHit`
+  riders (lifesteal, bleed, a snaring slow) and armour `evasion`/`spikes`/
+  `onDamage` answers surface with their odds; books and schematics list the
+  recipes/spells they teach, marking what's `(known)`; scrolls add a one-line
+  spell gist (mana cost, damage with your current scale bonus) and flag a
+  spell you already know; light sources show `burn time: ~m:ss from full`;
+  every slotted item names its `slot`; and a wearable compares itself against
+  what you have equipped in that slot (`vs an iron cap: armour +1, speed +1`).
+  Consumable action prefixes unify on `use:` (the verb that always works).
 - **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
   (mirrored on a mob's `attack.pierce`) ignores that many points of the
   defender's Armour before the physical soak — a blunt head cracking shell or
