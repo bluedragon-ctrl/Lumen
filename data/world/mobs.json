@@ -349,7 +349,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "guard",
     "hostile": true,
-    "attack": { "damage": "1d6", "actionCost": 13 },
+    "attack": { "pierce": 1, "damage": "1d6", "actionCost": 13 },
     "lightBane": { "above": 3, "damage": "1d2" },
     "xp": 13,
     "shards": "2d4",
@@ -796,7 +796,7 @@
     "helper": true,
     "pursues": true,
     "pursueRange": 3,
-    "attack": { "damage": "1d10", "actionCost": 14, "bonus": 2 },
+    "attack": { "pierce": 2, "damage": "1d10", "actionCost": 14, "bonus": 2 },
     "xp": 25,
     "shards": "2d6",
     "actions": [
@@ -1084,7 +1084,7 @@
     "pursues": true,
     "pursueRange": 2,
     "xp": 25,
-    "attack": { "damage": "3d4", "actionCost": 13 },
+    "attack": { "pierce": 1, "damage": "3d4", "actionCost": 13 },
     "spikes": { "damage": "1d4", "chance": 1 },
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -1213,6 +1213,7 @@
     "hostile": true,
     "lightBane": { "above": 4, "damage": "1d4" },
     "attack": {
+      "pierce": 2,
       "damage": "2d6",
       "actionCost": 14,
       "onHit": [
@@ -1398,7 +1399,7 @@
     "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 9 },
     "behavior": "wander",
     "hostile": false,
-    "attack": { "damage": "2d4", "actionCost": 14 },
+    "attack": { "pierce": 2, "damage": "2d4", "actionCost": 14 },
     "xp": 55,
     "actions": [
       { "type": "attack", "weight": 5 },
@@ -1431,7 +1432,7 @@
     "pursues": true,
     "pursueRange": 2,
     "xp": 32,
-    "attack": { "damage": "2d4", "actionCost": 14 },
+    "attack": { "pierce": 1, "damage": "2d4", "actionCost": 14 },
     "actions": [
       { "type": "attack", "weight": 5 },
       { "type": "idle", "weight": 6 },
@@ -1545,7 +1546,7 @@
     "helper": true,
     "remembers": true,
     "xp": 20,
-    "attack": { "damage": "1d6", "actionCost": 11 },
+    "attack": { "pierce": 1, "damage": "1d6", "actionCost": 11 },
     "spikes": { "damage": "1d4", "chance": 1 },
     "actions": [
       { "type": "attack", "weight": 6 },
@@ -1901,7 +1902,7 @@
     "pursues": true,
     "pursueRange": 2,
     "lightBane": { "above": 0, "damage": "1d4" },
-    "attack": { "damage": "1d8", "bonus": 2, "actionCost": 13 },
+    "attack": { "type": "magical", "damage": "1d8", "bonus": 2, "actionCost": 13 },
     "xp": 47,
     "shards": "2d6",
     "actions": [
@@ -1990,6 +1991,7 @@
     "lightAggro": { "above": 0 },
     "lightBane": { "above": 3, "damage": "1d3" },
     "attack": {
+      "pierce": 1,
       "damage": "1d8",
       "actionCost": 12,
       "onHit": [
@@ -2030,7 +2032,7 @@
     "hostile": true,
     "pursues": false,
     "lightBane": { "above": 6, "damage": "1d3" },
-    "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
+    "attack": { "pierce": 1, "damage": "1d8", "bonus": 1, "actionCost": 13 },
     "xp": 55,
     "shards": "5d4",
     "actions": [
@@ -2176,7 +2178,7 @@
     "pursues": true,
     "pursueRange": 2,
     "lightBane": { "above": 6, "damage": "1d3" },
-    "attack": { "damage": "1d8", "bonus": 1, "actionCost": 13 },
+    "attack": { "pierce": 1, "damage": "1d8", "bonus": 1, "actionCost": 13 },
     "xp": 59,
     "shards": "5d4",
     "actions": [
@@ -2214,7 +2216,7 @@
     "pursues": true,
     "pursueRange": 2,
     "lightBane": { "above": 0, "damage": "1d4" },
-    "attack": { "damage": "1d10", "bonus": 2, "actionCost": 13 },
+    "attack": { "type": "magical", "damage": "1d10", "bonus": 2, "actionCost": 13 },
     "xp": 98,
     "shards": "6d6",
     "actions": [
@@ -2464,6 +2466,7 @@
     "behavior": "hunt",
     "hostile": true,
     "attack": {
+      "pierce": 1,
       "damage": "1d6",
       "actionCost": 12,
       "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "venom", "damage": "1d3", "duration": 6, "chance": 1 }]
@@ -2521,6 +2524,7 @@
     "pursues": true,
     "pursueRange": 1,
     "attack": {
+      "pierce": 1,
       "damage": "2d6",
       "actionCost": 11,
       "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "gash", "damage": "1d3", "duration": 4, "chance": 0.5 }]
@@ -2552,6 +2556,7 @@
     "ambush": true,
     "helper": true,
     "attack": {
+      "pierce": 1,
       "damage": "2d4",
       "actionCost": 14,
       "onHit": [
@@ -2586,6 +2591,7 @@
     "ambush": true,
     "helper": true,
     "attack": {
+      "pierce": 2,
       "damage": "2d6",
       "bonus": 1,
       "actionCost": 13,
@@ -2624,6 +2630,7 @@
     "behavior": "hunt",
     "hostile": true,
     "attack": {
+      "pierce": 1,
       "damage": "1d6",
       "actionCost": 12,
       "onHit": [
