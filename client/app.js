@@ -92,6 +92,7 @@ const loginNameEl = $("login-name");
 const loginAdminEl = $("login-admin");
 let adminName = null; // who the "Log in as Admin" button logs in as
 let adminNeedsPassword = false; // admin account hasn't set a password yet (claimable)
+let adminNoPassword = false; // dev flag: admin logs in name-only, no password prompt
 let requireInvite = false; // creating a prospector needs an invitation key (server-gated)
 
 function showLogin() { loginEl.hidden = false; }
@@ -114,6 +115,7 @@ function renderLogin(msg) {
   closeAuth(); // a fresh roster supersedes any half-finished password prompt
   adminName = msg.adminName || null;
   adminNeedsPassword = !!msg.adminNeedsPassword;
+  adminNoPassword = !!msg.adminNoPassword;
   requireInvite = !!msg.requireInvite;
   loginAdminEl.hidden = !msg.showAdmin;
 
@@ -271,8 +273,12 @@ $("login-create").addEventListener("submit", (e) => {
   showLoginMsg(null);
   openAuth("create", name);
 });
-loginAdminEl.addEventListener("click", () =>
-  openAuth(adminNeedsPassword ? "claim" : "login", adminName || "admin"));
+loginAdminEl.addEventListener("click", () => {
+  // Dev passwordless admin (server DEV_ADMIN_NO_PASSWORD): log straight in,
+  // no modal. Otherwise claim (unclaimed) or prompt for the password.
+  if (adminNoPassword) return void sendLogin(adminName || "admin", "");
+  openAuth(adminNeedsPassword ? "claim" : "login", adminName || "admin");
+});
 $("login-auth-form").addEventListener("submit", (e) => { e.preventDefault(); submitAuth(); });
 $("login-auth-cancel").addEventListener("click", closeAuth);
 

@@ -26,6 +26,17 @@ module.exports = {
       ? true
       : !/^(0|false|no|off)$/i.test(process.env.SHOW_ADMIN_LOGIN.trim()),
 
+  // Local-dev convenience: let the built-in `admin` account log in WITHOUT a
+  // password — name-only, skipping the set-a-password-on-first-login claim that
+  // otherwise recurs in every fresh checkout and blocks scripted testing. This
+  // is the raw env toggle (default OFF); index.js combines it with the invariant
+  // that a configured ADMIN_PASSWORD always wins (accounts.devAdminActive), so
+  // the flag can NEVER weaken a deployment that set a real admin password. It
+  // only ever affects the admin account — every prospector still needs theirs.
+  // Set to 1/true/yes/on to enable. Never set this on a public deploy.
+  DEV_ADMIN_NO_PASSWORD:
+    /^(1|true|yes|on)$/i.test((process.env.DEV_ADMIN_NO_PASSWORD || "").trim()),
+
   // New-player registration gate. When set, creating a prospector — and
   // claiming a pre-password one (they sit on a public roster, so an ungated
   // claim would be a side door) — requires an invitation key. The value is a
