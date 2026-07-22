@@ -157,6 +157,15 @@ async function checkPassword(data, password) {
   return { ok: true, rehash: true };
 }
 
+// The dev passwordless-admin affordance (server/config.js DEV_ADMIN_NO_PASSWORD).
+// Pure so index.js's login path and the tests share one rule. The mode is in
+// force only when the dev flag is on AND no ADMIN_PASSWORD is configured — a
+// real admin password ALWAYS wins, so the flag can never downgrade a deployment
+// that set one. index.js then grants a name-only login only to `admin` accounts.
+function devAdminActive({ devFlag, adminPasswordSet }) {
+  return !!devFlag && !adminPasswordSet;
+}
+
 // Admin password reset: strip an account's password so it reverts to claimable
 // and the owner sets a fresh one on next login (claim-on-first-login). We never
 // hand a password back — the player picks their own. Returns false if there was
@@ -312,6 +321,6 @@ function remove(name) {
 
 module.exports = {
   validateName, exists, load, save, saveAsync, listNames, summaries, remove, PLAYERS_DIR,
-  validatePassword, hashPassword, hashPasswordSync, parseHash, hasPassword, checkPassword, clearPassword,
+  validatePassword, hashPassword, hashPasswordSync, parseHash, hasPassword, checkPassword, clearPassword, devAdminActive,
   hashInviteKey, verifyInviteKey, loadInviteHash, writeInviteHash, clearInviteHash,
 };

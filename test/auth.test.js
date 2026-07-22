@@ -150,6 +150,17 @@ test("clearPassword: reverts a claimed account to claimable (admin @reset-passwo
   }
 });
 
+// --- Dev passwordless-admin gate (DEV_ADMIN_NO_PASSWORD) -------------------
+
+test("devAdminActive: on only when the flag is set and no ADMIN_PASSWORD wins", () => {
+  // The whole point: a configured ADMIN_PASSWORD always beats the dev flag, so
+  // the affordance can never downgrade a deployment that set a real password.
+  assert.equal(accounts.devAdminActive({ devFlag: true, adminPasswordSet: false }), true);
+  assert.equal(accounts.devAdminActive({ devFlag: true, adminPasswordSet: true }), false, "ADMIN_PASSWORD wins");
+  assert.equal(accounts.devAdminActive({ devFlag: false, adminPasswordSet: false }), false, "off by default");
+  assert.equal(accounts.devAdminActive({ devFlag: false, adminPasswordSet: true }), false);
+});
+
 // --- Invitation key (new-player registration gate) -------------------------
 
 test("invite key: the right key verifies against its stored hash", async () => {

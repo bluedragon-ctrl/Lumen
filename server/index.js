@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { WebSocketServer } = require("ws");
 
-const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION, SHOW_ADMIN_LOGIN, INVITE_KEY_HASH } = require("./config");
+const { PORT, TICK_MS, SNAPSHOT_EVERY_TICKS, CLIENT_DIR, VERSION, SHOW_ADMIN_LOGIN, DEV_ADMIN_NO_PASSWORD, INVITE_KEY_HASH } = require("./config");
 const { loadWorld } = require("./world");
 const { GameState } = require("./state");
 const { buildRoomView, buildPlayerView } = require("./render");
@@ -32,6 +32,11 @@ console.log(
 // account at boot (creating or rotating the password). In local dev you can
 // leave it unset and claim a password on first login like any other account.
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+// Local-dev passwordless admin (config.js DEV_ADMIN_NO_PASSWORD). In force only
+// when the flag is on AND no ADMIN_PASSWORD is set — a real admin password
+// always wins (accounts.devAdminActive owns that rule). When active, the admin
+// account logs in name-only and the login screen skips the password modal.
+const DEV_ADMIN_LOGIN = accounts.devAdminActive({ devFlag: DEV_ADMIN_NO_PASSWORD, adminPasswordSet: !!ADMIN_PASSWORD });
 if (!accounts.exists("admin")) {
   const admin = state.createCharacter("admin", { isAdmin: true });
   if (ADMIN_PASSWORD) Object.assign(admin, accounts.hashPasswordSync(ADMIN_PASSWORD));
@@ -44,7 +49,16 @@ if (!accounts.exists("admin")) {
   accounts.save(admin);
   console.log("[lumen] admin password set from ADMIN_PASSWORD.");
 }
-if (SHOW_ADMIN_LOGIN && !accounts.hasPassword(accounts.load("admin"))) {
+if (DEV_ADMIN_LOGIN) {
+  console.warn(
+    "[lumen] DEV_ADMIN_NO_PASSWORD is ON — the admin account logs in without a password. " +
+      "Local-dev only; never set this on a public deploy."
+  );
+} else if (DEV_ADMIN_NO_PASSWORD) {
+  console.warn(
+    "[lumen] DEV_ADMIN_NO_PASSWORD is set but IGNORED — ADMIN_PASSWORD is configured and always wins."
+  );
+} else if (SHOW_ADMIN_LOGIN && !accounts.hasPassword(accounts.load("admin"))) {
   console.warn(
     "[lumen] WARNING: the admin account has no password — the first visitor can claim it. " +
       "Set ADMIN_PASSWORD before a public deploy (or SHOW_ADMIN_LOGIN=0 to hide admin login)."
@@ -195,6 +209,9 @@ function accountsPayload(notice) {
     showAdmin: SHOW_ADMIN_LOGIN && adminName != null,
     adminName: SHOW_ADMIN_LOGIN ? adminName : null,
     adminNeedsPassword: SHOW_ADMIN_LOGIN ? adminNeedsPassword : false,
+    // Dev passwordless admin: tell the client to log the admin in name-only,
+    // skipping the password/claim modal (server enforces the same via login()).
+    adminNoPassword: SHOW_ADMIN_LOGIN && DEV_ADMIN_LOGIN && adminName != null,
     requireInvite: !!activeInviteHash(), // create needs an invitation key when set
     notice: notice || null,
   };
@@ -372,6 +389,14 @@ async function login(ws, rawName, password) {
   // boots, but it can't be entered from the client.
   if (data.isAdmin && !SHOW_ADMIN_LOGIN)
     return void send(ws, { type: "error", text: "Admin login is disabled." });
+  // Local-dev passwordless admin: skip the password/claim gate entirely for the
+  // admin account. Guarded by DEV_ADMIN_LOGIN (flag on AND no ADMIN_PASSWORD),
+  // so it can't apply on a deployment with a real admin password, and never
+  // touches any prospector account.
+  if (data.isAdmin && DEV_ADMIN_LOGIN) {
+    console.log("[lumen] admin logged in without a password (DEV_ADMIN_NO_PASSWORD).");
+    return void enterGame(ws, data);
+  }
   const gate = throttle.check(throttleKey(v.name)); // before the scrypt work
   if (!gate.ok) return void send(ws, tooMany(gate.retryMs));
   const chk = await accounts.checkPassword(data, password);

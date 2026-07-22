@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`DEV_ADMIN_NO_PASSWORD` — passwordless admin login for local dev.** A new
+  opt-in env flag lets the built-in `admin` account log in name-only, skipping
+  the set-a-password-on-first-login claim that otherwise recurs in every fresh
+  checkout and blocks scripted testing. Default OFF, and **ignored whenever
+  `ADMIN_PASSWORD` is set** (a real admin password always wins), so it can never
+  weaken a real deployment; it only ever affects the admin account. The login
+  screen skips the password modal when it's active, and the server logs a loud
+  boot warning. Documented in `.env.example`.
 - **A way east from the Umbral Sanctuary into the Ember Deep.** Two new depth-9
   rooms bridge The Glow Garden and The Firethread: *The Warded Brink*, a dark
   transitional seam where the sanctuary's warded light gives out, and *The
