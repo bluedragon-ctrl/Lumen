@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   recipes/spells they teach, marking what's `(known)`; scrolls add a one-line
   spell gist (mana cost, damage with your current scale bonus) and flag a
   spell you already know; light sources show `burn time: ~m:ss from full`;
-  every slotted item names its `slot`; and a wearable compares itself against
-  what you have equipped in that slot (`vs an iron cap: armour +1, speed +1`).
-  Consumable action prefixes unify on `use:` (the verb that always works).
+  every slotted item names its slot on the type line (`type: armour · slot:
+  head`); and a wearable compares itself against what you have equipped in
+  that slot (`vs an iron cap: armour +1, speed +1`). Consumable action
+  prefixes unify on `use:` (the verb that always works). Examining a
+  craftable no longer repeats its inputs/station — that lives in `recipes`.
 - **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
   (mirrored on a mob's `attack.pierce`) ignores that many points of the
   defender's Armour before the physical soak — a blunt head cracking shell or

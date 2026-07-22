@@ -223,8 +223,8 @@ function spellGist(s, w, viewer) {
 }
 
 function itemSpecLines(tmpl, w, viewer) {
-  const lines = [`type: ${tmpl.type}`];
-  if (tmpl.slot) lines.push(`slot: ${tmpl.slot}`);
+  // Type and slot share a line (like value · sells) to keep the block short.
+  const lines = [tmpl.slot ? `type: ${tmpl.type} · slot: ${tmpl.slot}` : `type: ${tmpl.type}`];
   if (tmpl.weapon) {
     const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
     // Every melee swing adds an attribute bonus — the weapon's own `scale`, or
@@ -487,18 +487,11 @@ function buildExamineView(state, p, q) {
     if (!r || !r.output) continue;
     const t = w.items[r.output.template];
     if (!t || !hit(r.output.template, t.name, t.keywords)) continue;
-    const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
-    if (r.shards) ins.push(`${r.shards} shards`);
-    const stationFix = Object.values(w.fixtures).find((x) => x.station === r.station);
-    const where = stationFix ? stationFix.name : `a ${r.station} station`;
-    const recName = r.name || rid;
+    // Just the item itself — inputs, station and the craft command live in
+    // `recipes`, so examine doesn't repeat them.
     return entity("item", r.output.template, t.name, t.description, {
       rarity: t.rarity || "common",
       lines: itemSpecLines(t, w, p),
-      hints: [
-        `Craftable${ins.length ? ` from ${ins.join(", ")}` : ""} — at ${where}.`,
-        `Make it with \`craft ${recName}\`.`,
-      ],
     });
   }
   // Shop wares on display. Last of all — after everything you hold, perceive or

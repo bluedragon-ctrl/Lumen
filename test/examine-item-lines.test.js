@@ -33,9 +33,11 @@ const viewer = {
   knownRecipes: ["forge-iron-sword"],
 };
 
-test("examine lines: slot is named", () => {
+test("examine lines: type and slot share one line", () => {
   const lines = itemSpecLines({ type: "armour", slot: "body", armour: { armour: 1 } }, world, viewer);
-  assert.ok(lines.includes("slot: body"));
+  assert.ok(lines.includes("type: armour · slot: body"));
+  // No slot → the plain type line, no dangling separator.
+  assert.ok(itemSpecLines({ type: "material" }, world, viewer).includes("type: material"));
 });
 
 test("examine lines: restore consumable shows the HP/mana gained", () => {

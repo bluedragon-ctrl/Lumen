@@ -270,7 +270,9 @@ test("examine resolves a known craftable before a vendor ware with clashing keyw
   const view = buildExamineView(state, p, "barbed bomb");
   assert.ok(view, "resolves to an examine view");
   assert.equal(view.entity.name, "a barbed bomb");
-  assert.ok((view.entity.hints || []).some((h) => /Craftable/.test(h)), "shows the craftable recall view");
+  // The recall view is the bare item — no sale hint (and no crafting recap;
+  // inputs/station live in `recipes`).
+  assert.ok(!(view.entity.hints || []).some((h) => /On sale/.test(h)), "not the vendor's sheet");
 });
 
 test("examine still resolves the vendor ware by its own keyword", () => {
