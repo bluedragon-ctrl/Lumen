@@ -44,6 +44,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `attack.pierce` the engine already honours, mirroring the item editor's Weapon
   section.
 
+### Removed
+- **The Inspect window's Craft/Buy buttons.** Examining a craftable or a shop
+  ware no longer offers a click-to-act button — all operations go through the
+  console, which the hints already teach (`craft <recipe>`, `buy <item>`). The
+  `actions` protocol field, its client rendering, and its styles are gone.
+
 ### Changed
 - **A blunt/anti-armour weapon line now runs through every tier.** The iron
   mace previously lost to the iron sword on every axis — smaller die (1d6 vs

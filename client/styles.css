@@ -314,9 +314,6 @@ body {
 .ex-lines li { color: var(--muted); padding: 1px 0; }
 .ex-hints { margin: 8px 0; }
 .ex-hints .hint { display: block; color: var(--accent); font-size: 13px; padding: 1px 0; }
-.ex-actions { display: flex; gap: 6px; margin: 10px 0 4px; }
-.ex-action { background: var(--panel-2); color: var(--hostile); border: 1px solid var(--hostile); border-radius: 6px; padding: 4px 12px; font: inherit; cursor: pointer; }
-.ex-action:hover { background: var(--hostile); color: #0b0d10; }
 .ex-back { margin-top: 6px; background: var(--panel-2); color: var(--accent); border: 1px solid var(--edge); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
 .ex-back:hover { border-color: var(--accent); }
 

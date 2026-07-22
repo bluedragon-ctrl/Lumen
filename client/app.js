@@ -546,15 +546,6 @@ function renderExamine(e) {
     hints.appendChild(span);
   }
 
-  const actions = $("ex-actions");
-  actions.innerHTML = "";
-  for (const a of e.actions || []) {
-    const btn = document.createElement("button");
-    btn.className = "ex-action";
-    btn.textContent = a.label;
-    btn.addEventListener("click", () => sendCommand(a.command));
-    actions.appendChild(btn);
-  }
 }
 
 // Back to the live room view.

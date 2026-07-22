@@ -499,7 +499,6 @@ function buildExamineView(state, p, q) {
         `Craftable${ins.length ? ` from ${ins.join(", ")}` : ""} — at ${where}.`,
         `Make it with \`craft ${recName}\`.`,
       ],
-      actions: [{ label: "Craft", command: `craft ${rid}` }],
     });
   }
   // Shop wares on display. Last of all — after everything you hold, perceive or
@@ -523,7 +522,6 @@ function buildExamineView(state, p, q) {
           rarity: t.rarity || "common",
           lines: itemSpecLines(t, w, p),
           hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
-          actions: [{ label: `Buy (${price})`, command: `buy ${o.template}` }],
         });
       }
     }
