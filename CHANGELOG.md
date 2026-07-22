@@ -55,6 +55,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `actions` protocol field, its client rendering, and its styles are gone.
 
 ### Changed
+- **The Inspect window's back button shrank into the header.** The full-width
+  "↩ back to room" block at the bottom of an examine view is now a compact
+  `↩ room (⌫)` control on the title line — same click, same Backspace
+  shortcut, one less row of chrome.
 - **A blunt/anti-armour weapon line now runs through every tier.** The iron
   mace previously lost to the iron sword on every axis — smaller die (1d6 vs
   1d8), slower, heavier, dearer — while its `scale` merely re-stated the default

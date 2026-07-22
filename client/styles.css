@@ -314,8 +314,9 @@ body {
 .ex-lines li { color: var(--muted); padding: 1px 0; }
 .ex-hints { margin: 8px 0; }
 .ex-hints .hint { display: block; color: var(--accent); font-size: 13px; padding: 1px 0; }
-.ex-back { margin-top: 6px; background: var(--panel-2); color: var(--accent); border: 1px solid var(--edge); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
-.ex-back:hover { border-color: var(--accent); }
+/* Compact back-to-room control in the inspect header (Backspace does the same). */
+.ex-back { margin-left: auto; background: none; color: var(--muted); border: 1px solid var(--edge); border-radius: 6px; padding: 1px 8px; font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer; }
+.ex-back:hover { color: var(--accent); border-color: var(--accent); }
 
 /* Status strip --------------------------------------------------------- */
 .status {
