@@ -177,8 +177,56 @@ function buildRoomView(state, p) {
 // intentionally generic — `bars`/`lines`/`hints` — so HP bars, stats, and
 // interaction hints can grow without protocol churn.
 
-function itemSpecLines(tmpl, w, viewer) {
-  const lines = [`type: ${tmpl.type}`];
+// One terse line for an item's combat rider: a weapon's `onHit` entry ("on
+// hit") or armour's spikes/`onDamage` answer ("when struck"). These are an
+// item's defining trick — they must read at the counter, not be discovered
+// mid-fight. A chance-gated rider carries its odds in the prefix.
+function riderLine(when, o) {
+  const p = o.chance != null && o.chance < 1 ? `${when} (${Math.round(o.chance * 100)}%)` : when;
+  if (o.type === "restore") {
+    const gain = [o.hp ? `${o.hp} HP` : null, o.mana ? `${o.mana} mana` : null].filter(Boolean).join(", ");
+    return `${p}: restore ${gain}`;
+  }
+  if (o.type === "damage-over-time")
+    return `${p}: ${o.name || "bleed"} — ${o.damage}${o.damageType ? ` ${o.damageType}` : ""} per tick for ${fmtDuration(o.duration)}`;
+  if (o.type === "slow") return `${p}: ${(o.name || "slow").toLowerCase()} — speed −${o.magnitude} for ${fmtDuration(o.duration)}`;
+  if (o.type === "damage") return `${p}: attacker takes ${o.damage}`;
+  return `${p}: ${o.name || o.type}`;
+}
+
+// A one-line gist of what a scroll's spell does, so the sheet can be weighed
+// before it is bought or studied. Damage dice show the viewer's current scale
+// bonus (like weapon lines); status effects reduce to a plain phrase.
+function spellGist(s, w, viewer) {
+  const e = s.effect || {};
+  const dice = (roll) => {
+    const bonus = viewer && e.scale ? spellScaleBonus(effectiveAttributes(w, viewer), e.scale) : 0;
+    const cur = bonus ? ` +${bonus}` : "";
+    const rule = e.scale ? ` (${e.scale.attr}/${e.scale.per || 1})` : "";
+    return `${roll}${e.damageType ? ` ${e.damageType}` : ""}${cur}${rule}`;
+  };
+  switch (e.type) {
+    case "damage": return `${dice(e.damage)} damage to one target`;
+    case "damage-room": return `${dice(e.damage)} damage to every foe in the room`;
+    case "damage-over-time": return `${dice(e.damage)} per tick, lingering`;
+    case "drain": return `${dice(e.damage)} damage, part drunk back as healing`;
+    case "mana-drain": return `${dice(e.drain)} drawn from the target's mana`;
+    case "heal-over-time": return s.target === "room" ? "mends everyone on your side over time" : "mends the target over time";
+    case "protect": return "wraps the target in a protective ward";
+    case "summon": return "summons a creature to fight for you";
+    case "emit-light": return "the target sheds light";
+    case "cleanse": return "strips harmful effects";
+    case "sleep": return "puts a creature to sleep";
+    case "douse": return "snuffs the target's light";
+    default: return e.type || "?";
+  }
+}
+
+// `opts.salePrice` (a ware at a visible trader's counter) rides the value line
+// rather than a hint of its own, keeping the block short.
+function itemSpecLines(tmpl, w, viewer, opts = {}) {
+  // Type and slot share a line (like value · sells) to keep the block short.
+  const lines = [tmpl.slot ? `type: ${tmpl.type} · slot: ${tmpl.slot}` : `type: ${tmpl.type}`];
   if (tmpl.weapon) {
     const dmg = Object.entries(tmpl.weapon.damage || {}).map(([k, v]) => `${v} ${k}`).join(", ");
     // Every melee swing adds an attribute bonus — the weapon's own `scale`, or
@@ -195,6 +243,7 @@ function itemSpecLines(tmpl, w, viewer) {
     if (tmpl.weapon.pierce) lines.push(`armour pierce: ${tmpl.weapon.pierce}`);
     // Two-handed weapons fill both hands — no shield alongside them.
     if (tmpl.weapon.twoHanded) lines.push("two-handed (no shield)");
+    for (const o of tmpl.weapon.onHit || []) lines.push(riderLine("on hit", o));
   }
   if (tmpl.armour) {
     const ar = tmpl.armour.armour || 0, wd = tmpl.armour.ward || 0, vw = tmpl.armour.voidWard || 0;
@@ -207,29 +256,87 @@ function itemSpecLines(tmpl, w, viewer) {
     if (tmpl.armour.maxHp) lines.push(`max HP +${tmpl.armour.maxHp}`);
     if (tmpl.armour.maxMana) lines.push(`max mana +${tmpl.armour.maxMana}`);
     if (tmpl.armour.manaRegen) lines.push(`mana regen +${tmpl.armour.manaRegen}/tick`);
+    if (tmpl.armour.evasion) lines.push(`evasion +${Math.round(tmpl.armour.evasion * 100)}%`);
+    // Spikes (and any onDamage rider) answer the attacker — the mirror of onHit.
+    if (tmpl.armour.spikes) lines.push(riderLine("when struck", { type: "damage", damage: tmpl.armour.spikes.damage, chance: tmpl.armour.spikes.chance }));
+    for (const o of tmpl.armour.onDamage || []) lines.push(riderLine("when struck", o));
     const mod = tmpl.armour.attrMod;
     if (mod) lines.push(...Object.entries(mod).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`));
+    // A wearable compares against what the viewer has in that slot, so "is this
+    // an upgrade?" is answered at a glance. Silent for the very piece being worn
+    // (or a second copy of it), and when nothing (comparable) fills the slot.
+    const worn = viewer && tmpl.slot && viewer.equipment && viewer.equipment[tmpl.slot];
+    const wornT = worn && worn.template !== tmpl.id ? w.items[worn.template] : null;
+    if (wornT && wornT.armour) {
+      const a = tmpl.armour, b = wornT.armour;
+      const diffs = [];
+      const diff = (label, nv, ov, suffix = "") => {
+        const d = (nv || 0) - (ov || 0);
+        if (d) diffs.push(`${label} ${d > 0 ? "+" : ""}${d}${suffix}`);
+      };
+      diff("armour", a.armour, b.armour);
+      diff("ward", a.ward, b.ward);
+      diff("voidward", a.voidWard, b.voidWard);
+      diff("speed", -(a.speedPenalty || 0), -(b.speedPenalty || 0));
+      diff("max HP", a.maxHp, b.maxHp);
+      diff("max mana", a.maxMana, b.maxMana);
+      diff("mana regen", a.manaRegen, b.manaRegen);
+      diff("evasion", Math.round((a.evasion || 0) * 100), Math.round((b.evasion || 0) * 100), "%");
+      for (const k of new Set([...Object.keys(a.attrMod || {}), ...Object.keys(b.attrMod || {})]))
+        diff(k, (a.attrMod || {})[k], (b.attrMod || {})[k]);
+      if (diffs.length) lines.push(`vs ${wornT.name}: ${diffs.join(", ")}`);
+    }
   }
   if (tmpl.light) {
     lines.push(`light output: ${tmpl.light.output}`, `fuel capacity: ${tmpl.light.fuelMax}`);
+    // Fuel alone doesn't say how LONG it lasts — a blaze-lantern gulps 5/tick.
+    if (tmpl.light.burnPerTick) lines.push(`burn time: ~${fmtDuration(Math.round(tmpl.light.fuelMax / tmpl.light.burnPerTick))} from full`);
     if (tmpl.light.fuelItem) lines.push(`refuel with: ${w.items[tmpl.light.fuelItem] ? w.items[tmpl.light.fuelItem].name : tmpl.light.fuelItem}`);
   }
   const eff = tmpl.consumable && tmpl.consumable.effect;
   if (eff && typeof eff === "object") {
-    if (eff.type === "emit-light") lines.push(`drink: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
+    // Prefixed `use:` — the catch-all verb that works on every consumable
+    // (`drink`/`eat` work too; they only shape the flavour text).
+    if (eff.type === "restore") {
+      const gain = [eff.hp ? `${eff.hp} HP` : null, eff.mana ? `${eff.mana} mana` : null].filter(Boolean).join(", ");
+      lines.push(`use: restores ${gain}`);
+    }
+    else if (eff.type === "heal-over-time")
+      lines.push(`use: ${eff.magnitude} HP every ${eff.interval > 1 ? `${eff.interval} ticks` : "tick"} for ${fmtDuration(eff.duration)}`);
+    else if (eff.type === "summon") {
+      const mt = w.mobs[eff.mob];
+      lines.push(`use: hatches ${mt ? mt.name : eff.mob} to fight at your side (one at a time)`);
+    }
+    else if (eff.type === "emit-light") lines.push(`use: emit ${eff.magnitude} light for ${fmtDuration(eff.duration)}`);
     else if (eff.type === "attr-buff" && (eff.attrMod || eff.maxHp)) {
       const mods = Object.entries(eff.attrMod || {}).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${v}`);
       if (eff.maxHp) mods.push(`max HP +${eff.maxHp}`);
-      lines.push(`drink: ${mods.join(", ")} for ${fmtDuration(eff.duration)}`);
+      lines.push(`use: ${mods.join(", ")} for ${fmtDuration(eff.duration)}`);
     }
     else if (eff.type === "damage-room") lines.push(`throw: ${eff.damage}${eff.damageType ? ` ${eff.damageType}` : ""} damage to every foe in the room (single use)`);
-    else lines.push(`drink: ${eff.type}`);
+    else lines.push(`use: ${eff.type}`);
   }
   if (tmpl.scroll && tmpl.scroll.spell) {
     const s = w.spells[tmpl.scroll.spell];
-    lines.push(`study: learn ${s ? s.name : tmpl.scroll.spell}`);
+    const known = viewer && (viewer.knownSpells || []).includes(tmpl.scroll.spell);
+    lines.push(`study: learn ${s ? s.name : tmpl.scroll.spell}${known ? " (already known)" : ""}`);
+    if (s) lines.push(`spell: ${s.manaCost} mana${s.shardCost ? ` + ${s.shardCost} shards` : ""} — ${spellGist(s, w, viewer)}`);
   }
-  if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}`);
+  // A book (`teaches`) names several recipes/spells; a schematic (`recipe`)
+  // exactly one. List them — marking what's already known — so the sheet can
+  // be weighed before it's bought or studied (mirrors trade.js's "(known)").
+  if (tmpl.teaches || tmpl.recipe) {
+    const kr = (viewer && viewer.knownRecipes) || [];
+    const ks = (viewer && viewer.knownSpells) || [];
+    const label = (def, id, known) => `${def ? def.name : id}${known ? " (known)" : ""}`;
+    const taught = [
+      ...(tmpl.teaches ? tmpl.teaches.recipes || [] : [tmpl.recipe]).map((id) => label(w.recipes[id], id, kr.includes(id))),
+      ...(tmpl.teaches ? tmpl.teaches.spells || [] : []).map((id) => label(w.spells[id], id, ks.includes(id))),
+    ];
+    if (taught.length) lines.push(`study: learn ${taught.join(", ")}`);
+  }
+  if (tmpl.value != null) lines.push(`value: ${tmpl.value} shards · sells for ${sellValueOf(tmpl)}${opts.salePrice != null ? ` · on sale for ${opts.salePrice}` : ""}`);
+  else if (opts.salePrice != null) lines.push(`on sale for ${opts.salePrice}`); // a valueless ware still shows its price
   return lines;
 }
 
@@ -383,19 +490,11 @@ function buildExamineView(state, p, q) {
     if (!r || !r.output) continue;
     const t = w.items[r.output.template];
     if (!t || !hit(r.output.template, t.name, t.keywords)) continue;
-    const ins = (r.inputs || []).map((i) => `${i.qty || 1}× ${w.items[i.template].name}`);
-    if (r.shards) ins.push(`${r.shards} shards`);
-    const stationFix = Object.values(w.fixtures).find((x) => x.station === r.station);
-    const where = stationFix ? stationFix.name : `a ${r.station} station`;
-    const recName = r.name || rid;
+    // Just the item itself — inputs, station and the craft command live in
+    // `recipes`, so examine doesn't repeat them.
     return entity("item", r.output.template, t.name, t.description, {
       rarity: t.rarity || "common",
       lines: itemSpecLines(t, w, p),
-      hints: [
-        `Craftable${ins.length ? ` from ${ins.join(", ")}` : ""} — at ${where}.`,
-        `Make it with \`craft ${recName}\`.`,
-      ],
-      actions: [{ label: "Craft", command: `craft ${rid}` }],
     });
   }
   // Shop wares on display. Last of all — after everything you hold, perceive or
@@ -415,11 +514,11 @@ function buildExamineView(state, p, q) {
         if (!hit(o.template, t.name, t.keywords)) continue;
         if (!detailed) return entity("item", o.template, t.name, null, { dim: true, ...tooDim });
         const price = o.price != null ? o.price : buyValueOf(t);
+        // The price rides the value line (no hint) — `buy` itself is taught by
+        // the trader's own examine hint.
         return entity("item", o.template, t.name, t.description, {
           rarity: t.rarity || "common",
-          lines: itemSpecLines(t, w, p),
-          hints: [`On sale for ${price} shards — \`buy ${t.name}\`.`],
-          actions: [{ label: `Buy (${price})`, command: `buy ${o.template}` }],
+          lines: itemSpecLines(t, w, p, { salePrice: price }),
         });
       }
     }
@@ -427,4 +526,4 @@ function buildExamineView(state, p, q) {
   return null;
 }
 
-module.exports = { buildPlayerView, buildRoomView, buildExamineView, itemView, mobStatusTag };
+module.exports = { buildPlayerView, buildRoomView, buildExamineView, itemView, mobStatusTag, itemSpecLines };

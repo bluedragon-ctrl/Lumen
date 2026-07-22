@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **`examine` now tells the whole truth about an item.** The Inspect window's
+  spec lines cover everything the engine acts on: consumables show what they
+  actually do (`use: restores 8 HP, 6 mana`, heal-over-time pulses, what a
+  thornbug egg hatches) instead of a bare effect-type word; weapon `onHit`
+  riders (lifesteal, bleed, a snaring slow) and armour `evasion`/`spikes`/
+  `onDamage` answers surface with their odds; books and schematics list the
+  recipes/spells they teach, marking what's `(known)`; scrolls add a one-line
+  spell gist (mana cost, damage with your current scale bonus) and flag a
+  spell you already know; light sources show `burn time: ~m:ss from full`;
+  every slotted item names its slot on the type line (`type: armour · slot:
+  head`); and a wearable compares itself against what you have equipped in
+  that slot (`vs an iron cap: armour +1, speed +1`). Consumable action
+  prefixes unify on `use:` (the verb that always works). Examining a
+  craftable no longer repeats its inputs/station — that lives in `recipes` —
+  and a shop ware's price rides the value line (`value: 25 shards · sells
+  for 5 · on sale for 25`) instead of a hint of its own.
 - **Weapons can pierce Armour (`weapon.pierce`).** A new integer weapon field
   (mirrored on a mob's `attack.pierce`) ignores that many points of the
   defender's Armour before the physical soak — a blunt head cracking shell or
@@ -32,7 +48,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `attack.pierce` the engine already honours, mirroring the item editor's Weapon
   section.
 
+### Removed
+- **The Inspect window's Craft/Buy buttons.** Examining a craftable or a shop
+  ware no longer offers a click-to-act button — all operations go through the
+  console, which the hints already teach (`craft <recipe>`, `buy <item>`). The
+  `actions` protocol field, its client rendering, and its styles are gone.
+
 ### Changed
+- **The Inspect window's back button shrank into the header.** The full-width
+  "↩ back to room" block at the bottom of an examine view is now a compact
+  `↩ room (⌫)` control on the title line — same click, same Backspace
+  shortcut, one less row of chrome.
 - **A blunt/anti-armour weapon line now runs through every tier.** The iron
   mace previously lost to the iron sword on every axis — smaller die (1d6 vs
   1d8), slower, heavier, dearer — while its `scale` merely re-stated the default
