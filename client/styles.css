@@ -308,6 +308,9 @@ body {
 
 /* Examine view (a single entity shown in the Inspect window) */
 #ex-kind { text-transform: uppercase; letter-spacing: .06em; }
+/* Dot separators between the header items (name · rarity · kind); the hidden
+   rarity badge renders nothing, so the dots never double up. */
+#ex-rarity::before, #ex-kind::before { content: "· "; color: var(--muted); }
 .ex-bars { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
 .ex-bars .stat { gap: 8px; }
 .ex-lines { list-style: none; margin: 8px 0; padding: 0; }
