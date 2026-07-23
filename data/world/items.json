@@ -1759,24 +1759,72 @@
     "rarity": "rare",
     "name": "a dense chitin cuirass",
     "keywords": ["cuirass", "dense", "chitin", "carapace"],
-    "description": "A cuirass beaten from slabs of dense, mineral-banded chitin — the near-black, ceramic-hard plate of the deep's oldest armoured things — fitted to Mallki's pattern and bound to an iron frame. It is the heaviest thing a delver can wear and turns aside very nearly everything, but it sits like a second skeleton of stone: a body inside it lumbers, slow to move and slower to strike, and the dark has long to close before a swing comes round.",
+    "description": "A cuirass beaten from slabs of dense, mineral-banded chitin — the near-black, ceramic-hard plate of the deep's oldest armoured things — fitted to Mallki's pattern and bound to an iron frame. It is among the heaviest things a delver can wear and turns aside very nearly everything, but it sits like a second skeleton of stone: a body inside it lumbers, slow to move and slower to strike, and the dark has long to close before a swing comes round.",
     "type": "armour",
     "slot": "body",
     "weight": 12,
     "value": 80,
     "armour": { "armour": 4, "ward": 0, "speedPenalty": 2, "maxHp": 8, "attrMod": { "wits": -2 } }
   },
-  "schematic-dense-chitin-cuirass": {
-    "id": "schematic-dense-chitin-cuirass",
-    "name": "a dense chitin method",
-    "keywords": ["method", "schematic", "dense", "chitin", "cuirass"],
-    "description": "A strip of cured gut-skin marked in Mallki's careful hand — the layering of the dense black plate, the working of the iron frame, the fitting of a harness heavy enough to stop a deep-thing's charge. No words, only the sequence of steps. Study it to fix the method in memory.",
-    "type": "recipe",
-    "weight": 0,
-    "value": 45,
-    "stackable": true,
-    "recipe": "forge-dense-chitin-cuirass",
-    "rarity": "rare"
+  "dense-chitin-helm": {
+    "id": "dense-chitin-helm",
+    "rarity": "rare",
+    "name": "a dense chitin helm",
+    "keywords": ["helm", "helmet", "cap", "dense", "chitin", "carapace"],
+    "description": "A close cap beaten from the black, mineral-banded plate of the deep's oldest grinders, riveted to an iron band with fine drawn silver and fitted to Mallki's pattern. It turns very nearly anything that comes at the head — but the dense shell sits heavy and boxes the ears cold, and a delver under it hears the dark late and dim.",
+    "type": "armour",
+    "slot": "head",
+    "weight": 4,
+    "value": 48,
+    "armour": { "armour": 3, "ward": 0, "speedPenalty": 1, "maxHp": 5, "attrMod": { "wits": -2 } }
+  },
+  "dense-chitin-warplate": {
+    "id": "dense-chitin-warplate",
+    "rarity": "rare",
+    "name": "a dense chitin warplate",
+    "keywords": ["warplate", "plate", "harness", "dense", "chitin", "carapace"],
+    "description": "A full harness of dense black plate layered double over an iron frame, a whole ground crystal bound through the breast so the cold light runs in the seams — the heaviest thing a delver can stand up in. Almost nothing reaches the body inside it; but it rides like a second skeleton of stone, and a man in it lumbers half-blind and half-deaf while the dark takes its time closing the last pace.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 16,
+    "value": 130,
+    "armour": { "armour": 5, "ward": 0, "speedPenalty": 3, "maxHp": 7, "attrMod": { "wits": -4 } }
+  },
+  "dense-chitin-maul": {
+    "id": "dense-chitin-maul",
+    "rarity": "rare",
+    "name": "a dense chitin maul",
+    "keywords": ["maul", "hammer", "club", "dense", "chitin"],
+    "description": "A two-fisted head of fused black dense-plate, its striking face quenched hard in spring-salt and crowned with thornbug spikes, banded to a stout haft. It is heavier off the mark than the grey chitin maul and slower still — but where it lands it brings the ceramic weight of the deep's oldest armour down on a single point, and little plate keeps its shape under it.",
+    "type": "weapon",
+    "slot": "hand",
+    "weight": 8,
+    "value": 68,
+    "weapon": { "damage": { "physical": "2d8" }, "actionCost": 18, "scale": { "attr": "might", "per": 3 }, "twoHanded": true, "pierce": 3 }
+  },
+  "spiked-dense-chitin-armor": {
+    "id": "spiked-dense-chitin-armor",
+    "rarity": "rare",
+    "name": "spiked dense chitin armour",
+    "keywords": ["armour", "armor", "cuirass", "spiked", "barbed", "dense", "chitin"],
+    "description": "A cuirass of dense black plate studded all over with thornbug barbs, each spike bedded and set in slug-slime so it holds through a season of blows, points turned outward like a cornered pillbug grown monstrous. It guards a delver as well as the plain dense plate — and makes the dark pay dearer for every hand laid on them, the mineral-hard barbs raking deep where the grey chitin's only scratched.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 12,
+    "value": 96,
+    "armour": { "armour": 4, "ward": 0, "speedPenalty": 2, "maxHp": 6, "attrMod": { "wits": -2 }, "spikes": { "damage": "1d6", "chance": 1 } }
+  },
+  "dense-chitin-shield": {
+    "id": "dense-chitin-shield",
+    "rarity": "rare",
+    "name": "a dense chitin shield",
+    "keywords": ["shield", "board", "round", "dense", "chitin", "scute"],
+    "description": "A round of dense black plate banded to an iron rim, a chip of glimmer bedded cold at the boss to Mallki's pattern — lighter than the great tower-board and quicker to the block, though it drags where the grey chitin shield rode springy. It soaks a deep-thing's charge into the ceramic shell instead of the arm behind it, and the banded hood sits close over the brow.",
+    "type": "armour",
+    "slot": "shield",
+    "weight": 8,
+    "value": 88,
+    "armour": { "armour": 2, "ward": 0, "speedPenalty": 1, "maxHp": 5, "attrMod": { "wits": -1 } }
   },
   "schematic-dense-chitin-tower-shield": {
     "id": "schematic-dense-chitin-tower-shield",
@@ -1943,6 +1991,18 @@
     "stackable": true,
     "teaches": { "recipes": ["forge-chitin-helm", "forge-chitin-cuirass", "forge-heavy-chitin-plate", "forge-chitin-maul", "forge-spiked-chitin-armor", "forge-chitin-shield"] },
     "rarity": "uncommon"
+  },
+  "book-of-dense-chitin-craft": {
+    "id": "book-of-dense-chitin-craft",
+    "rarity": "rare",
+    "name": "a book of dense chitin craft",
+    "keywords": ["book", "treatise", "dense", "chitin", "deep-craft"],
+    "description": "A thick sheaf of cured gut-skin bound in iron wire, the whole working of the black plate set down in the stonewright's sure hand — how to prise and layer the dense, mineral-banded shell of the deep's oldest things, frame it to iron, and bed glimmer and silver and salt-quench into gear that turns aside very nearly everything the dark can bring. The deep-craft entire, and priced like it. Study it to learn the whole dense-chitin line at once.",
+    "type": "book",
+    "weight": 1,
+    "value": 800,
+    "stackable": true,
+    "teaches": { "recipes": ["forge-dense-chitin-helm", "forge-dense-chitin-cuirass", "forge-dense-chitin-warplate", "forge-dense-chitin-maul", "forge-spiked-dense-chitin", "forge-dense-chitin-shield", "forge-dense-chitin-tower-shield"] }
   },
   "book-of-glimmersteel": {
     "id": "book-of-glimmersteel",
