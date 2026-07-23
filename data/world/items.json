@@ -57,6 +57,18 @@
     "light": { "output": 4, "fuelMax": 360, "burnPerTick": 1 },
     "rarity": "uncommon"
   },
+  "coldglow-lamp": {
+    "id": "coldglow-lamp",
+    "name": "a coldglow lamp",
+    "keywords": ["coldglow", "lamp", "gland", "umbral", "light"],
+    "description": "A stoppered vessel of worked stone and river-shell, a live lightbug gland sealed cold behind a pane of thin horn. It throws no flame and casts only a soft blue-green glow — light enough to walk and work by, too little to sting a deep-adapted eye or to draw the dark's notice the way a flame does. The Umbrals carry these where the bright-folk carry fire; the gland's glow fades in time, and a fresh one fed in behind the horn brings it back.",
+    "type": "light",
+    "slot": "light",
+    "weight": 1,
+    "value": 40,
+    "light": { "output": 2, "fuelMax": 500, "burnPerTick": 0.5, "fuelItem": "luminescent-gland", "refuelPerUnit": 500 },
+    "rarity": "uncommon"
+  },
   "short-sword": {
     "id": "short-sword",
     "name": "a short sword",
@@ -1311,6 +1323,18 @@
     "stackable": true,
     "teaches": { "recipes": ["hearty-broth", "deep-stew"] }
   },
+  "book-of-umbral-cooking": {
+    "id": "book-of-umbral-cooking",
+    "name": "a book of Umbral cooking",
+    "keywords": ["book", "umbral", "cooking", "cookbook", "qhatuq"],
+    "description": "A folded sheaf of cured gut-skin leaves, marked in the qhatuq's careful hand and the rounded glyphs of the deep-folk — the cold cookery of the Umbral set down plain: the salt-curing of challwa, the long patient leaching of the witchglow cap, the pressing of a glimmer ration for the road. No fire in any of it, only the deep-folk's patience. Study it to fix the lot in memory.",
+    "type": "book",
+    "weight": 1,
+    "value": 60,
+    "stackable": true,
+    "teaches": { "recipes": ["cured-challwa", "witchglow-relish", "glimmer-ration"] },
+    "rarity": "uncommon"
+  },
   "book-of-emberfruit": {
     "id": "book-of-emberfruit",
     "name": "the Book of Emberfruit",
@@ -1578,6 +1602,42 @@
       "flavour": "You drink the beer down. It is thin and bitter, but a little of the day's weight lifts with it.",
       "effect": { "type": "restore", "hp": 2, "mana": 4 }
     }
+  },
+  "cured-challwa": {
+    "id": "cured-challwa",
+    "name": "a fold of cured challwa",
+    "keywords": ["challwa", "fish", "cured", "umbral", "food"],
+    "description": "The blind river-fish the deep-folk call challwa, split and salt-cured cold against the stone until the flesh firms and takes a faint blue sheen from the water it swam in. No fire touches it — the Umbral way is patience, not flame — and it keeps for a long haul folded in a leaf of dried moss. It eats clean and cold, and sits honest in the belly.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 11,
+    "stackable": true,
+    "consumable": { "flavour": "You eat the cured challwa in cool, firm slices. Clean and faintly briny, it fills the hollow under your ribs and steadies you.", "effect": { "type": "restore", "hp": 9, "mana": 2 } },
+    "rarity": "uncommon"
+  },
+  "witchglow-relish": {
+    "id": "witchglow-relish",
+    "name": "a pot of witchglow relish",
+    "keywords": ["witchglow", "relish", "paste", "umbral", "food"],
+    "description": "Witchglow caps steeped and pressed the deep-folk's careful way — the poison drawn off in changes of cold water over days, the faint cold glow left in — worked to a soft green paste with palecap and potted in worked stone. A surface cook would not dare the cap raw; the Umbral have eaten it safely since long before the Rush. Taken slow, its lingering warmth mends a body over the hour that follows.",
+    "type": "consumable",
+    "weight": 1,
+    "value": 13,
+    "stackable": true,
+    "consumable": { "flavour": "You eat a little of the relish. It is cool and faintly bitter, with a slow glow that settles under the skin and works at your hurts for a while after.", "effect": { "type": "heal-over-time", "name": "Witchglow", "magnitude": 2, "interval": 3, "duration": 24, "good": true } },
+    "rarity": "uncommon"
+  },
+  "glimmer-ration": {
+    "id": "glimmer-ration",
+    "name": "a glimmer ration",
+    "keywords": ["glimmer", "ration", "cake", "loaf", "umbral", "food"],
+    "description": "A dense, dark cake the deep-folk press for the long walks between kept places — ground palecap and bug-tallow bound cold around a worked luminescent gland, so a thread of the deep's own light is folded through the whole of it. It glows faintly where it is broken. Cold and close and filling, it feeds the will as much as the body — the Umbral answer to a long haul for anyone who spends the glimmer in the dark.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 14,
+    "stackable": true,
+    "consumable": { "flavour": "You break off a piece of the glimmer ration and eat it slowly. Dense and cold and faintly glowing, it fills you and sends the will flooding back to spend again.", "effect": { "type": "restore", "mana": 12, "hp": 4 } },
+    "rarity": "uncommon"
   },
   "venom-gland": {
     "id": "venom-gland",

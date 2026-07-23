@@ -415,6 +415,14 @@
     "type": "crafting",
     "station": "smithing"
   },
+  "umbral-curing-bench": {
+    "id": "umbral-curing-bench",
+    "name": "an Umbral curing-bench",
+    "keywords": ["bench", "curing", "kitchen", "larder", "cooking", "umbral"],
+    "description": "Not a cook-fire like the surface keeps, but a long bench of fitted stone hung with drying-racks and set with steeping-jars of cold river-water, a low knot of glimmer breathing blue-white beneath to hold the chill even. This is where the deep-folk make their food the way they make everything — cold, patient, and without a lick of flame: challwa salt-cured, the witchglow cap leached safe, rations pressed for the long dark. A delver with the knowing of a recipe and the makings to hand may work it the same way.",
+    "type": "crafting",
+    "station": "cooking"
+  },
   "fulgurite-vein": {
     "id": "fulgurite-vein",
     "name": "a seam of fulgurite",
