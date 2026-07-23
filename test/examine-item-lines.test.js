@@ -50,6 +50,12 @@ test("examine lines: heal-over-time consumable shows magnitude, pulse, duration"
   assert.ok(itemSpecLines(t, world, viewer).includes("use: 3 HP every 3 ticks for 0:24"));
 });
 
+test("examine lines: a reflect (Fire Shield) consumable shows the burn-back and duration", () => {
+  const t = { type: "consumable", consumable: { effect: { type: "reflect", name: "Fire Shield", duration: 90,
+    onDamage: [{ type: "damage", damage: "1d4", target: "attacker", on: ["melee"] }] } } };
+  assert.ok(itemSpecLines(t, world, viewer).includes("use: melee attackers take 1d4 damage back for 1:30"));
+});
+
 test("examine lines: summon consumable names what hatches", () => {
   const t = { type: "consumable", consumable: { effect: { type: "summon", mob: "baby-thornbug" } } };
   const lines = itemSpecLines(t, world, viewer);

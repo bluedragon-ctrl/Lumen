@@ -235,9 +235,11 @@ function main() {
   // pet path — see commands.drink), mirroring the spell effect of the same name.
   // `attr-buff` grants flat attribute bonuses for a duration (its `attrMod` is
   // folded into effectiveAttributes while the status is live — see combat-math).
-  // None is valid on a weapon onHit/onDamage trigger, so they live apart from
-  // EFFECT_TYPES.
-  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time", "summon", "attr-buff"];
+  // `reflect` is a timed retaliation buff carrying its own `onDamage` list (a Fire
+  // Shield potion): while it holds, playerOnDamage/mobOnDamage gather its reflects
+  // exactly as they do a spiked-armour's. None is valid on a weapon onHit/onDamage
+  // trigger, so they live apart from EFFECT_TYPES.
+  const CONSUMABLE_EFFECT_TYPES = [...EFFECT_TYPES, "damage-room", "heal-over-time", "summon", "attr-buff", "reflect"];
   const ATTRS = ["might", "vitality", "intellect", "wits", "perception"];
   const RARITIES = ["common", "uncommon", "rare", "epic", "legendary"];
 
@@ -409,6 +411,15 @@ function main() {
           if (!eff.mob || !has(mobs, eff.mob)) errs.push(`item ${id}: summon effect references missing mob ${eff.mob}`);
           if (eff.count != null && (!Number.isInteger(eff.count) || eff.count < 1))
             errs.push(`item ${id}: effect.count must be a positive integer`);
+        }
+        // A `reflect` buff (Fire Shield) grants a timed retaliation: it must carry a
+        // non-empty `onDamage` list (validated exactly as a mob/armour onDamage list)
+        // and a duration — a permanent reflect belongs on gear, not a potion.
+        if (eff.type === "reflect") {
+          if (!Array.isArray(eff.onDamage) || !eff.onDamage.length)
+            errs.push(`item ${id}: reflect effect needs a non-empty onDamage array`);
+          else checkOnDamage(eff.onDamage, `item ${id} reflect`);
+          if (eff.duration == null) errs.push(`item ${id}: reflect effect must set a duration (ticks)`);
         }
       }
     }

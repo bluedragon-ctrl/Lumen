@@ -140,6 +140,28 @@ test("craft asks on a dead-even tie between known recipes", () => {
   assert.equal(countItem(p, "rion_ore"), 2, "nothing was consumed");
 });
 
+test("craft on an outright name match picks it over a longer-named subset", () => {
+  // "Rion Bar" and "Rion Bar Ingot" both answer "rion bar" as keywords, but only
+  // the first is named in FULL — the query outright names it, so it wins even
+  // though the ingot is the affordable one at hand. (Mirrors Glimmer Dust vs
+  // Pressed Glimmer Dust: typing the full name of one must not tie with the
+  // other that merely contains those words.)
+  const state = new GameState(makeCraftWorld({ fixtures: ["furnace"], oreQty: 2, sells: [] }));
+  state.world.recipes.rion_bar_ingot = {
+    id: "rion_bar_ingot", name: "Rion Bar Ingot", station: "furnace",
+    inputs: [], shards: 0, output: { template: "rion_bar" },
+  };
+  const p = state.createCharacter("Smith");
+  state.admit(p);
+  state.setPlayerLocation(p, "forge");
+  p.knownRecipes = ["rion_bar", "rion_bar_ingot"];
+  p.inventory = []; // hold no ore — so only the input-free ingot is "affordable"
+  const out = craft(state, p, "rion bar", NOOP_CTX);
+  assert.equal(out[0].type, "error");
+  assert.match(out[0].text, /You need 2× a lump of rion ore/,
+    `outright names Rion Bar (needs ore), not the affordable ingot: ${JSON.stringify(out[0])}`);
+});
+
 test("craft suggests the nearest known recipe on a typo", () => {
   const { state, p } = setup();
   const out = craft(state, p, "rion barr", NOOP_CTX);

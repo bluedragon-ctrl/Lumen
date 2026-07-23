@@ -110,6 +110,30 @@ test("melee: a reflect that KILLS the attacker wakes the player but does not ret
   assert.equal(p.pending, null, "no pending set against the corpse");
 });
 
+test("reflect: a Fire Shield STATUS effect burns a melee attacker, exactly like spiked gear", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  p.hp = 100; p.posture = "standing";
+  // A drunk Fire Shield potion: a timed buff carrying its own onDamage reflect
+  // (50 back at any melee hit — enough to fell the maxHp-5 biter). The engine must
+  // gather this from p.states, not only from worn armour.
+  const ok = state.applyEffect(p, { type: "reflect", name: "Fire Shield", duration: 90, refresh: true,
+    onDamage: [{ type: "damage", damage: "50", cause: "fire shield", target: "attacker", on: ["melee"] }] });
+  assert.ok(ok && (p.states || []).some((s) => s.type === "reflect"), "the buff took hold");
+  const mob = addMob(state, "biter");
+  state._mobAttack(mob, state.world.mobs.biter, "arena", [], [pdesc(p)]);
+  assert.ok(!state.rooms.arena.mobs.includes(mob), "the buff's reflect killed the melee attacker");
+});
+
+test("reflect: with the Fire Shield lapsed, the same blow reflects nothing (control)", () => {
+  const state = setup();
+  const p = addPlayer(state);
+  p.hp = 100; p.posture = "standing"; // no buff applied
+  const mob = addMob(state, "biter");
+  state._mobAttack(mob, state.world.mobs.biter, "arena", [], [pdesc(p)]);
+  assert.ok(state.rooms.arena.mobs.includes(mob), "no reflect without the buff — the attacker is unharmed");
+});
+
 test("melee: mob-vs-mob neither rouses nor auto-starts a player", () => {
   const state = setup();
   const attacker = addMob(state, "biter");

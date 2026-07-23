@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **A craftable full `light-potion`.** New alchemy recipe (`luminescent-gland ×1 + spring-salt ×2 + vial`, 3 shards) for the bright, long-lived light potion — the spring-salt scraped off the geyser terraces acts as the fixative that holds the glow, giving the previously-unused `spring-salt` a purpose. Sold as **`schematic-light-potion`** ("a light potion recipe") by Corvane at Lastlight.
+- **Retaliation buffs, and the first one — a fire-shield potion.** Status effects can now carry their own `onDamage` triggers, so a *drink* (or a future spell/ward) can grant thorns for a while, exactly the way spiked armour already does (`playerOnDamage`/`mobOnDamage` now gather reflects from live states, not only worn gear). The debut: **`fire-shield-potion`** (uncommon) — a timed *Fire Shield* (~90 ticks) that burns any melee attacker for `1d4` when they hit you; a reflect that fells its attacker even credits the kill. Crafted at an alchemy bench from the two previously-unused ember reagents — `firescale ×2 + spring-salt ×1 + vial` (3 shards) — and sold as **`schematic-fire-shield-potion`** by Corvane at Lastlight. `examine` shows the burn-back and duration.
 - **The Umbral village qhatuq is now a working store, and the deep-folk keep a cold cuisine.** The market qhatuq (depth 10) sells the raw deep larder — oil, bug-tallow, palecap, witchglow cap, luminescent gland and blind cave-fish — plus a new **coldglow lamp** and the whole Umbral kitchen.
   - **`coldglow-lamp`** (uncommon) — a torch alternative the Umbrals use: a lightbug gland sealed cold behind horn, no flame. Casts only *dim* light (output 2), but burns far longer (1000 ticks/charge) and refuels on a `luminescent-gland` — a quiet stalking-light that draws less of the dark's notice than a bright torch.
   - **Umbral cold-cooking** — three no-fire foods with a `book of Umbral cooking` that teaches all three, and a new **`umbral-curing-bench`** cooking station in the market so a prospector can buy the book and the makings and cook on the spot: *cured challwa* (restore 9 HP / 2 mana), *witchglow relish* (a slow heal-over-time; the deep-folk's trick of leaching the cap safe), and a *glimmer ration* (mana-forward travel food, restore 12 mana / 4 HP). The foods are also sold ready-made.
@@ -86,6 +87,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ware no longer offers a click-to-act button — all operations go through the
   console, which the hints already teach (`craft <recipe>`, `buy <item>`). The
   `actions` protocol field, its client rendering, and its styles are gone.
+
+### Fixed
+- **`craft` no longer stalls on a name that fully matches one recipe but sits
+  inside another.** With both recipes known, `craft glimmer dust` used to refuse
+  with *"Which do you mean: Glimmer Dust or Pressed Glimmer Dust?"* — the matcher
+  scored an outright name match the same as a longer name that merely contained
+  those words, so the two tied. Name resolution (`matchRank`) now ranks an
+  outright match (the query covers the thing's whole name) above a subset match,
+  and `craft` treats an outright/id match as the deliberate choice it is — it
+  wins over the here-and-now station/affordability bonuses, so typing a recipe's
+  full name always picks that recipe.
 
 ### Changed
 - **The Inspect window's back button shrank into the header.** The full-width
