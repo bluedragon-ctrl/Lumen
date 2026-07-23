@@ -83,6 +83,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   console, which the hints already teach (`craft <recipe>`, `buy <item>`). The
   `actions` protocol field, its client rendering, and its styles are gone.
 
+### Fixed
+- **`craft` no longer stalls on a name that fully matches one recipe but sits
+  inside another.** With both recipes known, `craft glimmer dust` used to refuse
+  with *"Which do you mean: Glimmer Dust or Pressed Glimmer Dust?"* — the matcher
+  scored an outright name match the same as a longer name that merely contained
+  those words, so the two tied. Name resolution (`matchRank`) now ranks an
+  outright match (the query covers the thing's whole name) above a subset match,
+  and `craft` treats an outright/id match as the deliberate choice it is — it
+  wins over the here-and-now station/affordability bonuses, so typing a recipe's
+  full name always picks that recipe.
+
 ### Changed
 - **The Inspect window's back button shrank into the header.** The full-width
   "↩ back to room" block at the bottom of an examine view is now a compact
