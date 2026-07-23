@@ -65,6 +65,7 @@ class EffectsMixin {
       attrMod: spec.attrMod || null, // flat attribute bonuses, for "attr-buff" (folded into effectiveAttributes)
       maxHp: spec.maxHp || 0, // flat, timed max-HP bonus (a "fortify" buff — see _stateHpBonus / _refreshMaxHp)
       interval: spec.interval || null, // ticks between pulses, for periodic effects (heal-over-time)
+      onDamage: Array.isArray(spec.onDamage) ? spec.onDamage : null, // reflect/retaliate triggers a buff grants while it holds (Fire Shield) — see combat-math stateOnDamage
       pulse: 0, // counts ticks toward the next pulse (see _tickEffects)
       sourceId: spec.sourceId || null, // player to credit if a DoT lands the kill
       source: spec.source || null, // "item" = sustained by worn/carried gear; survives death

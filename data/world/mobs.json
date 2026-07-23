@@ -2391,7 +2391,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "minor-light-potion" }, { "template": "light-potion" }, { "template": "regeneration-draught" }, { "template": "mana-tonic" }, { "template": "glimmer-dust" }, { "template": "scroll-cleanse" }, { "template": "scroll-purge" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }]
+      "sells": [{ "template": "minor-light-potion" }, { "template": "light-potion" }, { "template": "regeneration-draught" }, { "template": "mana-tonic" }, { "template": "glimmer-dust" }, { "template": "scroll-cleanse" }, { "template": "scroll-purge" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }, { "template": "schematic-fire-shield-potion" }]
     }
   },
   "camp-healer": {

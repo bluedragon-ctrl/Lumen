@@ -81,6 +81,18 @@
     "shards": 1,
     "output": { "template": "acid-bomb", "qty": 1 }
   },
+  "fire-shield-potion": {
+    "id": "fire-shield-potion",
+    "name": "Fire Shield Potion",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "firescale", "qty": 2 },
+      { "template": "spring-salt", "qty": 1 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "fire-shield-potion", "qty": 1 }
+  },
   "craft-barbed-bomb": {
     "id": "craft-barbed-bomb",
     "name": "Barbed Bomb",

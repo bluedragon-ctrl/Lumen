@@ -772,6 +772,20 @@
     "stackable": true,
     "consumable": { "effect": { "type": "emit-light", "name": "Light", "magnitude": 3, "duration": 360 } }
   },
+  "fire-shield-potion": {
+    "id": "fire-shield-potion",
+    "rarity": "uncommon",
+    "name": "a fire-shield potion",
+    "description": "A vial of firescale ground fine and quenched in a bitter wash of spring-salt, still warm to the touch through the glass. Drink it and a thin skin of heat clings to you a while — every blow that lands flares back into the striker, so that hitting you costs them a scorching of their own.",
+    "type": "consumable",
+    "weight": 0,
+    "value": 45,
+    "stackable": true,
+    "consumable": {
+      "flavour": "You drink it down. A dry heat sheathes your skin and the air about you shimmers — let something strike you now, and it will burn for it.",
+      "effect": { "type": "reflect", "name": "Fire Shield", "duration": 90, "refresh": true, "good": true, "onDamage": [{ "type": "damage", "damage": "1d4", "cause": "fire shield", "target": "attacker", "on": ["melee"] }] }
+    }
+  },
   "regeneration-draught": {
     "id": "regeneration-draught",
     "rarity": "uncommon",
@@ -1301,6 +1315,17 @@
     "value": 25,
     "stackable": true,
     "recipe": "acid-bomb",
+    "rarity": "uncommon"
+  },
+  "schematic-fire-shield-potion": {
+    "id": "schematic-fire-shield-potion",
+    "name": "a fire shield recipe",
+    "description": "A scorch-marked page in Corvane's sprawling hand — firescale ground to a dust and quenched in spring-salt so the heat sets instead of spending itself, drawn off into a draught that throws a struck blow back at whoever lands it. He has underlined \"quench SLOW\" three times. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 45,
+    "stackable": true,
+    "recipe": "fire-shield-potion",
     "rarity": "uncommon"
   },
   "book-of-cooking": {

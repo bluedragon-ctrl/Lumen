@@ -314,6 +314,12 @@ function itemSpecLines(tmpl, w, viewer, opts = {}) {
       lines.push(`use: ${mods.join(", ")} for ${fmtDuration(eff.duration)}`);
     }
     else if (eff.type === "damage-room") lines.push(`throw: ${eff.damage}${eff.damageType ? ` ${eff.damageType}` : ""} damage to every foe in the room (single use)`);
+    else if (eff.type === "reflect" && Array.isArray(eff.onDamage)) {
+      const dmg = eff.onDamage.find((o) => o.type === "damage");
+      lines.push(dmg
+        ? `use: melee attackers take ${dmg.damage} damage back for ${fmtDuration(eff.duration)}`
+        : `use: reflects harm for ${fmtDuration(eff.duration)}`);
+    }
     else lines.push(`use: ${eff.type}`);
   }
   if (tmpl.scroll && tmpl.scroll.spell) {
