@@ -15,10 +15,13 @@ function craft(state, player, arg, ctx) {
   // Rank every recipe the query could mean instead of taking the first name
   // match in definition order (which made `craft bar` refuse over an unlearned
   // Barbed Bomb while you stood at the smelter with iron ore). Knowing the
-  // recipe dominates everything; then whatever you could craft right now —
-  // being at its station and holding its inputs each lift the score — and a
-  // whole-word match ("bar" in Iron Bar) beats a mere prefix ("bar" in
-  // Barbed). Ties keep world definition order.
+  // recipe dominates everything; then an OUTRIGHT name match (rank ≥ 3 — the
+  // query names the recipe in full, or by id) — a deliberate, unambiguous
+  // naming — dominates the here-and-now convenience bonuses, so `craft glimmer
+  // dust` picks Glimmer Dust even when Pressed Glimmer Dust is the one you can
+  // afford. Only then do the conveniences decide: being at its station and
+  // holding its inputs each lift the score, and a whole-word match ("bar" in
+  // Iron Bar) beats a mere prefix ("bar" in Barbed). Ties keep world order.
   const known = new Set(player.knownRecipes || []);
   const here = new Set(state.rooms[player.location].fixtures.map((f) => w.fixtures[f.template] && w.fixtures[f.template].station));
   let entry = null, best = 0, ties = [];
@@ -27,6 +30,7 @@ function craft(state, player, arg, ctx) {
     if (!rank) continue;
     const score = rank
       + (known.has(id) ? 1000 : 0)
+      + (rank >= 3 ? 500 : 0)
       + (here.has(r.station) ? 100 : 0)
       + (canAfford(player, r) ? 100 : 0);
     if (score > best) { entry = [id, r]; best = score; ties = [r.name || id]; }
