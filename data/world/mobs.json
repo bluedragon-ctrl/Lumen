@@ -2391,7 +2391,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "minor-light-potion" }, { "template": "light-potion" }, { "template": "regeneration-draught" }, { "template": "mana-tonic" }, { "template": "glimmer-dust" }, { "template": "scroll-cleanse" }, { "template": "scroll-purge" }, { "template": "scroll-aegis" }, { "template": "scroll-chorus-of-mending" }, { "template": "scroll-iron-skin" }, { "template": "scroll-iron-blast" }, { "template": "scroll-flame-burst" }, { "template": "schematic-light-potion" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }, { "template": "schematic-starsilver" }]
+      "sells": [{ "template": "minor-light-potion" }, { "template": "light-potion" }, { "template": "regeneration-draught" }, { "template": "mana-tonic" }, { "template": "glimmer-dust" }, { "template": "scroll-cleanse" }, { "template": "scroll-purge" }, { "template": "scroll-iron-skin" }, { "template": "scroll-iron-blast" }, { "template": "scroll-flame-burst" }, { "template": "schematic-light-potion" }, { "template": "schematic-regeneration-draught" }, { "template": "schematic-mana-tonic" }, { "template": "schematic-acid-bomb" }, { "template": "schematic-starsilver" }]
     }
   },
   "camp-healer": {
@@ -2433,7 +2433,7 @@
       ] }
     ],
     "shop": {
-      "sells": [{ "template": "scroll-regeneration" }, { "template": "scroll-chorus-of-mending" }, { "template": "scroll-halo" }, { "template": "scroll-candlelight" }, { "template": "scroll-mage-armour" }, { "template": "regeneration-draught" }]
+      "sells": [{ "template": "scroll-regeneration" }, { "template": "scroll-chorus-of-mending" }, { "template": "scroll-aegis" }, { "template": "scroll-halo" }, { "template": "scroll-candlelight" }, { "template": "scroll-mage-armour" }, { "template": "regeneration-draught" }]
     }
   },
   "the-gloamback": {

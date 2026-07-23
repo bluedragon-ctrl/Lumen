@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
-- **Corvane's bench (Lastlight, depth 10) becomes the deep's practical caster-supply.** Moved the six utility/combat scrolls off Vesper the glimmer-mage (surface) down to Corvane — **Aegis, Purge, the Mending Chorus, Iron Blast, Iron Skin, Flame Burst** — so a delver already ten floors down can restock without the long climb. Also moved the **starsilver alloy schematic** from Tobin the tinker-smith to Corvane.
+- **Lastlight (depth 10) becomes the deep's practical caster-supply.** Moved the six utility/combat scrolls off Vesper the glimmer-mage (surface) down to the frontline camp, so a delver already ten floors down can restock without the long climb: **Purge, Iron Blast, Iron Skin, Flame Burst** to Corvane the alchemist, and the defensive **Aegis** and **Mending Chorus** to Wren the mender (who already kept the Chorus). Also moved the **starsilver alloy schematic** from Tobin the tinker-smith to Corvane.
 
 ### Added
 - **A craftable full `light-potion`.** New alchemy recipe (`luminescent-gland ×1 + spring-salt ×2 + vial`, 3 shards) for the bright, long-lived light potion — the spring-salt scraped off the geyser terraces acts as the fixative that holds the glow, giving the previously-unused `spring-salt` a purpose. Sold as **`schematic-light-potion`** ("a light potion recipe") by Corvane at Lastlight.
