@@ -3105,8 +3105,8 @@
     "name": "The Moss Terraces",
     "depth": 10,
     "ambientLight": 1,
-    "description": "West of the common the floor climbs in worked terraces against the cavern wall, each step furred with a tended, even crop of luminous fungus and hung with long curtains of weeping chasm-moss that the deep-folk train down the wet stone and crop for its silk. The light here is soft and damp and green, and the rot at the foot of the terraces is rich: pale grubs chew slow trails through it, the quiet cleaners doing here in the kept calm what they do under any glow. A stonebug grinds among them, unhurried, and the lightbugs drift in over the steps and out again. The common lies back east.",
-    "exits": { "east": "d10.fields.commons" },
+    "description": "West of the common the floor climbs in worked terraces against the cavern wall, each step furred with a tended, even crop of luminous fungus and hung with long curtains of weeping chasm-moss that the deep-folk train down the wet stone and crop for its silk. The light here is soft and damp and green, and the rot at the foot of the terraces is rich: pale grubs chew slow trails through it, the quiet cleaners doing here in the kept calm what they do under any glow. A stonebug grinds among them, unhurried, and the lightbugs drift in over the steps and out again. The common lies back east; west, past the last of the tended steps, a squared-off cut of worked stone breaks the fungus and the green gives way to old timber and the cold breath of a mine.",
+    "exits": { "east": "d10.fields.commons", "west": "d10.delvings.adit" },
     "fixtures": ["weeping-moss-curtain", "pale-cluster"],
     "groundItems": [],
     "spawns": [
@@ -3505,6 +3505,259 @@
         },
         "message": "The seam takes your light the instant you drop into it — the flame gutters out as though the dark reached up and pinched it, and something vast shifts in the black to meet you."
       }
+    ]
+  },
+  "d10.delvings.adit": {
+    "id": "d10.delvings.adit",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Timbered Adit",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The tended green stops at a squared mouth of worked stone, and the mine begins. Old timber sets shore up the roof in a receding line of frames, grey and dry with age but sound, and a single Umbral glimmer-lamp still burns in its cradle by the entrance — kept lit, though nothing much comes and goes beneath it now. A tally of shifts is cut into the jamb in the deep-folk's rounded strokes, close and crowded near the top and thinning to a scatter lower down, where fewer and fewer have signed the stone. The lightfields lie back east; the cut runs on west, down into the dark and the cold breath of the workings.",
+    "exits": { "east": "d10.fields.terraces", "west": "d10.delvings.landing" },
+    "fixtures": ["umbral-coldlamp", "umbral-pillar"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "grub", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d10.delvings.landing": {
+    "id": "d10.delvings.landing",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Cabled Landing",
+    "depth": 10,
+    "ambientLight": 1,
+    "description": "The adit opens into a worked chamber where the mine gathers itself before it splits. A great winch of fitted stone and dark timber stands over a squared shaft in the floor, its drum wound with silver-grey cable gone stiff, the crank-handle worn smooth and freshly greased against the cold — someone still tends it. A cold glimmer-lamp fills the room with its even blue-white. Steps hewn into the wall climb up toward the old played-out drifts; the shaft and its cable drop away down into the working levels; the adit runs back east toward the light.",
+    "exits": { "east": "d10.delvings.adit", "up": "d9.delvings.updrift", "down": "d10.delvings.haulage" },
+    "fixtures": ["umbral-coldlamp", "umbral-pillar"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d9.delvings.updrift": {
+    "id": "d9.delvings.updrift",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Played-Out Drift",
+    "depth": 9,
+    "ambientLight": 0,
+    "description": "A low, level drift runs off along an old seam, worked out long ago and left to the dark. The silver here is all but gone — only a pale ghost of it threads the walls now, picked at at down the years until the swing stopped being worth the arm. Timber sets march away into the black, and the floor is soft with the grit of generations of digging. It is quiet, and it is safe enough; the deep-folk still send the old and the patient up here to work the last of the thin stuff. The landing lies back down the steps; the drift bends west.",
+    "exits": { "down": "d10.delvings.landing", "west": "d9.delvings.sorting" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "tremor-mole", "max": 2, "respawn": 150 },
+      { "mob": "grub", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d9.delvings.sorting": {
+    "id": "d9.delvings.sorting",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Sorting Floor",
+    "depth": 9,
+    "ambientLight": 1,
+    "description": "The drift widens into a worked floor where the ore was picked and sorted before it went up. Long stone tables stand in rows, their surfaces worn into shallow bowls by the ages of hands that have hunched over them, and beside the nearest a low stool waits and a half-picked pile of grey rock sits under a lit glimmer-lamp — a shift broken off partway, as though whoever sat here only stepped away. But the dust has settled thick over the leavings, and no one has come back to finish. The drift runs back east; a cut climbs north toward the old upper stope.",
+    "exits": { "east": "d9.delvings.updrift", "north": "d9.delvings.oldstope" },
+    "fixtures": ["umbral-coldlamp", "silver-vein"],
+    "groundItems": [
+      { "template": "silver-ore", "qty": 2 }
+    ],
+    "spawns": [
+      { "mob": "grub", "max": 2, "respawn": 150 },
+      { "mob": "stonebug", "max": 1, "respawn": 250 }
+    ]
+  },
+  "d9.delvings.oldstope": {
+    "id": "d9.delvings.oldstope",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Old Stope",
+    "depth": 9,
+    "ambientLight": 0,
+    "description": "The oldest cut in the delvings, and the first the deep-folk ever opened here — a tall, ragged void hollowed out of the rock where a whole seam was chased up and out until nothing was left but the shape of its going. The walls climb away into a dark the lamp cannot find the top of, scored top to bottom with the old, sure pick-work of hands long dead. It is worked out and quiet, kept only as a road to nowhere now. A tremor-mole or two noses the grit for what the diggers missed. The sorting floor lies back south.",
+    "exits": { "south": "d9.delvings.sorting" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "tremor-mole", "max": 2, "respawn": 150 }
+    ]
+  },
+  "d10.delvings.haulage": {
+    "id": "d10.delvings.haulage",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Haulage Way",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "The shaft-foot opens into a broad haulage way, the main road of the working level, where the ore was hauled up out of the deep toward the winch. A twin track of worn stone rails runs down the middle of the floor, and a single ore-cart sits derailed and canted against the wall, its bed still a third full of grey rock nobody came back for. The dark here is real dark now — past the reach of the deep-folk's lamps, this is a place a delver brings their own light. The landing shaft climbs back up; the way runs west to the pumps and south toward the great stope, and the ground trembles now and then with something moving through the stone.",
+    "exits": { "up": "d10.delvings.landing", "west": "d10.delvings.pumphouse", "south": "d10.delvings.greatstope" },
+    "fixtures": ["umbral-pillar"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "great-tremor-mole", "max": 1, "respawn": 250 },
+      { "mob": "tremor-mole", "max": 1, "respawn": 180 }
+    ]
+  },
+  "d10.delvings.pumphouse": {
+    "id": "d10.delvings.pumphouse",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Pump Gallery",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "A side gallery given over to the engine that kept the deep dry: a great stone-and-timber pump squats over a sump-hole in the floor, its long rocker-beam stilled halfway through a stroke, the leathers on its piston perished to cracked black scraps. This is what held the flood off the lower levels — and now that no one works it, the water is winning, and a wet, mineral cold seeps up out of the dark below. Something bright and slow has crept up the wet stone from the sump. The haulage way lies back east; a cut runs south to the old camp.",
+    "exits": { "east": "d10.delvings.haulage", "south": "d10.delvings.camp" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "shining-ooze", "max": 1, "respawn": 220 },
+      { "mob": "great-tremor-mole", "max": 1, "respawn": 250 }
+    ]
+  },
+  "d10.delvings.camp": {
+    "id": "d10.delvings.camp",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Miners' Camp",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "A dry alcove off the workings where the deep-folk kept a camp for the long shifts below — the last held ground before the mine turns dangerous. A shuttered glimmer-lamp sits dark in its cradle, banked by the last hand out the way you bank a fire you mean to come back to. An Umbral curing-bench stands against the wall, its drying-racks and steeping-jars still in order, cold and patient and ready to work. Someone kept this place against the deep for a long time; fewer keep it now. It is quiet, and nothing hunts here. The pump gallery lies back north.",
+    "exits": { "north": "d10.delvings.pumphouse" },
+    "fixtures": ["delvings-coldlamp", "umbral-curing-bench"],
+    "groundItems": [],
+    "spawns": []
+  },
+  "d10.delvings.greatstope": {
+    "id": "d10.delvings.greatstope",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Great Stope",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "The working heart of the delvings: a vast open cut where the richest silver of the upper level was taken out in great stepped benches that climb away into the dark on every side. Silver still threads the raw faces here in cool, pale seams, bright against the rust-dark rock — good ore, and plenty of it, left in the ground when the deep grew too dangerous to work. The vastness swallows a delver's light and gives back only the near faces and the drop of the benches. The haulage way lies back north; a crosscut runs west along a seam, and east the cut narrows toward a worked silver face.",
+    "exits": { "north": "d10.delvings.haulage", "west": "d10.delvings.crosscut", "east": "d10.delvings.silverface" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "silver-back-wyrm", "max": 1, "respawn": 400 },
+      { "mob": "great-tremor-mole", "max": 1, "respawn": 300 }
+    ]
+  },
+  "d10.delvings.crosscut": {
+    "id": "d10.delvings.crosscut",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Silver Crosscut",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "A narrow crosscut driven off the great stope to chase a silver seam sideways through the rock. The seam is a good one, running strong and pale along the left-hand wall, and the pick-marks follow it hungrily — then stop, all at once, where the diggers plainly met something and turned back. The walls are scoured and gouged low down in long bright tracks, as though something has dragged itself along them again and again, feeding. The great stope opens back east.",
+    "exits": { "east": "d10.delvings.greatstope" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "silver-back-wyrm", "max": 1, "respawn": 400 },
+      { "mob": "shining-ooze", "max": 1, "respawn": 220 }
+    ]
+  },
+  "d10.delvings.silverface": {
+    "id": "d10.delvings.silverface",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Silver Face",
+    "depth": 10,
+    "ambientLight": 0,
+    "description": "The cut narrows to a single working face where the silver runs richest of all — a broad wall of raw ore shot through with seams so thick and bright they throw back a delver's light in cold sparks. It should be the prize of the whole mine. Instead the pick-marks stop dead a spear's-length short of it, and the reason is plain: something vast has denned against the face, a hunched ridge of fused ore and dull silver that only shifts and resolves into a living thing when it moves. This is where the deep-folk gave up the lower runs. Beyond it a winze drops away into the flooded dark; the great stope lies back west.",
+    "exits": { "west": "d10.delvings.greatstope", "down": "d11.delvings.winze" },
+    "fixtures": ["silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "oreback", "max": 1, "respawn": 1500 },
+      { "mob": "silver-back-wyrm", "max": 1, "respawn": 500 }
+    ]
+  },
+  "d11.delvings.winze": {
+    "id": "d11.delvings.winze",
+    "zone": "argent-delvings",
+    "biome": "umbral",
+    "name": "The Winze",
+    "depth": 11,
+    "ambientLight": 0,
+    "description": "A steep winze drops from the silver face into the deep of the mine, its walls slick and cold and running with the seep the dead pumps no longer hold back. Rotten ladder-stagings sag from the rock at intervals, too far gone to trust, so the way down is a scramble over wet, broken stone. The air turns heavy and mineral and cold, and far below a faint, restless brightness moves on the walls — light with no lamp behind it. The silver face lies back up; the winze bottoms out further down.",
+    "exits": { "up": "d10.delvings.silverface", "down": "d11.delvings.drowned" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "silver-back-wyrm", "max": 1, "respawn": 450 }
+    ]
+  },
+  "d11.delvings.drowned": {
+    "id": "d11.delvings.drowned",
+    "zone": "argent-delvings",
+    "biome": "water",
+    "name": "The Drowned Level",
+    "depth": 11,
+    "ambientLight": 0,
+    "tags": ["water"],
+    "description": "The bottom level of the delvings, and the deep has taken it back. Cold black water stands shin-deep across the whole worked floor, filling the drifts to the springing of their arches, and drowned ore-carts and the stubs of rotted timber break the surface here and there. Everything down here has a faint mirror-sheen to it — the water carries the same bright, silver-laced slime that creeps the lower faces, and it stirs and gleams where things move through it. The winze climbs back up; the water runs west into a deeper sump and south toward a bright, still glow.",
+    "exits": { "up": "d11.delvings.winze", "west": "d11.delvings.sump", "south": "d11.delvings.brightseam" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "shining-ooze", "max": 2, "respawn": 220 },
+      { "mob": "pale-crayfish", "max": 2, "respawn": 200 }
+    ]
+  },
+  "d11.delvings.sump": {
+    "id": "d11.delvings.sump",
+    "zone": "argent-delvings",
+    "biome": "water",
+    "name": "The Sump",
+    "depth": 11,
+    "ambientLight": 0,
+    "tags": ["water"],
+    "description": "The lowest point of the whole working, where all the deep's water gathers into a broad black pool the pumps were built to keep down. It is deep here, and cold, and utterly still but for the slow rings where something rises and sinks again below. The drowned walls run with bright slime, and the pool itself catches and holds a faint silver light in its depths, as though the bottom were paved with coin. Pale crayfish work the shallows at the water's edge. The drowned level lies back east.",
+    "exits": { "east": "d11.delvings.drowned" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "pale-crayfish", "max": 2, "respawn": 200 },
+      { "mob": "shining-ooze", "max": 1, "respawn": 240 }
+    ]
+  },
+  "d11.delvings.brightseam": {
+    "id": "d11.delvings.brightseam",
+    "zone": "argent-delvings",
+    "biome": "water",
+    "name": "The Bright Seam",
+    "depth": 11,
+    "ambientLight": 1,
+    "tags": ["water"],
+    "description": "Here at the deep end of the drowned level the delvings gave up their richest find, and never got to take it: a great seam where silver and raw glimmer run together through the rock, the glimmer breathing its cold blue-white light into the standing water so the whole flooded chamber glows without a lamp. It is a fortune in the wall, and it has cost every hand that reached for it. The water lies bright and shin-deep over the worked floor; the drowned level lies back north, and west the glow deepens toward a wide, still, mirror-bright pool that is not quite water.",
+    "exits": { "north": "d11.delvings.drowned", "west": "d11.delvings.mire" },
+    "fixtures": ["glimmer-vein", "silver-vein"],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "silver-back-wyrm", "max": 2, "respawn": 450 },
+      { "mob": "shining-ooze", "max": 1, "respawn": 240 }
+    ]
+  },
+  "d11.delvings.mire": {
+    "id": "d11.delvings.mire",
+    "zone": "argent-delvings",
+    "biome": "water",
+    "name": "The Brightmire",
+    "depth": 11,
+    "ambientLight": 2,
+    "tags": ["water"],
+    "description": "The drowned drifts run out into a wide, low chamber wholly given over to the thing that has grown at the bottom of the mine. It is not water. It is a still, mirror-bright flood of silver-laced slime, filling the chamber wall to wall and lighting itself a cold, sourceless blue-white off all the metal it has eaten — a whole drowned level dissolved and pooled and patient. It has no edge you would trust and no shape you could name, and where a delver's own reflection stares back up out of it, warped and waiting, it has already begun, very slowly, to come. The bright seam lies back east; there is no way on but through.",
+    "exits": { "east": "d11.delvings.brightseam" },
+    "fixtures": [],
+    "groundItems": [],
+    "spawns": [
+      { "mob": "the-brightmire", "max": 1, "respawn": 1500 },
+      { "mob": "shining-ooze", "max": 1, "respawn": 240 }
     ]
   }
 }

@@ -2646,5 +2646,28 @@
     "weight": 2,
     "value": 280,
     "armour": { "armour": 3, "ward": 2, "voidWard": 16, "speedPenalty": -1, "maxHp": 8, "attrMod": { "wits": 1 } }
+  },
+  "oreback-plate": {
+    "id": "oreback-plate",
+    "rarity": "epic",
+    "name": "Oreback's plate",
+    "keywords": ["plate", "oreback", "ore", "cuirass", "armour", "armor", "wyrm"],
+    "description": "A slab of the wyrm's own back, hacked free where the ore had fused thickest and beaten cold into a harness a body can wear. It is a rough, heavy, ridged grey shell, silver caught raw through the metal in dull veins, and it turns a blow like the mountain it came out of — but it rides as one rigid weight, and a delver under it trades wind and quickness for the shrugging-off of nearly anything. There is only the one, cut from the only Oreback there was.",
+    "type": "armour",
+    "slot": "body",
+    "weight": 6,
+    "value": 220,
+    "armour": { "armour": 4, "ward": 0, "speedPenalty": 2, "maxHp": 8, "attrMod": { "wits": -1 } }
+  },
+  "quicksilver-tear": {
+    "id": "quicksilver-tear",
+    "rarity": "rare",
+    "name": "a quicksilver tear",
+    "keywords": ["tear", "quicksilver", "silver", "bead", "reagent"],
+    "description": "A single heavy bead of the Brightmire's substance, gone still and cold in the hand — a mirror-bright drop of silver-laced quick that runs and gathers but never quite spills, throwing back a warped little image of whatever holds it. The deep-folk would know what to make of it; a Rim trader only knows it is worth the carrying, and light for what it fetches.",
+    "type": "material",
+    "weight": 1,
+    "value": 120,
+    "stackable": true
   }
 }
