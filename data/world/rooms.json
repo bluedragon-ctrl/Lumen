@@ -2101,7 +2101,7 @@
     "ambientLight": 3,
     "description": "The thread feeds a deep throat in the floor, and the throat keeps time. For long minutes it only mutters and steams, a black gullet welling slow with molten rock; then it draws a breath the whole room feels, and spits — a roaring column of fire-lit steam and glowing spatter flung to the roof, so bright and so sudden it prints itself on the eye — and falls back, and mutters, and begins again on the same patient count. Prospectors who have watched it swear it keeps the Abyss's own hours, quickening when the Tide runs high. The scalded rock all around is crusted white and gold with the salts the geyser leaves as it breathes. The molten thread runs back west; a low crawl north lifts toward warm basking-stone.",
     "exits": { "west": "d9.ember.firethread", "north": "d9.ember.pools" },
-    "fixtures": ["salt-crust"],
+    "fixtures": ["salt-crust", "fulgurite-vein"],
     "groundItems": [],
     "spawns": [
       { "mob": "vent-scorpion", "max": 1, "respawn": 240 }

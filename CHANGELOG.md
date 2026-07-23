@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **A seam of fulgurite in The Clockwork Geyser** (depth 9). The `fulgurite-vein` fixture now runs the wall of the geyser room, where the deep's old fires fused the rock — a fitting place to mine the raw glass the Umbrals work into cold-shining glimmerglass.
 - **The Umbral village qhatuq is now a working store, and the deep-folk keep a cold cuisine.** The market qhatuq (depth 10) sells the raw deep larder — oil, bug-tallow, palecap, witchglow cap, luminescent gland and blind cave-fish — plus a new **coldglow lamp** and the whole Umbral kitchen.
   - **`coldglow-lamp`** (uncommon) — a torch alternative the Umbrals use: a lightbug gland sealed cold behind horn, no flame. Casts only *dim* light (output 2), but burns far longer (1000 ticks/charge) and refuels on a `luminescent-gland` — a quiet stalking-light that draws less of the dark's notice than a bright torch.
   - **Umbral cold-cooking** — three no-fire foods with a `book of Umbral cooking` that teaches all three, and a new **`umbral-curing-bench`** cooking station in the market so a prospector can buy the book and the makings and cook on the spot: *cured challwa* (restore 9 HP / 2 mana), *witchglow relish* (a slow heal-over-time; the deep-folk's trick of leaching the cap safe), and a *glimmer ration* (mana-forward travel food, restore 12 mana / 4 HP). The foods are also sold ready-made.
