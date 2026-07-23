@@ -676,6 +676,40 @@
     "shards": 1,
     "output": { "template": "emberfruit-conserve", "qty": 2 }
   },
+  "cured-challwa": {
+    "id": "cured-challwa",
+    "name": "Cured Challwa",
+    "station": "cooking",
+    "inputs": [
+      { "template": "cave-fish", "qty": 2 },
+      { "template": "bug-tallow", "qty": 1 }
+    ],
+    "shards": 1,
+    "output": { "template": "cured-challwa", "qty": 1 }
+  },
+  "witchglow-relish": {
+    "id": "witchglow-relish",
+    "name": "Witchglow Relish",
+    "station": "cooking",
+    "inputs": [
+      { "template": "witchglow-cap", "qty": 2 },
+      { "template": "palecap-mushroom", "qty": 1 }
+    ],
+    "shards": 1,
+    "output": { "template": "witchglow-relish", "qty": 1 }
+  },
+  "glimmer-ration": {
+    "id": "glimmer-ration",
+    "name": "Glimmer Ration",
+    "station": "cooking",
+    "inputs": [
+      { "template": "luminescent-gland", "qty": 1 },
+      { "template": "palecap-mushroom", "qty": 2 },
+      { "template": "bug-tallow", "qty": 1 }
+    ],
+    "shards": 2,
+    "output": { "template": "glimmer-ration", "qty": 1 }
+  },
   "craft-glimmerwood-spear": {
     "id": "craft-glimmerwood-spear",
     "name": "Glimmerwood Spear",

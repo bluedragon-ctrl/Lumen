@@ -3248,7 +3248,7 @@
     "ambientLight": 2,
     "description": "West of the plaza the ground opens into the village market: worked-stone stalls under a ring of cold glimmer-lamps, and beds of tended crop breathing their soft blue-green light between them, so the produce grows where it is sold. A qhatuq keeps a stall of river-shell, folded silk, and dried cap, sorting the goods into even rows with long unhurried fingers. Lightbugs drift low over the stalls. It is a quiet trade — the deep-folk buy and sell among themselves, and let the surface-folk look. The plaza lies back east; a reagent-reek leaks from the glimmer-worker's west.",
     "exits": { "east": "d10.village.plaza", "west": "d10.village.glimmer", "south": "d10.proving.stair" },
-    "fixtures": ["umbral-coldlamp", "umbral-garden-beds"],
+    "fixtures": ["umbral-coldlamp", "umbral-garden-beds", "umbral-curing-bench"],
     "groundItems": [],
     "spawns": [
       { "mob": "umbral-qhatuq", "max": 1, "respawn": 600 },
