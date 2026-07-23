@@ -57,17 +57,30 @@ function weaponOf(world, player) {
 // commonest entry — a flat melee reflect — normalized here into an onDamage entry.
 const spikesEntry = (s) => ({ type: "damage", damage: s.damage, chance: s.chance, target: "attacker", cause: "spikes", on: ["melee"] });
 
-/** A mob's resolved onDamage triggers: explicit `onDamage` entries plus its
- *  `spikes` sugar (a reflect entry). */
-function mobOnDamage(t) {
+/** onDamage triggers carried by an actor's live status effects (players or mobs).
+ *  A timed buff — a Fire Shield potion, a warding weave — can author its own
+ *  `onDamage` entries, so a reflect that lasts only while the buff holds is
+ *  gathered here exactly as worn gear's triggers are. */
+function stateOnDamage(actor) {
+  const list = [];
+  if (actor && Array.isArray(actor.states))
+    for (const s of actor.states) if (Array.isArray(s.onDamage)) list.push(...s.onDamage);
+  return list;
+}
+
+/** A mob's resolved onDamage triggers: explicit `onDamage` entries, its `spikes`
+ *  sugar (a reflect entry), and any carried by live status effects. */
+function mobOnDamage(t, mob) {
   const list = Array.isArray(t.onDamage) ? [...t.onDamage] : [];
   if (t.spikes) list.push(spikesEntry(t.spikes));
+  list.push(...stateOnDamage(mob));
   return list;
 }
 
 /** A player's resolved onDamage triggers, gathered across equipped armour
- *  (`armour.onDamage` entries plus `armour.spikes` sugar). Lets gear punish or
- *  profit from being hit exactly as a mob does — none seeded yet. */
+ *  (`armour.onDamage` entries plus `armour.spikes` sugar) and any live status
+ *  effect that carries one (a drunk Fire Shield). Lets gear or a potion punish
+ *  a hit exactly as a mob does. */
 function playerOnDamage(world, player) {
   const list = [];
   for (const inst of Object.values(player.equipment || {})) {
@@ -77,6 +90,7 @@ function playerOnDamage(world, player) {
     if (Array.isArray(t.armour.onDamage)) list.push(...t.armour.onDamage);
     if (t.armour.spikes) list.push(spikesEntry(t.armour.spikes));
   }
+  list.push(...stateOnDamage(player));
   return list;
 }
 

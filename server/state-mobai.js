@@ -690,7 +690,7 @@ class MobAIMixin {
   _mobDefender(mob, mt, roomId, attacker, events) {
     return {
       actor: mob, kind: "mob", id: mob.id, name: mt.name, emitsLight: mt.emitsLight > 0, roomId,
-      onDamage: mobOnDamage(mt),
+      onDamage: mobOnDamage(mt, mob),
       sourceId: null, // a mob defender's retaliatory DoT credits no one
       // A landed blow: hp, threat and any kill resolve in the shared sink. Silent —
       // the `attack` event already narrated the hit.
