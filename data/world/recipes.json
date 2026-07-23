@@ -10,6 +10,18 @@
     "shards": 2,
     "output": { "template": "minor-light-potion", "qty": 1 }
   },
+  "light-potion": {
+    "id": "light-potion",
+    "name": "Light Potion",
+    "station": "alchemy",
+    "inputs": [
+      { "template": "luminescent-gland", "qty": 1 },
+      { "template": "spring-salt", "qty": 2 },
+      { "template": "vial", "qty": 1 }
+    ],
+    "shards": 3,
+    "output": { "template": "light-potion", "qty": 1 }
+  },
   "saltpetre-torch": {
     "id": "saltpetre-torch",
     "name": "Saltpetre Torch",

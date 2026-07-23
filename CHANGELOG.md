@@ -5,7 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- **Corvane's bench (Lastlight, depth 10) becomes the deep's practical caster-supply.** Moved the six utility/combat scrolls off Vesper the glimmer-mage (surface) down to Corvane — **Aegis, Purge, the Mending Chorus, Iron Blast, Iron Skin, Flame Burst** — so a delver already ten floors down can restock without the long climb. Also moved the **starsilver alloy schematic** from Tobin the tinker-smith to Corvane.
+
 ### Added
+- **A craftable full `light-potion`.** New alchemy recipe (`luminescent-gland ×1 + spring-salt ×2 + vial`, 3 shards) for the bright, long-lived light potion — the spring-salt scraped off the geyser terraces acts as the fixative that holds the glow, giving the previously-unused `spring-salt` a purpose. Sold as **`schematic-light-potion`** ("a light potion recipe") by Corvane at Lastlight.
 - **The Umbral village qhatuq is now a working store, and the deep-folk keep a cold cuisine.** The market qhatuq (depth 10) sells the raw deep larder — oil, bug-tallow, palecap, witchglow cap, luminescent gland and blind cave-fish — plus a new **coldglow lamp** and the whole Umbral kitchen.
   - **`coldglow-lamp`** (uncommon) — a torch alternative the Umbrals use: a lightbug gland sealed cold behind horn, no flame. Casts only *dim* light (output 2), but burns far longer (1000 ticks/charge) and refuels on a `luminescent-gland` — a quiet stalking-light that draws less of the dark's notice than a bright torch.
   - **Umbral cold-cooking** — three no-fire foods with a `book of Umbral cooking` that teaches all three, and a new **`umbral-curing-bench`** cooking station in the market so a prospector can buy the book and the makings and cook on the spot: *cured challwa* (restore 9 HP / 2 mana), *witchglow relish* (a slow heal-over-time; the deep-folk's trick of leaching the cap safe), and a *glimmer ration* (mana-forward travel food, restore 12 mana / 4 HP). The foods are also sold ready-made.
