@@ -1749,7 +1749,7 @@
     ],
     "shards": "2d6",
     "shop": {
-      "sells": [{ "template": "schematic-glimmerglass" }, { "template": "schematic-dense-chitin-cuirass" }]
+      "sells": [{ "template": "schematic-glimmerglass" }, { "template": "book-of-dense-chitin-craft", "price": 160 }]
     }
   },
   "umbral-sentry": {

@@ -353,6 +353,66 @@
     "shards": 12,
     "output": { "template": "dense-chitin-tower-shield", "qty": 1 }
   },
+  "forge-dense-chitin-helm": {
+    "id": "forge-dense-chitin-helm",
+    "name": "Dense Chitin Helm",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 2 },
+      { "template": "iron-bar", "qty": 1 },
+      { "template": "silver-bar", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "dense-chitin-helm", "qty": 1 }
+  },
+  "forge-dense-chitin-warplate": {
+    "id": "forge-dense-chitin-warplate",
+    "name": "Dense Chitin Warplate",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 5 },
+      { "template": "iron-bar", "qty": 2 },
+      { "template": "crystal", "qty": 1 }
+    ],
+    "shards": 16,
+    "output": { "template": "dense-chitin-warplate", "qty": 1 }
+  },
+  "forge-dense-chitin-maul": {
+    "id": "forge-dense-chitin-maul",
+    "name": "Dense Chitin Maul",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 3 },
+      { "template": "chitin-spike", "qty": 3 },
+      { "template": "spring-salt", "qty": 1 }
+    ],
+    "shards": 12,
+    "output": { "template": "dense-chitin-maul", "qty": 1 }
+  },
+  "forge-spiked-dense-chitin": {
+    "id": "forge-spiked-dense-chitin",
+    "name": "Spiked Dense Chitin",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 3 },
+      { "template": "chitin-spike", "qty": 4 },
+      { "template": "slug-slime", "qty": 1 }
+    ],
+    "shards": 12,
+    "output": { "template": "spiked-dense-chitin-armor", "qty": 1 }
+  },
+  "forge-dense-chitin-shield": {
+    "id": "forge-dense-chitin-shield",
+    "name": "Dense Chitin Shield",
+    "station": "smithing",
+    "inputs": [
+      { "template": "dense-chitin-plate", "qty": 2 },
+      { "template": "iron-bar", "qty": 1 },
+      { "template": "glimmer-dust", "qty": 1 }
+    ],
+    "shards": 10,
+    "output": { "template": "dense-chitin-shield", "qty": 1 }
+  },
   "forge-heavy-chitin-plate": {
     "id": "forge-heavy-chitin-plate",
     "name": "Heavy Chitin Plate",
