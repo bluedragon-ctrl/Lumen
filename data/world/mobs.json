@@ -3155,5 +3155,134 @@
         "chance": 0.3
       }
     ]
+  },
+  "silver-back-wyrm": {
+    "id": "silver-back-wyrm",
+    "faction": "fauna",
+    "name": "a silver-back wyrm",
+    "keywords": ["wyrm", "silver-back", "silverback", "burrower"],
+    "description": "A heavy, blunt-headed burrower that has spent its life grinding through the silver face — and worn the face into itself. Raw ore has crusted along its back and flanks in fused grey plates, a living scab of metal it drags through the dark. It is slow and half-blind and does not hurry, because nothing down here has ever made it.",
+    "spawnMessage": "Stone grinds on stone, and {name} hauls its ore-crusted bulk out of the rock.",
+    "maxHp": 44,
+    "speed": 14,
+    "armour": 6,
+    "ward": 1,
+    "attributes": { "might": 11, "vitality": 14, "intellect": 1, "wits": 3, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": { "damage": "2d6", "actionCost": 16 },
+    "xp": 30,
+    "shards": "1d4",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["grinds its ore-fused plates against the face", "swings its blunt metal head slow toward your warmth", "drags itself a body's-length through the broken rock"] }
+    ],
+    "loot": [{ "template": "silver-ore", "chance": 0.7 }, { "template": "crystal", "chance": 0.2 }]
+  },
+  "great-tremor-mole": {
+    "id": "great-tremor-mole",
+    "faction": "fauna",
+    "name": "a great tremor-mole",
+    "keywords": ["mole", "tremor-mole", "tremor", "burrower"],
+    "description": "A tremor-mole grown to the size of a haulage-cart, its digging claws worn to chisels on the ore. It does not startle and dig away like its smaller kin — it has learned the mine, and it comes up under the warmth it feels through the rock.",
+    "spawnMessage": "The floor heaves and cracks, and {name} surfaces claws-first.",
+    "maxHp": 28,
+    "speed": 12,
+    "armour": 2,
+    "ward": 0,
+    "attributes": { "might": 8, "vitality": 9, "intellect": 1, "wits": 5, "perception": 8 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 6 },
+    "behavior": "hunt",
+    "hostile": true,
+    "attack": { "damage": "1d8+1", "actionCost": 13 },
+    "xp": 16,
+    "shards": "1d3",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["reads the stone with a shudder of its whiskers", "rakes the rock with worn chisel-claws", "noses blindly toward the warmth of you"] }
+    ],
+    "loot": []
+  },
+  "shining-ooze": {
+    "id": "shining-ooze",
+    "faction": "fauna",
+    "name": "a shining ooze",
+    "keywords": ["ooze", "shining", "slime"],
+    "description": "A slick of pale, mirror-bright slime creeping the ore faces, so laced with the silver it has eaten that it throws your own light back at you. It leaves a scoured, gleaming trail where it feeds, and it feeds on anything with metal in it — pick, blade, or the ore itself.",
+    "spawnMessage": "{Name} wells up out of a seam, catching the light in a mirror-bright sheen.",
+    "maxHp": 22,
+    "speed": 8,
+    "armour": 0,
+    "ward": 2,
+    "attributes": { "might": 6, "vitality": 8, "intellect": 0, "wits": 2, "perception": 3 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 8 },
+    "behavior": "wander",
+    "hostile": true,
+    "attack": { "damage": "1d6", "actionCost": 13 },
+    "xp": 14,
+    "shards": "2d3",
+    "actions": [
+      { "type": "attack", "weight": 6 },
+      { "type": "idle", "weight": 3 },
+      { "type": "emote", "weight": 2, "messages": ["humps toward you, throwing your own light back bright", "scours a gleaming trail across the ore", "swells and glints, dripping bright slime from every seam"] }
+    ],
+    "loot": [{ "template": "silver-ore", "chance": 0.5 }]
+  },
+  "oreback": {
+    "id": "oreback",
+    "name": "Oreback",
+    "keywords": ["oreback", "wyrm", "boss", "silver-back", "silverback"],
+    "description": "The oldest thing in the delvings, and the reason the deep-folk gave the lower runs back to the dark. A silver-back wyrm grown vast past all its kin, so long in the seam that it is half seam itself — its back a hunched ridge of fused ore, its head a battering ram of solid grey metal. It has made the silver face its den, and it does not give ground. The pick-marks stop where it begins.",
+    "spawnMessage": "The whole face shudders, and {name} heaves its mountain of ore-crusted bulk into the cut.",
+    "maxHp": 160,
+    "speed": 15,
+    "armour": 9,
+    "ward": 2,
+    "attributes": { "might": 14, "vitality": 22, "intellect": 1, "wits": 3, "perception": 5 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 3 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": {
+      "pierce": 4,
+      "damage": "3d6",
+      "actionCost": 16,
+      "onHit": [{ "type": "damage-over-time", "damageType": "physical", "name": "crush", "damage": "1d4", "duration": 4, "chance": 0.4 }]
+    },
+    "xp": 80,
+    "shards": "4d6",
+    "actions": [
+      { "type": "attack", "weight": 8 },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["grinds its ore-ridged back against the roof of the cut, and dust rains down", "swings its battering-ram head in a slow, certain arc", "sets its fused plates and refuses the ground a hand's-breadth"] }
+    ],
+    "loot": [{ "template": "silver-ore", "chance": 1 }, { "template": "crystal", "chance": 0.6 }, { "template": "oreback-plate", "chance": 1 }]
+  },
+  "the-brightmire": {
+    "id": "the-brightmire",
+    "name": "the Brightmire",
+    "keywords": ["brightmire", "mire", "ooze", "boss", "slime"],
+    "description": "The flooded sink at the bottom of the delvings is not water. It is a wide, still, mirror-bright pool of the same silver-laced slime the lesser oozes weep — a whole drowned level dissolved and pooled and hungry, so bright with eaten silver it lights its own pit. It has no front and no back; when you strike it, it parts around the blow and comes back together, and a piece of it always breaks away to come at you from the side.",
+    "spawnMessage": "The bright pool shivers along its whole length and gathers itself toward you.",
+    "maxHp": 150,
+    "speed": 10,
+    "armour": 2,
+    "ward": 4,
+    "attributes": { "might": 12, "vitality": 20, "intellect": 0, "wits": 2, "perception": 4 },
+    "perception": { "blindBelow": 0, "dimBelow": 0, "harmedAbove": 8 },
+    "behavior": "guard",
+    "hostile": true,
+    "attack": { "damage": "2d6", "actionCost": 13 },
+    "xp": 76,
+    "shards": "4d6",
+    "actions": [
+      { "type": "attack", "weight": 7 },
+      { "type": "summon", "weight": 3, "mob": "shining-ooze", "count": 1, "max": 3, "verb": "shivers, and a bright gobbet peels off the surface and humps toward you" },
+      { "type": "idle", "weight": 2 },
+      { "type": "emote", "weight": 2, "messages": ["parts around a blow that finds nothing and closes again", "floods a little wider across the drowned stone, hissing bright", "throws back the light of you in a hundred running mirrors"] }
+    ],
+    "loot": [{ "template": "silver-ore", "chance": 1 }, { "template": "crystal", "chance": 1 }, { "template": "glimmer-dust", "chance": 0.7 }, { "template": "quicksilver-tear", "chance": 1 }]
   }
 }

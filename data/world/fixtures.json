@@ -609,5 +609,13 @@
       "open": false,
       "key": "amaru-fang"
     }
+  },
+  "delvings-coldlamp": {
+    "id": "delvings-coldlamp",
+    "name": "a shuttered glimmer-lamp",
+    "keywords": ["lamp", "glimmer-lamp", "shutter", "coldlamp", "umbral"],
+    "description": "An Umbral cold glimmer-lamp in its carved stone cradle, the same the deep-folk light their halls by — but the sliding stone shutter is drawn full across it, and the knot of glimmer inside sits hooded and dark. The last hand out of this camp closed it, the way you bank a fire you mean to come back to. Fewer come back each season now. Slide the shutter and it will breathe its cold blue-white light again.",
+    "type": "switch",
+    "switch": { "emitsLight": 4, "on": false }
   }
 }
