@@ -1296,6 +1296,17 @@
     "recipe": "regeneration-draught",
     "rarity": "uncommon"
   },
+  "schematic-light-potion": {
+    "id": "schematic-light-potion",
+    "name": "a light potion recipe",
+    "description": "A char-edged page in Corvane's sprawling hand — a lightbug's gland cut and wept out, then set with a double measure of spring-salt scraped off the hot terraces, which he swears is the trick that holds the glow bright and long instead of letting it gutter. Study it to fix the method in memory.",
+    "type": "recipe",
+    "weight": 0,
+    "value": 45,
+    "stackable": true,
+    "recipe": "light-potion",
+    "rarity": "uncommon"
+  },
   "schematic-mana-tonic": {
     "id": "schematic-mana-tonic",
     "name": "a mana tonic recipe",
